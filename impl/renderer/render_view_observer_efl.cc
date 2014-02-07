@@ -17,12 +17,16 @@
 #include "third_party/WebKit/public/web/WebDocument.h"
 #include "third_party/WebKit/public/web/WebElement.h"
 #include "third_party/WebKit/public/web/WebFrame.h"
-#include "third_party/WebKit/public/web/WebFontCache.h"
 #include "third_party/WebKit/public/web/WebFrame.h"
 #include "third_party/WebKit/public/web/WebHitTestResult.h"
 #include "third_party/WebKit/public/web/WebPageSerializer.h"
 #include "third_party/WebKit/public/web/WebView.h"
 #include "third_party/WebKit/public/web/WebNodeList.h"
+
+// XXX: config.h needs to be included before internal blink headers.
+//      It'd be great if we did not include not internal blibk headers.
+#include "third_party/WebKit/Source/config.h"
+#include "third_party/WebKit/Source/platform/fonts/FontCache.h"
 
 namespace {
 
@@ -64,11 +68,11 @@ void PopulateEwkHitTestData(const blink::WebHitTestResult& web_hit_test, Ewk_Hit
 
   int context = EWK_HIT_TEST_RESULT_CONTEXT_DOCUMENT;
   if (!web_hit_test.absoluteLinkURL().isEmpty())
-    context |= EWK_HIT_TEST_RESULT_CONTEXT_LINK;
+    context |= TW_HIT_TEST_RESULT_CONTEXT_LINK;
   if (!web_hit_test.absoluteImageURL().isEmpty())
-    context |= EWK_HIT_TEST_RESULT_CONTEXT_IMAGE;
+    context |= TW_HIT_TEST_RESULT_CONTEXT_IMAGE;
   if (!web_hit_test.absoluteMediaURL().isEmpty())
-    context |= EWK_HIT_TEST_RESULT_CONTEXT_MEDIA;;
+    context |= TW_HIT_TEST_RESULT_CONTEXT_MEDIA;;
   if (web_hit_test.isSelected())
     context |= EWK_HIT_TEST_RESULT_CONTEXT_SELECTION;
   if (web_hit_test.isContentEditable())
@@ -179,8 +183,7 @@ void RenderViewObserverEfl::OnSetScroll(int x, int y)
 
 void RenderViewObserverEfl::OnUseSettingsFont()
 {
-  if (!blink::WebFontCache::clearIfContainsTizenSystemFont())
-    return;
+  WebCore::FontCache::fontCache()->invalidate();
 
   blink::WebView* view = render_view()->GetWebView();
   if (view)

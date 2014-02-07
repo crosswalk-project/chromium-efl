@@ -3,15 +3,17 @@
 #include "base/allocator/allocator_extension.h"
 #include "content/public/renderer/render_thread.h"
 #include "third_party/WebKit/public/web/WebCache.h"
-#include "third_party/WebKit/public/web/WebCrossOriginPreflightResultCache.h"
-#include "third_party/WebKit/public/web/WebFontCache.h"
 #include "third_party/sqlite/sqlite3.h"
 #include "v8/include/v8.h"
 #include "renderer/content_renderer_client_efl.h"
 
+// XXX:  config.h needs to be included before internal blink headers.
+// XXX2: It'd be great if we did not include internal blibk headers.
+#include "third_party/WebKit/Source/config.h"
+#include "third_party/WebKit/Source/platform/fonts/FontCache.h"
+
+
 using blink::WebCache;
-using blink::WebFontCache;
-using blink::WebCrossOriginPreflightResultCache;
 using content::RenderThread;
 
 bool RenderProcessObserverEfl::OnControlMessageReceived(const IPC::Message& message)
@@ -69,9 +71,7 @@ void RenderProcessObserverEfl::OnPurgeMemory()
   // freed).
   OnClearCache();
   // Clear the font/glyph cache.
-  WebFontCache::clear();
-  // Clear the Cross-Origin Preflight cache.
-  blink::WebCrossOriginPreflightResultCache::clear();
+  WebCore::FontCache::fontCache()->invalidate();
   // TODO(pk): currently web process not linking sqlite. when used this should enable
   // Release all freeable memory from the SQLite process-global page cache (a
   // low-level object which backs the Connection-specific page caches).
