@@ -1,0 +1,21 @@
+#!/bin/sh
+# Copyright (c) 2012 The Chromium Authors. All rights reserved.
+# Use of this source code is governed by a BSD-style license that can be
+# found in the LICENSE file.
+
+# Wrapper script named "ld" that either executes gold or the system linker.
+
+# The gold binaries are built on 64-bit Ubuntu Lucid and 32-bit Ubuntu Lucid,
+# for x86_64 and i686, respectively.
+# Note that we do not use "uname -m" because it prints the kernel architecture,
+# which can cause failures on 64-bit kernels with 32-bit userlands.
+
+base_dir=$(dirname "$0")
+host_arch=$(uname -m | sed -e \
+        's/i.86/ia32/;s/x86_64/x64/;s/amd64/x64/;s/arm.*/arm/;s/i86pc/ia32/')
+if [ "$host_arch" == "arm" ]; then
+    exec $base_dir/gold64 "$@"
+else
+    echo Arm gold linker used on on non-arm architecture.
+    exit 1
+fi

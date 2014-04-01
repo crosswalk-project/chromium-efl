@@ -1,0 +1,10 @@
+prefix=/usr
+exec_prefix=${prefix}
+libdir=${prefix}/lib
+includedir=${prefix}/include
+
+Name: chromium-efl
+Description: Chromium EFL port
+Version: ?VERSION?
+Libs: -L${libdir} -lchromium-efl
+Cflags: -I${includedir}/v8

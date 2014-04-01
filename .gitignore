@@ -1,0 +1,6 @@
+*.o
+*.orig
+/*.list
+/out.*
+/packaging/*.tar.gz
+/build/TARGET

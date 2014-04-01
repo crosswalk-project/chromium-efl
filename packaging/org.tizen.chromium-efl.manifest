@@ -1,0 +1,27 @@
+<manifest>
+  <define>
+    <domain name="chromium-efl" policy="shared" />
+    <permit>
+      <smack permit="com.samsung.app-tray" type="rwx" />
+      <smack permit="e17" type="rwx" />
+      <smack permit="system::use_internet" type="w" />
+    </permit>
+    <request>
+      <smack request="ail::db" type="rw" />
+      <smack request="dbus" type="rwx" />
+      <smack request="com.samsung.indicator" type="rw" />
+      <smack request="system::vconf" type="rwxat" />
+      <smack request="system::media" type="rwxat" />
+      <smack request="system::share" type="rwxat" />
+      <smack request="system::use_internet" type="rw" />
+      <smack request="system::homedir" type="rwxat" />
+      <smack request="xorg" type="rw" />
+    </request>
+  </define>
+  <request>
+    <domain name="_"/>
+  </request>
+  <assign>
+    <filesystem path="/usr/lib/org.tizen.chromium-efl/efl_webprocess" label="chromium-efl" exec_label="chromium-efl"/>
+  </assign>
+</manifest>

@@ -1,0 +1,20 @@
+{
+  global:
+    extern "C++" {
+      EWebView::*;
+      EWebContext::*;
+      content::NotificationControllerEfl::*;
+      ewk_ipc_*;
+    };
+
+    # ContentMain constructor
+    _ZN7content11ContentMainEiPPKcPNS_19ContentMainDelegateE;
+    # vtables for WebProcessContentMainDelegateEfl and ContentMainDelegate
+    _ZTVN7content32WebProcessContentMainDelegateEflE;
+    _ZTVN7content19ContentMainDelegateE;
+
+# TODO: hide all symbols not needed by the embedding API and efl_webprocess
+#  local:
+#    *;
+};
+
