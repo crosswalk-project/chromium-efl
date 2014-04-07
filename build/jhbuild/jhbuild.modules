@@ -10,6 +10,14 @@
       <dep package="eina"/>
       <dep package="eet"/>
       <dep package="elm"/>
+      <dep package="glib"/>
+      <dep package="glib-networking"/>
+      <dep package="gstreamer"/>
+      <dep package="gst-plugins-base"/>
+      <dep package="gst-plugins-good"/>
+      <dep package="gst-plugins-ugly"/>
+      <dep package="gst-plugins-bad"/>
+      <dep package="gst-ffmpeg"/>
     </dependencies>
   </metamodule>
 
@@ -17,6 +25,14 @@
       href="http://download.enlightenment.org"/>
   <repository type="tarball" name="ftp.gnome.org"
       href="http://ftp.gnome.org"/>
+  <repository type="git" name="git.gnome.org"
+      href="http://git.gnome.org/"/>
+  <repository type="tarball" name="gstreamer"
+      href="http://gstreamer.freedesktop.org/src/"/>
+  <repository type="tarball" name="sourceware.org"
+      href="ftp://sourceware.org"/>
+  <repository type="tarball" name="code.entropywave.com"
+      href="http://code.entropywave.com/download/"/>
 
   <autotools id="eina" autogen-sh="configure">
     <branch module="releases/eina-1.7.5.tar.bz2" version="1.7.5"
@@ -99,6 +115,118 @@
       <dep package="ecore"/>
       <dep package="edje"/>
     </dependencies>
+  </autotools>
+
+  <autotools id="libffi" autogen-sh="configure">
+    <branch module="/pub/libffi/libffi-3.0.11.tar.gz" version="3.0.11"
+            repo="sourceware.org"
+            hash="sha256:70bfb01356360089aa97d3e71e3edf05d195599fd822e922e50d46a0055a6283"
+            md5sum="f69b9693227d976835b4857b1ba7d0e3"/>
+  </autotools>
+
+  <autotools id="glib"
+             autogen-sh="configure"
+             autogenargs="--disable-dtrace">
+    <dependencies>
+      <dep package="libffi"/>
+    </dependencies>
+    <branch module="/pub/GNOME/sources/glib/2.36/glib-2.36.0.tar.xz" version="2.36.0"
+            repo="ftp.gnome.org"
+            hash="sha256:455a8abe8692c5174bcc7ffa15b96a7521a2f2f9fb47594405927c35cb9bb227"/>
+  </autotools>
+
+  <autotools id="glib-networking">
+    <dependencies>
+      <dep package="glib"/>
+    </dependencies>
+    <branch module="/pub/GNOME/sources/glib-networking/2.33/glib-networking-2.33.2.tar.xz" version="2.33.2"
+            repo="ftp.gnome.org"
+            hash="e298cff3935eb752be290bbf734e457f1870bdb5370ee292606e6040a82074e7"
+            md5sum="5abb364f2a0babe2ec1e3a6d59f69043"/>
+  </autotools>
+
+  <autotools id="libsoup"
+             autogen-sh="configure"
+             autogenargs="--without-gnome --disable-introspection">
+    <dependencies>
+      <dep package="glib-networking"/>
+    </dependencies>
+    <branch module="/pub/gnome/sources/libsoup/2.42/libsoup-2.42.0.tar.xz" version="2.42.0"
+            repo="ftp.gnome.org"
+            hash="sha256:9e0e7eb5d3f7401ccf521fbc289fc1fa0923b7c7833729e2ed7696f7b848893e">
+    </branch>
+  </autotools>
+
+  <autotools id="orc" autogen-sh="configure">
+    <branch module="orc/orc-0.4.18.tar.gz" version="0.4.18"
+            repo="code.entropywave.com"
+            hash="sha256:34d3c8a7259f42bed4dcfbc106c5e3d0cc8e17eeaa73128d1c5eaf92883a6a24">
+    </branch>
+  </autotools>
+
+  <autotools id="gstreamer"
+             autogen-sh="configure"
+             autogenargs="--disable-examples --disable-tests --disable-failing-tests">
+    <branch repo="gstreamer"
+            module="gstreamer/gstreamer-0.10.36.tar.xz" version="0.10.36"
+            hash="md5:15389c73e091b1dda915279c388b9cb2"/>
+  </autotools>
+
+  <autotools id="gst-plugins-base"
+             autogen-sh="configure"
+             autogenargs="--disable-examples --enable-iso-codes --enable-theora --enable-vorbis">
+    <dependencies>
+      <dep package="gstreamer"/>
+    </dependencies>
+    <branch repo="gstreamer"
+            module="gst-plugins-base/gst-plugins-base-0.10.36.tar.xz" version="0.10.36"
+            hash="md5:3d2337841b132fe996e5eb2396ac9438"/>
+  </autotools>
+
+  <autotools id="gst-plugins-good"
+             autogen-sh="configure"
+             autogenargs="--disable-examples --enable-pulse">
+    <dependencies>
+      <dep package="gst-plugins-base"/>
+      <dep package="libsoup"/>
+    </dependencies>
+    <branch repo="gstreamer"
+            module="gst-plugins-good/gst-plugins-good-0.10.31.tar.xz" version="0.10.31"
+            hash="md5:555845ceab722e517040bab57f9ace95"/>
+  </autotools>
+
+  <autotools id="gst-plugins-ugly"
+             autogen-sh="configure"
+             autogenargs="--disable-examples">
+    <dependencies>
+      <dep package="gst-plugins-base"/>
+    </dependencies>
+    <branch repo="gstreamer"
+            module="gst-plugins-ugly/gst-plugins-ugly-0.10.19.tar.xz" version="0.10.19"
+            hash="md5:ba26045c8c8c91f0d48d327ccf53ac0c"/>
+  </autotools>
+
+  <autotools id="gst-plugins-bad"
+             autogen-sh="configure"
+             autogenargs="--disable-examples --enable-faad">
+    <dependencies>
+      <dep package="gst-plugins-base"/>
+    </dependencies>
+    <branch repo="gstreamer"
+            module="gst-plugins-bad/gst-plugins-bad-0.10.23.tar.xz" version="0.10.23"
+            hash="md5:e4822fa2cc933768e2998311a1565979"/>
+  </autotools>
+
+  <autotools id="gst-ffmpeg"
+             autogen-sh="configure"
+             autogenargs="--with-ffmpeg-extra-configure='--disable-yasm'">
+    <dependencies>
+      <dep package="gst-plugins-base"/>
+      <dep package="orc"/>
+    </dependencies>
+    <branch repo="gstreamer"
+            module="gst-ffmpeg/gst-ffmpeg-0.10.13.tar.gz" version="0.10.13"
+            hash="md5:3e52d69a15d42f0a11abfc02f80effa1"/>
   </autotools>
 
 </moduleset>

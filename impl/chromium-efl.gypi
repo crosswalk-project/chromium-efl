@@ -26,6 +26,10 @@
       '<!@(<(pkg-config) --cflags ecore-imf-evas)',
       '<!@(<(pkg-config) --cflags evas)',
       '<!@(<(pkg-config) --cflags elementary)',
+      '<!@(<(pkg-config) --cflags glib-2.0)',
+      '<!@(<(pkg-config) --cflags gstreamer-0.10)',
+      '<!@(<(pkg-config) --cflags gstreamer-base-0.10)',
+      '<!@(<(pkg-config) --cflags gstreamer-app-0.10)',
     ],
     'link_settings': {
       'ldflags': [
@@ -36,6 +40,10 @@
         '<!@(<(pkg-config) --libs-only-L --libs-only-other ecore-imf-evas)',
         '<!@(<(pkg-config) --libs-only-L --libs-only-other evas)',
         '<!@(<(pkg-config) --libs-only-L --libs-only-other elementary)',
+        '<!@(<(pkg-config) --libs-only-L --libs-only-other glib-2.0)',
+        '<!@(<(pkg-config) --libs-only-L --libs-only-other gstreamer-0.10)',
+        '<!@(<(pkg-config) --libs-only-L --libs-only-other gstreamer-base-0.10)',
+        '<!@(<(pkg-config) --libs-only-L --libs-only-other gstreamer-app-0.10)',
       ],
       'libraries': [
         '<!@(<(pkg-config) --libs-only-l ecore)',
@@ -45,6 +53,10 @@
         '<!@(<(pkg-config) --libs-only-l ecore-imf-evas)',
         '<!@(<(pkg-config) --libs-only-l evas)',
         '<!@(<(pkg-config) --libs-only-l elementary)',
+        '<!@(<(pkg-config) --libs-only-l glib-2.0)',
+        '<!@(<(pkg-config) --libs-only-l gstreamer-0.10)',
+        '<!@(<(pkg-config) --libs-only-l gstreamer-base-0.10)',
+        '<!@(<(pkg-config) --libs-only-l gstreamer-app-0.10)',
       ],
     },
     # use_aura is enabled but clipboard_efl.cc implements clipboard.

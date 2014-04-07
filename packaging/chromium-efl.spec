@@ -65,6 +65,9 @@ BuildRequires: pkgconfig(zlib)
 BuildRequires: bzip2-devel
 BuildRequires: pkgconfig(vpx)
 %endif
+BuildRequires: pkgconfig(gstreamer-0.10)
+BuildRequires: pkgconfig(gstreamer-plugins-base-0.10)
+BuildRequires: pkgconfig(gstreamer-app-0.10)
 
 %description
 Browser Engine based on Chromium EFL (Shared Library)
