@@ -4,6 +4,15 @@
 
 #include "browser/renderer_host/render_widget_host_view_efl.h"
 
+#include "base/auto_reset.h"
+#include "base/basictypes.h"
+#include "base/bind.h"
+#include "base/callback_helpers.h"
+#include "base/command_line.h"
+#include "base/debug/trace_event.h"
+#include "base/message_loop/message_loop.h"
+#include "base/strings/string_number_conversions.h"
+
 #include "base/logging.h"
 #include "base/strings/utf_string_conversions.h"
 #include "browser/renderer_host/im_context_efl.h"
@@ -13,11 +22,17 @@
 #include "content/browser/renderer_host/ui_events_helper.h"
 #include "content/browser/renderer_host/event_with_latency_info.h"
 #include "content/public/browser/browser_thread.h"
+#include "content/browser/renderer_host/dip_util.h"
+#include "content/common/gpu/client/gl_helper.h"
+#include "content/public/browser/render_widget_host_view_frame_subscriber.h"
+#include "content/public/common/content_switches.h"
 #include "content/common/view_messages.h"
 #include "content/common/gpu/gpu_messages.h"
 #include "common/render_messages_efl.h"
 #include "eweb_context.h"
+#include "media/base/video_util.h"
 #include "selection_controller_efl.h"
+#include "skia/ext/image_operations.h"
 #include "third_party/WebKit/public/web/WebInputEvent.h"
 #include "third_party/WebKit/public/platform/WebScreenInfo.h"
 #include "third_party/WebKit/public/web/WebTouchPoint.h"
@@ -309,6 +324,187 @@ void RenderWidgetHostViewEfl::CopyFromCompositingSurface(
   // host_->GetSnapshotFromRenderer(src_subrect, callback);
 }
 
+// CopyFromCompositingSurfaceToVideoFrame implementation borrowed from Aura port
+bool RenderWidgetHostViewEfl::CanSubscribeFrame() const {
+  return true;
+}
+
+void RenderWidgetHostViewEfl::BeginFrameSubscription(
+    scoped_ptr<RenderWidgetHostViewFrameSubscriber> subscriber) {
+  frame_subscriber_ = subscriber.Pass();
+}
+
+void RenderWidgetHostViewEfl::EndFrameSubscription() {
+  idle_frame_subscriber_textures_.clear();
+  frame_subscriber_.reset();
+}
+
+void RenderWidgetHostViewEfl::ReturnSubscriberTexture(
+    base::WeakPtr<RenderWidgetHostViewEfl> rwhvefl,
+    scoped_refptr<OwnedMailbox> subscriber_texture,
+    uint32 sync_point) {
+  if (!subscriber_texture.get())
+    return;
+  if (!rwhvefl)
+    return;
+  DCHECK_NE(
+      rwhvefl->active_frame_subscriber_textures_.count(subscriber_texture.get()),
+      0u);
+
+  subscriber_texture->UpdateSyncPoint(sync_point);
+
+  rwhvefl->active_frame_subscriber_textures_.erase(subscriber_texture.get());
+  if (rwhvefl->frame_subscriber_ && subscriber_texture->texture_id())
+    rwhvefl->idle_frame_subscriber_textures_.push_back(subscriber_texture);
+}
+
+void RenderWidgetHostViewEfl::CopyFromCompositingSurfaceFinishedForVideo(
+    base::WeakPtr<RenderWidgetHostViewEfl> rwhvefl,
+    const base::Callback<void(bool)>& callback,
+    scoped_refptr<OwnedMailbox> subscriber_texture,
+    scoped_ptr<cc::SingleReleaseCallback> release_callback,
+    bool result) {
+  callback.Run(result);
+
+  GLHelper* gl_helper = ImageTransportFactory::GetInstance()->GetGLHelper();
+  uint32 sync_point = gl_helper ? gl_helper->InsertSyncPoint() : 0;
+  if (release_callback) {
+    // A release callback means the texture came from the compositor, so there
+    // should be no |subscriber_texture|.
+    DCHECK(!subscriber_texture);
+    release_callback->Run(sync_point, false);
+  }
+  ReturnSubscriberTexture(rwhvefl, subscriber_texture, sync_point);
+}
+
+void RenderWidgetHostViewEfl::CopyFromCompositingSurfaceHasResultForVideo(
+    base::WeakPtr<RenderWidgetHostViewEfl> rwhvefl,
+    scoped_refptr<OwnedMailbox> subscriber_texture,
+    scoped_refptr<media::VideoFrame> video_frame,
+    const base::Callback<void(bool)>& callback,
+    scoped_ptr<cc::CopyOutputResult> result) {
+  base::ScopedClosureRunner scoped_callback_runner(base::Bind(callback, false));
+  base::ScopedClosureRunner scoped_return_subscriber_texture(
+      base::Bind(&ReturnSubscriberTexture, rwhvefl, subscriber_texture, 0));
+
+  if (!rwhvefl)
+    return;
+  if (result->IsEmpty())
+    return;
+  if (result->size().IsEmpty())
+    return;
+
+  // Compute the dest size we want after the letterboxing resize. Make the
+  // coordinates and sizes even because we letterbox in YUV space
+  // (see CopyRGBToVideoFrame). They need to be even for the UV samples to
+  // line up correctly.
+  // The video frame's coded_size() and the result's size() are both physical
+  // pixels.
+  gfx::Rect region_in_frame =
+      media::ComputeLetterboxRegion(gfx::Rect(video_frame->coded_size()),
+                                    result->size());
+  region_in_frame = gfx::Rect(region_in_frame.x() & ~1,
+                              region_in_frame.y() & ~1,
+                              region_in_frame.width() & ~1,
+                              region_in_frame.height() & ~1);
+  if (region_in_frame.IsEmpty())
+    return;
+
+  if (!result->HasTexture()) {
+    DCHECK(result->HasBitmap());
+    scoped_ptr<SkBitmap> bitmap = result->TakeBitmap();
+    // Scale the bitmap to the required size, if necessary.
+    SkBitmap scaled_bitmap;
+    if (result->size().width() != region_in_frame.width() ||
+        result->size().height() != region_in_frame.height()) {
+      skia::ImageOperations::ResizeMethod method =
+          skia::ImageOperations::RESIZE_GOOD;
+      scaled_bitmap = skia::ImageOperations::Resize(*bitmap.get(), method,
+                                                    region_in_frame.width(),
+                                                    region_in_frame.height());
+    } else {
+      scaled_bitmap = *bitmap.get();
+    }
+
+    {
+      SkAutoLockPixels scaled_bitmap_locker(scaled_bitmap);
+
+      media::CopyRGBToVideoFrame(
+          reinterpret_cast<uint8*>(scaled_bitmap.getPixels()),
+          scaled_bitmap.rowBytes(),
+          region_in_frame,
+          video_frame.get());
+    }
+    ignore_result(scoped_callback_runner.Release());
+    callback.Run(true);
+    return;
+  }
+
+  ImageTransportFactory* factory = ImageTransportFactory::GetInstance();
+  GLHelper* gl_helper = factory->GetGLHelper();
+  if (!gl_helper)
+    return;
+  if (subscriber_texture.get() && !subscriber_texture->texture_id())
+    return;
+
+  cc::TextureMailbox texture_mailbox;
+  scoped_ptr<cc::SingleReleaseCallback> release_callback;
+  result->TakeTexture(&texture_mailbox, &release_callback);
+  DCHECK(texture_mailbox.IsTexture());
+  if (!texture_mailbox.IsTexture())
+    return;
+
+  gfx::Rect result_rect(result->size());
+
+  content::ReadbackYUVInterface* yuv_readback_pipeline =
+      rwhvefl->yuv_readback_pipeline_.get();
+  if (yuv_readback_pipeline == NULL ||
+      yuv_readback_pipeline->scaler()->SrcSize() != result_rect.size() ||
+      yuv_readback_pipeline->scaler()->SrcSubrect() != result_rect ||
+      yuv_readback_pipeline->scaler()->DstSize() != region_in_frame.size()) {
+    GLHelper::ScalerQuality quality = GLHelper::SCALER_QUALITY_FAST;
+    std::string quality_switch = switches::kTabCaptureDownscaleQuality;
+    // If we're scaling up, we can use the "best" quality.
+    if (result_rect.size().width() < region_in_frame.size().width() &&
+        result_rect.size().height() < region_in_frame.size().height())
+      quality_switch = switches::kTabCaptureUpscaleQuality;
+
+    std::string switch_value =
+        CommandLine::ForCurrentProcess()->GetSwitchValueASCII(quality_switch);
+    if (switch_value == "fast")
+      quality = GLHelper::SCALER_QUALITY_FAST;
+    else if (switch_value == "good")
+      quality = GLHelper::SCALER_QUALITY_GOOD;
+    else if (switch_value == "best")
+      quality = GLHelper::SCALER_QUALITY_BEST;
+
+    rwhvefl->yuv_readback_pipeline_.reset(
+        gl_helper->CreateReadbackPipelineYUV(quality,
+                                             result_rect.size(),
+                                             result_rect,
+                                             video_frame->coded_size(),
+                                             region_in_frame,
+                                             true,
+                                             true));
+    yuv_readback_pipeline = rwhvefl->yuv_readback_pipeline_.get();
+  }
+
+  ignore_result(scoped_callback_runner.Release());
+  ignore_result(scoped_return_subscriber_texture.Release());
+  base::Callback<void(bool result)> finished_callback = base::Bind(
+      &RenderWidgetHostViewEfl::CopyFromCompositingSurfaceFinishedForVideo,
+      rwhvefl->AsWeakPtr(),
+      callback,
+      subscriber_texture,
+      base::Passed(&release_callback));
+  yuv_readback_pipeline->ReadbackYUV(
+      texture_mailbox.mailbox(),
+      texture_mailbox.sync_point(),
+      video_frame,
+      finished_callback);
+}
+
+// Efl port - Implementation done, will enable this function after getting video test site to verify
 void RenderWidgetHostViewEfl::CopyFromCompositingSurfaceToVideoFrame(
   const gfx::Rect& src_subrect,
   const scoped_refptr<media::VideoFrame>& target,
@@ -318,6 +514,8 @@ void RenderWidgetHostViewEfl::CopyFromCompositingSurfaceToVideoFrame(
 }
 
 bool RenderWidgetHostViewEfl::CanCopyToVideoFrame() const {
+#warning "[M37] host_ no longer has is_accelerated_compositing_active function"
+  //return host_->is_accelerated_compositing_active();
   return false;
 }
 

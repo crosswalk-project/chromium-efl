@@ -9,6 +9,17 @@
 #include "base/format_macros.h"
 #include "content/browser/renderer_host/render_widget_host_view_base.h"
 #include "content/common/content_export.h"
+#include "cc/layers/delegated_frame_provider.h"
+#include "cc/layers/delegated_frame_resource_collection.h"
+#include "cc/output/compositor_frame.h"
+#include "cc/output/compositor_frame_ack.h"
+#include "cc/output/copy_output_request.h"
+#include "cc/output/copy_output_result.h"
+#include "cc/resources/single_release_callback.h"
+#include "cc/resources/texture_mailbox.h"
+#include "content/browser/accessibility/browser_accessibility_manager.h"
+#include "content/browser/compositor/image_transport_factory.h"
+#include "content/browser/compositor/owned_mailbox.h"
 #include "eweb_view.h"
 #include <Evas.h>
 #include <Ecore_Evas.h>
@@ -27,9 +38,13 @@ namespace content {
 class IMContextEfl;
 class RenderWidgetHostImpl;
 class RenderWidgetHostView;
+class ReadbackYUVInterface;
 
 // RenderWidgetHostView class hierarchy described in render_widget_host_view.h.
-class RenderWidgetHostViewEfl : public RenderWidgetHostViewBase, public IPC::Sender {
+class RenderWidgetHostViewEfl
+  : public RenderWidgetHostViewBase,
+    public base::SupportsWeakPtr<RenderWidgetHostViewEfl>,
+    public IPC::Sender {
  public:
   // RenderWidgetHostViewBase implementation.
   explicit RenderWidgetHostViewEfl(RenderWidgetHost*);
@@ -86,6 +101,10 @@ class RenderWidgetHostViewEfl : public RenderWidgetHostViewBase, public IPC::Sen
     const base::Callback<void(bool)>&) OVERRIDE;
 
   virtual bool CanCopyToVideoFrame() const OVERRIDE;
+  virtual bool CanSubscribeFrame() const OVERRIDE;
+  virtual void BeginFrameSubscription(
+      scoped_ptr<RenderWidgetHostViewFrameSubscriber> subscriber) OVERRIDE;
+  virtual void EndFrameSubscription() OVERRIDE;
   virtual void OnAcceleratedCompositingStateChange() OVERRIDE;
   virtual void AcceleratedSurfaceInitialized(int, int) OVERRIDE;
   virtual void AcceleratedSurfaceBuffersSwapped(
@@ -158,6 +177,23 @@ class RenderWidgetHostViewEfl : public RenderWidgetHostViewBase, public IPC::Sen
   void OnDidChangePageScaleFactor(double);
   void OnDidChangePageScaleRange(double, double);
 
+  static void CopyFromCompositingSurfaceHasResultForVideo(
+      base::WeakPtr<RenderWidgetHostViewEfl> rwhvefl,
+      scoped_refptr<OwnedMailbox> subscriber_texture,
+      scoped_refptr<media::VideoFrame> video_frame,
+      const base::Callback<void(bool)>& callback,
+      scoped_ptr<cc::CopyOutputResult> result);
+  static void CopyFromCompositingSurfaceFinishedForVideo(
+      base::WeakPtr<RenderWidgetHostViewEfl> rwhvefl,
+      const base::Callback<void(bool)>& callback,
+      scoped_refptr<OwnedMailbox> subscriber_texture,
+      scoped_ptr<cc::SingleReleaseCallback> release_callback,
+      bool result);
+  static void ReturnSubscriberTexture(
+      base::WeakPtr<RenderWidgetHostViewEfl> rwhvefl,
+      scoped_refptr<OwnedMailbox> subscriber_texture,
+      uint32 sync_point);
+
   RenderWidgetHostImpl* host_;
   EWebView* web_view_;
   IMContextEfl* im_context_;
@@ -168,6 +204,15 @@ class RenderWidgetHostViewEfl : public RenderWidgetHostViewBase, public IPC::Sen
 
   typedef std::map<gfx::PluginWindowHandle, Ecore_X_Window> PluginWindowToWidgetMap;
   PluginWindowToWidgetMap plugin_window_to_widget_map_;
+
+  // YUV readback pipeline.
+  scoped_ptr<content::ReadbackYUVInterface>
+      yuv_readback_pipeline_;
+
+  // Subscriber that listens to frame presentation events.
+  scoped_ptr<RenderWidgetHostViewFrameSubscriber> frame_subscriber_;
+  std::vector<scoped_refptr<OwnedMailbox> > idle_frame_subscriber_textures_;
+  std::set<OwnedMailbox*> active_frame_subscriber_textures_;
 
   // The touch-event. Its touch-points are updated as necessary. A new
   // touch-point is added from an ET_TOUCH_PRESSED event, and a touch-point is
