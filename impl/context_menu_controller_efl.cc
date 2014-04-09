@@ -83,6 +83,13 @@ void ContextMenuControllerEfl::GetProposedContextMenu() {
                          std::string());
   if (!params_.selection_text.empty())
     AddItemToPropsedList(MENU_ITEM_TYPE_ACTION,
+                         MENU_ITEM_CUT,
+                         std::string("Cut"),
+                         std::string(),
+                         std::string(),
+                         std::string());
+  if (!params_.selection_text.empty())
+    AddItemToPropsedList(MENU_ITEM_TYPE_ACTION,
                          MENU_ITEM_COPY,
                          std::string("Copy"),
                          std::string(),
@@ -229,6 +236,10 @@ void ContextMenuControllerEfl::MenuItemSelected(ContextMenuItemEfl *menu_item) {
     }
     case MENU_ITEM_PASTE: {
       view->ExecuteEditCommand("paste", NULL);
+      break;
+    }
+    case MENU_ITEM_CUT: {
+      view->ExecuteEditCommand("cut", NULL);
       break;
     }
     case MENU_ITEM_CLIPBOARD: {
