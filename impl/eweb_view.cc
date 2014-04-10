@@ -746,6 +746,16 @@ void EWebView::ProcessAckedTouchEvent(const TouchEventWithLatencyInfo& touch,
 }
 
 void EWebView::HandleTouchEvents(Ewk_Touch_Event_Type type) {
+  // These constants are used to map multi touch's touch id(s).
+  // The poorly-written Tizen API document says:
+  //  "0 for Mouse Event and device id for Multi Event."
+  //  "The point which comes from Mouse Event has id 0 and"
+  //  "The point which comes from Multi Event has id that is same as Multi Event's device id."
+  static const int kMultiTouchIDMapPart0SingleIndex = 0; // This constant is to map touch id 0 to 0, or [0] -> [0]
+  static const int kMultiTouchIDMapPart1StartIndex = 13; // This constant is to map [13, 23] -> [1, 11]
+  static const int kMultiTouchIDMapPart1EndIndex = 23; // This constant is to map [13, 23] -> [1, 11]
+  static const int kMultiTouchIDMapPart1DiffValue = 12; // 13 - 1 = 12, 23 - 11 = 12
+
   Ewk_View_Smart_Data* sd = ToSmartData(evas_object_);
 
   unsigned count = evas_touch_point_list_count(sd->base.evas);
@@ -755,7 +765,18 @@ void EWebView::HandleTouchEvents(Ewk_Touch_Event_Type type) {
   Eina_List* points = 0;
   for (unsigned i = 0; i < count; ++i) {
     Ewk_Touch_Point* point = new Ewk_Touch_Point;
+    // evas_touch_point_list_nth_id_get returns [0] or [13, )
+    // Multi touch's touch id [[0], [13, 23]] should be mapped to [[0], [1, 11]]
+    // Internet Blame URL:
+    //   https://groups.google.com/d/msg/mailing-enlightenment-devel/-R-ezCzpkTk/HJ0KBCdz6CgJ
     point->id = evas_touch_point_list_nth_id_get(sd->base.evas, i);
+    DCHECK(point->id == kMultiTouchIDMapPart0SingleIndex || point->id >= kMultiTouchIDMapPart1StartIndex);
+    if (point->id >= kMultiTouchIDMapPart1StartIndex && point->id <= kMultiTouchIDMapPart1EndIndex) {
+      point->id -= kMultiTouchIDMapPart1DiffValue;
+    } else if (point->id > kMultiTouchIDMapPart1EndIndex) {
+      LOG(ERROR) << "evas_touch_point_list_nth_id_get() returned a value greater than ("
+                 << kMultiTouchIDMapPart1EndIndex << "). It is ignored.";
+    }
     evas_touch_point_list_nth_xy_get(sd->base.evas, i, &point->x, &point->y);
     point->state = evas_touch_point_list_nth_state_get(sd->base.evas, i);
     if (type == EWK_TOUCH_CANCEL)
@@ -770,7 +791,7 @@ void EWebView::HandleTouchEvents(Ewk_Touch_Event_Type type) {
 
   void* data;
   EINA_LIST_FREE(points, data)
-      delete static_cast<Ewk_Touch_Point*>(data);
+  delete static_cast<Ewk_Touch_Point*>(data);
 }
 
 bool EWebView::CanDispatchToConsumer(ui::GestureConsumer* consumer) {
