@@ -41,6 +41,9 @@
 #include "ui/gfx/rect.h"
 #include "ui/gfx/screen.h"
 #include "ui/views/widget/desktop_aura/desktop_screen.h"
+#include "ui/events/event_utils.h"
+#include "browser/motion/wkext_motion.h"
+
 
 #include <Ecore.h>
 #include <Ecore_Evas.h>
@@ -674,6 +677,27 @@ void RenderWidgetHostViewEfl::HandleEvasEvent(const Evas_Event_Key_Up* event) {
     host_->ForwardKeyboardEvent(WebEventFactoryEfl::toWebKeyboardEvent(evas_, event));
 }
 
+#ifdef OS_TIZEN
+void RenderWidgetHostViewEfl::FilterInputMotion(const blink::WebGestureEvent& gesture_event) {
+  if (gesture_event.type == blink::WebInputEvent::GesturePinchUpdate) {
+    Evas_Coord_Point position;
+
+    position.x = gesture_event.x;
+    position.y = gesture_event.y;
+    wkext_motion_tilt_position_update(&position);
+  }
+}
+
+void RenderWidgetHostViewEfl::makePinchZoom(void* eventInfo) {
+  Wkext_Motion_Event* motionEvent = static_cast<Wkext_Motion_Event*>(eventInfo);
+
+  ui::GestureEvent event(ui::ET_GESTURE_PINCH_UPDATE,
+      motionEvent->position.x, motionEvent->position.y, 0, ui::EventTimeForNow(),
+      ui::GestureEventDetails(ui::ET_GESTURE_PINCH_UPDATE, motionEvent->scale, 0), 1);
+  HandleGesture(&event);
+}
+#endif
+
 void RenderWidgetHostViewEfl::HandleGesture(ui::GestureEvent* event) {
   blink::WebGestureEvent gesture = content::MakeWebGestureEventFromUIEvent(*event);
 
@@ -695,8 +719,11 @@ void RenderWidgetHostViewEfl::HandleGesture(ui::GestureEvent* event) {
     host_->ForwardGestureEvent(fling_cancel);
   }
 
+#ifdef OS_TIZEN
+  FilterInputMotion(gesture);
   if (gesture.type != blink::WebInputEvent::Undefined)
     host_->ForwardGestureEvent(gesture);
+#endif
 
   event->SetHandled();
 }

@@ -49,7 +49,11 @@
 #include "skia/ext/platform_canvas.h"
 #include "third_party/WebKit/public/web/WebFindOptions.h"
 #include "ui/events/gestures/gesture_recognizer.h"
+#include "browser/motion/wkext_motion.h"
 
+#ifdef OS_TIZEN
+#include <vconf.h>
+#endif
 #include <Ecore_Evas.h>
 #include <Elementary.h>
 #include <Eina.h>
@@ -277,6 +281,14 @@ EWebView::EWebView(EWebContext* context, Evas_Object* object)
   EWebEventHandler<EVAS_CALLBACK_KEY_UP>::Subscribe(object);
 
 #if defined(OS_TIZEN)
+  bool enable = GetTiltZoomEnabled();
+  if (enable) {
+    SubscribeMotionEvents();
+  } else {
+    UnsubscribeMotionEvents();
+  }
+  evas_object_smart_callback_call(evas_object(), "motion,enable", (void*)&enable);
+
   SetTouchEventsEnabled(true);
 #else
   SetMouseEventsEnabled(true);
@@ -334,6 +346,23 @@ void EWebView::UnsubscribeTouchEvents() {
   evas_object_event_callback_del(evas_object(), EVAS_CALLBACK_MULTI_UP, OnTouchUp);
   evas_object_event_callback_del(evas_object(), EVAS_CALLBACK_MULTI_MOVE, OnTouchMove);
 }
+
+#ifdef OS_TIZEN
+void EWebView::SubscribeMotionEvents()
+{
+  Ewk_View_Smart_Data* sd = ToSmartData(evas_object_);
+  evas_object_smart_callback_add(evas_object(), "motion,enable", OnMotionEnable, sd);
+  evas_object_smart_callback_add(evas_object(), "motion,move", OnMotionMove,sd);
+  evas_object_smart_callback_add(evas_object(), "motion,zoom", OnMotionZoom,sd);
+}
+
+void EWebView::UnsubscribeMotionEvents()
+{
+  evas_object_smart_callback_del(evas_object(), "motion,enable", OnMotionEnable);
+  evas_object_smart_callback_del(evas_object(), "motion,move", OnMotionMove);
+  evas_object_smart_callback_del(evas_object(), "motion,zoom", OnMotionZoom);
+}
+#endif
 
 void EWebView::SetFocus(Eina_Bool focus) {
   if (HasFocus() != focus)
@@ -762,6 +791,7 @@ void EWebView::HandleTouchEvents(Ewk_Touch_Event_Type type) {
   if (!count)
     return;
 
+  Evas_Coord_Point pt;
   Eina_List* points = 0;
   for (unsigned i = 0; i < count; ++i) {
     Ewk_Touch_Point* point = new Ewk_Touch_Point;
@@ -778,6 +808,8 @@ void EWebView::HandleTouchEvents(Ewk_Touch_Event_Type type) {
                  << kMultiTouchIDMapPart1EndIndex << "). It is ignored.";
     }
     evas_touch_point_list_nth_xy_get(sd->base.evas, i, &point->x, &point->y);
+    pt.x = point->x;
+    pt.y = point->y;
     point->state = evas_touch_point_list_nth_state_get(sd->base.evas, i);
     if (type == EWK_TOUCH_CANCEL)
       point->state = EVAS_TOUCH_POINT_CANCEL;
@@ -788,6 +820,20 @@ void EWebView::HandleTouchEvents(Ewk_Touch_Event_Type type) {
     SetFocus(EINA_TRUE);
 
   HandleTouchEvents(type, points, evas_key_modifier_get(sd->base.evas));
+
+#ifdef OS_TIZEN
+  if (count >= 2) {
+    if (type == EWK_TOUCH_START) {
+      LOG(ERROR) << " wkext_motion_tilt_start";
+      wkext_motion_tilt_start(evas_object(), &pt);
+    } else if (type == EWK_TOUCH_END) {
+      wkext_motion_tilt_stop();
+    }
+  }
+#else
+  // Silence unused variable warning
+  (void)(pt);
+#endif
 
   void* data;
   EINA_LIST_FREE(points, data)
@@ -1453,3 +1499,31 @@ void EWebView::SetDrawsTransparentBackground(bool enabled) {
 
   render_view_host->Send(new EwkViewMsg_SetDrawsTransparentBackground(render_view_host->GetRoutingID(), enabled));
 }
+
+#ifdef OS_TIZEN
+void EWebView::OnMotionEnable(void *data, Evas_Object *obj, void *eventInfo) {
+  bool* enable = static_cast<bool*>(eventInfo);
+  wkext_motion_tilt_enable_set(obj, *enable, 3);
+}
+
+void EWebView::OnMotionMove(void *data, Evas_Object *obj, void *eventInfo) {
+}
+
+void EWebView::OnMotionZoom(void *data, Evas_Object *obj, void *eventInfo) {
+  EWebView* view = ToEWebView(static_cast<Ewk_View_Smart_Data*>(data));
+  view->rwhv()->makePinchZoom(eventInfo);
+}
+
+bool EWebView::GetTiltZoomEnabled() {
+  int motion_enabled = 0;
+  vconf_get_bool(VCONFKEY_SETAPPL_MOTION_ACTIVATION, &motion_enabled);
+  if (motion_enabled) {
+    int tilt_enabled = 0;
+    vconf_get_bool(VCONFKEY_SETAPPL_USE_TILT, &tilt_enabled);
+    //BROWSER_LOGD("******* motion_enabled=[%d], tilt_enabled=[%d]", motion_enabled, tilt_enabled);
+    if (tilt_enabled)
+      return true;
+  }
+  return false;
+}
+#endif // OS_TIZEN

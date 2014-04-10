@@ -84,23 +84,28 @@
             '<!@(<(pkg-config) --cflags capi-system-info)',
             '<!@(<(pkg-config) --cflags capi-system-sensor)',
             '<!@(<(pkg-config) --cflags capi-location-manager)',
+            '<!@(<(pkg-config) --cflags vconf)',
          ],
          'link_settings': {
            'ldflags': [
              '<!@(<(pkg-config) --libs-only-L --libs-only-other capi-system-info)',
              '<!@(<(pkg-config) --libs-only-L --libs-only-other capi-system-sensor)',
              '<!@(<(pkg-config) --libs-only-L --libs-only-other capi-location-manager)',
+             '<!@(<(pkg-config) --libs-only-L --libs-only-other vconf)',
            ],
            'libraries': [
              '<!@(<(pkg-config) --libs-only-l capi-system-info)',
              '<!@(<(pkg-config) --libs-only-l capi-system-sensor)',
              '<!@(<(pkg-config) --libs-only-l capi-location-manager)',
+             '<!@(<(pkg-config) --libs-only-l vconf)',
            ],
          },
       }, {
         'sources/': [
           ['exclude', 'browser/device_sensors/data_fetcher_impl_tizen\\.(cc|h)$'],
           ['exclude', 'browser/device_sensors/data_fetcher_shared_memory_tizen\\.cc$'],
+          ['exclude', 'browser/motion/MotionUI\\.(h|cc)$'],
+          ['exclude', 'browser/motion/wkext_motion\\.(h|cc)$'],
         ],
       }],
       ['building_for_tizen_mobile==1', {

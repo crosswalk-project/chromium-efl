@@ -170,6 +170,11 @@ class RenderWidgetHostViewEfl
   void OnSelectionTextStyleState(const SelectionStylePrams&);
   void OnDidChangeMaxScrollOffset(int, int);
 
+#ifdef OS_TIZEN
+  void FilterInputMotion(const blink::WebGestureEvent& gesture_event);
+  void makePinchZoom(void* eventInfo);
+#endif
+
   Evas* evas() const {
     DCHECK(evas_);
     return evas_;

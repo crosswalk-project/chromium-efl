@@ -271,6 +271,15 @@ class EWebView
   void UnsubscribeMouseEvents();
   void SubscribeTouchEvents();
   void UnsubscribeTouchEvents();
+#ifdef OS_TIZEN
+  void SubscribeMotionEvents();
+  void UnsubscribeMotionEvents();
+  bool GetTiltZoomEnabled();
+
+  static void OnMotionZoom(void *data, Evas_Object *obj, void *eventInfo);
+  static void OnMotionEnable(void *data, Evas_Object *obj, void *eventInfo);
+  static void OnMotionMove(void *data, Evas_Object *obj, void *eventInfo);
+#endif
 
   // GestureEventHelper overrides
   virtual bool CanDispatchToConsumer(ui::GestureConsumer* consumer) OVERRIDE;
