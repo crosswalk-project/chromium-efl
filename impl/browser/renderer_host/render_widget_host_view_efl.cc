@@ -44,7 +44,7 @@
 #include "ui/events/event_utils.h"
 #include "browser/motion/wkext_motion.h"
 
-
+#include <assert.h>
 #include <Ecore.h>
 #include <Ecore_Evas.h>
 #include <Ecore_Input.h>
@@ -67,18 +67,182 @@ void RenderWidgetHostViewBase::GetDefaultScreenInfo(blink::WebScreenInfo* result
 }
 
 RenderWidgetHostViewEfl::RenderWidgetHostViewEfl(RenderWidgetHost* widget)
-  : host_(RenderWidgetHostImpl::From(widget))
-  , web_view_(NULL)
-  , im_context_(NULL)
-  , evas_(NULL)
-  , content_image_(NULL)
-  , scroll_detector_(new EflWebview::ScrollDetector()) {
-    host_->SetView(this);
+  : host_(RenderWidgetHostImpl::From(widget)),
+    web_view_(NULL),
+    im_context_(NULL),
+    evas_(NULL),
+    content_image_(NULL),
+    scroll_detector_(new EflWebview::ScrollDetector()),
+    m_IsEvasGLInit(0),
+    egl_image_(0),
+    current_pixmap_id_(0),
+    next_pixmap_id_(0) {
+  host_->SetView(this);
 }
 
 RenderWidgetHostViewEfl::~RenderWidgetHostViewEfl() {
   if (im_context_)
     delete im_context_;
+}
+
+static const char* vertexShaderSourceSimple =
+  "attribute vec4 a_position;   \n"
+  "attribute vec2 a_texCoord;   \n"
+  "varying vec2 v_texCoord;     \n"
+  "void main() {                \n"
+  "  gl_Position = a_position;  \n"
+  "  v_texCoord = a_texCoord;   \n"
+  "}                            \n";
+
+static const char* fragmentShaderSourceSimple =
+  "precision mediump float;                            \n"
+  "varying vec2 v_texCoord;                            \n"
+  "uniform sampler2D s_texture;                        \n"
+  "void main() {                                       \n"
+  "  gl_FragColor = texture2D( s_texture, v_texCoord );\n"
+  "}                                                   \n";
+
+void RenderWidgetHostViewEfl::initializeProgram() {
+  evas_gl_make_current(evas_gl_, evas_gl_surface_, evas_gl_context_);
+  const char* vertexShaderSourceProgram = vertexShaderSourceSimple;
+  const char* fragmentShaderSourceProgram = fragmentShaderSourceSimple;
+  GLuint vertexShader = evas_gl_api_->glCreateShader(GL_VERTEX_SHADER);
+  GLuint fragmentShader = evas_gl_api_->glCreateShader(GL_FRAGMENT_SHADER);
+
+  evas_gl_api_->glShaderSource(vertexShader, 1, &vertexShaderSourceProgram, 0);
+  evas_gl_api_->glShaderSource(fragmentShader, 1, &fragmentShaderSourceProgram, 0);
+  program_id_ = evas_gl_api_->glCreateProgram();
+  evas_gl_api_->glCompileShader(vertexShader);
+  evas_gl_api_->glCompileShader(fragmentShader);
+  evas_gl_api_->glAttachShader(program_id_, vertexShader);
+  evas_gl_api_->glAttachShader(program_id_, fragmentShader);
+  evas_gl_api_->glLinkProgram(program_id_);
+
+  position_attrib_ = evas_gl_api_->glGetAttribLocation(program_id_, "a_position");
+  texcoord_attrib_ = evas_gl_api_->glGetAttribLocation(program_id_, "a_texCoord");
+  source_texture_location_ = evas_gl_api_->glGetUniformLocation (program_id_, "s_texture" );
+}
+
+void RenderWidgetHostViewEfl::EvasObjectImagePixelsGetCallback(void* data, Evas_Object* obj) {
+  RenderWidgetHostViewEfl* rwhv_efl = reinterpret_cast<RenderWidgetHostViewEfl*>(data);
+  Evas_GL_API* gl_api = rwhv_efl->evasGlApi();
+  DCHECK(gl_api);
+
+  evas_gl_make_current(rwhv_efl->evas_gl_, rwhv_efl->evas_gl_surface_, rwhv_efl->evas_gl_context_);
+
+  gfx::Rect bounds = rwhv_efl->GetViewBounds();
+  gl_api->glViewport(0, 0, bounds.width(), bounds.height());
+  gl_api->glClearColor(1.0, 1.0, 1.0, 1.0);
+  gl_api->glClear(GL_COLOR_BUFFER_BIT);
+
+  if (rwhv_efl->current_pixmap_id_ != rwhv_efl->next_pixmap_id_) {
+    gl_api->glBindTexture(GL_TEXTURE_2D, 0);
+    gl_api->glDeleteTextures(1, &rwhv_efl->texture_id_);
+    gl_api->evasglDestroyImage(rwhv_efl->egl_image_);
+    rwhv_efl->texture_id_ = 0;
+    rwhv_efl->egl_image_ = 0;
+    rwhv_efl->current_pixmap_id_ = rwhv_efl->next_pixmap_id_;
+  }
+
+  if (!rwhv_efl->egl_image_) {
+    rwhv_efl->egl_image_ = gl_api->evasglCreateImage(EVAS_GL_NATIVE_PIXMAP, (void*)(intptr_t)rwhv_efl->current_pixmap_id_, 0);
+    gl_api->glGenTextures(1, &rwhv_efl->texture_id_);
+    gl_api->glBindTexture(GL_TEXTURE_2D, rwhv_efl->texture_id_);
+    gl_api->glEvasGLImageTargetTexture2DOES(GL_TEXTURE_2D, rwhv_efl->egl_image_);
+    gl_api->glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+    gl_api->glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+    gl_api->glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+    gl_api->glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+  }
+
+  gl_api->glUseProgram(rwhv_efl->program_id_);
+
+  GLfloat vertex_attributes[20];
+
+  rwhv_efl->current_orientation_ = ecore_evas_rotation_get(ecore_evas_ecore_evas_get(rwhv_efl->evas_));
+
+  if (rwhv_efl->current_orientation_ == 270) {
+    vertex_attributes[0] = -1.0f; vertex_attributes[1] = 1.0f;   vertex_attributes[2] = 0.0f;
+    vertex_attributes[3] = 0.0f;  vertex_attributes[4] = 1.0f;
+    vertex_attributes[5] = -1.0f; vertex_attributes[6] = -1.0f;  vertex_attributes[7] = 0.0f;
+    vertex_attributes[8] = 1.0f;  vertex_attributes[9] = 1.0f;
+    vertex_attributes[10] = 1.0f; vertex_attributes[11] = -1.0f; vertex_attributes[12] = 0.0f;
+    vertex_attributes[13] = 1.0f; vertex_attributes[14] = 0.0f;
+    vertex_attributes[15] = 1.0f; vertex_attributes[16] = 1.0f;  vertex_attributes[17] = 0.0f;
+    vertex_attributes[18] = 0.0f; vertex_attributes[19] = 0.0f;
+  } else if (rwhv_efl->current_orientation_ == 90) {
+    vertex_attributes[0] = -1.0f; vertex_attributes[1] = 1.0f;   vertex_attributes[2] = 0.0f;
+    vertex_attributes[3] = 1.0f;  vertex_attributes[4] = 0.0f;
+    vertex_attributes[5] = -1.0f; vertex_attributes[6] = -1.0f;  vertex_attributes[7] = 0.0f;
+    vertex_attributes[8] = 0.0f;  vertex_attributes[9] = 0.0f;
+    vertex_attributes[10] = 1.0f; vertex_attributes[11] = -1.0f; vertex_attributes[12] = 0.0f;
+    vertex_attributes[13] = 0.0f; vertex_attributes[14] = 1.0f;
+    vertex_attributes[15] = 1.0f; vertex_attributes[16] = 1.0f;  vertex_attributes[17] = 0.0f;
+    vertex_attributes[18] = 1.0f; vertex_attributes[19] = 1.0f;
+  }
+  else {
+    vertex_attributes[0] = -1.0f; vertex_attributes[1] = 1.0f;   vertex_attributes[2] = 0.0f;
+    vertex_attributes[3] = 0.0f;  vertex_attributes[4] = 0.0f;
+    vertex_attributes[5] = -1.0f; vertex_attributes[6] = -1.0f;  vertex_attributes[7] = 0.0f;
+    vertex_attributes[8] = 0.0f;  vertex_attributes[9] = 1.0f;
+    vertex_attributes[10] = 1.0f; vertex_attributes[11] = -1.0f; vertex_attributes[12] = 0.0f;
+    vertex_attributes[13] = 1.0f; vertex_attributes[14] = 1.0f;
+    vertex_attributes[15] = 1.0f; vertex_attributes[16] = 1.0f;  vertex_attributes[17] = 0.0f;
+    vertex_attributes[18] = 1.0f; vertex_attributes[19] = 0.0f;
+  }
+
+  GLushort indices[] = {0, 1, 2, 0, 2, 3};
+
+  gl_api->glVertexAttribPointer(rwhv_efl->position_attrib_, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(GLfloat), vertex_attributes);
+  gl_api->glVertexAttribPointer(rwhv_efl->texcoord_attrib_, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(GLfloat), &vertex_attributes[3]);
+
+  gl_api->glEnableVertexAttribArray(rwhv_efl->position_attrib_);
+  gl_api->glEnableVertexAttribArray(rwhv_efl->texcoord_attrib_);
+  gl_api->glActiveTexture(GL_TEXTURE0);
+  gl_api->glBindTexture(GL_TEXTURE_2D, rwhv_efl->texture_id_);
+  gl_api->glUniform1i(rwhv_efl->source_texture_location_, 0);
+  gl_api->glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_SHORT, indices);
+}
+
+void RenderWidgetHostViewEfl::Init_EvasGL(int width, int height) {
+  assert(width > 0 && height > 0);
+
+  setenv("EVAS_GL_DIRECT_OVERRIDE", "1", 1);
+  setenv("EVAS_GL_DIRECT_MEM_OPT", "1",1);
+
+  evas_gl_config_ = evas_gl_config_new();
+  evas_gl_config_->options_bits = EVAS_GL_OPTIONS_DIRECT;
+  evas_gl_config_->color_format = EVAS_GL_RGBA_8888;
+  evas_gl_config_->depth_bits = EVAS_GL_DEPTH_BIT_24;
+  evas_gl_config_->stencil_bits = EVAS_GL_STENCIL_BIT_8;
+
+  evas_gl_ = evas_gl_new(evas_);
+  evas_gl_api_ = evas_gl_api_get(evas_gl_);
+  evas_gl_context_ = evas_gl_context_create(evas_gl_, 0);
+  if (!evas_gl_context_) {
+    LOG(ERROR) << "set_eweb_view -- Create evas gl context Fail";
+  } else {
+    LOG(INFO) << "set_eweb_view -- Create evas gl context Success";
+  }
+
+  evas_gl_surface_ = evas_gl_surface_create(evas_gl_, evas_gl_config_, width, height);
+  if (!evas_gl_surface_) {
+    LOG(ERROR) << "set_eweb_view -- Create evas gl Surface Fail";
+  } else {
+    LOG(ERROR) << "set_eweb_view -- Create evas gl Surface Success";
+  }
+
+  Evas_Native_Surface nativeSurface;
+  if (evas_gl_native_surface_get(evas_gl_, evas_gl_surface_, &nativeSurface)) {
+    evas_object_image_native_surface_set(content_image_, &nativeSurface);
+    evas_object_image_pixels_get_callback_set(content_image_, EvasObjectImagePixelsGetCallback, this);
+  } else {
+    LOG(ERROR) << "set_eweb_view -- Fail to get Natvie surface";
+  }
+
+  initializeProgram();
+
+  m_IsEvasGLInit=1;
 }
 
 void RenderWidgetHostViewEfl::set_eweb_view(EWebView* view) {
@@ -89,6 +253,15 @@ void RenderWidgetHostViewEfl::set_eweb_view(EWebView* view) {
   content_image_ = web_view_->GetContentImageObject();
   DCHECK(content_image_);
 
+#ifdef OS_TIZEN
+  gfx::Rect bounds = GetViewBounds();
+  if(bounds.width() == 0 && bounds.height() == 0) {
+    LOG(ERROR) << "set_eweb_view -- view width and height set to '0' --> skip to configure evasgl";
+  } else {
+    Init_EvasGL(bounds.width(), bounds.height());
+  }
+#endif
+
   im_context_ = IMContextEfl::Create(this);
 }
 
@@ -98,6 +271,7 @@ bool RenderWidgetHostViewEfl::OnMessageReceived(const IPC::Message& message) {
     IPC_MESSAGE_HANDLER(ViewHostMsg_DidFirstVisuallyNonEmptyLayout, OnDidFirstVisuallyNonEmptyLayout)
     IPC_MESSAGE_HANDLER(EwkHostMsg_PlainTextGetContents, OnPlainTextGetContents)
     IPC_MESSAGE_HANDLER(EwkHostMsg_DidChangeContentsSize, OnDidChangeContentsSize)
+    IPC_MESSAGE_HANDLER(EwkHostMsg_OrientationChangeEvent, OnOrientationChangeEvent)
     IPC_MESSAGE_HANDLER(EwkViewMsg_SelectionTextStyleState, OnSelectionTextStyleState)
     IPC_MESSAGE_HANDLER(EwkHostMsg_DidChangeMaxScrollOffset, OnDidChangeMaxScrollOffset)
     IPC_MESSAGE_HANDLER(EwkHostMsg_ReadMHTMLData, OnMHTMLContentGet)
@@ -149,13 +323,17 @@ void RenderWidgetHostViewEfl::SetBounds(const gfx::Rect& rect) {
 gfx::NativeView RenderWidgetHostViewEfl::GetNativeView() const {
   // With aura this is expected to return an aura::Window*.
   // We don't have that so make sure nobody calls this.
-  //NOTREACHED();
+  // NOTREACHED();
   return gfx::NativeView();
 }
 
 gfx::NativeViewId RenderWidgetHostViewEfl::GetNativeViewId() const {
+#ifdef OS_TIZEN
+  return reinterpret_cast<gfx::NativeViewId>(content_image_);
+#else
   Ecore_Evas* ee = ecore_evas_ecore_evas_get(evas_);
   return ecore_evas_window_get(ee);
+#endif
 }
 
 gfx::NativeViewAccessible RenderWidgetHostViewEfl::GetNativeViewAccessible() {
@@ -170,9 +348,11 @@ bool RenderWidgetHostViewEfl::IsSurfaceAvailableForCopy() const {
 }
 
 void RenderWidgetHostViewEfl::Show() {
+  evas_object_show(content_image_);
 }
 
 void RenderWidgetHostViewEfl::Hide() {
+  //evas_object_hide(content_image_);
 }
 
 bool RenderWidgetHostViewEfl::IsShowing() {
@@ -283,7 +463,7 @@ void RenderWidgetHostViewEfl::ImeCompositionRangeChanged(
     const std::vector<gfx::Rect>& character_bounds) {
   SelectionControllerEfl* controller = web_view_->GetSelectionController();
   if (controller) {
-    if(controller->GetCaretSelectionStatus()){
+    if (controller->GetCaretSelectionStatus()){
       controller->SetCaretSelectionStatus(false);
     }
   }
@@ -550,6 +730,11 @@ void RenderWidgetHostViewEfl::AcceleratedSurfaceInitialized(int host_id, int rou
 void RenderWidgetHostViewEfl::AcceleratedSurfaceBuffersSwapped(
   const GpuHostMsg_AcceleratedSurfaceBuffersSwapped_Params& params,
   int gpu_host_id) {
+#ifdef OS_TIZEN
+  next_pixmap_id_ = params.pixmap_id;
+#endif
+  evas_object_image_pixels_dirty_set(content_image_, true);
+
   AcceleratedSurfaceMsg_BufferPresented_Params ack_params;
   ack_params.sync_point = 0;
   RenderWidgetHostImpl::AcknowledgeBufferPresent(
@@ -587,8 +772,16 @@ gfx::Rect RenderWidgetHostViewEfl::GetBoundsInRootWindow() {
 }
 
 gfx::GLSurfaceHandle RenderWidgetHostViewEfl::GetCompositingSurface() {
-  NOTIMPLEMENTED();
+#ifdef OS_TIZEN
+  gfx::NativeViewId window_id = GetNativeViewId();
+  return gfx::GLSurfaceHandle(static_cast<gfx::PluginWindowHandle>(window_id), gfx::NATIVE_TRANSPORT);
+#else
   return gfx::GLSurfaceHandle();
+#endif
+}
+
+void RenderWidgetHostViewEfl::ResizeCompositingSurface(const gfx::Size& size)
+{
 }
 
 void RenderWidgetHostViewEfl::SetHasHorizontalScrollbar(bool) {
@@ -783,6 +976,11 @@ void RenderWidgetHostViewEfl::OnPlainTextGetContents(const std::string& content_
 void RenderWidgetHostViewEfl::OnDidChangeContentsSize(int width, int height) {
   DCHECK(content::BrowserThread::CurrentlyOn(content::BrowserThread::UI));
   web_view_->DidChangeContentsSize(width, height);
+
+#ifdef OS_TIZEN
+  if(!m_IsEvasGLInit)
+    Init_EvasGL(width, height);
+#endif
 }
 
 void RenderWidgetHostViewEfl::OnOrientationChangeEvent(int orientation) {

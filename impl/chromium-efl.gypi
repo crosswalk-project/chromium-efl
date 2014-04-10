@@ -85,6 +85,9 @@
             '<!@(<(pkg-config) --cflags capi-system-sensor)',
             '<!@(<(pkg-config) --cflags capi-location-manager)',
             '<!@(<(pkg-config) --cflags vconf)',
+            '<!@(<(pkg-config) --cflags libtbm)',
+            '<!@(<(pkg-config) --cflags libdri2)',
+            '<!@(<(pkg-config) --cflags gles20)',
          ],
          'link_settings': {
            'ldflags': [
@@ -98,6 +101,9 @@
              '<!@(<(pkg-config) --libs-only-l capi-system-sensor)',
              '<!@(<(pkg-config) --libs-only-l capi-location-manager)',
              '<!@(<(pkg-config) --libs-only-l vconf)',
+             '<!@(<(pkg-config) --libs-only-l libtbm)',
+             '<!@(<(pkg-config) --libs-only-l libdri2)',
+             '<!@(<(pkg-config) --libs-only-l gles20)',
            ],
          },
       }, {

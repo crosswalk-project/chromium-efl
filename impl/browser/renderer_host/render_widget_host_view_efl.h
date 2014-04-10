@@ -24,6 +24,14 @@
 #include "eweb_view.h"
 #include <Evas.h>
 #include <Ecore_Evas.h>
+#include <Evas_GL.h>
+
+#ifndef OS_TIZEN
+// On desktops using mesa as GLES2 implementation GLchar is not defined
+// Normally chromium uses it's own modified khronos headers from third_party/khronos,
+// unfortunately those headers won't be included by Evas_GL.h
+typedef char GLchar;
+#endif
 
 namespace ui {
 class GestureEvent;
@@ -123,6 +131,7 @@ class RenderWidgetHostViewEfl
   virtual void GetScreenInfo(blink::WebScreenInfo*) OVERRIDE;
   virtual gfx::Rect GetBoundsInRootWindow() OVERRIDE;
   virtual gfx::GLSurfaceHandle GetCompositingSurface() OVERRIDE;
+  virtual void ResizeCompositingSurface(const gfx::Size&);
   virtual void SetHasHorizontalScrollbar(bool) OVERRIDE;
   virtual void SetScrollOffsetPinning(bool, bool) OVERRIDE;
   virtual void OnAccessibilityEvents(const std::vector<AccessibilityHostMsg_EventParams>&) OVERRIDE;
@@ -180,6 +189,8 @@ class RenderWidgetHostViewEfl
     return evas_;
   } 
 
+  void Init_EvasGL(int width, int height);
+
   void set_eweb_view(EWebView*);
   EWebView* eweb_view() const { return web_view_; }
   RenderWidgetHostImpl* host() const { return host_; }
@@ -203,6 +214,8 @@ class RenderWidgetHostViewEfl
   void SelectRange(const gfx::Point&, const gfx::Point&);
   void MoveCaret(const gfx::Point&);
   void OnMHTMLContentGet(const std::string&, int);
+
+  Evas_GL_API* evasGlApi() { return evas_gl_api_; }
 
  protected:
   friend class RenderWidgetHostView;
@@ -232,6 +245,9 @@ class RenderWidgetHostViewEfl
       scoped_refptr<OwnedMailbox> subscriber_texture,
       uint32 sync_point);
 
+  static void EvasObjectImagePixelsGetCallback(void*, Evas_Object*);
+  void initializeProgram();
+
   RenderWidgetHostImpl* host_;
   EWebView* web_view_;
   IMContextEfl* im_context_;
@@ -239,6 +255,7 @@ class RenderWidgetHostViewEfl
   Evas* evas_;
   Evas_Object* content_image_;
   scoped_ptr<EflWebview::ScrollDetector> scroll_detector_;
+  int m_IsEvasGLInit;
 
   typedef std::map<gfx::PluginWindowHandle, Ecore_X_Window> PluginWindowToWidgetMap;
   PluginWindowToWidgetMap plugin_window_to_widget_map_;
@@ -261,6 +278,21 @@ class RenderWidgetHostViewEfl
   blink::WebTouchEvent touch_event_;
 
   int current_orientation_;
+
+  Evas_GL* evas_gl_;
+  Evas_GL_API* evas_gl_api_;
+  Evas_GL_Context* evas_gl_context_;
+  Evas_GL_Surface* evas_gl_surface_;
+  Evas_GL_Config* evas_gl_config_;
+
+  GLuint program_id_;
+  GLint source_texture_location_;
+  GLuint position_attrib_;
+  GLuint texcoord_attrib_;
+  void* egl_image_;
+  unsigned int current_pixmap_id_;
+  unsigned int next_pixmap_id_;
+  GLuint texture_id_;
 
   DISALLOW_COPY_AND_ASSIGN(RenderWidgetHostViewEfl);
 };

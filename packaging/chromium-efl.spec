@@ -69,6 +69,9 @@ BuildRequires: pkgconfig(gstreamer-0.10)
 BuildRequires: pkgconfig(gstreamer-plugins-base-0.10)
 BuildRequires: pkgconfig(gstreamer-app-0.10)
 BuildRequires: pkgconfig(vconf)
+BuildRequires: pkgconfig(libdri2)
+BuildRequires: pkgconfig(libtbm)
+BuildRequires: pkgconfig(x11)
 
 %description
 Browser Engine based on Chromium EFL (Shared Library)

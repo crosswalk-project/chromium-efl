@@ -7,7 +7,9 @@
 
 #include "content/public/common/content_switches.h"
 #include "content/public/common/content_client.h"
+#include "cc/base/switches.h"
 #include "ui/events/event_switches.h"
+#include "extensions/common/switches.h"
 #include "ui/gl/gl_switches.h"
 #include "url/gurl.h"
 
@@ -36,10 +38,7 @@ content::MainFunctionParams CommandLineEfl::GetDefaultPortParams() {
 
   p_command_line->AppendSwitch(switches::kNoSandbox);
   p_command_line->AppendSwitch(switches::kDisablePlugins);
-
-  // XXX: kInProcessGPU in not exported by content API
-  // (see: content/public/common/content_switches.h)
-  p_command_line->AppendSwitch("--in-process-gpu");
+  p_command_line->AppendSwitch(switches::kInProcessGPU);
 
   p_command_line->AppendSwitch(switches::kUseMobileUserAgent);
   p_command_line->AppendSwitch(switches::kEnableViewportMeta);
@@ -52,6 +51,23 @@ content::MainFunctionParams CommandLineEfl::GetDefaultPortParams() {
 #else
   p_command_line->AppendSwitchASCII(switches::kUseGL, gfx::kGLImplementationDesktopName);
 #endif
+
+  p_command_line->AppendSwitch(switches::kDisableDelegatedRenderer);
+  p_command_line->AppendSwitch(switches::kDisableImplSidePainting);
+
+  p_command_line->AppendSwitch(switches::kForceCompositingMode);
+  p_command_line->AppendSwitch(switches::kEnableThreadedCompositing);
+  p_command_line->AppendSwitch(switches::kIgnoreGpuBlacklist);
+  p_command_line->AppendSwitch(switches::kAllowWebUICompositing);
+  p_command_line->AppendSwitch(switches::kEnablePinch);
+
+  p_command_line->AppendSwitch(cc::switches::kEnableMapImage);
+  p_command_line->AppendSwitch(cc::switches::kEnableImplSidePainting);
+
+  // XXX: Skia benchmarking should be only used for testing,
+  // when enabled the following warning is printed to stderr:
+  // "Enabling unsafe Skia benchmarking extension."
+  // p_command_line->AppendSwitch(switches::kEnableSkiaBenchmarking);
 
   p_command_line->AppendSwitch("--enable-pinch");
 
