@@ -25,6 +25,7 @@
 #include "ui/base/resource/resource_bundle.h"
 #include "paths_efl.h"
 #include "renderer/content_renderer_client_efl.h"
+#include "common/content_client_efl.h"
 
 namespace content {
 
@@ -44,6 +45,8 @@ void WebProcessContentMainDelegateEfl::PreSandboxStartup() {
 
 bool WebProcessContentMainDelegateEfl::BasicStartupComplete(int* exit_code) {
   PathsEfl::Register();
+  ContentClientEfl* content_client = new ContentClientEfl();
+  content::SetContentClient(content_client);
   return false;
 }
 

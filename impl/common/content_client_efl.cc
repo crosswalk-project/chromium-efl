@@ -19,6 +19,9 @@
 #include "content/public/common/content_switches.h"
 #include "content/public/common/user_agent.h"
 #include "common/version_info.h"
+#include "ipc/ipc_message.h"
+#include "ui/base/resource/resource_bundle.h"
+#include "ui/base/l10n/l10n_util.h"
 
 std::string ContentClientEfl::GetProduct() const {
   return EflWebView::VersionInfo::GetInstance()->ProductNameAndVersionForUserAgent();
@@ -44,4 +47,27 @@ std::string ContentClientEfl::GetUserAgent() const {
   return content::BuildUserAgentFromOSAndProduct(
       EflWebView::VersionInfo::GetInstance()->OSType(), product);
 #endif
+}
+
+base::string16 ContentClientEfl::GetLocalizedString(int message_id) const {
+  // TODO(boliu): Used only by WebKit, so only bundle those resources for
+  // Android WebView.
+  return l10n_util::GetStringUTF16(message_id);
+}
+
+base::StringPiece ContentClientEfl::GetDataResource(
+      int resource_id,
+      ui::ScaleFactor scale_factor) const {
+  // TODO(boliu): Used only by WebKit, so only bundle those resources for
+  // Android WebView.
+  return ResourceBundle::GetSharedInstance().GetRawDataResourceForScale(
+    resource_id, scale_factor);
+}
+
+bool ContentClientEfl::CanSendWhileSwappedOut(const IPC::Message* message) {
+  // For legacy API support we perform a few browser -> renderer synchronous IPC
+  // messages that block the browser. However, the synchronous IPC replies might
+  // be dropped by the renderer during a swap out, deadlocking the browser.
+  // Because of this we should never drop any synchronous IPC replies.
+  return message->type() == IPC_REPLY_ID;
 }
