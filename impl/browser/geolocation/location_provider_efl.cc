@@ -17,105 +17,117 @@
     Boston, MA 02110-1301, USA.
 */
 
-#if defined(OS_TIZEN)
+#include "browser/geolocation/location_provider_efl.h"
+
+#include "base/bind.h"
 #include "base/logging.h"
 #include "base/time/time.h"
+#include "base/message_loop/message_loop.h"
 #include "content/public/common/geoposition.h"
-
-#include "browser/geolocation/location_provider_efl.h"
 
 namespace content {
 
 LocationProviderEfl::LocationProviderEfl()
   : LocationProviderBase()
-  , locationManager_(NULL)
-{
+  , location_manager_(NULL)
+  , geolocation_message_loop_(base::MessageLoop::current()) {
 }
 
-LocationProviderEfl::~LocationProviderEfl()
-{
+LocationProviderEfl::~LocationProviderEfl() {
   StopProvider();
 }
 
-static void GeolocationPositionChangedCallback(double latitude, double longitude, double altitude, time_t timestamp, void* user_data)
-{
-  LocationProviderEfl* location_provider = static_cast<LocationProviderEfl*>(user_data);
+// static
+void LocationProviderEfl::GeoPositionChangedCb(
+      double latitude, double longitude, double altitude,
+      time_t timestamp, void* user_data) {
+  LocationProviderEfl* location_provider =
+      static_cast<LocationProviderEfl*>(user_data);
   DCHECK(location_provider);
-  DCHECK(location_provider->GetManager());
-  
-  Geoposition geo_position;
-  location_accuracy_level_e level;
-
-  location_manager_get_last_accuracy(location_provider->GetManager(), &level, &geo_position.accuracy, &geo_position.altitude_accuracy);
-
-  geo_position.latitude = latitude;
-  geo_position.longitude = longitude;
-  geo_position.timestamp = base::Time::FromTimeT(timestamp);
-  location_provider->SetGeoPosition(geo_position);
+  location_provider->NotifyPositionChanged(
+      latitude, longitude, altitude, timestamp);
 }
 
-bool LocationProviderEfl::StartProvider(bool high_accuracy)
-{
-  if (locationManager_) {
+void LocationProviderEfl::NotifyPositionChanged(
+      double latitude, double longitude, double altitude, time_t timestamp) {
+  location_accuracy_level_e level;
+
+  DCHECK(location_manager_);
+  DCHECK(geolocation_message_loop_);
+
+  last_position_.latitude = latitude;
+  last_position_.longitude = longitude;
+  last_position_.timestamp = base::Time::FromTimeT(timestamp);
+
+  location_manager_get_last_accuracy(location_manager_,
+      &level, &last_position_.accuracy, &last_position_.altitude_accuracy);
+
+  base::Closure task = base::Bind(&LocationProviderEfl::NotifyCallback,
+                                    base::Unretained(this),
+                                    last_position_);
+  geolocation_message_loop_->PostTask(FROM_HERE, task);
+}
+
+bool LocationProviderEfl::StartProvider(bool high_accuracy) {
+  if (location_manager_) {
     // already started!
     return false;
   }
 
-  location_error_e ret = static_cast<location_error_e>(location_manager_create(LOCATIONS_METHOD_HYBRID, &locationManager_));
-  if (ret != LOCATIONS_ERROR_NONE)
-    return false;
-
-  ret = static_cast<location_error_e>(location_manager_set_position_updated_cb(locationManager_, GeolocationPositionChangedCallback, 1, this));
+  int ret = location_manager_create(LOCATIONS_METHOD_HYBRID, &location_manager_);
   if (ret != LOCATIONS_ERROR_NONE) {
-    location_manager_destroy(locationManager_);
-    locationManager_ = NULL;
+    LOG(ERROR) << "Failed to create location manager!";
     return false;
   }
 
-  ret = static_cast<location_error_e>(location_manager_start(locationManager_));
+  ret = location_manager_set_position_updated_cb(
+      location_manager_, GeoPositionChangedCb, 1, this);
   if (ret != LOCATIONS_ERROR_NONE) {
-    location_manager_unset_position_updated_cb(locationManager_);
-    location_manager_destroy(locationManager_);
-    locationManager_ = NULL;
+    LOG(ERROR) << "Failed to register position changed callback!";
+    location_manager_destroy(location_manager_);
+    location_manager_ = NULL;
+    return false;
+  }
+
+  ret = static_cast<location_error_e>(location_manager_start(location_manager_));
+  if (ret != LOCATIONS_ERROR_NONE) {
+    LOG(ERROR) << "Failed to start location manager: " << ret;
+    location_manager_unset_position_updated_cb(location_manager_);
+    location_manager_destroy(location_manager_);
+    location_manager_ = NULL;
     return false;
   }
 
   return true;
 }
 
-void LocationProviderEfl::StopProvider()
-{
-  if (locationManager_) {
-    location_error_e ret = static_cast<location_error_e>(location_manager_stop(locationManager_));
+void LocationProviderEfl::StopProvider() {
+  if (location_manager_) {
+    int ret = location_manager_stop(location_manager_);
     if (ret == LOCATIONS_ERROR_NONE) {
-      location_manager_unset_position_updated_cb(locationManager_);
+      location_manager_unset_position_updated_cb(location_manager_);
     }
 
     // TODO: didn't stop but destroy?
-    location_manager_destroy(locationManager_);
-    locationManager_ = NULL;
+    location_manager_destroy(location_manager_);
+    location_manager_ = NULL;
   }
 }
 
-void LocationProviderEfl::GetPosition(Geoposition* position)
-{
+void LocationProviderEfl::GetPosition(Geoposition* position) {
    DCHECK(position);
   *position = last_position_;
 }
 
-void LocationProviderEfl::RequestRefresh()
-{
+void LocationProviderEfl::RequestRefresh() {
 }
 
-void LocationProviderEfl::OnPermissionGranted()
-{
+void LocationProviderEfl::OnPermissionGranted() {
 }
 
 //static
-LocationProvider* LocationProviderEfl::Create()
-{
+LocationProvider* LocationProviderEfl::Create() {
   return new LocationProviderEfl();
 }
 
 }  // namespace content
-#endif // OS_TIZEN

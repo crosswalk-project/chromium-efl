@@ -20,15 +20,17 @@
 #ifndef LOCATION_PROVIDER_EFL_H_
 #define LOCATION_PROVIDER_EFL_H_
 
-#if defined(OS_TIZEN)
 #include "base/compiler_specific.h"
 #include "content/browser/geolocation/location_provider_base.h"
 #include "content/public/common/geoposition.h"
+
 #include <location/locations.h>
 
-namespace content {
+namespace base {
+class MessageLoop;
+}
 
-struct Geoposition;
+namespace content {
 
 class LocationProviderEfl : public LocationProviderBase {
  public:
@@ -36,25 +38,24 @@ class LocationProviderEfl : public LocationProviderBase {
 
   static LocationProvider* Create();
 
-  // LocationProvider.
   virtual bool StartProvider(bool high_accuracy) OVERRIDE;
   virtual void StopProvider() OVERRIDE;
   virtual void GetPosition(Geoposition* position) OVERRIDE;
   virtual void RequestRefresh() OVERRIDE;
   virtual void OnPermissionGranted() OVERRIDE;
 
-  void SetGeoPosition(const Geoposition& position) { last_position_ = position; }
-
-  location_manager_h GetManager() { return locationManager_; }
  private:
   LocationProviderEfl();
+  static void GeoPositionChangedCb(double, double, double, time_t, void*);
+  void NotifyPositionChanged(double, double, double, time_t);
 
   Geoposition last_position_;
-  location_manager_h locationManager_;
+  location_manager_h location_manager_;
+  base::MessageLoop* geolocation_message_loop_;
+
+  DISALLOW_COPY_AND_ASSIGN(LocationProviderEfl);
 };
 
 }  // namespace content
-
-#endif // OS_TIZEN
 
 #endif  // LOCATION_PROVIDER_EFL_H_

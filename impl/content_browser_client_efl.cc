@@ -33,6 +33,10 @@
 #include "common/web_contents_utils.h"
 #include "components/editing/content/browser/editor_client_observer.h"
 
+#if defined(OS_TIZEN)
+#include "browser/geolocation/location_provider_efl.h"
+#endif
+
 using web_contents_utils::WebContentsFromFrameID;
 using web_contents_utils::WebContentsFromViewID;
 

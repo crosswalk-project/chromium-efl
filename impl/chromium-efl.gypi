@@ -104,6 +104,7 @@
         'sources/': [
           ['exclude', 'browser/device_sensors/data_fetcher_impl_tizen\\.(cc|h)$'],
           ['exclude', 'browser/device_sensors/data_fetcher_shared_memory_tizen\\.cc$'],
+          ['exclude', 'browser/geolocation/location_provider_efl\\.(cc|h)$'],
           ['exclude', 'browser/motion/MotionUI\\.(h|cc)$'],
           ['exclude', 'browser/motion/wkext_motion\\.(h|cc)$'],
         ],

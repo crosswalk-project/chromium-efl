@@ -15,7 +15,13 @@
       <smack request="system::share" type="rwxat" />
       <smack request="system::use_internet" type="rw" />
       <smack request="system::homedir" type="rwxat" />
-      <smack request="xorg" type="rw" />
+      <smack request="xorg" type="rwx" />
+      <smack request="isf" type="rwx" />
+      <smack request="net-config" type="rw" />
+      <smack request="device::app_logging" type="w" />
+      <smack request="immvibed" type="rw" />
+      <smack request="aul::launch" type="x" />
+      <smack request="location_fw::client" type="rw" />
     </request>
   </define>
   <request>
