@@ -30,6 +30,7 @@
       '<!@(<(pkg-config) --cflags gstreamer-0.10)',
       '<!@(<(pkg-config) --cflags gstreamer-base-0.10)',
       '<!@(<(pkg-config) --cflags gstreamer-app-0.10)',
+      '<!@(<(pkg-config) --cflags gstreamer-pbutils-0.10)',
     ],
     'link_settings': {
       'ldflags': [
@@ -44,6 +45,7 @@
         '<!@(<(pkg-config) --libs-only-L --libs-only-other gstreamer-0.10)',
         '<!@(<(pkg-config) --libs-only-L --libs-only-other gstreamer-base-0.10)',
         '<!@(<(pkg-config) --libs-only-L --libs-only-other gstreamer-app-0.10)',
+        '<!@(<(pkg-config) --libs-only-L --libs-only-other gstreamer-pbutils-0.10)',
       ],
       'libraries': [
         '<!@(<(pkg-config) --libs-only-l ecore)',
@@ -57,6 +59,7 @@
         '<!@(<(pkg-config) --libs-only-l gstreamer-0.10)',
         '<!@(<(pkg-config) --libs-only-l gstreamer-base-0.10)',
         '<!@(<(pkg-config) --libs-only-l gstreamer-app-0.10)',
+        '<!@(<(pkg-config) --libs-only-l gstreamer-pbutils-0.10)',
       ],
     },
     # use_aura is enabled but clipboard_efl.cc implements clipboard.
