@@ -31,6 +31,7 @@ namespace content {
 // Inherited from WK2 w.r.t tizen style
 const int kWidthOffset = 32;
 const int kHeightOffset = 60;
+const float kZoomScale = 0.66;
 
 SelectionMagnifierEfl::SelectionMagnifierEfl(content::SelectionControllerEfl* controller)
   : controller_(controller),
@@ -50,8 +51,8 @@ SelectionMagnifierEfl::SelectionMagnifierEfl(content::SelectionControllerEfl* co
   elm_layout_file_set(container_, magnifier_edj.AsUTF8Unsafe().c_str(), "magnifier");
   int get_height, get_width;
   edje_object_part_geometry_get(elm_layout_edje_get(container_), "bg", 0, 0, &get_width, &get_height);
-  width_ = get_width - kWidthOffset;
-  height_ = get_height - kHeightOffset;
+  width_ = (int)((get_width - kWidthOffset) * kZoomScale);
+  height_ = (int)((get_height - kHeightOffset) * kZoomScale);
 }
 
 SelectionMagnifierEfl::~SelectionMagnifierEfl() {
