@@ -109,6 +109,8 @@
       'browser/vibration/vibration_provider_client.h',
       'browser/web_contents/web_contents_view_efl.cc',
       'browser/web_contents/web_contents_view_efl.h',
+      'browser/web_contents/web_drag_dest_efl.cc',
+      'browser/web_contents/web_drag_dest_efl.h',
       'browser_context_efl.cc',
       'browser_context_efl.h',
       'cache_params_efl.h',

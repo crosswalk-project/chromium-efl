@@ -5,6 +5,7 @@
 #ifndef WEB_CONTENTS_VIEW_EFL
 #define WEB_CONTENTS_VIEW_EFL
 
+#include "browser/web_contents/web_drag_dest_efl.h"
 #include "content/browser/renderer_host/render_view_host_delegate_view.h"
 #include "content/browser/web_contents/web_contents_view.h"
 
@@ -17,7 +18,8 @@ class WebContentsViewEfl
     : public content::WebContentsView
     , public content::RenderViewHostDelegateView {
  public:
-  WebContentsViewEfl(WebContents* contents);
+  WebContentsViewEfl(WebContents* contents,
+                     WebContentsViewDelegate* delegate = NULL);
 
   // content::WebContentsView implementation.
   virtual void CreateView(
@@ -55,6 +57,20 @@ class WebContentsViewEfl
 
   virtual void ShowContextMenu(const ContextMenuParams& params) OVERRIDE;
   virtual void CancelContextMenu(int request_id) OVERRIDE;
+
+  void UpdateDragDest(RenderViewHost* host);
+
+  // Our optional views wrapper.
+  scoped_ptr<WebContentsViewDelegate> delegate_;
+
+  WebDragDestDelegate* drag_dest_delegate_;
+
+  // The size we want the view to be.
+  gfx::Size requested_size_;
+
+  // The helper object that handles drag destination related interactions with
+  // EFL.
+  scoped_ptr<WebDragDestEfl> drag_dest_;
 
   WebContents* web_contents_;
 };

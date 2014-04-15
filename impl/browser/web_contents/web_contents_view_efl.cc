@@ -18,13 +18,15 @@ WebContentsView* CreateWebContentsView(
     WebContentsImpl* web_contents,
     WebContentsViewDelegate* delegate,
     RenderViewHostDelegateView** render_view_host_delegate_view) {
-  WebContentsViewEfl* view = new WebContentsViewEfl(web_contents);
+  WebContentsViewEfl* view = new WebContentsViewEfl(web_contents, delegate);
   *render_view_host_delegate_view = view;
   return view;
 }
 
-WebContentsViewEfl::WebContentsViewEfl(WebContents* contents)
-    : web_contents_(contents) {
+WebContentsViewEfl::WebContentsViewEfl(WebContents* contents,
+    WebContentsViewDelegate* delegate)
+    : delegate_(delegate),
+      web_contents_(contents) {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -32,7 +34,10 @@ WebContentsViewEfl::WebContentsViewEfl(WebContents* contents)
 
 void WebContentsViewEfl::CreateView(const gfx::Size& initial_size,
                                     gfx::NativeView context) {
-  NOTIMPLEMENTED();
+  requested_size_ = initial_size;
+
+  if (delegate_)
+    drag_dest_delegate_ = delegate_->GetDragDestDelegate();
 }
 
 RenderWidgetHostViewBase* WebContentsViewEfl::CreateViewForWidget(
@@ -64,12 +69,43 @@ void WebContentsViewEfl::SetPageTitle(const base::string16& title) {
     delegate->web_view()->SmartCallback<EWebViewCallbacks::TitleChange>().call(base::UTF16ToUTF8(title).c_str());
 }
 
+void WebContentsViewEfl::UpdateDragDest(RenderViewHost* host) {
+  // Drag-and-drop is entirely managed by BrowserPluginGuest for guest
+  // processes in a largely platform independent way. WebDragDestEfl
+  // will result in spurious messages being sent to the guest process which
+  // will violate assumptions.
+  if (host->GetProcess() && host->GetProcess()->IsIsolatedGuest()) {
+    DCHECK(!drag_dest_);
+    return;
+  }
+
+  // If supporting RenderWidgetHostViewEfl::GetNativeView(), following lines
+  // will be enabled similar to GTK+ port
+  RenderWidgetHostViewEfl* view = static_cast<RenderWidgetHostViewEfl*>(
+    web_contents_->GetRenderWidgetHostView());
+
+  // If the host is already used by the drag_dest_, there's no point in deleting
+  // the old one to create an identical copy.
+
+  /*if (drag_dest_.get() && drag_dest_->widget() == content_view)
+    return;*/
+
+  // Clear the currently connected drag drop signals by deleting the old
+  // drag_dest_ before creating the new one.
+  drag_dest_.reset();
+  // Create the new drag_dest_.
+  drag_dest_.reset(new WebDragDestEfl(web_contents_, view));
+
+  if (delegate_)
+    drag_dest_->set_delegate(delegate_->GetDragDestDelegate());
+}
+
 void WebContentsViewEfl::RenderViewCreated(RenderViewHost* host) {
   NOTIMPLEMENTED();
 }
 
 void WebContentsViewEfl::RenderViewSwappedIn(RenderViewHost* host) {
-  NOTIMPLEMENTED();
+  UpdateDragDest(host);
 }
 
 void WebContentsViewEfl::SetOverscrollControllerEnabled(bool enabled) {
