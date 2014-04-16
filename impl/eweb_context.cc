@@ -232,6 +232,20 @@ EWebContext* EWebContext::DefaultContext() {
   return default_context_;
 }
 
+void EWebContext::Delete(EWebContext*const context) {
+  if (!context)
+    return;
+
+  if (context == default_context_ && context->HasOneRef()) {
+    // With chromium engine there is only single context
+    // which is default context hence this delete
+    // function will not be implemented
+    NOTIMPLEMENTED();
+    return;
+  }
+  context->Release();
+}
+
 EWebContext::EWebContext()
     : browser_context_(new BrowserContextEfl(this))
     , m_pixmap(0) {
@@ -244,6 +258,8 @@ EWebContext::EWebContext()
 
 EWebContext::~EWebContext() {
   VibrationProviderClient::DeleteInstance();
+  if (this == default_context_)
+    default_context_= NULL;
 }
 
 // static

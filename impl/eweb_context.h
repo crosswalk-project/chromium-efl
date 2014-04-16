@@ -60,6 +60,7 @@ class EWebContext : public EWebObject {
   EWebContext();
 
   static EWebContext* DefaultContext();
+  static void Delete(EWebContext*);
 
   content::BrowserContextEfl* browser_context() const { return browser_context_.get(); }
 
