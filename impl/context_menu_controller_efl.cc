@@ -239,6 +239,21 @@ void ContextMenuControllerEfl::MenuItemSelected(ContextMenuItemEfl *menu_item) {
     }
     case MENU_ITEM_COPY: {
       view->ExecuteEditCommand("copy", NULL);
+      if (params_.is_editable) {
+        SelectionControllerEfl* controller = view->GetSelectionController();
+        if (controller)
+          controller->HideHandle();
+
+        Eina_Rectangle left_rect, right_rect;
+        Eina_Bool result = view->GetSelectionRange(&left_rect, &right_rect);
+        Evas_Coord x, y;
+        evas_object_geometry_get(view->evas_object(), &x, &y, 0, 0);
+        right_rect.x += x;
+        right_rect.y += y;
+        view->MoveCaret(gfx::Point(right_rect.x, right_rect.y));
+      } else {
+        view->ExecuteEditCommand("Unselect", NULL);
+      }
       break;
     }
     case MENU_ITEM_PASTE: {
