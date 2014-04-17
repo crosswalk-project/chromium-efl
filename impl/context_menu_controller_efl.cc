@@ -109,6 +109,13 @@ void ContextMenuControllerEfl::GetProposedContextMenu() {
                          params_.link_url.spec(),
                          params_.link_url.spec(),
                          std::string());
+  if (!params_.has_image_contents && !params_.link_url.is_empty())
+    AddItemToPropsedList(MENU_ITEM_TYPE_ACTION,
+                         MENU_ITEM_SELECT_WORD,
+                         std::string("Select Mode"),
+                         params_.link_url.spec(),
+                         params_.link_url.spec(),
+                         std::string());
   AddItemToPropsedList(MENU_ITEM_TYPE_ACTION,
                        MENU_ITEM_CLIPBOARD,
                        std::string("Clipboard"),
