@@ -267,10 +267,27 @@ void RenderWidgetHostViewEfl::ImeCancelComposition() {
     im_context_->CancelComposition();
 }
 
+bool RenderWidgetHostViewEfl::GetCompositionCharacterBounds(uint32 index, gfx::Rect* rect) const
+{
+  DCHECK(rect);
+  if (index >= composition_character_bounds_.size())
+    return false;
+
+  *rect = composition_character_bounds_[index];
+  return true;
+}
+
 void RenderWidgetHostViewEfl::ImeCompositionRangeChanged(
-  const gfx::Range&, 
-  const std::vector<gfx::Rect>&) {
-  NOTIMPLEMENTED();
+    const gfx::Range& range,
+    const std::vector<gfx::Rect>& character_bounds) {
+  SelectionControllerEfl* controller = web_view_->GetSelectionController();
+  if (controller) {
+    if(controller->GetCaretSelectionStatus()){
+      controller->SetCaretSelectionStatus(false);
+    }
+  }
+
+  composition_character_bounds_ = character_bounds;
 }
 
 void RenderWidgetHostViewEfl::DidUpdateBackingStore(
