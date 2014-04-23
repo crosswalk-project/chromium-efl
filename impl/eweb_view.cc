@@ -1167,6 +1167,10 @@ void EWebView::UseSettingsFont() {
     render_view_host->Send(new EwkViewMsg_UseSettingsFont(render_view_host->GetRoutingID()));
 }
 
+void EWebView::DidChangeContentsArea(int width, int height) {
+  contents_area_ = gfx::Size(width, height);
+}
+
 void EWebView::DidChangeContentsSize(int width, int height) {
   contents_size_ = gfx::Size(width, height);
 }
@@ -1185,10 +1189,17 @@ void EWebView::GetScrollSize(int* width, int* height) {
 
   Ewk_View_Smart_Data* smart_data = ToSmartData(evas_object());
 
+#ifdef OS_TIZEN
+  if (width && contents_area_.width() > smart_data->view.w)
+    *width = contents_area_.width() - smart_data->view.w;
+  if (height && contents_area_.height() > smart_data->view.h)
+    *height = contents_area_.height() - smart_data->view.h;
+#else
   if (width && contents_size_.width() > smart_data->view.w)
     *width = contents_size_.width() - smart_data->view.w;
   if (height && contents_size_.height() > smart_data->view.h)
     *height = contents_size_.height() - smart_data->view.h;
+#endif
 }
 
 void EWebView::SelectRange(const gfx::Point& start, const gfx::Point& end) {

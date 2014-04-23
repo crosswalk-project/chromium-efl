@@ -241,6 +241,7 @@ class EWebView
   void ProcessAckedTouchEvent(const content::TouchEventWithLatencyInfo& touch,
                               content::InputEventAckState ack_result);
   void ShowFileChooser(const content::FileChooserParams&);
+  void DidChangeContentsArea(int width, int height);
 
  private:
   EWebView(EWebContext*, Evas_Object* smart_object);
@@ -335,6 +336,7 @@ class EWebView
   static int find_request_id_counter_;
   IDMap<EwkViewPlainTextGetCallback, IDMapOwnPointer> plain_text_get_callback_map_;
   gfx::Size contents_size_;
+  gfx::Size contents_area_;
   double progress_;
   mutable std::string title_;
   Ewk_Hit_Test hit_test_data_;

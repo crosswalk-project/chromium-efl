@@ -845,8 +845,8 @@ gfx::GLSurfaceHandle RenderWidgetHostViewEfl::GetCompositingSurface() {
 #endif
 }
 
-void RenderWidgetHostViewEfl::ResizeCompositingSurface(const gfx::Size& size)
-{
+void RenderWidgetHostViewEfl::ResizeCompositingSurface(const gfx::Size& size) {
+  web_view_->DidChangeContentsArea(size.width(), size.height());
 }
 
 void RenderWidgetHostViewEfl::SetHasHorizontalScrollbar(bool) {
