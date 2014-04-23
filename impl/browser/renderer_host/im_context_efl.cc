@@ -162,6 +162,23 @@ void IMContextEfl::UpdateInputMethodState(ui::TextInputType input_type,
   }
 }
 
+void IMContextEfl::UpdateInputMethodState(ui::TextInputType input_type) {
+  IM_CTX_LOG << "textinputtype=" << input_type;
+
+  bool enabled = input_type != ui::TEXT_INPUT_TYPE_NONE;
+  enabled_ = enabled;
+
+  bool is_showing = ecore_imf_context_input_panel_state_get(context_) ==
+                    ECORE_IMF_INPUT_PANEL_STATE_SHOW;
+  if (enabled_) {
+    if (!is_showing) {
+      ecore_imf_context_focus_in(context_);
+      ecore_imf_context_input_panel_show(context_);
+    }
+  } else
+    HidePanel();
+}
+
 void IMContextEfl::ShowPanel(ui::TextInputType input_type, ui::TextInputMode input_mode, bool is_user_action) {
   if (!is_user_action && !view_->eweb_view()->GetSettings()->useKeyPadWithoutUserAction())
     return;

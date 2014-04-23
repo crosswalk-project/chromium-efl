@@ -49,6 +49,7 @@ class IMContextEfl {
 
   void UpdateInputMethodState(ui::TextInputType type, bool can_compose_inline, ui::TextInputMode input_mode,
                               bool is_user_action = false);
+  void UpdateInputMethodState(ui::TextInputType type);
   void UpdateCaretBounds(const gfx::Rect& caret_bounds);
 
   void OnFocusIn();

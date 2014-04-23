@@ -179,8 +179,9 @@ class RenderWidgetHostViewEfl
   virtual void DidStopFlinging() OVERRIDE;
 
   void OnDidFirstVisuallyNonEmptyLayout();
-  void OnSelectionTextStyleState(const SelectionStylePrams&);
-  void OnDidChangeMaxScrollOffset(int, int);
+  void OnSelectionTextStyleState(const SelectionStylePrams& params);
+  void OnDidChangeMaxScrollOffset(int maxScrollX, int maxScrollY);
+  void OnTextInputStateChanged(const ViewHostMsg_TextInputState_Params& params);
 
 #ifdef OS_TIZEN
   void FilterInputMotion(const blink::WebGestureEvent& gesture_event);

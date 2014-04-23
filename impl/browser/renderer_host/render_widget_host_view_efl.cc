@@ -293,6 +293,8 @@ bool RenderWidgetHostViewEfl::OnMessageReceived(const IPC::Message& message) {
     IPC_MESSAGE_HANDLER(EwkHostMsg_ReadMHTMLData, OnMHTMLContentGet)
     IPC_MESSAGE_HANDLER(EwkHostMsg_DidChangePageScaleFactor, OnDidChangePageScaleFactor)
     IPC_MESSAGE_HANDLER(EwkHostMsg_DidChangePageScaleRange, OnDidChangePageScaleRange)
+    IPC_MESSAGE_HANDLER(ViewHostMsg_TextInputStateChanged,
+                        OnTextInputStateChanged)
     IPC_MESSAGE_UNHANDLED(handled = false)
   IPC_END_MESSAGE_MAP()
   return handled;
@@ -455,6 +457,12 @@ void RenderWidgetHostViewEfl::TextInputTypeChanged(ui::TextInputType type, ui::T
     gfx::Rect empty_rect = gfx::Rect(0, 0, 0, 0);
     host_->ScrollFocusedEditableNodeIntoRect(empty_rect);
   }
+}
+
+void RenderWidgetHostViewEfl::OnTextInputStateChanged(const ViewHostMsg_TextInputState_Params& params) {
+  LOG(INFO) << "RenderWidgetHostViewEfl::TextInputStateChanged";
+  if (im_context_)
+    im_context_->UpdateInputMethodState(params.type);
 }
 
 void RenderWidgetHostViewEfl::ImeCancelComposition() {
