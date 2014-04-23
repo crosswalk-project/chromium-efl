@@ -63,6 +63,9 @@ class SelectionHandleEfl {
   // it is in evas coordinates
   gfx::Point current_touch_point_;
 
+  // This save the gap between the touch point and base point when OnMouseDown is called
+  gfx::Point diff_point_;
+
   // Parent to send back mouse events
   content::SelectionControllerEfl* controller_;
 

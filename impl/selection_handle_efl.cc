@@ -47,6 +47,7 @@ static const char* GetEdjeObjectGroupPath(SelectionHandleEfl::HandleType type) {
 SelectionHandleEfl::SelectionHandleEfl(SelectionControllerEfl* controller, HandleType type, Evas_Object* parent)
   : base_point_(0,0),
     current_touch_point_(0,0),
+    diff_point_(0,0),
     controller_(controller),
     is_cursor_handle_(false) {
   Evas* evas = evas_object_evas_get(parent);
@@ -100,10 +101,10 @@ void SelectionHandleEfl::OnMouseDown(void* data, Evas*, Evas_Object*, void* even
   Evas_Event_Mouse_Down* event = static_cast<Evas_Event_Mouse_Down*>(event_info);
   SelectionHandleEfl* handle = static_cast<SelectionHandleEfl*>(data);
   evas_object_event_callback_add(handle->handle_, EVAS_CALLBACK_MOUSE_MOVE, OnMouseMove, handle);
+  //Save the diff_point between touch point and base point of the handle
+  handle->diff_point_.SetPoint(event->canvas.x - handle->base_point_.x(), event->canvas.y - handle->base_point_.y());
+  handle->controller_->OnMouseDown(gfx::Point(event->canvas.x , event->canvas.y ));
 
-  Evas_Coord x, y;
-  evas_object_geometry_get(handle->controller_->GetParentView()->evas_object(), &x, &y, 0, 0);
-  handle->controller_->OnMouseDown(gfx::Point(event->canvas.x - x, event->canvas.y - y));
 }
 
 void SelectionHandleEfl::OnMouseMove(void* data, Evas*, Evas_Object*, void* event_info) {
@@ -128,19 +129,11 @@ void SelectionHandleEfl::UpdateMouseMove(void* data) {
   Evas_Coord x, y;
   evas_object_geometry_get(handle->controller_->GetParentView()->evas_object(), &x, &y, 0, 0);
   if (!handle->is_cursor_handle_) {
-    int height = 0;
-    int width = 0;
-
-    edje_object_part_geometry_get(handle->handle_, "handle", NULL, NULL, &width, &height);
-
-    // The touch point on the handle will be approx middle of the handle.
-    // So proportionally x and y are calculated and subtracted from the actual touch point
-    // This will be the delta that is diff between old selection point the new one
-
-    int delta_x = handle->current_touch_point_.x() - x - (width/2);
-    int delta_y = handle->current_touch_point_.y() - y - (height/2);
+    //New base point calculation should be based on new touch point and diff_point
+    int delta_x = handle->current_touch_point_.x() - handle->diff_point_.x();
+    int delta_y = handle->current_touch_point_.y() - handle->diff_point_.y();
     handle->base_point_.SetPoint(delta_x, delta_y);
-    handle->controller_->OnMouseMove(gfx::Point(delta_x, delta_y), false);
+    handle->controller_->OnMouseMove(gfx::Point(handle->current_touch_point_.x(), handle->current_touch_point_.y()), false);
   } else {
     handle->base_point_.set_x(handle->current_touch_point_.x() - x);
     handle->controller_->OnMouseMove(gfx::Point(handle->current_touch_point_.x() - x, handle->current_touch_point_.y() - y), true);
