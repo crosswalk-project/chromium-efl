@@ -138,13 +138,17 @@ void SelectionControllerEfl::ShowHandleAndContextMenuIfRequired() {
 
   // FIXME : Check the text Direction later
   gfx::Rect left = selection_data_->GetLeftRect();
-  start_handle_->SetBasePosition(gfx::Point(left.x(), left.y()));
+  // The base position of start_handle should be set to the middle of the left rectangle.
+  // Otherwise the start_handle may be shifted up when the right_handle is moving
+  start_handle_->SetBasePosition(gfx::Point(left.x(), left.y() + (left.height() / 2)));
   start_handle_->Move(gfx::Point(left.x(), left.y() + left.height()));
   start_handle_->Show();
 
   gfx::Rect right = selection_data_->GetRightRect();
 
-  end_handle_->SetBasePosition(gfx::Point(right.x(), right.y()));
+  // The base position of end_handle should be set to the middle of the right rectangle.
+  // Otherwise the end_handle may be shifted up when the left_handle is moving
+  end_handle_->SetBasePosition(gfx::Point(right.x(), right.y() + (right.height() / 2)));
   end_handle_->Move(gfx::Point(right.x() + right.width(), right.y() + right.height()));
   end_handle_->Show();
 
