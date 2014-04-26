@@ -72,6 +72,7 @@ BuildRequires: pkgconfig(vconf)
 BuildRequires: pkgconfig(libdri2)
 BuildRequires: pkgconfig(libtbm)
 BuildRequires: pkgconfig(x11)
+BuildRequires: pkgconfig(feedback)
 
 %description
 Browser Engine based on Chromium EFL (Shared Library)
