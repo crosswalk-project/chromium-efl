@@ -465,6 +465,7 @@ void RenderWidgetHostViewEfl::TextInputStateChanged(
 }
 
 void RenderWidgetHostViewEfl::ImeCancelComposition() {
+  LOG(INFO) << __PRETTY_FUNCTION__;
   if (im_context_)
     im_context_->CancelComposition();
 }
@@ -477,6 +478,7 @@ void RenderWidgetHostViewEfl::OnTextInputInFormStateChanged(bool is_in_form_tag)
 
 bool RenderWidgetHostViewEfl::GetCompositionCharacterBounds(uint32 index, gfx::Rect* rect) const
 {
+  LOG(INFO) << __PRETTY_FUNCTION__;
   DCHECK(rect);
   if (index >= composition_character_bounds_.size())
     return false;
@@ -488,11 +490,15 @@ bool RenderWidgetHostViewEfl::GetCompositionCharacterBounds(uint32 index, gfx::R
 void RenderWidgetHostViewEfl::ImeCompositionRangeChanged(
     const gfx::Range& range,
     const std::vector<gfx::Rect>& character_bounds) {
-  SelectionControllerEfl* controller = GetSelectionController();
-  if (controller && controller->GetCaretSelectionStatus())
-    controller->SetCaretSelectionStatus(false);
-
+  LOG(INFO) << __PRETTY_FUNCTION__;
   composition_character_bounds_ = character_bounds;
+  SelectionControllerEfl* controller = web_view_->GetSelectionController();
+  if (controller) {
+    if(controller->GetCaretSelectionStatus()) {
+      controller->SetCaretSelectionStatus(false);
+      controller->HideHandleAndContextMenu();
+    }
+  }
 }
 
 void RenderWidgetHostViewEfl::DidUpdateBackingStore(
@@ -517,13 +523,15 @@ void RenderWidgetHostViewEfl::SetTooltipText(const base::string16& text) {
 void RenderWidgetHostViewEfl::SelectionChanged(const base::string16& text,
   size_t offset,
   const gfx::Range& range) {
-  SelectionControllerEfl* controller = GetSelectionController();
+  LOG(INFO) << __PRETTY_FUNCTION__;
+  SelectionControllerEfl* controller = web_view_->GetSelectionController();
   if (controller)
     controller->UpdateSelectionData(text);
 }
 
 void RenderWidgetHostViewEfl::SelectionBoundsChanged(
   const ViewHostMsg_SelectionBounds_Params& params) {
+  LOG(INFO) << __PRETTY_FUNCTION__;
   ViewHostMsg_SelectionBounds_Params guest_params(params);
   guest_params.anchor_rect = ConvertRectToPixel(device_scale_factor_, params.anchor_rect);
   guest_params.focus_rect = ConvertRectToPixel(device_scale_factor_, params.focus_rect);
@@ -537,6 +545,7 @@ void RenderWidgetHostViewEfl::SelectionBoundsChanged(
 }
 
 void RenderWidgetHostViewEfl::ScrollOffsetChanged() {
+  LOG(INFO) << __PRETTY_FUNCTION__;
   NOTIMPLEMENTED();
 }
 
@@ -931,9 +940,16 @@ void RenderWidgetHostViewEfl::HandleEvasEvent(const Evas_Event_Mouse_Wheel* even
 }
 
 void RenderWidgetHostViewEfl::HandleEvasEvent(const Evas_Event_Key_Down* event) {
+  LOG(INFO) << __PRETTY_FUNCTION__ << " : " << event->key;
   bool wasFiltered = false;
   if (im_context_)
     im_context_->HandleKeyDownEvent(event, &wasFiltered);
+
+  if (!strcmp(event->key, "BackSpace")) {
+    SelectionControllerEfl* controller = web_view_->GetSelectionController();
+    if (controller)
+      controller->HideHandleAndContextMenu();
+  }
 
   if(!wasFiltered)
     host_->ForwardKeyboardEvent(WebEventFactoryEfl::toWebKeyboardEvent(evas_, event));
@@ -1070,6 +1086,7 @@ void RenderWidgetHostViewEfl::OnDidChangeContentsSize(int width, int height) {
 }
 
 void RenderWidgetHostViewEfl::OnOrientationChangeEvent(int orientation) {
+  LOG(INFO) << __PRETTY_FUNCTION__;
   current_orientation_ = orientation;
 }
 

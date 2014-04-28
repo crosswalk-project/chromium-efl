@@ -46,7 +46,7 @@ void SelectionBoxEfl::UpdateSelectStringData(const base::string16& text) {
 }
 
 void SelectionBoxEfl::UpdateRectData(const gfx::Rect& left_rect, const gfx::Rect& right_rect, bool is_anchor_first) {
-  LOG(INFO) << "SelectionBoxEfl::UpdateRectData : l_x = " << left_rect.x() << " l_y = " << left_rect.y() << " r_x = " << right_rect.x() << " r_y = " << right_rect.y();
+  LOG(INFO) << __PRETTY_FUNCTION__ << " l_x = " << left_rect.x() << " l_y = " << left_rect.y() << " r_x = " << right_rect.x() << " r_y = " << right_rect.y();
   is_anchor_first_ = is_anchor_first;
   left_rect_ = left_rect;
   right_rect_ = right_rect;

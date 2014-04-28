@@ -99,6 +99,7 @@ void SelectionControllerEfl::UpdateMagnifierScreen(Evas_Object* img) {
 }
 
 void SelectionControllerEfl::UpdateSelectionDataAndShow(const gfx::Rect& left_rect, const gfx::Rect& right_rect, bool is_anchor_first) {
+  LOG(INFO) << __PRETTY_FUNCTION__;
   selection_data_->UpdateRectData(left_rect, right_rect, is_anchor_first);
 
   if (!IsSelectionValid(left_rect, right_rect)) {
@@ -118,7 +119,7 @@ void SelectionControllerEfl::UpdateSelectionDataAndShow(const gfx::Rect& left_re
 }
 
 void SelectionControllerEfl::ShowHandleAndContextMenuIfRequired() {
-  LOG(INFO) << "SelectionControllerEfl::ShowHandleAndContextMenuIfRequired: ";
+  LOG(INFO) << __PRETTY_FUNCTION__;
   if (!selection_data_->GetStatus())
     return;
 
@@ -156,8 +157,12 @@ void SelectionControllerEfl::HideHandle() {
   Clear();
 }
 
-void SelectionControllerEfl::Clear() {
+void SelectionControllerEfl::HideHandleAndContextMenu() {
   parent_view_->CancelContextMenu(0);
+  HideHandle();
+}
+
+void SelectionControllerEfl::Clear() {
   start_handle_->Hide();
   end_handle_->Hide();
   input_handle_->Hide();
@@ -223,7 +228,7 @@ void SelectionControllerEfl::HandleLongPressEndEvent() {
 }
 
 bool SelectionControllerEfl::IsSelectionValid(const gfx::Rect& left_rect, const gfx::Rect& right_rect) {
-  LOG(INFO) << "SelectionControllerEfl::IsSelectionValid, l_x = " << left_rect.x() << " l_y = " << left_rect.y() << " r_x = " << right_rect.x() << " r_y = " << right_rect.y();
+  LOG(INFO) << __PRETTY_FUNCTION__ << " l_x = " << left_rect.x() << " l_y = " << left_rect.y() << " r_x = " << right_rect.x() << " r_y = " << right_rect.y();
   // For all normal cases the widht will be 0 and we want to check empty which Implies
   // x, y, h w all to be 0
   if ((IsRectEmpty(left_rect) || IsRectEmpty(right_rect))) {
