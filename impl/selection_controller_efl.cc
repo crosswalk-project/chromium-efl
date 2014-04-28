@@ -127,8 +127,8 @@ void SelectionControllerEfl::ShowHandleAndContextMenuIfRequired() {
   if (selection_data_->IsInEditField() && GetCaretSelectionStatus()) {
     gfx::Rect left = selection_data_->GetLeftRect();
     input_handle_->SetBasePosition(gfx::Point(left.x(), left.y()));
-    input_handle_->Move(gfx::Point(left.x(), left.y() + left.height()));
     input_handle_->SetCursorHandlerStatus(true);
+    input_handle_->Move(gfx::Point(left.x(), left.y() + left.height()));
     input_handle_->Show();
 
     return;
@@ -267,6 +267,14 @@ void SelectionControllerEfl::OnParentParentViewMove() {
   parent_view_->CancelContextMenu(0);
   start_handle_->Move(start_handle_->GetBasePosition());
   end_handle_->Move(end_handle_->GetBasePosition());
+}
+
+gfx::Rect SelectionControllerEfl::GetLeftRect() {
+  return selection_data_->GetLeftRect();
+}
+
+gfx::Rect SelectionControllerEfl::GetRightRect() {
+  return selection_data_->GetRightRect();
 }
 
 }

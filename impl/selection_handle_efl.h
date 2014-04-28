@@ -40,6 +40,13 @@ class SelectionHandleEfl {
     HANDLE_TYPE_INPUT
   };
 
+  enum HandleDirection {
+    DirectionBottomNormal,
+    DirectionBottomReverse,
+    DirectionTopNormal,
+    DirectionTopReverse,
+  };
+
   SelectionHandleEfl(SelectionControllerEfl* controller, HandleType type, Evas_Object* parent);
   ~SelectionHandleEfl();
   void Show();
@@ -54,6 +61,12 @@ class SelectionHandleEfl {
   static void OnMouseMove(void* data, Evas*, Evas_Object*, void* event_info);
   static void OnMouseUp(void* data, Evas*, Evas_Object*, void* event_info);
   static void UpdateMouseMove(void* data);
+
+  void ChangeObjectDirection(HandleType, int);
+  HandleType GetHandleType(const gfx::Point&);
+  gfx::Rect GetSelectionRect(HandleType);
+  void MoveObject(gfx::Point&);
+  void SetIsMouseDowned(bool enable) { is_mouse_downed_ = enable; };
 
   // This point is one which will be used during extending selection
   // it is in web view coordinates
@@ -74,6 +87,9 @@ class SelectionHandleEfl {
 
   // Is set if the handle is of type input
   bool is_cursor_handle_;
+
+  // Is mouse down
+  bool is_mouse_downed_;
 };
 
 } // namespace

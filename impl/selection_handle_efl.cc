@@ -49,7 +49,9 @@ SelectionHandleEfl::SelectionHandleEfl(SelectionControllerEfl* controller, Handl
     current_touch_point_(0,0),
     diff_point_(0,0),
     controller_(controller),
-    is_cursor_handle_(false) {
+    is_cursor_handle_(false),
+    is_mouse_downed_(false) {
+
   Evas* evas = evas_object_evas_get(parent);
   handle_ = edje_object_add(evas);
 
@@ -90,21 +92,62 @@ void SelectionHandleEfl::Hide() {
 }
 
 void SelectionHandleEfl::Move(const gfx::Point& point) {
-  // FIXME: Currently no viewport boudry checks present. Add later
-  // Also to check the handle direction based on the viewport
-  Evas_Coord x, y, width, height;
-  evas_object_geometry_get(controller_->GetParentView()->evas_object(), &x, &y, &width, &height);
-  evas_object_move(handle_, point.x() + x, point.y() + y);
+  Evas_Coord x, y, deviceWidth, deviceHeight;
+  gfx::Point movePoint = point;
+  const int reverseMargin = 32;
+  int handleHeight;
+  edje_object_part_geometry_get(handle_, "handle", 0, 0, 0, &handleHeight);
+  evas_object_geometry_get(controller_->GetParentView()->evas_object(), &x, &y, &deviceWidth, &deviceHeight);
+
+  HandleType handleType = GetHandleType(point);
+  LOG(INFO) << __PRETTY_FUNCTION__ << "HANDLE_TYPE : " << handleType;
+  gfx::Rect selectionRect = GetSelectionRect(handleType);
+
+  if ((handleType == HANDLE_TYPE_LEFT && (movePoint.x() <= reverseMargin)) 
+      || (handleType == HANDLE_TYPE_RIGHT && (movePoint.x() >= deviceWidth - reverseMargin))) {
+    if ((movePoint.y() + handleHeight) > (y + deviceHeight)) {
+      movePoint.set_y(movePoint.y() - selectionRect.height());
+      if (!is_mouse_downed_)
+        ChangeObjectDirection(handleType, DirectionTopReverse);
+    } else {
+      if (!is_mouse_downed_)
+        ChangeObjectDirection(handleType, DirectionBottomReverse);
+    }
+  } else {
+    if ((movePoint.y() + handleHeight) > (y + deviceHeight)) {
+      // Check If handler is not overLapping Device Boundary.
+      if ((movePoint.y() - selectionRect.height() - handleHeight) >= y) {
+        movePoint.set_y(movePoint.y() - selectionRect.height());
+        if (!is_mouse_downed_) {
+          if (is_cursor_handle_)
+            ChangeObjectDirection(handleType, DirectionTopNormal);
+          else
+            ChangeObjectDirection(handleType, DirectionTopNormal);
+        }
+        MoveObject(movePoint);
+        return;
+      }
+    }
+
+    if (!is_mouse_downed_) {
+      if (handleType == HANDLE_TYPE_INPUT)
+        ChangeObjectDirection(handleType, DirectionBottomNormal);
+      else
+        ChangeObjectDirection(handleType, DirectionBottomNormal);
+    }
+  }
+
+  MoveObject(movePoint);
 }
 
 void SelectionHandleEfl::OnMouseDown(void* data, Evas*, Evas_Object*, void* event_info) {
   Evas_Event_Mouse_Down* event = static_cast<Evas_Event_Mouse_Down*>(event_info);
   SelectionHandleEfl* handle = static_cast<SelectionHandleEfl*>(data);
+  handle->SetIsMouseDowned(true);
   evas_object_event_callback_add(handle->handle_, EVAS_CALLBACK_MOUSE_MOVE, OnMouseMove, handle);
   //Save the diff_point between touch point and base point of the handle
   handle->diff_point_.SetPoint(event->canvas.x - handle->base_point_.x(), event->canvas.y - handle->base_point_.y());
   handle->controller_->OnMouseDown(gfx::Point(event->canvas.x , event->canvas.y ));
-
 }
 
 void SelectionHandleEfl::OnMouseMove(void* data, Evas*, Evas_Object*, void* event_info) {
@@ -117,6 +160,7 @@ void SelectionHandleEfl::OnMouseMove(void* data, Evas*, Evas_Object*, void* even
 void SelectionHandleEfl::OnMouseUp(void* data, Evas*, Evas_Object*, void* event_info) {
   Evas_Event_Mouse_Up* event = static_cast<Evas_Event_Mouse_Up*>(event_info);
   SelectionHandleEfl* handle = static_cast<SelectionHandleEfl*>(data);
+  handle->SetIsMouseDowned(false);
   evas_object_event_callback_del(handle->handle_, EVAS_CALLBACK_MOUSE_MOVE, OnMouseMove);
 
   Evas_Coord x, y;
@@ -138,6 +182,80 @@ void SelectionHandleEfl::UpdateMouseMove(void* data) {
     handle->base_point_.set_x(handle->current_touch_point_.x() - x);
     handle->controller_->OnMouseMove(gfx::Point(handle->current_touch_point_.x() - x, handle->current_touch_point_.y() - y), true);
   }
+}
+
+void SelectionHandleEfl::ChangeObjectDirection(HandleType handleType, int direction) {
+  LOG(INFO) << __PRETTY_FUNCTION__ << "HANDLE_TYPE : " << handleType << " direction = " << direction << " is_cursor_handle_ ? " << is_cursor_handle_;
+
+  switch (direction) {
+    case DirectionBottomNormal:
+      if (is_cursor_handle_)
+        edje_object_signal_emit(handle_, "edje,cursor,handle,show", "edje");
+      else
+        edje_object_signal_emit(handle_, "elm,state,bottom", "elm");
+      break;
+    case DirectionBottomReverse:
+      if (is_cursor_handle_)
+        edje_object_signal_emit(handle_, "edje,cursor,handle,show", "edje");
+      else
+        edje_object_signal_emit(handle_, "elm,state,bottom,reversed", "elm");
+      break;
+    case DirectionTopNormal:
+      if (is_cursor_handle_)
+        edje_object_signal_emit(handle_, "edje,cursor,handle,top", "edje");
+      else
+        edje_object_signal_emit(handle_, "elm,state,top", "elm");
+      break;
+    case DirectionTopReverse:
+      if (is_cursor_handle_)
+        edje_object_signal_emit(handle_, "edje,cursor,handle,top", "edje");
+      else
+        edje_object_signal_emit(handle_, "elm,state,top,reversed", "elm");
+      break;
+    }
+
+  switch (handleType) {
+    case HANDLE_TYPE_LEFT:
+      evas_object_smart_callback_call(controller_->GetParentView()->evas_object(), "selection,handle,left,direction", &direction);
+      break;
+    case HANDLE_TYPE_RIGHT:
+      evas_object_smart_callback_call(controller_->GetParentView()->evas_object(), "selection,handle,right,direction", &direction);
+      break;
+    case HANDLE_TYPE_INPUT:
+      evas_object_smart_callback_call(controller_->GetParentView()->evas_object(), "selection,handle,large,direction", &direction);
+      break;
+  }
+}
+
+SelectionHandleEfl::HandleType SelectionHandleEfl::GetHandleType(const gfx::Point& point) {
+  gfx::Rect leftRect = controller_->GetLeftRect();
+  gfx::Rect rightRect = controller_->GetRightRect();
+  HandleType type = HANDLE_TYPE_INPUT;
+
+  if (leftRect.x() == rightRect.x())
+    type = HANDLE_TYPE_INPUT;
+  else if (point.x() == leftRect.x())
+    type = HANDLE_TYPE_LEFT;
+  else if (point.x() == rightRect.x())
+    type = HANDLE_TYPE_RIGHT;
+
+  return type;
+}
+
+gfx::Rect SelectionHandleEfl::GetSelectionRect(HandleType handleType) {
+  gfx::Rect leftRect = controller_->GetLeftRect();
+  gfx::Rect rect = leftRect;
+
+  if (handleType == HANDLE_TYPE_RIGHT)
+    rect = controller_->GetRightRect();
+
+  return rect;
+}
+
+void SelectionHandleEfl::MoveObject(gfx::Point& point) {
+  Evas_Coord x, y;
+  evas_object_geometry_get(controller_->GetParentView()->evas_object(), &x, &y, 0, 0);
+  evas_object_move(handle_, point.x() + x, point.y() + y);
 }
 
 }

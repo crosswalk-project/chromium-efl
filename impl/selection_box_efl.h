@@ -50,6 +50,7 @@ class SelectionBoxEfl {
   gfx::Rect GetLeftRect() const { return left_rect_; }
   gfx::Rect GetRightRect() const { return right_rect_; }
   ContextMenuParams* GetContextMenuParams() const { return context_params_.get(); }
+  bool IsAnchorFirst() { return is_anchor_first_; }
 
  private:
   // Save the state of selection, if active or not

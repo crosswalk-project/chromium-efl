@@ -79,6 +79,9 @@ class SelectionControllerEfl {
   void SetScrollStatus(const bool enable);
   bool GetScrollStatus();
 
+  gfx::Rect GetLeftRect();
+  gfx::Rect GetRightRect();
+
  private:
   void ShowHandleAndContextMenuIfRequired();
   void Clear();
