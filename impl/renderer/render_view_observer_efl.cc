@@ -138,6 +138,7 @@ bool RenderViewObserverEfl::OnMessageReceived(const IPC::Message& message)
     IPC_MESSAGE_HANDLER(EwkViewMsg_GetMHTMLData, OnGetMHTMLData);
     IPC_MESSAGE_HANDLER(EwkViewMsg_WebAppIconUrlGet, OnWebAppIconUrlGet);
     IPC_MESSAGE_HANDLER(EwkViewMsg_SetDrawsTransparentBackground, OnSetDrawsTransparentBackground);
+    IPC_MESSAGE_HANDLER(EwkViewMsg_SetBrowserFont, OnSetBrowserFont);
     IPC_MESSAGE_UNHANDLED(handled = false)
   IPC_END_MESSAGE_MAP()
   return handled;
@@ -388,7 +389,16 @@ void RenderViewObserverEfl::OrientationChangeEvent(int orientation)
   Send(new EwkHostMsg_OrientationChangeEvent(render_view()->GetRoutingID(), orientation));
 }
 
-void RenderViewObserverEfl::WillSubmitForm(blink::WebFrame* frame, const blink::WebFormElement& form) {
+void RenderViewObserverEfl::WillSubmitForm(blink::WebFrame* frame, const blink::WebFormElement& form)
+{
   GURL url(form.action());
   Send(new EwkHostMsg_FormSubmit(routing_id(),url));
+}
+
+void RenderViewObserverEfl::OnSetBrowserFont()
+{
+  blink::WebView* view = render_view()->GetWebView();
+  if (view) {
+    view->setBrowserFont();
+  }
 }

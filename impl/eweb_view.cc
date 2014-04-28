@@ -1653,6 +1653,12 @@ bool EWebView::RestoreFromSessionData(const char *data, unsigned length) {
   return true;
 }
 
+void EWebView::SetBrowserFont() {
+  RenderViewHost* render_view_host = web_contents_delegate()->web_contents()->GetRenderViewHost();
+  if (render_view_host)
+    render_view_host->Send(new EwkViewMsg_SetBrowserFont(render_view_host->GetRoutingID()));
+}
+
 #ifdef OS_TIZEN
 void EWebView::OnMotionEnable(void *data, Evas_Object *obj, void *eventInfo) {
   bool* enable = static_cast<bool*>(eventInfo);

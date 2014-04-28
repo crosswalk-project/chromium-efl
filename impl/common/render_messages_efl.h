@@ -119,6 +119,7 @@ IPC_STRUCT_TRAITS_END()
 // Tells the renderer to clear the cache.
 IPC_MESSAGE_CONTROL0(EflViewMsg_ClearCache)
 IPC_MESSAGE_ROUTED0(EwkViewMsg_UseSettingsFont)
+IPC_MESSAGE_ROUTED0(EwkViewMsg_SetBrowserFont)
 
 IPC_MESSAGE_CONTROL1(EflViewMsg_SetCache,
                      CacheParamsEfl)

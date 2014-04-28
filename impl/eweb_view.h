@@ -282,6 +282,8 @@ class EWebView
                               content::InputEventAckState ack_result);
   void ShowFileChooser(const content::FileChooserParams&);
   void DidChangeContentsArea(int width, int height);
+  void SetBrowserFont();
+
   void RequestColorPicker(int r, int g, int b, int a);
   void DismissColorPicker();
   bool SetColorPickerColor(int r, int g, int b, int a);
