@@ -881,8 +881,9 @@ void EWebView::DispatchPostponedGestureEvent(ui::GestureEvent* event) {
       }
       rwhv()->HandleGesture(event);
     }
-  } else if (event->details().type() == ui::ET_GESTURE_TAP) {
+  } else if ((event->details().type() == ui::ET_GESTURE_TAP) || (event->details().type() == ui::ET_GESTURE_SHOW_PRESS))  {
     _Ewk_Hit_Test* hit_test_data = RequestHitTestDataAt(event->x(), event->y(), EWK_HIT_TEST_MODE_DEFAULT);
+    LOG(INFO) << __PRETTY_FUNCTION__ << " hit_test = " << hit_test_data;
     if (hit_test_data && hit_test_data->context & EWK_HIT_TEST_RESULT_CONTEXT_EDITABLE) {
       LOG(INFO) << "DispatchPostponedGestureEvent :: EWK_HIT_TEST_RESULT_CONTEXT_EDITABLE";
       selection_controller_->SetSelectionStatus(true);
@@ -893,11 +894,15 @@ void EWebView::DispatchPostponedGestureEvent(ui::GestureEvent* event) {
         selection_controller_->SetSelectionEditable(true);
       delete hit_test_data;
     } else {
-        selection_controller_->SetSelectionEditable(false);
-        ClearSelection();
+      if (hit_test_data && hit_test_data->context & EWK_HIT_TEST_RESULT_CONTEXT_DOCUMENT)
+        LOG(INFO) << __PRETTY_FUNCTION__ << " DOCUMENT";
+      if (hit_test_data && hit_test_data->context & EWK_HIT_TEST_RESULT_CONTEXT_TEXT)
+        LOG(INFO) << __PRETTY_FUNCTION__ << " TEXT";
+
+      selection_controller_->SetSelectionEditable(false);
+      ClearSelection();
     }
     rwhv()->HandleGesture(event);
-  } else if (event->details().type() == ui::ET_GESTURE_TAP) {
   } else {
     ClearSelection();
     rwhv()->HandleGesture(event);

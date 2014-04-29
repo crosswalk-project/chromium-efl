@@ -494,10 +494,8 @@ void RenderWidgetHostViewEfl::ImeCompositionRangeChanged(
   composition_character_bounds_ = character_bounds;
   SelectionControllerEfl* controller = web_view_->GetSelectionController();
   if (controller) {
-    if(controller->GetCaretSelectionStatus()) {
-      controller->SetCaretSelectionStatus(false);
-      controller->HideHandleAndContextMenu();
-    }
+    controller->SetCaretSelectionStatus(false);
+    controller->HideHandleAndContextMenu();
   }
 }
 

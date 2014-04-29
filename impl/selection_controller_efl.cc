@@ -123,6 +123,8 @@ void SelectionControllerEfl::ShowHandleAndContextMenuIfRequired() {
   if (!selection_data_->GetStatus())
     return;
 
+  Clear();
+
   // Is in edit field and no text is selected. show only single handle
   if (selection_data_->IsInEditField() && GetCaretSelectionStatus()) {
     gfx::Rect left = selection_data_->GetLeftRect();
@@ -251,6 +253,14 @@ bool SelectionControllerEfl::IsSelectionValid(const gfx::Rect& left_rect, const 
   LOG(INFO) << "SelectionControllerEfl::IsSelectionValid true";
   if (!GetSelectionStatus())
     SetSelectionStatus(true);
+
+  if (left_rect.x() != right_rect.x() || left_rect.y() != right_rect.y() &&
+      selection_data_->IsInEditField() && GetCaretSelectionStatus()) {
+    if (!long_mouse_press_)
+      SetCaretSelectionStatus(false);
+  }
+
+  LOG(INFO) << "SelectionControllerEfl::IsSelectionValid true";
   return true;
 }
 
