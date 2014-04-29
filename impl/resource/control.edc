@@ -1,0 +1,737 @@
+
+collections {
+    group { name: "datetime_popup";
+        parts {
+            part { name: "bg";
+                type: RECT;
+                scale: 1;
+                description {
+                    state: "default" 0.0;
+                    visible: 0;
+                    align: 0.0 0.0;
+                    min: 0 100;
+                    rel1 { relative: 0.0 0.0; }
+                    rel2 { relative: 1.0 1.0; }
+                }
+            }
+            part { name: "pad_left";
+                type: SPACER;
+                scale: 1;
+                description {
+                    state: "default" 0.0;
+                    align: 0.0 0.5;
+                    min: 20 0;
+                    rel1 { relative: 0.0 0.0; to: "bg"; }
+                    rel2 { relative: 0.0 1.0; to: "bg"; }
+                }
+            }
+            part { name: "elm.swallow.datetime";
+                type: SWALLOW;
+                scale: 1;
+                description {
+                    state: "default" 0.0;
+                    align: 0.0 0.5;
+                    rel1 { relative: 1.0 0.0; to: "pad_left"; }
+                    rel2 { relative: 1.0 1.0; to: "bg"; }
+                }
+            }
+        }
+    }
+    group { name: "color_picker";
+        parts {
+            part { name: "bg";
+                scale: 1;
+                type: RECT;
+                description { state: "default" 0.0;
+                    visible: 0;
+                    min : 0 320;
+                    fixed: 0 0;
+                    align: 0.0 0.0;
+                    rel1 {relative: 0.0 0.0;}
+                    rel2 {relative: 1.0 1.0;}
+                }
+            }
+            part { name: "color_rect_bg";
+                scale: 1;
+                type: RECT;
+                description { state: "default" 0.0;
+                    visible: 0;
+                    min : 0 140;
+                    fixed: 0 0;
+                    align: 0.0 0.0;
+                    rel1 {relative: 0.0 0.0; to: "bg"; }
+                    rel2 {relative: 1.0 0.0; to: "bg"; }
+                }
+            }
+            part { name: "elm.swallow.color_rect";
+                scale: 1;
+                type: SWALLOW;
+                description { state: "default" 0.0;
+                    visible: 1;
+                    min: 200 80;
+                    max: 200 80;
+                    fixed: 1 1;
+                    align: 0.5 0.4;
+                    rel1 {relative: 0.0 0.0; to: "color_rect_bg"; }
+                    rel2 {relative: 1.0 1.0; to: "color_rect_bg"; }
+                }
+            }
+
+            part { name: "color_palette_bg";
+                scale: 1;
+                type: RECT;
+                description { state: "default" 0.0;
+                    visible: 0;
+                    align: 0.0 0.0;
+                    min: 710 200;
+                    rel1 {relative: 0.0 1.0; to: "color_rect_bg"; }
+                    rel2 {relative: 1.0 1.0; to: "bg"; }
+                }
+            }
+           part { name: "elm.swallow.color1";
+                scale: 1;
+                type: SWALLOW;
+                description { state: "default" 0.0;
+                    visible: 1;
+                    min: 70 70;
+                    max: 70 70;
+                    fixed: 1 1;
+                    align: 0.125 0.0;
+                    rel1 {relative: 0.0 0.0; to: "color_palette_bg"; }
+                    rel2 {relative: 1.0 1.0; to: "color_palette_bg"; }
+                }
+            }
+            part { name: "elm.swallow.color2";
+                scale: 1;
+                type: SWALLOW;
+                description { state: "default" 0.0;
+                    visible: 1;
+                    min: 70 70;
+                    max: 70 70;
+                    fixed: 1 1;
+                    align: 0.25 0.0;
+                    rel1 {relative: 0.0 0.0; to: "color_palette_bg"; }
+                    rel2 {relative: 1.0 1.0; to: "color_palette_bg"; }
+                }
+            }
+            part { name: "elm.swallow.color3";
+                scale: 1;
+                type: SWALLOW;
+                description { state: "default" 0.0;
+                    visible: 1;
+                    min: 70 70;
+                    max: 70 70;
+                    fixed: 1 1;
+                    align: 0.375 0.0;
+                    rel1 {relative: 0.0 0.0; to: "color_palette_bg"; }
+                    rel2 {relative: 1.0 1.0; to: "color_palette_bg"; }
+                }
+            }
+            part { name: "elm.swallow.color4";
+                scale: 1;
+                type: SWALLOW;
+                description { state: "default" 0.0;
+                    visible: 1;
+                    min: 70 70;
+                    max: 70 70;
+                    fixed: 1 1;
+                    align: 0.5 0.0;
+                    rel1 {relative: 0.0 0.0; to: "color_palette_bg"; }
+                    rel2 {relative: 1.0 1.0; to: "color_palette_bg"; }
+                }
+            }
+            part { name: "elm.swallow.color5";
+                scale: 1;
+                type: SWALLOW;
+                description { state: "default" 0.0;
+                    visible: 1;
+                    min: 70 70;
+                    max: 70 70;
+                    fixed: 1 1;
+                    align: 0.625 0.0;
+                    rel1 {relative: 0.0 0.0; to: "color_palette_bg"; }
+                    rel2 {relative: 1.0 1.0; to: "color_palette_bg"; }
+                }
+            }
+            part { name: "elm.swallow.color6";
+                scale: 1;
+                type: SWALLOW;
+                description { state: "default" 0.0;
+                    visible: 1;
+                    min: 70 70;
+                    max: 70 70;
+                    fixed: 1 1;
+                    align: 0.75 0.0;
+                    rel1 {relative: 0.0 0.0; to: "color_palette_bg"; }
+                    rel2 {relative: 1.0 1.0; to: "color_palette_bg"; }
+                }
+            }
+            part { name: "elm.swallow.color7";
+                scale: 1;
+                type: SWALLOW;
+                description { state: "default" 0.0;
+                    visible: 1;
+                    min: 70 70;
+                    max: 70 70;
+                    fixed: 1 1;
+                    align: 0.875 0.0;
+                    rel1 {relative: 0.0 0.0; to: "color_palette_bg"; }
+                    rel2 {relative: 1.0 1.0; to: "color_palette_bg"; }
+                }
+            }
+            part { name: "elm.swallow.color8";
+                scale: 1;
+                type: SWALLOW;
+                description { state: "default" 0.0;
+                    visible: 1;
+                    min: 70 70;
+                    max: 70 70;
+                    fixed: 1 1;
+                    align: 0.125 0.66;
+                    rel1 {relative: 0.0 0.0; to: "color_palette_bg"; }
+                    rel2 {relative: 1.0 1.0; to: "color_palette_bg"; }
+                }
+            }
+            part { name: "elm.swallow.color9";
+                scale: 1;
+                type: SWALLOW;
+                description { state: "default" 0.0;
+                    visible: 1;
+                    min: 70 70;
+                    max: 70 70;
+                    fixed: 1 1;
+                    align: 0.25 0.66;
+                    rel1 {relative: 0.0 0.0; to: "color_palette_bg"; }
+                    rel2 {relative: 1.0 1.0; to: "color_palette_bg"; }
+                }
+            }
+            part { name: "elm.swallow.color10";
+                scale: 1;
+                type: SWALLOW;
+                description { state: "default" 0.0;
+                    visible: 1;
+                    min: 70 70;
+                    max: 70 70;
+                    fixed: 1 1;
+                    align: 0.375 0.66;
+                    rel1 {relative: 0.0 0.0; to: "color_palette_bg"; }
+                    rel2 {relative: 1.0 1.0; to: "color_palette_bg"; }
+                }
+            }
+            part { name: "elm.swallow.color11";
+                scale: 1;
+                type: SWALLOW;
+                description { state: "default" 0.0;
+                    visible: 1;
+                    min: 70 70;
+                    max: 70 70;
+                    fixed: 1 1;
+                    align: 0.5 0.66;
+                    rel1 {relative: 0.0 0.0; to: "color_palette_bg"; }
+                    rel2 {relative: 1.0 1.0; to: "color_palette_bg"; }
+                }
+            }
+            part { name: "elm.swallow.color12";
+                scale: 1;
+                type: SWALLOW;
+                description { state: "default" 0.0;
+                    visible: 1;
+                    min: 70 70;
+                    max: 70 70;
+                    fixed: 1 1;
+                    align: 0.625 0.66;
+                    rel1 {relative: 0.0 0.0; to: "color_palette_bg"; }
+                    rel2 {relative: 1.0 1.0; to: "color_palette_bg"; }
+                }
+            }
+            part { name: "elm.swallow.color13";
+                scale: 1;
+                type: SWALLOW;
+                description { state: "default" 0.0;
+                    visible: 1;
+                    min: 70 70;
+                    max: 70 70;
+                    fixed: 1 1;
+                    align: 0.75 0.66;
+                    rel1 {relative: 0.0 0.0; to: "color_palette_bg"; }
+                    rel2 {relative: 1.0 1.0; to: "color_palette_bg"; }
+                }
+            }
+            part { name: "elm.swallow.color14";
+                scale: 1;
+                type: SWALLOW;
+                description { state: "default" 0.0;
+                    visible: 1;
+                    min: 70 70;
+                    max: 70 70;
+                    fixed: 1 1;
+                    align: 0.875 0.66;
+                    rel1 {relative: 0.0 0.0; to: "color_palette_bg"; }
+                    rel2 {relative: 1.0 1.0; to: "color_palette_bg"; }
+                }
+            }
+        }
+    }
+    group { name: "data_list_picker";
+        parts {
+            part { name: "bg";
+                type: RECT;
+                mouse_events: 1;
+                repeat_events: 0;
+                scale: 1;
+                description { state: "default" 0.0;
+                    min : 0 400;
+                    fixed: 0 0;
+                    align: 0.0 0.0;
+                    rel1 { relative: 0.0 0.0; }
+                    rel2 { relative: 1.0 1.0; }
+                    color: 0 0 0 0;
+                }
+            }
+            part { name: "selected_item";
+                type: SWALLOW;
+                mouse_events: 1;
+                repeat_events: 0;
+                scale: 1;
+                description { state: "default" 0.0;
+                    align: 0.0 1.0;
+                    min: 0 80;
+                    fixed: 0 1;
+                    rel1 { relative: 0.0 1.0; to: "bg"; }
+                    rel2 { relative: 1.0 1.0; to: "bg"; }
+                }
+            }
+            part { name: "data_list";
+                type: SWALLOW;
+                mouse_events: 1;
+                repeat_events: 0;
+                scale: 1;
+                description { state: "default" 0.0;
+                    align: 0.0 0.0;
+                    rel1 { relative: 0.0 0.0; to: "bg"; }
+                    rel2 { relative: 1.0 0.0; to_x: "bg"; to_y: "selected_item"; }
+                }
+            }
+        }
+    }
+    group { name: "elm/picker";
+        images {
+            image: "I01_picker_panel_bg.png" COMP;
+            image: "I01_picker_btn_02_normal.png" COMP;
+            image: "I01_picker_btn_02_press.png" COMP;
+            image: "I01_picker_btn_normal.png" COMP;
+            image: "I01_picker_arrow_left.png" COMP;
+            image: "I01_picker_arrow_right.png" COMP;
+        }
+        parts {
+            part { name: "dimm";
+                type: RECT;
+                mouse_events: 1;
+                repeat_events: 0;
+                scale: 1;
+                description { state: "default" 0.0;
+                    rel1 { relative: 0.0 0.0; }
+                    rel2 { relative: 1.0 1.0; }
+                    color: 0 0 0 0;
+                }
+            }
+            part { name: "bg";
+                type: SWALLOW;
+                mouse_events: 0;
+                scale: 1;
+                description { state: "default" 0.0;
+                    rel1 { relative: 0.0 1.0; }
+                    rel2 { relative: 1.0 1.5; }
+                }
+                description { state: "show" 0.0;
+                    inherit: "default" 0.0;
+                    rel1 { relative: 0.0 0.48;}
+                    rel2 { relative: 1.0 1.0; offset: 0 2; }
+                }
+                description { state: "imf_panel" 0.0;
+                    inherit: "show" 0.0;
+                    visible: 0;
+                }
+            }
+            part { name: "elm.image.panel";
+                type: IMAGE;
+                mouse_events: 1;
+                scale: 1;
+                description { state: "default" 0.0;
+                    min: 0 86;
+                    fixed: 0 1;
+                    align: 0.0 0.0;
+                    rel1 { relative: 0.0 0.0; to: "bg"; }
+                    rel2 { relative: 1.0 0.0; to: "bg"; }
+                    image.normal: "I01_picker_panel_bg.png";
+                }
+                description { state: "show" 0.0;
+                    inherit: "default" 0.0;
+                }
+                description { state: "imf_panel" 0.0;
+                    inherit: "default" 0.0;
+                    align: 0.0 1.0;
+                    rel1 { relative: 0.0 1.0; to: "bg"; offset: 0 2; }
+                    rel2 { relative: 1.0 1.0; to: "bg"; offset: 0 2; }
+                }
+            }
+            part { name: "padding.prev_bg.left";
+                type: RECT;
+                mouse_events: 1;
+                scale: 1;
+                description { state: "default" 0.0;
+                    visible: 0;
+                    min: 10 0;
+                    fixed: 1 0;
+                    align: 0.0 0.0;
+                    rel1 { relative: 0.0 0.0; to: "elm.image.panel"; }
+                    rel2 { relative: 0.0 1.0; to: "elm.image.panel"; }
+                }
+            }
+            part { name: "elm.image.prev_bg";
+                type: IMAGE;
+                mouse_events: 1;
+                scale: 1;
+                description { state: "default" 0.0;
+                    visible: 0;
+                    min: 72 64;
+                    max: 72 64;
+                    fixed: 1 1;
+                    align: 0.0 0.5;
+                    rel1 { relative: 1.0 0.0; to_x: "padding.prev_bg.left"; to_y: "elm.image.panel"; }
+                    rel2 { relative: 1.0 1.0; to_x: "padding.prev_bg.left"; to_y: "elm.image.panel"; }
+                    image.normal: "I01_picker_btn_02_normal.png";
+                    image.border: 5 5 5 5;
+                }
+                description { state: "press" 0.0;
+                    inherit: "default" 0.0;
+                    visible: 1;
+                    image.normal: "I01_picker_btn_02_press.png";
+                }
+                description { state: "visible" 0.0;
+                    inherit: "default" 0.0;
+                    visible: 1;
+                }
+                description { state: "disable" 0.0;
+                    inherit: "default" 0.0;
+                    visible: 1;
+                    color: 255 255 255 150;
+                }
+            }
+            part { name: "elm.image.prev_arrow";
+                type: IMAGE;
+                mouse_events: 1;
+                repeat_events: 1;
+                scale: 1;
+                description { state: "default" 0.0;
+                    visible: 0;
+                    min: 32 32;
+                    max: 32 32;
+                    fixed: 1 1;
+                    align: 0.5 0.5;
+                    rel1 { relative: 0.0 0.0; to: "elm.image.prev_bg"; }
+                    rel2 { relative: 1.0 1.0; to: "elm.image.prev_bg"; }
+                    image.normal: "I01_picker_arrow_left.png";
+                }
+                description { state: "visible" 0.0;
+                    inherit: "default" 0.0;
+                    visible: 1;
+                }
+                description { state: "disable" 0.0;
+                    inherit: "default" 0.0;
+                    visible: 1;
+                    color: 255 255 255 150;
+                }
+            }
+            part { name: "padding.prev_bg.right";
+                type: RECT;
+                mouse_events: 1;
+                scale: 1;
+                description { state: "default" 0.0;
+                    visible: 0;
+                    min: 16 0;
+                    fixed: 1 0;
+                    align: 0.0 0.0;
+                    rel1 { relative: 1.0 0.0; to: "elm.image.prev_bg"; }
+                    rel2 { relative: 1.0 1.0; to: "elm.image.prev_bg"; }
+                }
+            }
+            part { name: "elm.image.next_bg";
+                type: IMAGE;
+                mouse_events: 1;
+                scale: 1;
+                description { state: "default" 0.0;
+                    visible: 0;
+                    min: 72 64;
+                    max: 72 64;
+                    fixed: 1 1;
+                    align: 0.0 0.5;
+                    rel1 { relative: 1.0 0.0; to_x: "padding.prev_bg.right"; to_y: "elm.image.panel"; }
+                    rel2 { relative: 1.0 1.0; to_x: "padding.prev_bg.right"; to_y: "elm.image.panel"; }
+                    image.normal: "I01_picker_btn_02_normal.png";
+                    image.border: 5 5 5 5;
+                }
+                description { state: "press" 0.0;
+                    inherit: "default" 0.0;
+                    visible: 1;
+                    image.normal: "I01_picker_btn_02_press.png";
+                }
+                description { state: "visible" 0.0;
+                    inherit: "default" 0.0;
+                    visible: 1;
+                }
+                description { state: "disable" 0.0;
+                    inherit: "default" 0.0;
+                    visible: 1;
+                    color: 255 255 255 150;
+                }
+            }
+            part { name: "elm.image.next_arrow";
+                type: IMAGE;
+                mouse_events: 1;
+                repeat_events: 1;
+                scale: 1;
+                description { state: "default" 0.0;
+                    visible: 0;
+                    min: 32 32;
+                    max: 32 32;
+                    fixed: 1 1;
+                    align: 0.5 0.5;
+                    rel1 { relative: 0.0 0.0; to: "elm.image.next_bg"; }
+                    rel2 { relative: 1.0 1.0; to: "elm.image.next_bg"; }
+                    image.normal: "I01_picker_arrow_right.png";
+                }
+                description { state: "visible" 0.0;
+                    inherit: "default" 0.0;
+                    visible: 1;
+                }
+                description { state: "disable" 0.0;
+                    inherit: "default" 0.0;
+                    visible: 1;
+                    color: 255 255 255 150;
+                }
+            }
+            part { name: "padding.done_bg.right";
+                type: RECT;
+                mouse_events: 1;
+                scale: 1;
+                description { state: "default" 0.0;
+                    visible: 0;
+                    min: 10 0;
+                    fixed: 1 0;
+                    align: 1.0 0.0;
+                    rel1 { relative: 1.0 0.0; to: "elm.image.panel"; }
+                    rel2 { relative: 1.0 1.0; to: "elm.image.panel"; }
+                }
+            }
+            part { name: "elm.image.done_bg";
+                type: IMAGE;
+                mouse_events: 1;
+                scale: 1;
+                description { state: "default" 0.0;
+                    min: 132 64;
+                    max: 132 64;
+                    fixed: 1 1;
+                    align: 1.0 0.5;
+                    rel1 { relative: 0.0 0.0; to_x: "padding.done_bg.right"; to_y: "elm.image.panel"; }
+                    rel2 { relative: 0.0 1.0; to_x: "padding.done_bg.right"; to_y: "elm.image.panel"; }
+                    image.normal: "I01_picker_btn_02_normal.png";
+                    image.border: 5 5 5 5;
+                }
+                description { state: "press" 0.0;
+                    inherit: "default" 0.0;
+                    image.normal: "I01_picker_btn_02_press.png";
+                }
+            }
+            part { name: "elm.text.done";
+                type: TEXT;
+                repeat_events: 1;
+                scale: 1;
+                description { state: "default" 0.0;
+                   visible: 1;
+                   fixed: 1 1;
+                   rel1.to: "elm.image.done_bg";
+                   rel2.to: "elm.image.done_bg";
+                   color: 255 255 255 255;
+                   text {
+                      font: "Tizen:style=Medium";
+                      size: 32;
+                      min: 1 1;
+                      align: 0.5 0.5;
+                   }
+                }
+            }
+            part { name: "elm.swallow.content";
+                type: SWALLOW;
+                mouse_events: 1;
+                scale: 1;
+                description { state: "default" 0.0;
+                    align: 0.0 0.0;
+                    rel1 { relative: 0.0 1.0; to: "elm.image.panel"; }
+                    rel2 { relative: 1.0 1.0;}
+                }
+                description { state: "show" 0.0;
+                    inherit: "default" 0.0;
+                }
+                description { state: "imf_panel" 0.0;
+                    inherit: "default" 0.0;
+                    visible: 0;
+                }
+            }
+        }
+
+        programs {
+            program {
+                name: "prev_button_press";
+                signal: "mouse,down,1";
+                source: "elm.image.prev_bg";
+                script {
+                    new st[31];
+                    new Float:vl;
+                    get_state(PART:"elm.image.prev_bg", st, 30, vl);
+                    if (!strcmp(st, "visible"))
+                        set_state(PART:"elm.image.prev_bg", "press", 0.0);
+                }
+            }
+            program {
+                name: "prev_button_release";
+                signal: "mouse,up,1";
+                source: "elm.image.prev_bg";
+                script {
+                    new st[31];
+                    new Float:vl;
+                    get_state(PART:"elm.image.prev_bg", st, 30, vl);
+                    if (!strcmp(st, "press"))
+                        set_state(PART:"elm.image.prev_bg", "visible", 0.0);
+                }
+            }
+            program {
+                name: "next_button_press";
+                signal: "mouse,down,1";
+                source: "elm.image.next_bg";
+                script {
+                    new st[31];
+                    new Float:vl;
+                    get_state(PART:"elm.image.next_bg", st, 30, vl);
+                    if (!strcmp(st, "visible"))
+                         set_state(PART:"elm.image.next_bg", "press", 0.0);
+                }
+            }
+            program {
+                name: "next_button_release";
+                signal: "mouse,up,1";
+                source: "elm.image.next_bg";
+                script {
+                    new st[31];
+                    new Float:vl;
+                    get_state(PART:"elm.image.next_bg", st, 30, vl);
+                    if (!strcmp(st, "press"))
+                        set_state(PART:"elm.image.next_bg", "visible", 0.0);
+                }
+            }
+            program {
+                name: "done_button_press";
+                signal: "mouse,down,1";
+                source: "elm.image.done_bg";
+                script {
+                    new st[31];
+                    new Float:vl;
+                    get_state(PART:"elm.image.done_bg", st, 30, vl);
+                    if (!strcmp(st, "default"))
+                        set_state(PART:"elm.image.done_bg", "press", 0.0);
+                }
+            }
+            program {
+                name: "done_button_release";
+                signal: "mouse,up,1";
+                source: "elm.image.done_bg";
+                script {
+                    new st[31];
+                    new Float:vl;
+                    get_state(PART:"elm.image.done_bg", st, 30, vl);
+                    if (!strcmp(st, "press"))
+                        set_state(PART:"elm.image.done_bg", "default", 0.0);
+                }
+            }
+            program { name: "show,picker";
+                signal: "show,picker,signal";
+                transition: LINEAR 0.4;
+                action: STATE_SET "show" 0.0;
+                target: "bg";
+                target: "elm.image.panel";
+                target: "elm.swallow.content";
+            }
+            program { name: "show,picker_delay";
+                signal: "show,picker_delay,signal";
+                action: STATE_SET "show" 0.0;
+                in: 0.5 0.0;
+                target: "bg";
+                target: "elm.image.panel";
+                target: "elm.swallow.content";
+            }
+            program { name: "hide,picker";
+                signal: "hide,picker,signal";
+                action: STATE_SET "default" 0.0;
+                target: "bg";
+                target: "elm.image.panel";
+                target: "elm.swallow.content";
+            }
+            program { name: "show,prev_button";
+                signal: "show,prev_button,signal";
+                action: STATE_SET "visible" 0.0;
+                target: "elm.image.prev_bg";
+                target: "elm.image.prev_arrow";
+            }
+            program { name: "hide,prev_button";
+                signal: "hide,prev_button,signal";
+                action: STATE_SET "default" 0.0;
+                target: "elm.image.prev_bg";
+                target: "elm.image.prev_arrow";
+            }
+            program { name: "enable,prev_button";
+                signal: "enable,prev_button,signal";
+                action: STATE_SET "visible" 0.0;
+                target: "elm.image.prev_bg";
+                target: "elm.image.prev_arrow";
+            }
+            program { name: "disable,prev_button";
+                signal: "disable,prev_button,signal";
+                action: STATE_SET "disable" 0.0;
+                target: "elm.image.prev_bg";
+                target: "elm.image.prev_arrow";
+            }
+            program { name: "show,next_button";
+                signal: "show,next_button,signal";
+                action: STATE_SET "visible" 0.0;
+                target: "elm.image.next_bg";
+                target: "elm.image.next_arrow";
+            }
+            program { name: "hide,next_button";
+                signal: "hide,next_button,signal";
+                action: STATE_SET "default" 0.0;
+                target: "elm.image.next_bg";
+                target: "elm.image.next_arrow";
+            }
+            program { name: "enable,next_button";
+                signal: "enable,next_button,signal";
+                action: STATE_SET "visible" 0.0;
+                target: "elm.image.next_bg";
+                target: "elm.image.next_arrow";
+            }
+            program { name: "disable,next_button";
+                signal: "disable,next_button,signal";
+                action: STATE_SET "disable" 0.0;
+                target: "elm.image.next_bg";
+                target: "elm.image.next_arrow";
+            }
+            program { name: "show,imf_panel";
+                signal: "show,imf_panel,signal";
+                action: STATE_SET "imf_panel" 0.0;
+                target: "bg";
+                target: "elm.image.panel";
+                target: "elm.swallow.content";
+            }
+        }
+    }
+}
+

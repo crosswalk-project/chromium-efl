@@ -1569,3 +1569,17 @@ void EWebView::ShowFileChooser(const content::FileChooserParams& params) {
   file_chooser_.reset(new content::FileChooserControllerEfl(render_view_host, &params));
   file_chooser_->open();
 }
+
+void EWebView::RequestColorPicker(int r, int g, int b, int a) {
+  inputPicker_.reset(new InputPicker(web_contents_delegate()->web_contents()));
+  inputPicker_->showColorPicker(r, g, b, a);
+}
+
+void EWebView::DismissColorPicker() {
+  inputPicker_->hideColorPicker();
+}
+
+bool EWebView::SetColorPickerColor(int r, int g, int b, int a) {
+  // FIXME : DJKim : not implemented yet
+  return true;
+}

@@ -22,6 +22,7 @@
 
 #include <map>
 #include <string>
+#include <Evas.h>
 
 #include "base/memory/scoped_ptr.h"
 #include "base/synchronization/waitable_event.h"
@@ -48,8 +49,7 @@
 #include "file_chooser_controller_efl.h"
 #include "ui/gfx/point.h"
 #include "ui/gfx/size.h"
-
-#include <Evas.h>
+#include "browser/inputpicker/InputPicker.h"
 
 namespace content {
 class RenderViewHost;
@@ -244,6 +244,9 @@ class EWebView
                               content::InputEventAckState ack_result);
   void ShowFileChooser(const content::FileChooserParams&);
   void DidChangeContentsArea(int width, int height);
+  void RequestColorPicker(int r, int g, int b, int a);
+  void DismissColorPicker();
+  bool SetColorPickerColor(int r, int g, int b, int a);
 
  private:
   EWebView(EWebContext*, Evas_Object* smart_object);
@@ -348,6 +351,7 @@ class EWebView
   double min_page_scale_factor_;
   double max_page_scale_factor_;
   scoped_ptr<OrientationLockCallback> orientation_lock_callback_;
+  scoped_ptr<content::InputPicker> inputPicker_;
 
 #ifndef NDEBUG
   bool renderer_crashed_;

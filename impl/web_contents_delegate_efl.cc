@@ -438,4 +438,13 @@ void WebContentsDelegateEfl::RunFileChooser(WebContents* web_contents, const Fil
   web_view_->ShowFileChooser(params);
 }
 
+content::ColorChooser* WebContentsDelegateEfl::OpenColorChooser(
+    WebContents* web_contents,
+    SkColor color,
+    const std::vector<ColorSuggestion>& suggestions) {
+  web_view_->RequestColorPicker(SkColorGetR(color), SkColorGetG(color), SkColorGetB(color), SkColorGetA(color));
+
+  // FIXME : DJKim : not implemented yet
+  return NULL;
+}
 } //namespace content

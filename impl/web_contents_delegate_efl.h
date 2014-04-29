@@ -144,6 +144,7 @@ class WebContentsDelegateEfl
                                    int32 line_no,
                                    const base::string16& source_id) OVERRIDE;
   void RunFileChooser(WebContents* web_contents, const FileChooserParams& params);
+  ColorChooser* OpenColorChooser(WebContents* web_contents, SkColor color, const std::vector<ColorSuggestion>& suggestions);
 
  private:
   void OnGetContentSecurityPolicy(IPC::Message* reply_msg);
