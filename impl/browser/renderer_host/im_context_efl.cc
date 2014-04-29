@@ -169,7 +169,7 @@ void IMContextEfl::ShowPanel(ui::TextInputType input_type, ui::TextInputMode inp
   Ecore_IMF_Input_Panel_Layout layout;
   Ecore_IMF_Input_Panel_Return_Key_Type return_key_type = ECORE_IMF_INPUT_PANEL_RETURN_KEY_TYPE_DEFAULT;
   Ecore_IMF_Autocapital_Type cap_type = ECORE_IMF_AUTOCAPITAL_TYPE_NONE;
-  bool allow_prediction = false;
+  bool allow_prediction = true;
 
   switch (input_type) {
     case ui::TEXT_INPUT_TYPE_TEXT:
@@ -177,7 +177,7 @@ void IMContextEfl::ShowPanel(ui::TextInputType input_type, ui::TextInputMode inp
       break;
     case ui::TEXT_INPUT_TYPE_PASSWORD:
       layout = ECORE_IMF_INPUT_PANEL_LAYOUT_PASSWORD;
-      allow_prediction = true;
+      allow_prediction = false;
       break;
     case ui::TEXT_INPUT_TYPE_SEARCH:
       layout = ECORE_IMF_INPUT_PANEL_LAYOUT_NORMAL;
@@ -336,8 +336,7 @@ void IMContextEfl::OnPreeditChanged(void* data, Ecore_IMF_Context* context, void
   if (!view_->GetRenderWidgetHost())
     return;
 
-  ui::CompositionUnderline underline(0, composition_.text.length(), SK_ColorBLACK, false);
-
+  composition_.underlines.push_back(ui::CompositionUnderline(0, composition_.text.length(), SK_ColorBLACK, false));
   composition_.selection = gfx::Range(composition_.text.length());
 
   const std::vector<blink::WebCompositionUnderline>& underlines =
