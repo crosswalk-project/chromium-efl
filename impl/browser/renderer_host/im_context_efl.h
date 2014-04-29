@@ -57,6 +57,7 @@ class IMContextEfl {
 
   void CancelComposition();
   void ConfirmComposition();
+  void SetIsInFormTag(bool is_in_form_tag);
 
  private:
   IMContextEfl(RenderWidgetHostViewEfl*, Ecore_IMF_Context*);
@@ -109,6 +110,10 @@ class IMContextEfl {
   // in order to check that input method is supported on the platform. Later on we need to reset context
   // before showing the panel to be able to switch between different layouts.
   bool panel_was_ever_shown_;
+
+  // Whether or not is in form tag.
+  bool is_in_form_tag_;
+
   ui::CompositionText composition_;
 };
 

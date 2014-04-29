@@ -293,8 +293,7 @@ bool RenderWidgetHostViewEfl::OnMessageReceived(const IPC::Message& message) {
     IPC_MESSAGE_HANDLER(EwkHostMsg_ReadMHTMLData, OnMHTMLContentGet)
     IPC_MESSAGE_HANDLER(EwkHostMsg_DidChangePageScaleFactor, OnDidChangePageScaleFactor)
     IPC_MESSAGE_HANDLER(EwkHostMsg_DidChangePageScaleRange, OnDidChangePageScaleRange)
-    IPC_MESSAGE_HANDLER(ViewHostMsg_TextInputStateChanged,
-                        OnTextInputStateChanged)
+    IPC_MESSAGE_HANDLER(ViewHostMsg_TextInputInFormStateChanged, OnTextInputInFormStateChanged)
     IPC_MESSAGE_UNHANDLED(handled = false)
   IPC_END_MESSAGE_MAP()
   return handled;
@@ -459,15 +458,21 @@ void RenderWidgetHostViewEfl::TextInputTypeChanged(ui::TextInputType type, ui::T
   }
 }
 
-void RenderWidgetHostViewEfl::OnTextInputStateChanged(const ViewHostMsg_TextInputState_Params& params) {
-  LOG(INFO) << "RenderWidgetHostViewEfl::TextInputStateChanged";
-  if (im_context_)
+void RenderWidgetHostViewEfl::TextInputStateChanged(
+    const ViewHostMsg_TextInputState_Params& params) {
+  if (im_context_) {
     im_context_->UpdateInputMethodState(params.type);
 }
 
 void RenderWidgetHostViewEfl::ImeCancelComposition() {
   if (im_context_)
     im_context_->CancelComposition();
+}
+
+void RenderWidgetHostViewEfl::OnTextInputInFormStateChanged(bool is_in_form_tag)
+{
+  if (im_context_)
+    im_context_->SetIsInFormTag(is_in_form_tag);
 }
 
 bool RenderWidgetHostViewEfl::GetCompositionCharacterBounds(uint32 index, gfx::Rect* rect) const

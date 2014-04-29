@@ -81,7 +81,8 @@ IMContextEfl::IMContextEfl(RenderWidgetHostViewEfl* view, Ecore_IMF_Context* con
       context_(context),
       focused_(false),
       enabled_(false),
-      panel_was_ever_shown_(false) {
+      panel_was_ever_shown_(false),
+      is_in_form_tag_(false) {
   IM_CTX_LOG;
   InitializeIMFContext(context_);
 }
@@ -187,6 +188,9 @@ void IMContextEfl::ShowPanel(ui::TextInputType input_type, ui::TextInputMode inp
   Ecore_IMF_Input_Panel_Return_Key_Type return_key_type = ECORE_IMF_INPUT_PANEL_RETURN_KEY_TYPE_DEFAULT;
   Ecore_IMF_Autocapital_Type cap_type = ECORE_IMF_AUTOCAPITAL_TYPE_NONE;
   bool allow_prediction = true;
+
+  if (is_in_form_tag_)
+    return_key_type = ECORE_IMF_INPUT_PANEL_RETURN_KEY_TYPE_GO;
 
   switch (input_type) {
     case ui::TEXT_INPUT_TYPE_TEXT:
@@ -319,6 +323,27 @@ void IMContextEfl::CancelComposition() {
 void IMContextEfl::ConfirmComposition() {
   // Gtk use it to send the empty string as committed.
   // I'm not sure we need it (kbalazs).
+}
+
+void IMContextEfl::SetIsInFormTag(bool is_in_form_tag) {
+  is_in_form_tag_ = is_in_form_tag;
+  if (!context_)
+    return;
+
+  if (ecore_imf_context_input_panel_state_get(context_) ==
+      ECORE_IMF_INPUT_PANEL_STATE_HIDE)
+    return;
+
+  if (ecore_imf_context_input_panel_return_key_type_get(context_) ==
+      ECORE_IMF_INPUT_PANEL_RETURN_KEY_TYPE_SEARCH)
+    return;
+
+  if (is_in_form_tag_)
+    ecore_imf_context_input_panel_return_key_type_set(context_,
+      ECORE_IMF_INPUT_PANEL_RETURN_KEY_TYPE_GO);
+  else
+    ecore_imf_context_input_panel_return_key_type_set(context_,
+      ECORE_IMF_INPUT_PANEL_RETURN_KEY_TYPE_DEFAULT);
 }
 
 void IMContextEfl::OnCommit(void* event_info) {
