@@ -454,8 +454,7 @@ void RenderWidgetHostViewEfl::TextInputTypeChanged(ui::TextInputType type, ui::T
     im_context_->UpdateInputMethodState(type, can_compose_inline, input_mode);
     // Make Empty Rect for inputFieldZoom Gesture
     // Finally, the empty rect is not used.
-    gfx::Rect empty_rect = gfx::Rect(0, 0, 0, 0);
-    host_->ScrollFocusedEditableNodeIntoRect(empty_rect);
+    host_->ScrollFocusedEditableNodeIntoRect(gfx::Rect(0, 0, 0, 0));
   }
 }
 
@@ -463,6 +462,7 @@ void RenderWidgetHostViewEfl::TextInputStateChanged(
     const ViewHostMsg_TextInputState_Params& params) {
   if (im_context_) {
     im_context_->UpdateInputMethodState(params.type);
+  }
 }
 
 void RenderWidgetHostViewEfl::ImeCancelComposition() {
@@ -1084,6 +1084,7 @@ void RenderWidgetHostViewEfl::OnPlainTextGetContents(const std::string& content_
 void RenderWidgetHostViewEfl::OnDidChangeContentsSize(int width, int height) {
   DCHECK(content::BrowserThread::CurrentlyOn(content::BrowserThread::UI));
   web_view_->DidChangeContentsSize(width, height);
+  host_->ScrollFocusedEditableNodeIntoRect(gfx::Rect(0, 0, 0, 0));
 
 #ifdef OS_TIZEN
   if(!m_IsEvasGLInit)
