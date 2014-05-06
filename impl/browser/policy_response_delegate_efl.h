@@ -19,6 +19,9 @@ class PolicyResponseDelegateEfl: public base::RefCountedThreadSafe<PolicyRespons
   virtual void IgnoreResponse();
   void HandleURLRequestDestroyedOnIOThread();
 
+  int GetRenderProcessId() const { return render_process_id_; }
+  int GetRenderFrameId() const { return render_frame_id_; }
+
  private:
   friend class base::RefCountedThreadSafe<PolicyResponseDelegateEfl>;
 

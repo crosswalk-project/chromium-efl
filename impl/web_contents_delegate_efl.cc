@@ -36,11 +36,6 @@ void WritePdfDataToFile(printing::PdfMetafileSkia* metafile, const base::FilePat
   delete metafile;
 }
 
-void FreeResponseHeaders(void* data) {
-  EINA_SAFETY_ON_NULL_RETURN(data);
-  eina_stringshare_del(static_cast<char*>(data));
-}
-
 WebContentsDelegateEfl::WebContentsDelegateEfl(EWebView* view)
     : web_view_(view),
       document_created_(false),
@@ -92,9 +87,9 @@ bool WebContentsDelegateEfl::ShouldCreateWebContents(
   // This method is called ONLY when creating a new window, no matter what type.
   web_view_->set_policy_decision(new Ewk_Policy_Decision(this, target_url, frame_name));
   web_view_->SmartCallback<EWebViewCallbacks::NewWindowPolicyDecision>().call(web_view_->get_policy_decision());
-  // Chromium has a synchronous API. We cannot block this calls on UI thread.
-  CHECK(!web_view_->get_policy_decision()->isSuspended);
-  if (web_view_->get_policy_decision()->isDecided)
+  // Chromium has sync API. We cannot block this calls on UI thread.
+  CHECK(!web_view_->get_policy_decision()->isSuspended());
+  if (web_view_->get_policy_decision()->isDecided())
     return should_open_new_window_;
 
   // By default we return false. If embedder is not prepared to handle new window creation then we prevent this behaviour.
@@ -274,32 +269,8 @@ void WebContentsDelegateEfl::RequestCertificateConfirm(WebContents* /*web_conten
 void WebContentsDelegateEfl::OnHeadersReceived(PolicyResponseDelegateEfl* delegate,
                                                const GURL& request_url,
                                                const net::HttpResponseHeaders* original_response_headers) {
-  scoped_ptr<Ewk_Policy_Decision> policy_decision(new Ewk_Policy_Decision(delegate));
-  policy_decision->requestUrl = request_url;
-  policy_decision->responseStatusCode = original_response_headers->response_code();
-  std::string mime_type;
-  if (original_response_headers->GetMimeType(&mime_type)) {
-    policy_decision->responseMime = eina_stringshare_add(mime_type.c_str());
-    // In WK2, media player is opened for audio/video. Not handling that case for now.
-    // Supported mime type list should also be updated to match platform.
-    if (net::IsSupportedMimeType(mime_type))
-      policy_decision->decisionType = EWK_POLICY_DECISION_USE;
-    else
-      policy_decision->decisionType = EWK_POLICY_DECISION_DOWNLOAD;
-  }
-
-  std::string cookie;
-  if (original_response_headers->EnumerateHeader(NULL, "Set-Cookie", &cookie))
-    policy_decision->cookie = eina_stringshare_add(cookie.c_str());
-
-  void* iter = NULL;
-  std::string name;
-  std::string value;
-  policy_decision->responseHeaders = eina_hash_string_small_new(FreeResponseHeaders);
-  while (original_response_headers->EnumerateHeaderLines(&iter, &name, &value)) {
-    eina_hash_add(policy_decision->responseHeaders, name.c_str(), eina_stringshare_add(value.c_str()));
-  }
-  // web_view_ takes owenership of Ewk_Policy_Decision. This is the same as WK2/Tizen
+  scoped_ptr<Ewk_Policy_Decision> policy_decision(new Ewk_Policy_Decision(request_url, original_response_headers, delegate));
+  // web_view_ takes owenership of Ewk_Policy_Decision. This is same as WK2/Tizen
   web_view_->InvokePolicyResponseCallback(policy_decision.release());
 }
 

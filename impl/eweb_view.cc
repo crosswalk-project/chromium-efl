@@ -566,25 +566,22 @@ void EWebView::InvokePolicyResponseCallback(Ewk_Policy_Decision* policy_decision
   SmartCallback<EWebViewCallbacks::PolicyResponseDecide>().call(policy_decision_.get());
 
   // if app has not decided nor suspended, we act as if it was accepted.
-  if (!policy_decision_->isDecided && !policy_decision_->isSuspended)
+  if (!policy_decision_->isDecided() && !policy_decision_->isSuspended())
     policy_decision_->Use();
 }
 
 void EWebView::InvokePolicyNavigationCallback(RenderViewHost* rvh,
     const NavigationPolicyParams params, bool* handled) {
   DCHECK(BrowserThread::CurrentlyOn(BrowserThread::UI));
-  policy_decision_.reset(new Ewk_Policy_Decision(params.url,
-                                                 static_cast<Ewk_Policy_Navigation_Type>(params.type),
-                                                 params.is_main_frame,
-                                                 new NavigationPolicyHandlerEfl(rvh, params)));
+  policy_decision_.reset(new Ewk_Policy_Decision(params, rvh));
 
   SmartCallback<EWebViewCallbacks::NavigationPolicyDecision>().call(policy_decision_.get());
 
   // if app has not decided nor suspended, we act as if it was accepted.
-  if (!policy_decision_->isDecided && !policy_decision_->isSuspended)
+  if (!policy_decision_->isDecided() && !policy_decision_->isSuspended())
     policy_decision_->Use();
 
-  *handled = policy_decision_.get()->navigation_policy_handler->GetDecision() == NavigationPolicyHandlerEfl::Handled;
+  *handled = policy_decision_->GetNavigationPolicyHandler()->GetDecision() == NavigationPolicyHandlerEfl::Handled;
 }
 
 void EWebView::handleEvasObjectAdd(Evas_Object* evas_object) {

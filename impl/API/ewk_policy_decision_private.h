@@ -31,113 +31,85 @@
 #include <browser/navigation_policy_handler_efl.h>
 #include <browser/policy_response_delegate_efl.h>
 #include <public/ewk_policy_decision.h>
+#include <public/ewk_frame.h>
 
 namespace content {
 class WebContentsDelegateEfl;
+class RenderViewHost;
 } // namespace content
 
-struct _Ewk_Policy_Decision {
+class _Ewk_Policy_Decision {
+ public:
+ /**
+  * Constructs _Ewk_Policy_Decision with navigation type POLICY_RESPONSE
+  */
+  explicit _Ewk_Policy_Decision(const GURL& request_url, const net::HttpResponseHeaders* response_headers, PolicyResponseDelegateEfl* delegate);
 
-  explicit _Ewk_Policy_Decision(PolicyResponseDelegateEfl* delegate)
-      : new_window_policy_delegate(NULL),
-        policy_response_delegate(delegate),
-        cookie(0),
-        url(0),
-        host(0),
-        scheme(0),
-        responseMime(0),
-        responseHeaders(0),
-        decisionType(EWK_POLICY_DECISION_USE),
-        navigationType(EWK_POLICY_NAVIGATION_TYPE_OTHER),
-        isDecided(false),
-        isSuspended(false),
-        responseStatusCode(0),
-        AuthUser(0),
-        AuthPassword(0),
-        isMainFrame(true),
-        type(POLICY_RESPONSE) {
-  }
+ /**
+  * Constructs _Ewk_Policy_Decision with navigation type POLICY_NAVIGATION
+  */
+  explicit _Ewk_Policy_Decision(const NavigationPolicyParams &params, content::RenderViewHost* rvh);
 
-  _Ewk_Policy_Decision(const GURL& request_url, Ewk_Policy_Navigation_Type nav_type, bool is_main_frame, NavigationPolicyHandlerEfl* delegate)
-      : new_window_policy_delegate(NULL),
-        navigation_policy_handler(delegate),
-        requestUrl(request_url),
-        cookie(0),
-        url(0),
-        host(0),
-        scheme(0),
-        responseMime(0),
-        responseHeaders(0),
-        decisionType(EWK_POLICY_DECISION_USE),
-        navigationType(nav_type),
-        isDecided(false),
-        isSuspended(false),
-        responseStatusCode(0),
-        AuthUser(0),
-        AuthPassword(0),
-        isMainFrame(is_main_frame),
-        type(POLICY_NAVIGATION) {
-  }
+ /**
+  * Constructs _Ewk_Policy_Decision with navigation type POLICY_NEWWINDOW
+  */
+  explicit _Ewk_Policy_Decision(content::WebContentsDelegateEfl* view, const GURL& url, const base::string16& frame);
 
-  _Ewk_Policy_Decision(content::WebContentsDelegateEfl* view, const GURL& url, const base::string16& frame)
-      : new_window_policy_delegate(view),
-        requestUrl(url),
-        cookie(0),
-        url(0),
-        host(0),
-        scheme(0),
-        responseMime(0),
-        responseHeaders(0),
-        decisionType(EWK_POLICY_DECISION_USE),
-        navigationType(EWK_POLICY_NAVIGATION_TYPE_OTHER),
-        frame_name(frame),
-        isDecided(false),
-        isSuspended(false),
-        responseStatusCode(0),
-        AuthUser(0),
-        AuthPassword(0),
-        isMainFrame(true),
-        type(POLICY_NEWWINDOW) {
-  }
+  ~_Ewk_Policy_Decision();
 
-  ~_Ewk_Policy_Decision() {
-    eina_stringshare_del(cookie);
-    eina_stringshare_del(url);
-    eina_stringshare_del(host);
-    eina_stringshare_del(scheme);
-    eina_stringshare_del(responseMime);
-    eina_hash_free(responseHeaders);
-    eina_stringshare_del(AuthUser);
-    eina_stringshare_del(AuthPassword);
-  }
+  void Use();
+  void Ignore();
+  void Download();
+  void Suspend();
+
+  bool isDecided() const { return isDecided_; }
+  bool isSuspended() const { return isSuspended_; }
+  bool isMainFrame() const { return isMainFrame_; }
+  Ewk_Policy_Navigation_Type GetNavigationType() const { return navigationType_; }
+  Eina_Stringshare* GetCookie() const { return cookie_; }
+  Eina_Stringshare* GetAuthUser() const { return AuthUser_; }
+  Eina_Stringshare* GetAuthPassword() const { return AuthPassword_; }
+  Eina_Stringshare* GetUrl() const { return url_; }
+  Eina_Stringshare* GetScheme() const { return scheme_; }
+  Eina_Stringshare* GetHost() const { return host_; }
+  Eina_Stringshare* GetResponseMime() const { return responseMime_; }
+  Ewk_Policy_Decision_Type GetDecisionType() const { return decisionType_; }
+  Eina_Hash* GetResponseHeaders() const { return responseHeaders_; }
+  int GetResponseStatusCode() const { return responseStatusCode_; }
+
+  NavigationPolicyHandlerEfl* GetNavigationPolicyHandler() const { return navigation_policy_handler_.get(); }
+  Ewk_Frame_Ref GetFrameRef() const;
+
+ private:
+  void ParseUrl(const GURL& url);
+
   enum PolicyType {
     POLICY_RESPONSE,
     POLICY_NAVIGATION,
     POLICY_NEWWINDOW,
   };
 
-  void Use();
-
-  content::WebContentsDelegateEfl* new_window_policy_delegate;
-  scoped_refptr<PolicyResponseDelegateEfl> policy_response_delegate;
-  scoped_ptr<NavigationPolicyHandlerEfl> navigation_policy_handler;
-  GURL requestUrl;
-  const char* cookie;
-  const char* url;
-  const char* host;
-  const char* scheme;
-  const char* responseMime;
-  Eina_Hash* responseHeaders;
-  Ewk_Policy_Decision_Type decisionType;
-  Ewk_Policy_Navigation_Type navigationType;
-  base::string16 frame_name;
-  bool isDecided;
-  bool isSuspended;
-  int responseStatusCode;
-  const char* AuthUser;
-  const char* AuthPassword;
-  bool isMainFrame;
-  PolicyType type;
+  content::WebContentsDelegateEfl* new_window_policy_delegate_;
+  scoped_refptr<PolicyResponseDelegateEfl> policy_response_delegate_;
+  scoped_ptr<NavigationPolicyHandlerEfl> navigation_policy_handler_;
+  int frame_id_;
+  int process_id_;
+  const char* cookie_;
+  const char* url_;
+  const char* host_;
+  const char* scheme_;
+  const char* responseMime_;
+  Eina_Hash* responseHeaders_;
+  Ewk_Policy_Decision_Type decisionType_;
+  Ewk_Policy_Navigation_Type navigationType_;
+  base::string16 frame_name_;
+  bool isDecided_;
+  bool isSuspended_;
+  int responseStatusCode_;
+  const char* AuthUser_;
+  const char* AuthPassword_;
+  bool isMainFrame_;
+  PolicyType type_;
 };
 
 #endif /* EWK_POLICY_DECISION_PRIVATE_H_ */
