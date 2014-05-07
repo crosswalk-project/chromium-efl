@@ -14,6 +14,7 @@
 #include "third_party/WebKit/public/web/WebView.h"
 
 #include "components/editing/content/renderer/editorclient_agent.h"
+#include "components/visitedlink/renderer/visitedlink_slave.h"
 #include "renderer/content_renderer_client_efl.h"
 #include "navigation_policy_params.h"
 #include "wrt/wrtwidget.h"
@@ -28,8 +29,10 @@ ContentRendererClientEfl::~ContentRendererClientEfl() {
 void ContentRendererClientEfl::RenderThreadStarted()
 {
   render_process_observer_.reset(new RenderProcessObserverEfl(this));
+  visited_link_slave_.reset(new visitedlink::VisitedLinkSlave());
   content::RenderThread* thread = content::RenderThread::Get();
   thread->AddObserver(render_process_observer_.get());
+  thread->AddObserver(visited_link_slave_.get());
 }
 
 void ContentRendererClientEfl::RenderViewCreated(content::RenderView* render_view) {
@@ -106,4 +109,13 @@ void ContentRendererClientEfl::WillReleaseScriptContext(blink::WebFrame* frame,
                                                         v8::Handle<v8::Context> context,
                                                         int world_id) {
   wrt_widget_->StopSession(context);
+}
+
+unsigned long long ContentRendererClientEfl::VisitedLinkHash(const char* canonical_url,
+                                                             size_t length) {
+  return visited_link_slave_->ComputeURLFingerprint(canonical_url, length);
+}
+
+bool ContentRendererClientEfl::IsLinkVisited(unsigned long long link_hash) {
+  return visited_link_slave_->IsVisited(link_hash);
 }

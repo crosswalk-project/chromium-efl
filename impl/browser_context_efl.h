@@ -20,8 +20,12 @@
 #ifndef BROWSER_CONTEXT_EFL
 #define BROWSER_CONTEXT_EFL
 
+#include <vector>
+
 #include "base/memory/scoped_ptr.h"
 #include "base/files/scoped_temp_dir.h"
+#include "components/visitedlink/browser/visitedlink_delegate.h"
+#include "components/visitedlink/browser/visitedlink_master.h"
 #include "content/public/browser/content_browser_client.h"
 #include "content/public/browser/browser_context.h"
 #include "content/public/browser/storage_partition.h"
@@ -36,7 +40,8 @@ class EWebContext;
 namespace content {
 
 class BrowserContextEfl
-    : public BrowserContext {
+  : public BrowserContext,
+    public visitedlink::VisitedLinkDelegate {
  public:
   BrowserContextEfl(EWebContext*);
 
@@ -53,6 +58,14 @@ class BrowserContextEfl
   virtual net::URLRequestContextGetter* GetMediaRequestContextForStoragePartition(
       const base::FilePath&, bool) OVERRIDE
   { return GetRequestContext(); }
+
+  // These methods map to Add methods in visitedlink::VisitedLinkMaster.
+  void AddVisitedURLs(const std::vector<GURL>& urls);
+  // visitedlink::VisitedLinkDelegate implementation.
+  virtual void RebuildTable(
+      const scoped_refptr<URLEnumerator>& enumerator) OVERRIDE;
+  // Reset visitedlink master and initialize it.
+  void InitVisitedLinkMaster();
 
   virtual ResourceContext* GetResourceContext() OVERRIDE;
 
@@ -100,6 +113,7 @@ class BrowserContextEfl
  private:
   static void ReadCertificateAndAdd(base::FilePath* file_path);
 
+  scoped_ptr<visitedlink::VisitedLinkMaster> visitedlink_master_;
   scoped_ptr<ResourceContextEfl> resource_context_;
   scoped_refptr<URLRequestContextGetterEfl> request_context_getter_;
   EWebContext* web_context_;

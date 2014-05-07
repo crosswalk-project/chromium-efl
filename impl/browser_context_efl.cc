@@ -21,6 +21,7 @@
 
 #include "base/file_util.h"
 #include "base/path_service.h"
+#include "components/visitedlink/browser/visitedlink_master.h"
 #include "content/public/browser/browser_thread.h"
 #include "content/public/browser/render_view_host.h"
 #include "content/public/browser/web_contents.h"
@@ -65,6 +66,7 @@ BrowserContextEfl::BrowserContextEfl(EWebContext* web_context)
     notification_controllerefl_(new NotificationControllerEfl()),
 #endif
     temp_dir_creation_attempted_(false) {
+  InitVisitedLinkMaster();
 }
 
 net::URLRequestContextGetter* BrowserContextEfl::GetRequestContext() {
@@ -142,6 +144,23 @@ void BrowserContextEfl::ReadCertificateAndAdd(base::FilePath* file_path) {
     DLOG(ERROR) << "User certificate could not be added. Error code : " << err_code;
     return;
   }
+}
+
+void BrowserContextEfl::InitVisitedLinkMaster() {
+  visitedlink_master_.reset(new visitedlink::VisitedLinkMaster(this, this, false));
+  visitedlink_master_->Init();
+}
+
+void BrowserContextEfl::AddVisitedURLs(const std::vector<GURL>& urls) {
+  DCHECK(visitedlink_master_);
+  visitedlink_master_->AddURLs(urls);
+}
+
+void BrowserContextEfl::RebuildTable(const scoped_refptr<URLEnumerator>& enumerator) {
+  // WebView rebuilds from WebChromeClient.getVisitedHistory. The client
+  // can change in the lifetime of this WebView and may not yet be set here.
+  // Therefore this initialization path is not used.
+  enumerator->OnComplete(true);
 }
 
 }

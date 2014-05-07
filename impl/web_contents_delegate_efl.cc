@@ -189,6 +189,7 @@ void WebContentsDelegateEfl::DidCommitProvisionalLoadForFrame(int64 frame_id,
 
 void WebContentsDelegateEfl::DidNavigateAnyFrame(const LoadCommittedDetails& details, const FrameNavigateParams& params) {
   web_view_->SmartCallback<EWebViewCallbacks::ProvisionalLoadRedirect>().call();
+  static_cast<BrowserContextEfl*>(web_contents_->GetBrowserContext())->AddVisitedURLs(params.redirects);
 }
 
 void WebContentsDelegateEfl::DidFailProvisionalLoad(int64 frame_id,

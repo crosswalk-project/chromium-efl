@@ -247,10 +247,10 @@ void EWebContext::Delete(EWebContext*const context) {
 }
 
 EWebContext::EWebContext()
-    : browser_context_(new BrowserContextEfl(this))
-    , m_pixmap(0) {
+  : m_pixmap(0) {
   EnsureGlobalData();
 
+  browser_context_.reset(new BrowserContextEfl(this));
   // Notification Service gets init in BrowserMainRunner init,
   // so cache manager can register for notifications only after that.
   web_cache_manager_.reset(new WebCacheManagerEfl(browser_context_.get()));

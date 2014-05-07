@@ -12,6 +12,10 @@ class RenderFrame;
 class DocumentState;
 }
 
+namespace visitedlink {
+class VisitedLinkSlave;
+}
+
 class WrtWidget;
 
 class ContentRendererClientEfl : public content::ContentRendererClient
@@ -55,9 +59,15 @@ class ContentRendererClientEfl : public content::ContentRendererClient
                                const GURL& first_party_for_cookies,
                                GURL* new_url);
 
+  unsigned long long VisitedLinkHash(const char* canonical_url,
+                                     size_t length) OVERRIDE;
+
+  bool IsLinkVisited(unsigned long long link_hash) OVERRIDE;
+
  private:
   scoped_ptr<WrtWidget> wrt_widget_;
   scoped_ptr<RenderProcessObserverEfl> render_process_observer_;
+  scoped_ptr<visitedlink::VisitedLinkSlave> visited_link_slave_;
 };
 
 #endif
