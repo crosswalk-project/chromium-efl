@@ -79,8 +79,13 @@ class EflScreen : public gfx::Screen {
     static gfx::Display display(0,
         gfx::Rect(0, 0, WidthOfScreen(screen), HeightOfScreen(screen)));
 
+    //TODO:remove hardcoding
     if (!gfx::Display::HasForceDeviceScaleFactor())
-      display.set_device_scale_factor(2.0f);//TODO:remove hardcoding
+#if defined(OS_TIZEN_MOBILE)
+      display.set_device_scale_factor(2.0f);
+#else
+      display.set_device_scale_factor(1.0f);
+#endif
 
     return display;
   }
