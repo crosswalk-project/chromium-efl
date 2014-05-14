@@ -188,6 +188,7 @@ class EWebView
   void QuerySelectionStyle();
   void OnQuerySelectionStyleReply(const SelectionStylePrams& params);
   void SelectClosestWord(const gfx::Point& touch_point);
+  void SelectLinkText(const gfx::Point& touch_point);
   bool GetSelectionRange(Eina_Rectangle* left_rect, Eina_Rectangle* right_rect);
   bool ClearSelection();
   // Callback OnCopyFromBackingStore will be called once we get the snapshot from render

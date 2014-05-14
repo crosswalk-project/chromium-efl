@@ -111,7 +111,7 @@ void ContextMenuControllerEfl::GetProposedContextMenu() {
                          std::string());
   if (!params_.has_image_contents && !params_.link_url.is_empty())
     AddItemToPropsedList(MENU_ITEM_TYPE_ACTION,
-                         MENU_ITEM_SELECT_WORD,
+                         MENU_ITEM_SELECT_LINK,
                          std::string("Select Mode"),
                          params_.link_url.spec(),
                          params_.link_url.spec(),
@@ -254,6 +254,12 @@ void ContextMenuControllerEfl::MenuItemSelected(ContextMenuItemEfl *menu_item) {
       } else {
         view->ExecuteEditCommand("Unselect", NULL);
       }
+      break;
+    }
+    case MENU_ITEM_SELECT_LINK: {
+      Evas_Coord x, y;
+      evas_object_geometry_get(view->evas_object(), &x, &y, 0, 0);
+      view->SelectLinkText(gfx::Point(params_.x - x, params_.y - y));
       break;
     }
     case MENU_ITEM_PASTE: {
