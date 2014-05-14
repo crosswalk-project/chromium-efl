@@ -66,15 +66,18 @@
            ['exclude', 'browser/device_sensors/data_fetcher_shared_memory_default.cc$'],
          ],
          'cflags': [
+            '<!@(<(pkg-config) --cflags capi-system-info)',
             '<!@(<(pkg-config) --cflags capi-system-sensor)',
             '<!@(<(pkg-config) --cflags capi-location-manager)',
          ],
          'link_settings': {
            'ldflags': [
+             '<!@(<(pkg-config) --libs-only-L --libs-only-other capi-system-info)',
              '<!@(<(pkg-config) --libs-only-L --libs-only-other capi-system-sensor)',
              '<!@(<(pkg-config) --libs-only-L --libs-only-other capi-location-manager)',
            ],
            'libraries': [
+             '<!@(<(pkg-config) --libs-only-l capi-system-info)',
              '<!@(<(pkg-config) --libs-only-l capi-system-sensor)',
              '<!@(<(pkg-config) --libs-only-l capi-location-manager)',
            ],

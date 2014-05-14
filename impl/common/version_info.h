@@ -96,9 +96,6 @@ class VersionInfo {
 
   std::string product_name_;
   std::string product_version_;
-  // Whether to fake Android user agent
-  // Many sites sniff for "Android" along with "Mobile" in User Agent string
-  bool fake_android_;
   static VersionInfo* version_info_;
 
   DISALLOW_COPY_AND_ASSIGN(VersionInfo);
