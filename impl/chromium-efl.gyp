@@ -79,6 +79,8 @@
       'browser/geolocation/location_provider_efl.h',
       'browser/inputpicker/InputPicker.cc',
       'browser/inputpicker/InputPicker.h',
+      'browser/inputpicker/color_chooser_efl.cc',
+      'browser/inputpicker/color_chooser_efl.h',
       'browser/javascript_dialog_manager_efl.cc',
       'browser/javascript_dialog_manager_efl.h',
       'browser/javascript_modal_dialog_efl.cc',

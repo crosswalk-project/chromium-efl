@@ -34,11 +34,9 @@
 #include <vconf/vconf.h>
 #endif
 
-// FIXME : DJKim : not implemented yet
-#if 0 //ENABLE(TIZEN_HW_MORE_BACK_KEY)
+#ifdef OS_TIZEN_MOBILE
 #include <dlfcn.h>
 #include <efl_assist.h>
-extern void* EflAssistHandle;
 #endif
 
 namespace content {
@@ -55,8 +53,7 @@ struct InputPicker::Layout {
     , datePicker(0)
     , colorRect(0)
     , dataListEditField(0)
-    // FIXME : DJKim : not implemented yet
-#if 0 //ENABLE(TIZEN_HW_MORE_BACK_KEY)
+#ifdef OS_TIZEN_MOBILE
     , initial_r(0)
     , initial_g(0)
     , initial_b(0)
@@ -82,8 +79,7 @@ struct InputPicker::Layout {
   Evas_Object* colorRect;
   Evas_Object* okButton;
   Evas_Object* dataListEditField;
-// FIXME : DJKim : not implemented yet
-#if 0 //ENABLE(TIZEN_HW_MORE_BACK_KEY)
+#ifdef OS_TIZEN_MOBILE
   int initial_r;
   int initial_g;
   int initial_b;
@@ -202,6 +198,10 @@ InputPicker::InputPicker(WebContents* web_contents)
     , m_dataList(0) {
   web_contents_delegate_ = static_cast<WebContentsDelegateEfl*>(web_contents->GetDelegate());
   m_ewkView = web_contents_delegate_->web_view()->evas_object();
+#ifdef OS_TIZEN_MOBILE
+  if (!EflAssistHandle)
+    EflAssistHandle = dlopen("/usr/lib/libefl-assist.so.0", RTLD_LAZY);
+#endif
 }
 
 InputPicker::~InputPicker() {
@@ -237,6 +237,8 @@ void InputPicker::showColorPicker(int r, int g, int b, int) {
 void InputPicker::hideColorPicker() {
   if (!m_pickerLayout)
     return;
+
+  web_contents_delegate_->web_contents()->DidEndColorChooser();
 
   if (m_pickerLayout->popup) {
     evas_object_del(m_pickerLayout->popup);
@@ -310,8 +312,7 @@ void InputPicker::ewk_color_popup(int r, int g, int b) {
   m_pickerLayout->popup = elm_popup_add(m_ewkView);
   elm_object_part_text_set(m_pickerLayout->popup, "title,text", "Select color");
 
-  // FIXME : DJKim : not implemented yet
-#if 0 //ENABLE(TIZEN_HW_MORE_BACK_KEY)
+#ifdef OS_TIZEN_MOBILE
   m_pickerLayout->initial_r = r;
   m_pickerLayout->initial_g = g;
   m_pickerLayout->initial_b = b;
@@ -432,14 +433,11 @@ void InputPicker::_color_popup_response_cb(void* data,  Evas_Object* obj, void* 
   int a = 0;
   evas_object_color_get(inputPicker->m_pickerLayout->colorRect, &r, &g, &b, &a);
 
-  // FIXME : DJKim : not implemented yet
-  //ewk_view_color_picker_color_set(inputPicker->m_ewkView, r, g, b, a);
-
+  inputPicker->web_contents_delegate_->web_contents()->DidChooseColorInColorChooser(SkColorSetARGB(a, r, g, b));
   inputPicker->hideColorPicker();
 }
 
-// FIXME : DJKim : not implemented yet
-#if 0 //ENABLE(TIZEN_HW_MORE_BACK_KEY)
+#ifdef OS_TIZEN_MOBILE
 void InputPicker::_color_back_cb(void* data,  Evas_Object* obj, void* event_info) {
   InputPicker* inputPicker = static_cast<InputPicker*>(data);
 
@@ -447,7 +445,8 @@ void InputPicker::_color_back_cb(void* data,  Evas_Object* obj, void* event_info
   int g = inputPicker->m_pickerLayout->initial_g;
   int b = inputPicker->m_pickerLayout->initial_b;
   int a = 255;
-  ewk_view_color_picker_color_set(inputPicker->m_ewkView, r, g, b, a);
+
+  inputPicker->web_contents_delegate_->web_contents()->DidChooseColorInColorChooser(SkColorSetARGB(a, r, g, b));
 
   inputPicker->hideColorPicker();
 }

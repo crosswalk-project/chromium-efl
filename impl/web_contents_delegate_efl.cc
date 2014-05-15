@@ -8,6 +8,7 @@
 #include "API/ewk_view_private.h"
 #include "browser/policy_response_delegate_efl.h"
 #include "browser/renderer_host/render_widget_host_view_efl.h"
+#include "browser/inputpicker/color_chooser_efl.h"
 #include "common/render_messages_efl.h"
 #include "eweb_view.h"
 #include "eweb_view_callbacks.h"
@@ -442,9 +443,9 @@ content::ColorChooser* WebContentsDelegateEfl::OpenColorChooser(
     WebContents* web_contents,
     SkColor color,
     const std::vector<ColorSuggestion>& suggestions) {
+  ColorChooserEfl* color_chooser_efl = new ColorChooserEfl(web_contents);
   web_view_->RequestColorPicker(SkColorGetR(color), SkColorGetG(color), SkColorGetB(color), SkColorGetA(color));
 
-  // FIXME : DJKim : not implemented yet
-  return NULL;
+  return color_chooser_efl;
 }
 } //namespace content

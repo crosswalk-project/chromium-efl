@@ -1589,6 +1589,6 @@ void EWebView::DismissColorPicker() {
 }
 
 bool EWebView::SetColorPickerColor(int r, int g, int b, int a) {
-  // FIXME : DJKim : not implemented yet
+  web_contents_delegate()->web_contents()->DidChooseColorInColorChooser(SkColorSetARGB(a, r, g, b));
   return true;
 }

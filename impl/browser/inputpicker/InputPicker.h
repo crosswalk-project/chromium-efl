@@ -73,9 +73,11 @@ class InputPicker {
   static void _color_selected_cb(void*, Evas*, Evas_Object*, void*);
   static void colorKeyDownCallback(void*, Evas*, Evas_Object*, void*);
 
+#ifdef OS_TIZEN_MOBILE
+    static void _color_back_cb(void*, Evas_Object*, void*);
+#endif
 // FIXME : DJKim : not implemented yet
 #if 0 //ENABLE(TIZEN_HW_MORE_BACK_KEY)
-  static void _color_back_cb(void*, Evas_Object*, void*);
   static void _popup_back_cb(void*, Evas_Object*, void*);
 #endif
   static Eina_Bool removeDatetimePicker(void*);
@@ -84,6 +86,7 @@ class InputPicker {
   Evas_Object* m_ewkView;
   Layout* m_pickerLayout;
   Eina_List* m_dataList;
+  void* EflAssistHandle;
 };
 
 } // namespace content

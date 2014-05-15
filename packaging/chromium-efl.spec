@@ -31,6 +31,7 @@ BuildRequires: pkgconfig(openssl)
 BuildRequires: pkgconfig(libxml-2.0)
 BuildRequires: pkgconfig(libxslt)
 BuildRequires: pkgconfig(sqlite3)
+BuildRequires: pkgconfig(capi-appfw-application)
 BuildRequires: pkgconfig(capi-system-sensor)
 BuildRequires: pkgconfig(capi-system-info)
 BuildRequires: pkgconfig(capi-location-manager)
@@ -64,6 +65,7 @@ BuildRequires: pkgconfig(zlib)
 %if %{!?TIZEN_PROFILE_TV:1}%{?TIZEN_PROFILE_TV:0}
 BuildRequires: bzip2-devel
 BuildRequires: pkgconfig(vpx)
+BuildRequires: pkgconfig(efl-assist)
 %endif
 BuildRequires: pkgconfig(gstreamer-0.10)
 BuildRequires: pkgconfig(gstreamer-plugins-base-0.10)
