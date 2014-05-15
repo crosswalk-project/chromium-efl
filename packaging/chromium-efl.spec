@@ -117,6 +117,12 @@ CFLAGS=$(echo $CFLAGS | sed 's/ -g / /')
 CXXFLAGS=$(echo $CXXFLAGS | sed 's/ -g / /')
 %endif
 
+%if %{!?TIZEN_PROFILE_TV:1}%{?TIZEN_PROFILE_TV:0}
+%define OUTPUT_BUILD_PROFILE_TARGET mobile
+%else
+%define OUTPUT_BUILD_PROFILE_TARGET tv
+%endif
+
 %ifarch %{arm}
 %define EFL_TARGET arm
 %else
@@ -132,9 +138,11 @@ CXXFLAGS=$(echo $CXXFLAGS | sed 's/ -g / /')
 
 . ./build/envsetup.sh
 
+%define OUTPUT_BASE_FOLDER out.%{OUTPUT_BUILD_PROFILE_TARGET}.%{EFL_TARGET}
+
 #set build mode
 %if 0%{?_debug_mode}
-%global OUTPUT_FOLDER out.%{EFL_TARGET}/Debug
+%global OUTPUT_FOLDER %{OUTPUT_BASE_FOLDER}/Debug
 # Building the RPM in the GBS chroot fails with errors such as
 #   /usr/lib/gcc/i586-tizen-linux/4.7/../../../../i586-tizen-linux/bin/ld:
 #       failed to set dynamic section sizes: Memory exhausted
@@ -142,9 +150,10 @@ CXXFLAGS=$(echo $CXXFLAGS | sed 's/ -g / /')
 # linker for memory usage.
 export LDFLAGS="${LDFLAGS} -Wl,--no-keep-memory"
 %else
-%global OUTPUT_FOLDER out.%{EFL_TARGET}/Release
+%global OUTPUT_FOLDER %{OUTPUT_BASE_FOLDER}/Release
 %endif
-export OUTPUT_FOLDER=%{OUTPUT_FOLDER}
+# to workaround mess in ./build/envsetup.sh
+export GYP_GENERATOR_OUTPUT=%{OUTPUT_BASE_FOLDER}
 
 #gyp generate
 %if %{?_skip_gyp:0}%{!?_skip_gyp:1}
