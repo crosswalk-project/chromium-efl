@@ -2,6 +2,7 @@
 #define WEB_CONTENTS_DELEGATE_EFL
 
 #include "base/memory/scoped_ptr.h"
+#include "base/memory/weak_ptr.h"
 #include "content/public/browser/browser_context.h"
 #include "browser/javascript_dialog_manager_efl.h"
 #include "browser_context_efl.h"
@@ -15,6 +16,7 @@
 #include "content/public/browser/web_contents_observer.h"
 #include "content/browser/web_contents/web_contents_impl.h"
 #include "url/gurl.h"
+#include "browser/favicon/favicon_downloader.h"
 
 class PolicyResponseDelegateEfl;
 class DidPrintPagesParams;
@@ -123,6 +125,9 @@ class WebContentsDelegateEfl
                              RenderViewHost* render_view_host) OVERRIDE;
 
   virtual void DidStartLoading(RenderViewHost* render_view_host) OVERRIDE;
+  virtual void DidUpdateFaviconURL(int32 page_id,
+                                   const std::vector<FaviconURL>& candidates) OVERRIDE;
+  virtual void DidDownloadFavicon(bool success, const GURL& icon_url, const SkBitmap& bitmap);
 
   void SetContentSecurityPolicy(const std::string& policy, Ewk_CSP_Header_Type header_type);
   void OnHeadersReceived(PolicyResponseDelegateEfl* delegate,
@@ -172,6 +177,8 @@ class WebContentsDelegateEfl
   bool should_open_new_window_;
   scoped_ptr<JavaScriptDialogManagerEfl> dialog_manager_;
   int forward_backward_list_count_;
+  scoped_ptr<FaviconDownloader> favicon_downloader_;
+  base::WeakPtrFactory<WebContentsDelegateEfl> weak_ptr_factory_;
 
   DISALLOW_COPY_AND_ASSIGN(WebContentsDelegateEfl);
 };

@@ -119,7 +119,8 @@ enum CallbackType {
   MagnifierHide,
   ClipboardOpened,
   ConsoleMessage,
-  WrtPluginsMessage
+  WrtPluginsMessage,
+  IconReceived
 };
 
 template <CallbackType>
@@ -271,6 +272,7 @@ DECLARE_EWK_VIEW_CALLBACK(BackForwardListChange, "back,forward,list,changed", vo
 DECLARE_EWK_VIEW_CALLBACK(WebProcessCrashed, "webprocess,crashed", bool*);
 DECLARE_EWK_VIEW_CALLBACK(ConsoleMessage, "console,message", _Ewk_Console_Message*);
 DECLARE_EWK_VIEW_CALLBACK(WrtPluginsMessage, "wrt,message", Ewk_IPC_Wrt_Message_Data*);
+DECLARE_EWK_VIEW_CALLBACK(IconReceived, "icon,received", void);
 }
 
 #endif

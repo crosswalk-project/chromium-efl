@@ -20,10 +20,14 @@
 #include "content/common/view_messages.h"
 #include "content/public/browser/invalidate_type.h"
 #include "content/public/browser/browser_thread.h"
+#include "content/public/browser/navigation_entry.h"
+#include "content/public/browser/favicon_status.h"
+#include "content/public/common/favicon_url.h"
 #include "net/base/load_states.h"
 #include "net/http/http_response_headers.h"
 #include "printing/pdf_metafile_skia.h"
 #include "url/gurl.h"
+#include "browser/favicon/favicon_service.h"
 
 using base::string16;
 
@@ -40,7 +44,8 @@ WebContentsDelegateEfl::WebContentsDelegateEfl(EWebView* view)
     : web_view_(view),
       document_created_(false),
       should_open_new_window_(true),
-      forward_backward_list_count_(0) {
+      forward_backward_list_count_(0),
+      weak_ptr_factory_(this) {
   BrowserContext* browser_context = web_view_->context()->browser_context();
   web_contents_.reset(WebContents::Create(WebContents::CreateParams(browser_context)));
   web_contents_->SetDelegate(this);
@@ -53,7 +58,8 @@ WebContentsDelegateEfl::WebContentsDelegateEfl(EWebView* view, WebContents* cont
     web_contents_(contents),
     document_created_(false),
     should_open_new_window_(true),
-    forward_backward_list_count_(0) {
+    forward_backward_list_count_(0),
+    weak_ptr_factory_(this) {
   web_contents_->SetDelegate(this);
 }
 
@@ -240,11 +246,56 @@ void WebContentsDelegateEfl::DidFinishLoad(int64 frame_id,
   if (!is_main_frame)
     return;
 
+  NavigationEntry *entry = web_contents()->GetController().GetActiveEntry();
+  FaviconStatus &favicon = entry->GetFavicon();
+
+  // check/update the url and favicon url in favicon database
+  FaviconService fs;
+  fs.SetFaviconURLForPageURL(favicon.url, validated_url);
+
+  // download favicon if there is no such in database
+  if (!fs.ExistsForFaviconURL(favicon.url)) {
+    fprintf(stderr, "[DidFinishLoad] :: no favicon in database for URL: %s\n", favicon.url.spec().c_str());
+    favicon_downloader_.reset(new FaviconDownloader(web_contents(),
+                                                   favicon.url,
+                                                   base::Bind(&WebContentsDelegateEfl::DidDownloadFavicon,
+                                                              weak_ptr_factory_.GetWeakPtr())));
+    favicon_downloader_->Start();
+  } else {
+    web_view_->SmartCallback<EWebViewCallbacks::IconReceived>().call();
+  }
+
   web_view_->SmartCallback<EWebViewCallbacks::LoadFinished>().call();
 }
 
 void WebContentsDelegateEfl::DidStartLoading(RenderViewHost* render_view_host) {
   web_view_->SmartCallback<EWebViewCallbacks::LoadStarted>().call();
+}
+
+void WebContentsDelegateEfl::DidUpdateFaviconURL(int32 page_id, const std::vector<FaviconURL>& candidates) {
+  // select and set proper favicon
+  for (unsigned int i = 0; i < candidates.size(); ++i) {
+    FaviconURL favicon = candidates[i];
+    if (favicon.icon_type == FaviconURL::FAVICON && !favicon.icon_url.is_empty()) {
+      NavigationEntry *entry = web_contents_->GetController().GetActiveEntry();
+      if (!entry)
+        return;
+      entry->GetFavicon().url = favicon.icon_url;
+      entry->GetFavicon().valid = true;
+      return;
+    }
+  }
+  return;
+}
+
+void WebContentsDelegateEfl::DidDownloadFavicon(bool success, const GURL& icon_url, const SkBitmap& bitmap) {
+  favicon_downloader_.reset();
+  if (success) {
+    FaviconService fs;
+    fs.SetBitmapForFaviconURL(bitmap, icon_url);
+    // emit "icon,received"
+    web_view_->SmartCallback<EWebViewCallbacks::IconReceived>().call();
+  }
 }
 
 void WebContentsDelegateEfl::RequestCertificateConfirm(WebContents* /*web_contents*/,

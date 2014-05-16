@@ -28,6 +28,7 @@
 #include "content/public/browser/render_process_host.h"
 #include "content/public/browser/local_storage_usage_info.h"
 #include "content/public/browser/dom_storage_context.h"
+#include "browser/favicon/favicon_service.h"
 #include "net/http/http_cache.h"
 #include "net/proxy/proxy_config_service_fixed.h"
 #include "net/proxy/proxy_service.h"
@@ -459,5 +460,28 @@ void EWebContext::GetAllOriginsWithFileSystem(Ewk_Local_File_System_Origins_Get_
   BrowserThread::PostTask(
       BrowserThread::FILE,
       FROM_HERE,
-      base::Bind(&GetFileSystemOriginsOnFILEThread, callback, user_data, partition));
+        base::Bind(&GetFileSystemOriginsOnFILEThread, callback, user_data, partition));
+}
+
+bool EWebContext::SetFaviconDatabasePath(const char* path) {
+  FaviconService fs;
+  return fs.SetDatabasePath(path);
+}
+
+Evas_Object *EWebContext::AddFaviconObject(const char* uri, Evas* canvas) const {
+  if (uri == NULL || canvas == NULL) {
+    return NULL;
+  }
+  FaviconService fs;
+  SkBitmap bitmap = fs.GetBitmapForPageURL(GURL(uri));
+  if (bitmap.isNull()) {
+    return NULL;
+  }
+
+  Evas_Object *favicon = evas_object_image_filled_add(canvas);
+  evas_object_image_size_set(favicon, bitmap.width(), bitmap.height());
+  evas_object_image_colorspace_set(favicon, EVAS_COLORSPACE_ARGB8888);
+  bitmap.copyPixelsTo(evas_object_image_data_get(favicon, EINA_TRUE), bitmap.getSize());
+
+  return favicon;
 }
