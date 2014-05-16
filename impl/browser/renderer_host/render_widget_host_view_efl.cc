@@ -956,7 +956,11 @@ void RenderWidgetHostViewEfl::HandleHide() {
 }
 
 void RenderWidgetHostViewEfl::HandleResize(int width, int height) {
+#if defined(OS_TIZEN_MOBILE)
+  UpdateScreenInfo(GetNativeView());
+#else
   host_->WasResized();
+#endif
 }
 
 void RenderWidgetHostViewEfl::HandleFocusIn() {
