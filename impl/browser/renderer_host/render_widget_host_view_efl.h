@@ -130,6 +130,9 @@ class RenderWidgetHostViewEfl
       gfx::Vector2dF accumulated_overscroll,
       gfx::Vector2dF latest_overscroll_delta) OVERRIDE;
 #endif
+#ifdef TIZEN_CONTENTS_DETECTION
+  virtual void OnContentsDetected(const char*) OVERRIDE;
+#endif
 
   virtual void OnAcceleratedCompositingStateChange() OVERRIDE;
   virtual void AcceleratedSurfaceInitialized(int, int) OVERRIDE;

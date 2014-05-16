@@ -54,8 +54,8 @@ class Ewk_Settings {
           m_textStyleState(true),
           m_autoFitting(false),
           m_linkEffectEnabled(true),
-          m_evas_object(evas_object) {
-    }
+          m_detectContentsAutomatically(false),
+          m_evas_object(evas_object) { }
 
     const char* defaultTextEncoding() const { return m_defaultTextEncoding; }
     void setDefaultTextEncoding(const char*);
@@ -94,6 +94,8 @@ class Ewk_Settings {
     bool linkEffectEnabled() const { return m_linkEffectEnabled; }
     void setLinkEffectEnabled(bool flag) { m_linkEffectEnabled = flag; }
     void setSpdyEnabled(bool flag);
+    void setDetectContentsAutomatically(bool enable) { m_detectContentsAutomatically = enable; }
+    bool detectContentsAutomatically() const { return m_detectContentsAutomatically; }
 
     Evas_Object* getEvasObject() { return m_evas_object; }
     content::WebPreferences& getPreferences() { return m_preferences; }
@@ -118,6 +120,7 @@ class Ewk_Settings {
     bool m_textStyleState;
     bool m_autoFitting;
     bool m_linkEffectEnabled;
+    bool m_detectContentsAutomatically;
     Evas_Object* m_evas_object;
 };
 

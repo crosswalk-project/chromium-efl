@@ -50,6 +50,9 @@
 #include "ui/gfx/point.h"
 #include "ui/gfx/size.h"
 #include "browser/inputpicker/InputPicker.h"
+#ifdef TIZEN_CONTENTS_DETECTION
+#include "popup_controller_efl.h"
+#endif
 
 #ifdef TIZEN_EDGE_EFFECT
 #include "EdgeEffect.h"
@@ -60,6 +63,9 @@ class RenderViewHost;
 class RenderWidgetHostViewEfl;
 class WebContentsDelegateEfl;
 class ContextMenuControllerEfl;
+#ifdef TIZEN_CONTENTS_DETECTION
+class PopupControllerEfl;
+#endif
 }
 
 namespace ui {
@@ -191,6 +197,9 @@ class EWebView
   void SetScroll(int x, int y);
 
   content::SelectionControllerEfl* GetSelectionController() const { return selection_controller_.get(); }
+#ifdef TIZEN_CONTENTS_DETECTION
+  content::PopupControllerEfl* GetPopupController() const { return popup_controller_.get(); }
+#endif
   void SelectRange(const gfx::Point& start, const gfx::Point& end);
   void MoveCaret(const gfx::Point& point);
   void QuerySelectionStyle();
@@ -256,6 +265,9 @@ class EWebView
 #ifdef TIZEN_EDGE_EFFECT
   void SetSettingsGetCallback(Ewk_View_Settings_Get callback, void* user_data);
   scoped_refptr<EdgeEffect> edgeEffect() { return edge_effect_; }
+#endif
+#ifdef TIZEN_CONTENTS_DETECTION
+  void ShowContentsDetectedPopup(const char*);
 #endif
 
   bool IsIMEShow();
@@ -350,6 +362,9 @@ class EWebView
   scoped_ptr<Ewk_Policy_Decision> policy_decision_;
   scoped_ptr<content::ContextMenuControllerEfl> context_menu_;
   scoped_ptr<content::FileChooserControllerEfl> file_chooser_;
+#ifdef TIZEN_CONTENTS_DETECTION
+  scoped_ptr<content::PopupControllerEfl> popup_controller_;
+#endif
   scoped_ptr<content::SelectionControllerEfl> selection_controller_;
   base::string16 previous_text_;
   int current_find_request_id_;

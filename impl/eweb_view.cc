@@ -1611,6 +1611,13 @@ void EWebView::ShowFileChooser(const content::FileChooserParams& params) {
   file_chooser_->open();
 }
 
+#ifdef TIZEN_CONTENTS_DETECTION
+void EWebView::ShowContentsDetectedPopup(const char* message) {
+  popup_controller_.reset(new PopupControllerEfl(this));
+  popup_controller_->openPopup(message);
+}
+#endif
+
 void EWebView::RequestColorPicker(int r, int g, int b, int a) {
   inputPicker_.reset(new InputPicker(web_contents_delegate()->web_contents()));
   inputPicker_->showColorPicker(r, g, b, a);

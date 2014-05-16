@@ -123,13 +123,17 @@
         ],
       }],
       ['building_for_tizen_mobile==1', {
-         'defines': ['OS_TIZEN_MOBILE=1'],
+         'defines': [
+           'OS_TIZEN_MOBILE=1',
+           'TIZEN_CONTENTS_DETECTION=1',
+           ],
          'include_dirs': [
            '/usr/include/ug-1',
            '/usr/include/appfw',
          ],
          'cflags': [
            '<!@(<(pkg-config) --cflags efl-assist)',
+           '<!@(<(pkg-config) --cflags ewebkit2-ext)',
          ],
          'link_settings': {
            'ldflags': [
@@ -137,6 +141,7 @@
            ],
            'libraries': [
              '<!@(<(pkg-config) --libs-only-l efl-assist)',
+             '<!@(<(pkg-config) --libs-only-l ewebkit2-ext)',
            ],
          },
       }],

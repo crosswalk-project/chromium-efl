@@ -178,6 +178,8 @@
       'network_delegate_efl.h',
       'paths_efl.cc',
       'paths_efl.h',
+      'popup_controller_efl.cc',
+      'popup_controller_efl.h',
       'renderer/content_renderer_client_efl.cc',
       'renderer/content_renderer_client_efl.h',
       'renderer/print_pages_params.cc',

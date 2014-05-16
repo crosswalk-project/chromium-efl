@@ -675,6 +675,12 @@ void RenderWidgetHostViewEfl::OnOverscrolled(
 }
 #endif
 
+#ifdef TIZEN_CONTENTS_DETECTION
+void RenderWidgetHostViewEfl::OnContentsDetected(const char* message) {
+  web_view_->ShowContentsDetectedPopup(message);
+}
+#endif
+
 void RenderWidgetHostViewEfl::ReturnSubscriberTexture(
     base::WeakPtr<RenderWidgetHostViewEfl> rwhvefl,
     scoped_refptr<OwnedMailbox> subscriber_texture,
@@ -1014,6 +1020,15 @@ void RenderWidgetHostViewEfl::HandleEvasEvent(const Evas_Event_Key_Down* event) 
   LOG(INFO) << __PRETTY_FUNCTION__ << " : " << event->key;
   bool wasFiltered = false;
 
+#ifdef TIZEN_CONTENTS_DETECTION
+  if (!strcmp(event->key, "XF86Stop")) {
+    PopupControllerEfl* popup_controller = web_view_->GetPopupController();
+    if (popup_controller)
+      popup_controller->closePopup();
+  }
+#endif
+
+  //if (!strcmp(event->key, "XF86Stop") || !strcmp(event->key, "BackSpace")) {
   if (!strcmp(event->key, "BackSpace")) {
     SelectionControllerEfl* controller = web_view_->GetSelectionController();
     if (controller)
