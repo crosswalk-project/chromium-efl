@@ -158,6 +158,18 @@ export LDFLAGS="${LDFLAGS} -Wl,--no-keep-memory"
 # to workaround mess in ./build/envsetup.sh
 export GYP_GENERATOR_OUTPUT=%{OUTPUT_BASE_FOLDER}
 
+if type ccache &> /dev/null; then
+export CCACHE_CPP2=yes
+export CCACHE_SLOPPINESS=time_macros
+export CCACHE_BASEDIR=$PWD/src
+export CCACHE_DIR=$PWD/%{OUTPUT_BASE_FOLDER}.ccache
+export CCACHE_COMPILERCHECK=content
+CCACHESIZE=$(ccache -s | grep max | grep -oE "[0-9]+" | head -1)
+  if [ $CCACHESIZE == "1" ]; then
+    ccache -M 10
+  fi
+fi
+
 #gyp generate
 %if %{?_skip_gyp:0}%{!?_skip_gyp:1}
 gyp_chromiumefl \
