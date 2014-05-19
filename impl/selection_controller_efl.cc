@@ -110,6 +110,7 @@ void SelectionControllerEfl::UpdateSelectionDataAndShow(const gfx::Rect& left_re
   selection_data_->UpdateRectData(left_rect, right_rect, is_anchor_first);
 
   if (!IsSelectionValid(left_rect, right_rect)) {
+    selection_data_->ClearRectData();
     Clear();
     return;
   }
@@ -146,15 +147,19 @@ void SelectionControllerEfl::ShowHandleAndContextMenuIfRequired() {
     return;
   }
 
-  // FIXME : Check the text Direction later
   gfx::Rect left = selection_data_->GetLeftRect();
+  gfx::Rect right = selection_data_->GetRightRect();
+
+  if (left.x() == 0 && left.y() == 0 && right.x() == 0 && right.y() == 0) {
+    selection_data_->ClearRectData();
+    return;
+  }
   // The base position of start_handle should be set to the middle of the left rectangle.
   // Otherwise the start_handle may be shifted up when the right_handle is moving
   start_handle_->SetBasePosition(gfx::Point(left.x(), left.y() + (left.height() / 2)));
   start_handle_->Move(gfx::Point(left.x(), left.y() + left.height()));
   start_handle_->Show();
 
-  gfx::Rect right = selection_data_->GetRightRect();
 
   // The base position of end_handle should be set to the middle of the right rectangle.
   // Otherwise the end_handle may be shifted up when the left_handle is moving

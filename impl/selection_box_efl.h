@@ -44,6 +44,7 @@ class SelectionBoxEfl {
   void UpdateHandleData();
   void UpdateSelectStringData(const base::string16& text);
   void UpdateRectData(const gfx::Rect& left_rect, const gfx::Rect& right_rect, bool is_anchor_first);
+  void ClearRectData();
   bool IsInEditField() const;
   void SetCaretSelectionStatus(const bool enable) { is_caret_selection_ = enable; }
   bool GetCaretSelectionStatus() const { return is_caret_selection_; }

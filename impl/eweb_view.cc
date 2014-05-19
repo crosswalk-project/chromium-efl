@@ -1152,7 +1152,7 @@ void EWebView::ShowContextMenu(const content::ContextMenuParams& params, content
   }
 
   context_menu_.reset(new content::ContextMenuControllerEfl(evas_object(), type));
-  if(!context_menu_->PopulateAndShowContextMenu(convertedParams))
+  if (!context_menu_->PopulateAndShowContextMenu(convertedParams))
     context_menu_.reset();
 }
 
