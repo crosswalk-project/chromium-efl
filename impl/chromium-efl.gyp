@@ -41,6 +41,7 @@
       'EXE_DIR="<(exe_dir)"',
     ],
     'sources': [
+      'API/ewk_cookie_manager_private.h',
       'browser/device_sensors/data_fetcher_impl_tizen.cc',
       'browser/device_sensors/data_fetcher_impl_tizen.h',
       'browser/device_sensors/data_fetcher_shared_memory_tizen.cc',
@@ -97,6 +98,8 @@
       'components/clipboard/clipboard_helper_efl.h',
       'context_menu_controller_efl.cc',
       'context_menu_controller_efl.h',
+      'cookie_manager.cc',
+      'cookie_manager.h',
       'memory_purger.cc',
       'memory_purger.h',
       'network_delegate_efl.cc',
