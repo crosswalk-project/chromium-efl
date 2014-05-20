@@ -169,7 +169,7 @@ void SelectionControllerEfl::ShowHandleAndContextMenuIfRequired() {
 
     if (!mouse_press_)
       parent_view_->ShowContextMenu(*(selection_data_->GetContextMenuParams()), MENU_TYPE_SELECTION);
-
+    parent_view_->QuerySelectionStyle();
     return;
   }
 
