@@ -53,6 +53,8 @@
       #'browser/geolocation/geolocation_permission_context_efl.h',
       'browser/geolocation/location_provider_efl.cc',
       'browser/geolocation/location_provider_efl.h',
+      'command_line_efl.cc',
+      'command_line_efl.h',
       'network_delegate_efl.cc',
       'network_delegate_efl.h',
       'paths_efl.cc',
