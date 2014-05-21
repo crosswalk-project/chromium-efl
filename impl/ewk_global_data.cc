@@ -20,6 +20,11 @@
 #include "message_pump_for_ui_efl.h"
 #include "screen_efl.h"
 
+#ifdef OS_TIZEN_MOBILE
+#include <dlfcn.h>
+void* EflAssistHandle = 0;
+#endif
+
 using base::MessageLoop;
 using content::BrowserMainRunner;
 using content::BrowserThread;
@@ -95,5 +100,10 @@ void EwkGlobalData::Ensure() {
   settings.logging_dest = logging::LOG_TO_SYSTEM_DEBUG_LOG;
   logging::InitLogging(settings);
   logging::SetLogItems(true, true, true, true);
+#endif
+
+#ifdef OS_TIZEN_MOBILE
+  if (!EflAssistHandle)
+    EflAssistHandle = dlopen("/usr/lib/libefl-assist.so.0", RTLD_LAZY);
 #endif
 }

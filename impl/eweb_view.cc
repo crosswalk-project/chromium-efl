@@ -1659,6 +1659,11 @@ bool EWebView::SetColorPickerColor(int r, int g, int b, int a) {
   return true;
 }
 
+void EWebView::InputPickerShow(Ewk_Input_Type inputType, const char* inputValue) {
+  inputPicker_.reset(new InputPicker(web_contents_delegate()->web_contents()));
+  inputPicker_->show(inputType, inputValue);
+}
+
 bool EWebView::IsIMEShow() {
   if (rwhv()->im_context())
     return rwhv()->im_context()->IsShow();

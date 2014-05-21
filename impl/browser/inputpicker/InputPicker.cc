@@ -37,6 +37,7 @@
 #ifdef OS_TIZEN_MOBILE
 #include <dlfcn.h>
 #include <efl_assist.h>
+extern void* EflAssistHandle;
 #endif
 
 namespace content {
@@ -111,15 +112,6 @@ struct Input_Date_Str {
   char min[maxDateStringLength];
   char sec[maxDateStringLength];
 };
-
-// FIXME : DJKim : not implemented yet
-#if 0 // ENABLE(TIZEN_HW_MORE_BACK_KEY)
-static void _edit_end_cb(void* data, Evas_Object* obj, void* event_info) {
-  WebKit::InputPicker* inputPicker = static_cast<WebKit::InputPicker*>(data);
-  if (inputPicker)
-    inputPicker->removeDatetimePickerDelayed();
-}
-#endif // ENABLE(TIZEN_HW_MORE_BACK_KEY)
 
 static char* datetimeFormat() {
 #ifdef OS_TIZEN
@@ -198,10 +190,6 @@ InputPicker::InputPicker(WebContents* web_contents)
     , m_dataList(0) {
   web_contents_delegate_ = static_cast<WebContentsDelegateEfl*>(web_contents->GetDelegate());
   m_ewkView = web_contents_delegate_->web_view()->evas_object();
-#ifdef OS_TIZEN_MOBILE
-  if (!EflAssistHandle)
-    EflAssistHandle = dlopen("/usr/lib/libefl-assist.so.0", RTLD_LAZY);
-#endif
 }
 
 InputPicker::~InputPicker() {
@@ -212,9 +200,17 @@ InputPicker::~InputPicker() {
   }
 }
 
+#ifdef OS_TIZEN_MOBILE
+void InputPicker::_edit_end_cb(void* data, Evas_Object* obj, void* event_info)
+{
+  InputPicker* inputPicker = static_cast<InputPicker*>(data);
+  if (inputPicker)
+    inputPicker->removeDatetimePickerDelayed();
+}
+#endif
+
 void InputPicker::show(Ewk_Input_Type inputType, const char* inputValue) {
-  // FIXME : DJKim : not implemented yet
-  // ewk_view_command_execute(m_ewkView, "Unselect", 0);
+  web_contents_delegate_->web_view()->ExecuteEditCommand("Unselect", 0);
 
   if (inputType == EWK_INPUT_TYPE_DATE)
     ewk_date_popup(inputValue);
@@ -307,7 +303,7 @@ void InputPicker::ewk_color_popup(int r, int g, int b) {
   if (m_pickerLayout)
     return;
 
-  m_pickerLayout = new InputPicker::Layout(m_ewkView);
+  m_pickerLayout->popup = elm_popup_add(elm_object_parent_widget_get(m_ewkView));
 
   m_pickerLayout->popup = elm_popup_add(m_ewkView);
   elm_object_part_text_set(m_pickerLayout->popup, "title,text", "Select color");
@@ -501,7 +497,15 @@ void InputPicker::ewk_date_popup(const char* inputValue) {
   elm_datetime_field_visible_set(m_pickerLayout->popup, ELM_DATETIME_AMPM, EINA_FALSE);
 
   evas_object_smart_callback_add(m_pickerLayout->popup, "picker,value,set", _date_popup_response_cb, this);
+#ifdef OS_TIZEN_MOBILE
+  if (EflAssistHandle) {
+    void (*webkit_ea_object_event_callback_add)(Evas_Object *, Ea_Callback_Type , Ea_Event_Cb func, void *);
+    webkit_ea_object_event_callback_add = (void (*)(Evas_Object *, Ea_Callback_Type , Ea_Event_Cb func, void *))dlsym(EflAssistHandle, "ea_object_event_callback_add");
+    (*webkit_ea_object_event_callback_add)(m_pickerLayout->popup, EA_CALLBACK_BACK, _popup_back_cb, this);
+  }
+#endif
 
+  evas_object_focus_set(m_pickerLayout->popup, true);
   evas_object_show(m_pickerLayout->popup);
   elm_object_signal_emit(m_pickerLayout->popup, "datepicker,show", "");
 }
@@ -660,7 +664,14 @@ void InputPicker::ewk_week_popup(const char* inputValue) {
   elm_datetime_field_visible_set(m_pickerLayout->datePicker, ELM_DATETIME_AMPM, EINA_FALSE);
 
   evas_object_smart_callback_add(m_pickerLayout->popup, "picker,value,set", _week_popup_response_cb, this);
-
+#ifdef OS_TIZEN_MOBILE
+  if (EflAssistHandle) {
+    void (*webkit_ea_object_event_callback_add)(Evas_Object *, Ea_Callback_Type , Ea_Event_Cb func, void *);
+    webkit_ea_object_event_callback_add = (void (*)(Evas_Object *, Ea_Callback_Type , Ea_Event_Cb func, void *))dlsym(EflAssistHandle, "ea_object_event_callback_add");
+    (*webkit_ea_object_event_callback_add)(m_pickerLayout->popup, EA_CALLBACK_BACK, _popup_back_cb, this);
+  }
+#endif
+  evas_object_focus_set(m_pickerLayout->popup, true);
   evas_object_show(m_pickerLayout->popup);
   elm_object_signal_emit(m_pickerLayout->popup, "datepicker,show", "");
 }
@@ -706,7 +717,14 @@ void InputPicker::ewk_time_popup(const char* inputValue) {
   elm_datetime_field_visible_set(m_pickerLayout->popup, ELM_DATETIME_DATE, EINA_FALSE);
 
   evas_object_smart_callback_add(m_pickerLayout->popup, "picker,value,set", _time_popup_response_cb, this);
-
+#ifdef OS_TIZEN_MOBILE
+  if (EflAssistHandle) {
+    void (*webkit_ea_object_event_callback_add)(Evas_Object *, Ea_Callback_Type , Ea_Event_Cb func, void *);
+    webkit_ea_object_event_callback_add = (void (*)(Evas_Object *, Ea_Callback_Type , Ea_Event_Cb func, void *))dlsym(EflAssistHandle, "ea_object_event_callback_add");
+    (*webkit_ea_object_event_callback_add)(m_pickerLayout->popup, EA_CALLBACK_BACK, _popup_back_cb, this);
+  }
+#endif
+  evas_object_focus_set(m_pickerLayout->popup, true);
   evas_object_show(m_pickerLayout->popup);
   elm_object_signal_emit(m_pickerLayout->popup, "timepicker,show", "");
 }
@@ -757,7 +775,15 @@ void InputPicker::ewk_month_popup(const char* inputValue) {
   elm_datetime_format_set(m_pickerLayout->datePicker, "%Y/%m");
 
   evas_object_smart_callback_add(m_pickerLayout->popup, "picker,value,set", _month_popup_response_cb, this);
-
+#ifdef OS_TIZEN_MOBILE
+  if (EflAssistHandle) {
+    LOG(ERROR) << "[DJKim] ++++++++++++++++++++++++++++++++++++ EA_CALLBACK_BACK" ;
+    void (*webkit_ea_object_event_callback_add)(Evas_Object *, Ea_Callback_Type , Ea_Event_Cb func, void *);
+    webkit_ea_object_event_callback_add = (void (*)(Evas_Object *, Ea_Callback_Type , Ea_Event_Cb func, void *))dlsym(EflAssistHandle, "ea_object_event_callback_add");
+    (*webkit_ea_object_event_callback_add)(m_pickerLayout->popup, EA_CALLBACK_BACK, _popup_back_cb, this);
+  }
+#endif
+  evas_object_focus_set(m_pickerLayout->popup, true);
   evas_object_show(m_pickerLayout->popup);
   elm_object_signal_emit(m_pickerLayout->popup, "datepicker,show", "");
 }
@@ -844,12 +870,12 @@ void InputPicker::ewk_datetime_popup(const char* inputValue, bool local) {
 
 Eina_Bool InputPicker::removeDatetimePicker(void* data) {
   InputPicker* inputPicker = static_cast<InputPicker*>(data);
+  inputPicker->web_contents_delegate_->web_contents()->DidCancelDialog();
 
   if (!inputPicker->m_pickerLayout)
     return ECORE_CALLBACK_CANCEL;
 
-  // FIXME : DJKim : not implemented yet
-  // ewk_view_command_execute(inputPicker->m_ewkView, "Unselect", 0);
+  inputPicker->web_contents_delegate_->web_view()->ExecuteEditCommand("Unselect", 0);
 
   inputPicker->deletePopupLayout();
   delete inputPicker->m_pickerLayout;
@@ -875,8 +901,7 @@ void InputPicker::createDatetimePicker(struct tm* currentTime) {
 
   elm_datetime_value_set(m_pickerLayout->popup, currentTime);
 
-  // FIXME : DJKim : not implemented yet
-#if 0 //ENABLE(TIZEN_HW_MORE_BACK_KEY)
+#ifdef OS_TIZEN_MOBILE
   evas_object_smart_callback_add(m_pickerLayout->popup, "edit,end", _edit_end_cb, this);
 #endif
 }
@@ -886,8 +911,7 @@ void InputPicker::createDatetimePopup(const char* title, struct tm* currentTime)
   evas_object_size_hint_weight_set(m_pickerLayout->popup, EVAS_HINT_EXPAND, EVAS_HINT_EXPAND);
   elm_object_part_text_set(m_pickerLayout->popup, "title,text", title);
 
-  // FIXME : DJKim : not implemented yet
-#if 0 //ENABLE(TIZEN_HW_MORE_BACK_KEY)
+#ifdef OS_TIZEN_MOBILE
   if (EflAssistHandle) {
     void (*webkit_ea_object_event_callback_add)(Evas_Object *, Ea_Callback_Type , Ea_Event_Cb func, void *);
     webkit_ea_object_event_callback_add = (void (*)(Evas_Object *, Ea_Callback_Type , Ea_Event_Cb func, void *))dlsym(EflAssistHandle, "ea_object_event_callback_add");
@@ -917,8 +941,7 @@ void InputPicker::createDatetimePopup(const char* title, struct tm* currentTime)
 
   elm_datetime_value_set(m_pickerLayout->datePicker, currentTime);
 
-  // FIXME : DJKim : not implemented yet
-#if 0 //ENABLE(TIZEN_HW_MORE_BACK_KEY)
+#ifdef OS_TIZEN_MOBILE
   evas_object_smart_callback_add(m_pickerLayout->datePicker, "edit,end", _edit_end_cb, 0);
 #endif
 }
@@ -942,8 +965,7 @@ void InputPicker::_date_popup_response_cb(void* data,  Evas_Object* obj, void* e
   char dateStr[20] = { 0, };
   strftime(dateStr, 20, "%F" , &currentTime);
 
-  // FIXME : DJKim : not implemented yet
-  //ewk_view_focused_input_element_value_set(inputPicker->m_ewkView, dateStr);
+  inputPicker->web_contents_delegate_->web_contents()->DidReplaceDateTime(std::string(dateStr));
 }
 
 void InputPicker::_week_popup_response_cb(void* data,  Evas_Object* obj, void* event_info) {
@@ -958,8 +980,7 @@ void InputPicker::_week_popup_response_cb(void* data,  Evas_Object* obj, void* e
   char dateStr[20] = { 0, };
   strftime(dateStr, 20, "%G-W%V", &currentTime);
 
-  // FIXME : DJKim : not implemented yet
-  //ewk_view_focused_input_element_value_set(inputPicker->m_ewkView, dateStr);
+  inputPicker->web_contents_delegate_->web_contents()->DidReplaceDateTime(std::string(dateStr));
 }
 
 void InputPicker::_time_popup_response_cb(void* data,  Evas_Object* obj, void* event_info) {
@@ -974,8 +995,7 @@ void InputPicker::_time_popup_response_cb(void* data,  Evas_Object* obj, void* e
   char dateStr[20] = { 0, };
   strftime(dateStr, 20, "%R", &currentTime);
 
-  // FIXME : DJKim : not implemented yet
-  //ewk_view_focused_input_element_value_set(inputPicker->m_ewkView, dateStr);
+  inputPicker->web_contents_delegate_->web_contents()->DidReplaceDateTime(std::string(dateStr));
 }
 
 void InputPicker::_month_popup_response_cb(void* data,  Evas_Object* obj, void* event_info) {
@@ -990,8 +1010,7 @@ void InputPicker::_month_popup_response_cb(void* data,  Evas_Object* obj, void* 
   char dateStr[20] = { 0, };
   strftime(dateStr, 20, "%Y-%m", &currentTime);
 
-  // FIXME : DJKim : not implemented yet
-  //ewk_view_focused_input_element_value_set(inputPicker->m_ewkView, dateStr);
+  inputPicker->web_contents_delegate_->web_contents()->DidReplaceDateTime(std::string(dateStr));
 }
 
 void InputPicker::_datetime_popup_response_cb(void* data,  Evas_Object* obj, void* event_info) {
@@ -1009,19 +1028,15 @@ void InputPicker::_datetime_popup_response_cb(void* data,  Evas_Object* obj, voi
   else
     strftime(dateStr, 50, "%FT%RZ", &currentTime);
 
-  // FIXME : DJKim : not implemented yet
-  // ewk_view_focused_input_element_value_set(inputPicker->m_ewkView, dateStr);
-
-  // FIXME : DJKim : not implemented yet
-  // ewk_view_command_execute(inputPicker->m_ewkView, "Unselect", 0);
+  inputPicker->web_contents_delegate_->web_contents()->DidReplaceDateTime(std::string(dateStr));
+  inputPicker->web_contents_delegate_->web_view()->ExecuteEditCommand("Unselect", 0);
 
   inputPicker->deletePopupLayout();
   delete inputPicker->m_pickerLayout;
   inputPicker->m_pickerLayout = 0;
 }
 
-// FIXME : DJKim : not implemented yet
-#if 0//ENABLE(TIZEN_HW_MORE_BACK_KEY)
+#ifdef OS_TIZEN_MOBILE
 void InputPicker::_popup_back_cb(void* data, Evas_Object* obj, void* event_info) {
   removeDatetimePicker(data);
 }

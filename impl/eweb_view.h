@@ -283,6 +283,7 @@ class EWebView
   void RequestColorPicker(int r, int g, int b, int a);
   void DismissColorPicker();
   bool SetColorPickerColor(int r, int g, int b, int a);
+  void InputPickerShow(Ewk_Input_Type inputType, const char* inputValue);
 
 #ifdef TIZEN_EDGE_EFFECT
   void SetSettingsGetCallback(Ewk_View_Settings_Get callback, void* user_data);

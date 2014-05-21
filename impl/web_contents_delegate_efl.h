@@ -19,11 +19,13 @@
 #include "content/browser/web_contents/web_contents_impl.h"
 #include "url/gurl.h"
 #include "browser/favicon/favicon_downloader.h"
+#include "ui/base/ime/text_input_type.h"
 
 class PolicyResponseDelegateEfl;
 class DidPrintPagesParams;
 
 namespace content {
+struct DateTimeSuggestion;
 
 class WebContentsDelegateEfl
     : public WebContentsDelegate,
@@ -156,6 +158,12 @@ class WebContentsDelegateEfl
   void RunFileChooser(WebContents* web_contents, const FileChooserParams& params);
   ColorChooser* OpenColorChooser(WebContents* web_contents, SkColor color, const std::vector<ColorSuggestion>& suggestions);
   void OnAccessRequestResponse(Eina_Bool allowed);
+  void OpenDateTimeDialog(ui::TextInputType dialog_type,
+                          double dialog_value,
+                          double min,
+                          double max,
+                          double step,
+                          const std::vector<DateTimeSuggestion>& suggestions);
 
  private:
   void OnGetContentSecurityPolicy(IPC::Message* reply_msg);

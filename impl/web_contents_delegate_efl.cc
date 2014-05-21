@@ -15,6 +15,7 @@
 #include "public/ewk_custom_handlers.h"
 #include "public/ewk_hit_test.h"
 #include "public/ewk_policy_decision.h"
+#include "public/ewk_view.h"
 
 #include "base/strings/utf_string_conversions.h"
 #include "content/common/view_messages.h"
@@ -23,6 +24,7 @@
 #include "content/public/browser/navigation_entry.h"
 #include "content/public/browser/favicon_status.h"
 #include "content/public/common/favicon_url.h"
+#include "content/common/date_time_suggestion.h"
 #include "net/base/load_states.h"
 #include "net/http/http_response_headers.h"
 #include "printing/pdf_metafile_skia.h"
@@ -518,5 +520,56 @@ content::ColorChooser* WebContentsDelegateEfl::OpenColorChooser(
   web_view_->RequestColorPicker(SkColorGetR(color), SkColorGetG(color), SkColorGetB(color), SkColorGetA(color));
 
   return color_chooser_efl;
+}
+
+void WebContentsDelegateEfl::OpenDateTimeDialog(
+    ui::TextInputType dialog_type,
+    double dialog_value,
+    double min,
+    double max,
+    double step,
+    const std::vector<DateTimeSuggestion>& suggestions) {
+  int inputPickerType;
+  std::string inputMethodHints;
+
+  switch (dialog_type) {
+    case ui::TEXT_INPUT_TYPE_DATE:
+      inputPickerType = EWK_INPUT_TYPE_DATE;
+      inputMethodHints = "date";
+      break;
+    case ui::TEXT_INPUT_TYPE_DATE_TIME:
+      inputPickerType = EWK_INPUT_TYPE_DATETIME;
+      inputMethodHints = "datetime";
+      break;
+    case ui::TEXT_INPUT_TYPE_DATE_TIME_LOCAL:
+      inputPickerType = EWK_INPUT_TYPE_DATETIMELOCAL;
+      inputMethodHints = "datetime-local";
+      break;
+    case ui::TEXT_INPUT_TYPE_TIME:
+      inputPickerType = EWK_INPUT_TYPE_TIME;
+      inputMethodHints = "time";
+      break;
+    case ui::TEXT_INPUT_TYPE_WEEK:
+      inputPickerType = EWK_INPUT_TYPE_WEEK;
+      inputMethodHints = "week";
+      break;
+    case ui::TEXT_INPUT_TYPE_CONTENT_EDITABLE:
+      inputPickerType = EWK_INPUT_TYPE_TEXT;
+      inputMethodHints = "date";
+      break;
+    case ui::TEXT_INPUT_TYPE_DATE_TIME_FIELD:
+      inputPickerType = EWK_INPUT_TYPE_DATETIME;
+      inputMethodHints = "datetime";
+      break;
+    case ui::TEXT_INPUT_TYPE_MONTH:
+      inputPickerType = EWK_INPUT_TYPE_MONTH;
+      inputMethodHints = "month";
+      break;
+    default:
+      inputPickerType = EWK_INPUT_TYPE_TEXT;
+      inputMethodHints = "";
+      break;
+  }
+  web_view_->InputPickerShow(static_cast<Ewk_Input_Type>(inputPickerType), inputMethodHints.c_str());
 }
 } //namespace content
