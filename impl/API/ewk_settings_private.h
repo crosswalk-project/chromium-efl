@@ -93,6 +93,7 @@ class Ewk_Settings {
     void setAutoFitting(bool enable) {m_autoFitting = enable; }
     bool linkEffectEnabled() const { return m_linkEffectEnabled; }
     void setLinkEffectEnabled(bool flag) { m_linkEffectEnabled = flag; }
+    void setSpdyEnabled(bool flag);
 
     Evas_Object* getEvasObject() { return m_evas_object; }
     content::WebPreferences& getPreferences() { return m_preferences; }

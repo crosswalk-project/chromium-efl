@@ -56,6 +56,7 @@
       'API/ewk_policy_decision_private.cc',
       'API/ewk_policy_decision_private.h',
       'API/ewk_security_origin_private.h',
+      'API/ewk_settings_private.cc',
       'API/ewk_settings_private.h',
       'API/ewk_text_style_private.h',
       'API/ewk_user_media_private.h',
