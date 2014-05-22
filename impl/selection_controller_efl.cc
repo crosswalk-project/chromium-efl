@@ -134,6 +134,7 @@ void SelectionControllerEfl::ClearSelectionViaEWebView() {
 void SelectionControllerEfl::UpdateSelectionDataAndShow(const gfx::Rect& left_rect, const gfx::Rect& right_rect, bool is_anchor_first) {
   TRACE_EVENT0("selection,efl", __PRETTY_FUNCTION__);
   selection_data_->UpdateRectData(left_rect, right_rect, is_anchor_first);
+  parent_view_->QuerySelectionStyle();
 
   if (!IsSelectionValid(left_rect, right_rect)) {
     selection_data_->ClearRectData();
