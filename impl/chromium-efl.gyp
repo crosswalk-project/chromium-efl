@@ -46,6 +46,9 @@
       'browser/device_sensors/data_fetcher_shared_memory_tizen.cc',
       'browser/download_manager_delegate_efl.cc',
       'browser/download_manager_delegate_efl.h',
+      # [M37] Geolocation related code changed. Figure out how to fix it.
+      #'browser/geolocation/geolocation_permission_context_efl.cc',
+      #'browser/geolocation/geolocation_permission_context_efl.h',
       'web_contents_delegate_efl.cc',
       'web_contents_delegate_efl.h',
     ],
