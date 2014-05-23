@@ -53,6 +53,8 @@
       'paths_efl.h',
       'renderer/content_renderer_client_efl.cc',
       'renderer/content_renderer_client_efl.h',
+      'renderer/render_process_observer_efl.cc',
+      'renderer/render_process_observer_efl.h',
       'renderer/render_view_observer_efl.cc',
       'renderer/render_view_observer_efl.h',
       'web_contents_delegate_efl.cc',
