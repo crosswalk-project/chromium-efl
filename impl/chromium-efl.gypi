@@ -86,6 +86,7 @@
             '<!@(<(pkg-config) --cflags capi-system-info)',
             '<!@(<(pkg-config) --cflags capi-system-sensor)',
             '<!@(<(pkg-config) --cflags capi-location-manager)',
+            '<!@(<(pkg-config) --cflags capi-media-audio-io)',
             '<!@(<(pkg-config) --cflags capi-media-camera)',
             '<!@(<(pkg-config) --cflags vconf)',
             '<!@(<(pkg-config) --cflags libtbm)',
@@ -99,6 +100,7 @@
              '<!@(<(pkg-config) --libs-only-L --libs-only-other capi-system-info)',
              '<!@(<(pkg-config) --libs-only-L --libs-only-other capi-system-sensor)',
              '<!@(<(pkg-config) --libs-only-L --libs-only-other capi-location-manager)',
+             '<!@(<(pkg-config) --libs-only-L --libs-only-other capi-media-audio-io)',
              '<!@(<(pkg-config) --libs-only-L --libs-only-other capi-media-camera)',
              '<!@(<(pkg-config) --libs-only-L --libs-only-other vconf)',
            ],
@@ -107,6 +109,7 @@
              '<!@(<(pkg-config) --libs-only-l capi-system-info)',
              '<!@(<(pkg-config) --libs-only-l capi-system-sensor)',
              '<!@(<(pkg-config) --libs-only-l capi-location-manager)',
+             '<!@(<(pkg-config) --libs-only-l capi-media-audio-io)',
              '<!@(<(pkg-config) --libs-only-l capi-media-camera)',
              '<!@(<(pkg-config) --libs-only-l vconf)',
              '<!@(<(pkg-config) --libs-only-l libtbm)',
@@ -127,6 +130,7 @@
          'defines': [
            'OS_TIZEN_MOBILE=1',
            'TIZEN_CONTENTS_DETECTION=1',
+           'TIZEN_ENABLE_CAPI_SUPPORT=1',
            ],
          'include_dirs': [
            '/usr/include/ug-1',
