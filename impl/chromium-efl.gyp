@@ -91,6 +91,8 @@
       'resource/JavaScriptPopup.edc',
       'screen_efl.cc',
       'screen_efl.h',
+      'url_request_context_getter_efl.cc',
+      'url_request_context_getter_efl.h',
       'web_contents_delegate_efl.cc',
       'web_contents_delegate_efl.h',
     ],
