@@ -41,6 +41,9 @@
       'EXE_DIR="<(exe_dir)"',
     ],
     'sources': [
+      'browser/device_sensors/data_fetcher_impl_tizen.cc',
+      'browser/device_sensors/data_fetcher_impl_tizen.h',
+      'browser/device_sensors/data_fetcher_shared_memory_tizen.cc',
     ],
     'cflags!': [
       # Symbol visibility controled by chromium-efl.filter
