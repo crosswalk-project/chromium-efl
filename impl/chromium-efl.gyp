@@ -46,6 +46,8 @@
       'browser/device_sensors/data_fetcher_shared_memory_tizen.cc',
       'browser/download_manager_delegate_efl.cc',
       'browser/download_manager_delegate_efl.h',
+      'web_contents_delegate_efl.cc',
+      'web_contents_delegate_efl.h',
     ],
     'cflags!': [
       # Symbol visibility controled by chromium-efl.filter
