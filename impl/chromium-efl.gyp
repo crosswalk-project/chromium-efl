@@ -51,6 +51,8 @@
       #'browser/geolocation/geolocation_permission_context_efl.h',
       'paths_efl.cc',
       'paths_efl.h',
+      'renderer/content_renderer_client_efl.cc',
+      'renderer/content_renderer_client_efl.h',
       'web_contents_delegate_efl.cc',
       'web_contents_delegate_efl.h',
     ],
