@@ -49,6 +49,8 @@
       # [M37] Geolocation related code changed. Figure out how to fix it.
       #'browser/geolocation/geolocation_permission_context_efl.cc',
       #'browser/geolocation/geolocation_permission_context_efl.h',
+      'paths_efl.cc',
+      'paths_efl.h',
       'web_contents_delegate_efl.cc',
       'web_contents_delegate_efl.h',
     ],
