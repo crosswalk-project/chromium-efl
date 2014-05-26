@@ -45,6 +45,8 @@
     ],
     'sources': [
       'API/ewk_auth_challenge_private.h',
+      'API/ewk_autofill_profile_private.h',
+      'API/ewk_autofill_profile_private.cc',
       'API/ewk_certificate_private.h',
       'API/ewk_console_message_private.h',
       'API/ewk_context_menu_private.h',
