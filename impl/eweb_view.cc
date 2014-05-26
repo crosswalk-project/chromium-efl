@@ -782,11 +782,11 @@ void EWebView::ProcessAckedTouchEvent(const TouchEventWithLatencyInfo& touch,
     return;
 
   ui::EventResult result = (ack_result == INPUT_EVENT_ACK_STATE_CONSUMED) ?
-	  ui::ER_HANDLED : ui::ER_UNHANDLED;
+      ui::ER_HANDLED : ui::ER_UNHANDLED;
   for (ScopedVector<ui::TouchEvent>::const_iterator iter = events.begin(),
       end = events.end(); iter != end; ++iter)  {
     scoped_ptr<ui::GestureRecognizer::Gestures> gestures(
-	gesture_recognizer_->ProcessTouchEventForGesture(*(*iter), result, this));
+        gesture_recognizer_->ProcessTouchEventForGesture(*(*iter), result, this));
     if (gestures) {
       for (size_t j = 0; j < gestures->size(); ++j) {
         ui::GestureEvent* event = gestures->get().at(j);
@@ -1606,7 +1606,18 @@ void EWebView::ShowFileChooser(const content::FileChooserParams& params) {
   RenderViewHost* render_view_host = web_contents_delegate()->web_contents()->GetRenderViewHost();
   if (!render_view_host)
     return;
-
+#if defined(OS_TIZEN_MOBILE)
+  //If capture type is camcorder, launch camera instead of file chooser.
+  if (params.capture) {
+    std::vector<base::string16>::iterator it;
+    std::vector<base::string16> accept_types = params.accept_types;
+    it = accept_types.begin();
+    base::string16 filechoosertype = *it;
+    filechooser_mode_ = params.mode;
+    LaunchCamera(filechoosertype);
+    return;
+  }
+#endif
   file_chooser_.reset(new content::FileChooserControllerEfl(render_view_host, &params));
   file_chooser_->open();
 }
@@ -1690,3 +1701,69 @@ std::string EWebView::GetErrorPage(const std::string& invalidUrl) {
     ;
    return html;
 }
+
+#if defined(OS_TIZEN_MOBILE)
+void EWebView::cameraResultCb(service_h request,
+                              service_h reply,
+                              service_result_e result,
+		              void* data)
+{
+  EWebView* webview = static_cast<EWebView*>(data);
+  if (result == SERVICE_RESULT_SUCCEEDED) {
+    int ret = -1;
+    char** filesarray;
+    int number;
+    ret =service_get_extra_data_array(reply, SERVICE_DATA_SELECTED,
+      &filesarray,&number);
+    if (filesarray) {
+      for(int i =0; i< number;i++) {
+        std::vector<ui::SelectedFileInfo> files;
+        RenderViewHost* render_view_host = webview->web_contents_delegate()->
+          web_contents()->GetRenderViewHost();
+        if (!render_view_host) {
+          return;
+        }
+        if (filesarray[i]) {
+          GURL url(filesarray[i]);
+          if (!url.is_valid()) {
+            base::FilePath path(url.SchemeIsFile() ? url.path() :
+              filesarray[i]);
+            files.push_back(ui::SelectedFileInfo(path, base::FilePath()));
+          }
+        }
+        render_view_host->FilesSelectedInChooser(files,
+          webview->filechooser_mode_);
+      }
+    }
+  } else {
+    RenderViewHost* render_view_host = webview->web_contents_delegate()->
+      web_contents()->GetRenderViewHost();
+    std::vector<ui::SelectedFileInfo> files;
+    if (render_view_host) {
+      render_view_host->FilesSelectedInChooser(files,
+        webview->filechooser_mode_);
+    }
+  }
+}
+
+bool EWebView::LaunchCamera(base::string16 mimetype)
+{
+  service_h svcHandle = 0;
+  if (service_create(&svcHandle) < 0 || !svcHandle) {
+    LOG(ERROR) << __FUNCTION__ << " Service Creation Failed ";
+    return false;
+  }
+  service_set_operation(svcHandle, SERVICE_OPERATION_CREATE_CONTENT);
+  service_set_mime(svcHandle, UTF16ToUTF8(mimetype).c_str());
+  service_add_extra_data(svcHandle, "CALLER", "Browser");
+
+  int ret = service_send_launch_request(svcHandle, cameraResultCb, this);
+  if (ret != SERVICE_ERROR_NONE) {
+    LOG(ERROR) << __FUNCTION__ << " Service Launch Failed ";
+    service_destroy(svcHandle);
+    return false;
+  }
+  service_destroy(svcHandle);
+  return true;
+}
+#endif

@@ -20,6 +20,11 @@
 #ifndef EWEB_VIEW_H
 #define EWEB_VIEW_H
 
+#if defined(OS_TIZEN_MOBILE)
+#include <appfw/app_service.h>
+#include <vector>
+#endif
+
 #include <map>
 #include <string>
 #include <Evas.h>
@@ -302,6 +307,10 @@ class EWebView
   static void OnTouchDown(void*, Evas*, Evas_Object*, void*);
   static void OnTouchUp(void*, Evas*, Evas_Object*, void*);
   static void OnTouchMove(void*, Evas*, Evas_Object*, void*);
+#if defined(OS_TIZEN_MOBILE)
+  static void cameraResultCb(service_h request, service_h reply,
+    service_result_e result, void* data);
+#endif
 
   void HandleTouchEvents(Ewk_Touch_Event_Type);
 
@@ -325,6 +334,9 @@ class EWebView
   virtual void DispatchCancelTouchEvent(ui::TouchEvent* event) OVERRIDE;
   virtual void DispatchGestureEvent(ui::GestureEvent*) OVERRIDE;
 
+#if defined(OS_TIZEN_MOBILE)
+  bool LaunchCamera(base::string16 mimetype);
+#endif
   content::RenderWidgetHostViewEfl* rwhv() const;
   JavaScriptDialogManagerEfl* GetJavaScriptDialogManagerEfl();
 
@@ -388,6 +400,9 @@ class EWebView
 
 #ifndef NDEBUG
   bool renderer_crashed_;
+#endif
+#if defined(OS_TIZEN_MOBILE)
+  content::FileChooserParams::Mode filechooser_mode_;
 #endif
 };
 
