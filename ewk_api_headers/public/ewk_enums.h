@@ -24,8 +24,6 @@
 extern "C" {
 #endif
 
-// #if OS(TIZEN)
-/// Represents types of gesture.
 enum _Ewk_Gesture_Type {
     EWK_GESTURE_TAP,
     EWK_GESTURE_LONG_PRESS,
@@ -33,11 +31,8 @@ enum _Ewk_Gesture_Type {
     EWK_GESTURE_FLICK,
     EWK_GESTURE_PINCH
 };
-/// Creates a type name for @a _Ewk_Gesture_Type.
 typedef enum _Ewk_Gesture_Type Ewk_Gesture_Type;
-// #endif // #if OS(TIZEN)
 
-//#if ENABLE(TIZEN_ORIENTATION_EVENTS)
 enum _Ewk_Screen_Orientation {
     EWK_SCREEN_ORIENTATION_PORTRAIT_PRIMARY = 1,
     EWK_SCREEN_ORIENTATION_LANDSCAPE_PRIMARY = 1 << 1,
@@ -54,7 +49,6 @@ enum _Ewk_Screen_Orientation_Degrees {
     EWK_SCREEN_ORIENTATION_270 = 270
 };
 typedef enum _Ewk_Screen_Orientation_Degrees Ewk_Screen_Orientation_Degrees;
-//#endif
 
 #ifdef __cplusplus
 }

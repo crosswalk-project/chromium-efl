@@ -20,8 +20,6 @@
 #ifndef ewk_security_origin_h
 #define ewk_security_origin_h
 
-#include <stdint.h>
-#include <Eina.h>
 
 #ifdef __cplusplus
 extern "C" {
@@ -29,32 +27,6 @@ extern "C" {
 
 typedef struct _Ewk_Security_Origin Ewk_Security_Origin;
 
-/**
- * Requests for getting host of security origin.
- *
- * @param origin security origin
- *
- * @return host of security origin
- */
-EAPI Eina_Stringshare* ewk_security_origin_host_get(const Ewk_Security_Origin* origin);
-
-/**
- * Requests for getting host of security origin.
- *
- * @param origin security origin
- *
- * @return host of security origin
- */
-EAPI Eina_Stringshare* ewk_security_origin_protocol_get(const Ewk_Security_Origin* origin);
-
-/**
- * Requests for getting host of security origin.
- *
- * @param origin security origin
- *
- * @return host of security origin
- */
-EAPI uint16_t ewk_security_origin_port_get(const Ewk_Security_Origin* origin);
 
 #ifdef __cplusplus
 }

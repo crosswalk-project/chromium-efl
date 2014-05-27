@@ -10,7 +10,7 @@
 #include "API/ewk_text_style_private.h"
 #include "API/ewk_ipc_message_private.h"
 #include "cache_params_efl.h"
-#include "public/ewk_csp_header_type.h"
+#include "public/ewk_view.h"
 #include "public/ewk_hit_test.h"
 #include "navigation_policy_params.h"
 #include "public/ewk_ipc_message.h"

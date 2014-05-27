@@ -27,6 +27,7 @@
 #define NOTIFICATION_CONTROLLER_EFL_H
 
 #include <Eina.h>
+#include <Evas.h>
 #include "public/ewk_notification.h"
 #include "base/strings/utf_string_conversions.h"
 #include "base/id_map.h"

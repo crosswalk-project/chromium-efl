@@ -31,7 +31,6 @@
 #include "API/ewk_settings_private.h"
 #include "API/ewk_text_style_private.h"
 #include "API/ewk_view_private.h"
-#include "public/ewk_private.h"
 #include "web_contents_delegate_efl.h"
 #include "public/platform/WebString.h"
 #include "base/command_line.h"

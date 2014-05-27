@@ -20,8 +20,6 @@
 #ifndef ewk_hit_test_h
 #define ewk_hit_test_h
 
-#include <Eina.h>
-
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -68,113 +66,6 @@ typedef enum {
 /** Creates a type name for _Ewk_Hit_Test */
 typedef struct _Ewk_Hit_Test Ewk_Hit_Test;
 
-/**
- * Frees hit test instance created by ewk_view_hit_test_new().
- *
- * @param hit_test instance
- */
-EAPI void ewk_hit_test_free(Ewk_Hit_Test* hit_test);
-
-/**
- * Gets the context of  the hit test
- *
- * @param hit_test instance
- * @return a bitmask of the hit test context on success, @c EWK_HIT_TEST_RESULT_CONTEXT_DOCUMENT otherwise.
- */
-EAPI Ewk_Hit_Test_Result_Context ewk_hit_test_result_context_get(Ewk_Hit_Test* hit_test);
-
-/**
- * Gets the link uri string of the hit test
- *
- * @param hit_test instance
- * @return the URI of the link element in the coordinates of the hit test on success, @c 0 otherwise.
- */
-EAPI const char* ewk_hit_test_link_uri_get(Ewk_Hit_Test* hit_test);
-
-/**
- * Gets the link title string of the hit test
- *
- * @param hit_test instance
- * @return the title of the link element in the coordinates of the hit test on success, @c 0 otherwise.
- */
-EAPI const char* ewk_hit_test_link_title_get(Ewk_Hit_Test* hit_test);
-
-/**
- * Gets the link label string of the hit test
- *
- * @param hit_test instance
- * @return the label of the link element in the coordinates of the hit test on success, @c 0 otherwise.
- */
-EAPI const char* ewk_hit_test_link_label_get(Ewk_Hit_Test* hit_test);
-
-/**
- * Gets the image uri string of the hit test
- *
- * @param hit_test instance
- * @return the URI of the image element in the coordinates of the hit test on success, @c 0 otherwise.
- */
-EAPI const char* ewk_hit_test_image_uri_get(Ewk_Hit_Test* hit_test);
-
-/**
- * Gets the media uri string of the hit test
- *
- * @param hit_test instance
- * @return the URI of the media element in the coordinates of the hit test on success, @c 0 otherwise.
- */
-EAPI const char* ewk_hit_test_media_uri_get(Ewk_Hit_Test* hit_test);
-
-/**
- * Gets the tag name string of hit element of the hit test
- *
- * @param hit_test instance
- * @return the tag name of the hit element in the coordinates of the hit test on success, @c 0 otherwise.
- */
-EAPI const char* ewk_hit_test_tag_name_get(Ewk_Hit_Test* hit_test);
-
-/**
- * Gets the node value string of hit element of the hit test
- *
- * @param hit_test instance
- * @return the node value of the hit element in the coordinates of the hit test on success, @c 0 otherwise.
- */
-EAPI const char* ewk_hit_test_node_value_get(Ewk_Hit_Test* hit_test);
-
-/**
- * Gets the attribute data of hit element of the hit test
- *
- * @param hit_test instance
- * @return the attribute data of the hit element in the coordinates of the hit test on success, @c 0 otherwise.
- */
-EAPI Eina_Hash* ewk_hit_test_attribute_hash_get(Ewk_Hit_Test* hit_test);
-
-/**
- * Gets the image buffer of hit element of the hit test
- *
- * @param hit_test instance
- * @return the image buffer of the hit element in the coordinates of the hit test on success, @c 0 otherwise.
- */
-EAPI void* ewk_hit_test_image_buffer_get(Ewk_Hit_Test* hit_test);
-
-/**
- * Gets the image buffer length of hit element of the hit test
- *
- * @param hit_test instance
- * @return the image buffer length of the hit element in the coordinates of the hit test on success, @c 0 otherwise.
- * Buffer length is truncated to 32 bit.
- */
-EAPI unsigned int ewk_hit_test_image_buffer_length_get(Ewk_Hit_Test* hit_test);
-
-/**
- * Gets the image fiile name extension string of hit element of the hit test
- *
- * @param hit_test instance
- * @return the image fiile name extension of the hit element in the coordinates of the hit test on success, @c 0 otherwise.
- */
-EAPI const char* ewk_hit_test_image_file_name_extension_get(Ewk_Hit_Test* hit_test);
-
-// API to test image saving functionality. Not to be used.
-EAPI int FOR_TESTING_ewk_hit_test_image_width_get(Ewk_Hit_Test* hit_test);
-EAPI int FOR_TESTING_ewk_hit_test_image_height_get(Ewk_Hit_Test* hit_test);
 
 #ifdef __cplusplus
 }

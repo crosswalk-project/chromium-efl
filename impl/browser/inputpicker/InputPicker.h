@@ -20,7 +20,7 @@
 #ifndef InputPicker_h
 #define InputPicker_h
 
-#include "ewk_view.h"
+#include "public/ewk_view.h"
 
 #include <ctime>
 #include <Evas.h>

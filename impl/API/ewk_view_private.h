@@ -22,7 +22,7 @@
 #define ewk_view_private_h
 
 #include <Evas.h>
-#include "ewk_custom_handlers.h"
+#include "public/ewk_custom_handlers.h"
 #include "webkit/common/webpreferences.h"
 
 struct _Ewk_Custom_Handlers_Data {

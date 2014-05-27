@@ -19,7 +19,6 @@
 
 #include "InputPicker.h"
 
-#include "ewk_view.h"
 #include "base/path_service.h"
 #include "base/files/file_path.h"
 #include "paths_efl.h"

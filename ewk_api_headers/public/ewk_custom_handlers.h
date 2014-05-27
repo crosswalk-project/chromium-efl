@@ -25,9 +25,6 @@
 #ifndef ewk_custom_handlers_h
 #define ewk_custom_handlers_h
 
-#include <Eina.h>
-#include <Evas.h>
-
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -47,49 +44,6 @@ enum _Ewk_Custom_Handlers_State {
 /// Creates a type name for @a _Ewk_Custom_Handlers_State.
 typedef enum _Ewk_Custom_Handlers_State Ewk_Custom_Handlers_State;
 
-/**
- * Get target(scheme or mime type) of custom handlers.
- *
- * @param data custom handlers's structure.
- *
- * @return @c target (scheme or mime type).
- */
-EAPI Eina_Stringshare* ewk_custom_handlers_data_target_get(const Ewk_Custom_Handlers_Data* data);
-
-/**
- * Get base url of custom handlers.
- *
- * @param data custom handlers's structure.
- *
- * @return @c base url.
- */
-EAPI Eina_Stringshare* ewk_custom_handlers_data_base_url_get(const Ewk_Custom_Handlers_Data* data);
-
-/**
- * Get url of custom handlers.
- *
- * @param data custom handlers's structure.
- *
- * @return @c url.
- */
-EAPI Eina_Stringshare* ewk_custom_handlers_data_url_get(const Ewk_Custom_Handlers_Data* data);
-
-/**
- * Get title of custom handlers.
- *
- * @param data custom handlers's structure.
- *
- * @return @c title.
- */
-EAPI Eina_Stringshare* ewk_custom_handlers_data_title_get(const Ewk_Custom_Handlers_Data* data);
-
-/**
- * Set result of isProtocolRegistered API.
- *
- * @param data custom handlers's structure
- * @param result(Ewk_Custom_Handlers_State) of isProtocolRegistered and isContentRegistered API
- */
-EAPI void ewk_custom_handlers_data_result_set(Ewk_Custom_Handlers_Data* data, Ewk_Custom_Handlers_State result);
 #ifdef __cplusplus
 }
 #endif

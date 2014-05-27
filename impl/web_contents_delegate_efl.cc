@@ -15,6 +15,7 @@
 #include "public/ewk_custom_handlers.h"
 #include "public/ewk_hit_test.h"
 #include "public/ewk_view.h"
+#include "public/ewk_policy_decision.h"
 
 #include "base/strings/utf_string_conversions.h"
 #include "content/common/view_messages.h"

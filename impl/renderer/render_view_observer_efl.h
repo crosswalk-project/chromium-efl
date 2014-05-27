@@ -3,7 +3,7 @@
 
 #include <string>
 #include "content/public/renderer/render_view_observer.h"
-#include "public/ewk_csp_header_type.h"
+#include "public/ewk_view.h"
 #include "renderer/print_web_view_helper_efl.h"
 #include "content/public/renderer/render_view_observer.h"
 #include "public/ewk_hit_test.h"
