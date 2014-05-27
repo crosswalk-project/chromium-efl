@@ -63,6 +63,8 @@
       'browser/renderer_host/native_web_keyboard_event_efl.cc',
       'browser/renderer_host/web_cache_manager_efl.cc',
       'browser/renderer_host/web_cache_manager_efl.h',
+      'browser_context_efl.cc',
+      'browser_context_efl.h',
       'cache_params_efl.h',
       'command_line_efl.cc',
       'command_line_efl.h',
