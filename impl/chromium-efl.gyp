@@ -76,6 +76,8 @@
       'common/version_info_efl.h',
       'common/web_contents_utils.cc',
       'common/web_contents_utils.h',
+      'memory_purger.cc',
+      'memory_purger.h',
       'network_delegate_efl.cc',
       'network_delegate_efl.h',
       'paths_efl.cc',
