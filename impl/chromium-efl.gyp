@@ -53,6 +53,10 @@
       #'browser/geolocation/geolocation_permission_context_efl.h',
       'browser/geolocation/location_provider_efl.cc',
       'browser/geolocation/location_provider_efl.h',
+      'browser/javascript_dialog_manager_efl.cc',
+      'browser/javascript_dialog_manager_efl.h',
+      'browser/javascript_modal_dialog_efl.cc',
+      'browser/javascript_modal_dialog_efl.h',
       # [M37] backing store support removed from chromium. Efl implementations should probably also be removed
       #'browser/renderer_host/backing_store_efl.cc',
       #'browser/renderer_host/backing_store_efl.h',
@@ -79,6 +83,7 @@
       'renderer/render_process_observer_efl.h',
       'renderer/render_view_observer_efl.cc',
       'renderer/render_view_observer_efl.h',
+      'resource/JavaScriptPopup.edc',
       'screen_efl.cc',
       'screen_efl.h',
       'web_contents_delegate_efl.cc',
