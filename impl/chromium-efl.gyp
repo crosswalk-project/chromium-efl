@@ -99,6 +99,8 @@
       'url_request_context_getter_efl.h',
       'web_contents_delegate_efl.cc',
       'web_contents_delegate_efl.h',
+      'web_process_content_main_delegate_efl.cc',
+      'web_process_content_main_delegate_efl.h',
     ],
     'cflags!': [
       # Symbol visibility controled by chromium-efl.filter
