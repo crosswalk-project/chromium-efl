@@ -96,12 +96,16 @@ void SetProxyConfigCallbackOnIOThread(base::WaitableEvent* done,
   done->Signal();
 }
 
+void DeleteApplicationCacheCallback() {
+  // no implementation needed; callback is just to prevent segmentation fault caused by null callback
+}
+
 void DeleteApplicationCache(content::StoragePartition* partition) {
   const GURL storage_origin;
   const content::StoragePartition::OriginMatcherFunction origin_matcher;
   const base::Time begin;
   const base::Time end;
-  const base::Closure callback;
+  const base::Closure callback = base::Bind(&DeleteApplicationCacheCallback);
 
   // FIXME: M34 API change demands above values to be passed as arguments.
   //        For now, not sure how to get/set the values, so passing dummy values.
