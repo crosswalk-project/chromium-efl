@@ -59,6 +59,8 @@
       'renderer/render_process_observer_efl.h',
       'renderer/render_view_observer_efl.cc',
       'renderer/render_view_observer_efl.h',
+      'screen_efl.cc',
+      'screen_efl.h',
       'web_contents_delegate_efl.cc',
       'web_contents_delegate_efl.h',
     ],
