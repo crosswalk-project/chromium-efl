@@ -11,6 +11,7 @@ class PathsEfl {
     // The value here is taken from chromium/src/chrome/common/chrome_paths.h.
     PATH_START = 1000,
     EDJE_RESOURCE_DIR,
+    WEB_DATABSE_DIR,
     PATH_END
   };
 

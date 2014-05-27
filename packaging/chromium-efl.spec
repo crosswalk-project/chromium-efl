@@ -94,6 +94,8 @@ Browser Engine dev library based on Chromium EFL (developement files)
 %global CHROMIUM_EXE_DIR %{_libdir}/%{name}
 # Constant read only data used by chromium-efl port
 %global CHROMIUM_DATA_DIR %{_datadir}/%{name}
+# Web Databse read write data used by chromium-efl port
+%global CHROMIUM_WEBDB_DIR /opt/usr/apps/%{name}
 
 %prep
 %setup -q
@@ -175,7 +177,8 @@ fi
 gyp_chromiumefl \
   -Dexe_dir="%{CHROMIUM_EXE_DIR}" \
   -Ddata_dir="%{CHROMIUM_DATA_DIR}" \
-  -Dedje_dir="%{CHROMIUM_DATA_DIR}"/themes
+  -Dedje_dir="%{CHROMIUM_DATA_DIR}"/themes \
+  -Dwebdb_dir="%{CHROMIUM_WEBDB_DIR}"/data/db
 %endif
 
 ninja %{_smp_mflags} -C"%{OUTPUT_FOLDER}"
@@ -203,6 +206,35 @@ install -m 0644 src/v8/include/*.h                   "%{INSTALL_ROOT}"%{_include
 %post
 # apply smack rule
 smack_reload.sh
+
+# create webdatabase directory
+mkdir -p %{CHROMIUM_WEBDB_DIR}/data/db/
+
+# create dummy webdatabase
+if [ ! -f %{CHROMIUM_WEBDB_DIR}/data/db/FormData.db ];
+then
+    sqlite3 %{CHROMIUM_WEBDB_DIR}/data/db/FormData.db 'PRAGMA journal_mode=PERSIST;
+    create table dummy_table(id integer primary key);'
+fi
+if [ ! -f %{CHROMIUM_WEBDB_DIR}/data/db/LoginData.db ];
+then
+    sqlite3 %{CHROMIUM_WEBDB_DIR}/data/db/LoginData.db 'PRAGMA journal_mode=PERSIST;
+    create table dummy_table(id integer primary key);'
+fi
+
+# change db file owner & permission
+chmod 660 %{CHROMIUM_WEBDB_DIR}/data/db/FormData.db
+chmod 660 %{CHROMIUM_WEBDB_DIR}/data/db/FormData.db-journal
+chmod 660 %{CHROMIUM_WEBDB_DIR}/data/db/LoginData.db
+chmod 660 %{CHROMIUM_WEBDB_DIR}/data/db/LoginData.db-journal
+
+chown -R 5000:5000 %{CHROMIUM_WEBDB_DIR}/
+
+# Apply SMACK label to database files
+if [ -f /usr/lib/rpm-plugins/msm.so ]
+then
+    chsmack -a 'chromium-efl' %{CHROMIUM_WEBDB_DIR}/data/db/*.db*
+fi
 
 %postun
 

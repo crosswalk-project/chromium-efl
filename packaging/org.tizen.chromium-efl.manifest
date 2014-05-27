@@ -1,6 +1,9 @@
 <manifest>
   <define>
     <domain name="chromium-efl" policy="shared" />
+    <provide>
+      <label name="chromium-efl::db"/>
+    </provide>
     <permit>
       <smack permit="com.samsung.app-tray" type="rwx" />
       <smack permit="e17" type="rwx" />
@@ -22,6 +25,7 @@
       <smack request="immvibed" type="rw" />
       <smack request="aul::launch" type="x" />
       <smack request="location_fw::client" type="rw" />
+      <smack request="chromium-efl::db" type="rwxat" />
     </request>
   </define>
   <request>
@@ -29,5 +33,6 @@
   </request>
   <assign>
     <filesystem path="/usr/lib/org.tizen.chromium-efl/efl_webprocess" label="chromium-efl" exec_label="chromium-efl"/>
+    <filesystem path="/opt/usr/apps/org.tizen.chromium-efl/data/db/" label="chromium-efl::db" exec_label="chromium-efl"/>
   </assign>
 </manifest>

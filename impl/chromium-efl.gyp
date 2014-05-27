@@ -3,6 +3,7 @@
     'data_dir%': '/usr/share/chromium-efl/',
     'exe_dir%': '/usr/lib/chromium-efl/',
     'edje_dir%': '/usr/share/chromium-efl/themes/',
+    'webdb_dir%': '/usr/share/chromium-efl/db/',
     'edje_compiler%': 'edje_cc',
   },
 
@@ -42,6 +43,7 @@
       'DATA_DIR="<(data_dir)"',
       'EXE_DIR="<(exe_dir)"',
       'EDJE_DIR="<(edje_dir)"',
+      'WEBDB_DIR="<(webdb_dir)"',
     ],
     'sources': [
       'API/ewk_auth_challenge_private.h',
@@ -273,6 +275,7 @@
       'DATA_DIR="<(data_dir)"',
       'EXE_DIR="<(exe_dir)"',
       'EDJE_DIR="<(edje_dir)"',
+      'WEBDB_DIR="<(webdb_dir)"',
     ],
     'type': 'executable',
     'include_dirs': [
