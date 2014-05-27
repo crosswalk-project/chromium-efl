@@ -65,6 +65,8 @@
       'browser/renderer_host/native_web_keyboard_event_efl.cc',
       'browser/renderer_host/render_message_filter_efl.cc',
       'browser/renderer_host/render_message_filter_efl.h',
+      'browser/renderer_host/render_widget_host_view_efl.cc',
+      'browser/renderer_host/render_widget_host_view_efl.h',
       # The same files is present in src/content, do we need another copy if it?
       #'browser/renderer_host/touchpad_tap_suppression_controller_efl.cc',
       'browser/renderer_host/web_cache_manager_efl.cc',
