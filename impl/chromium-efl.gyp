@@ -60,6 +60,8 @@
       # [M37] backing store support removed from chromium. Efl implementations should probably also be removed
       #'browser/renderer_host/backing_store_efl.cc',
       #'browser/renderer_host/backing_store_efl.h',
+      'browser/renderer_host/browsing_data_remover_efl.cc',
+      'browser/renderer_host/browsing_data_remover_efl.h',
       'browser/renderer_host/native_web_keyboard_event_efl.cc',
       'browser/renderer_host/render_message_filter_efl.cc',
       'browser/renderer_host/render_message_filter_efl.h',
