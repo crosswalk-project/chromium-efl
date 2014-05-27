@@ -53,6 +53,9 @@
       #'browser/geolocation/geolocation_permission_context_efl.h',
       'browser/geolocation/location_provider_efl.cc',
       'browser/geolocation/location_provider_efl.h',
+      # [M37] backing store support removed from chromium. Efl implementations should probably also be removed
+      #'browser/renderer_host/backing_store_efl.cc',
+      #'browser/renderer_host/backing_store_efl.h',
       'browser/renderer_host/native_web_keyboard_event_efl.cc',
       'command_line_efl.cc',
       'command_line_efl.h',
