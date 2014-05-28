@@ -114,6 +114,8 @@
       'eweb_object.h',
       'memory_purger.cc',
       'memory_purger.h',
+      'message_pump_for_ui_efl.cc',
+      'message_pump_for_ui_efl.h',
       'network_delegate_efl.cc',
       'network_delegate_efl.h',
       'paths_efl.cc',
