@@ -76,6 +76,10 @@
       'browser/javascript_dialog_manager_efl.h',
       'browser/javascript_modal_dialog_efl.cc',
       'browser/javascript_modal_dialog_efl.h',
+      'browser/login_delegate_efl.cc',
+      'browser/login_delegate_efl.h',
+      'browser/navigation_policy_handler_efl.cc',
+      'browser/navigation_policy_handler_efl.h',
       'browser/policy_response_delegate_efl.cc',
       'browser/policy_response_delegate_efl.h',
       # [M37] backing store support removed from chromium. Efl implementations should probably also be removed
@@ -98,6 +102,7 @@
       'browser/renderer_host/web_cache_manager_efl.h',
       'browser/renderer_host/web_event_factory_efl.cc',
       'browser/renderer_host/web_event_factory_efl.h',
+      'browser/scoped_wait_for_ewk.h',
       'browser/vibration/vibration_message_filter.cc',
       'browser/vibration/vibration_message_filter.h',
       'browser/vibration/vibration_provider_client.cc',
@@ -198,6 +203,12 @@
       'conditions': [
         ['_toolset=="target"', {
           'libraries': [ '<!($(echo ${CXX_target:-g++}) -print-libgcc-file-name)', ]
+        }],
+        ['notifications==1', {
+          'sources': [
+            'browser/notification/notification_controller_efl.cc',
+            'browser/notification/notification_controller_efl.h',
+          ],
         }],
       ],
     },
