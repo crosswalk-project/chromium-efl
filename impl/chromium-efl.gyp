@@ -95,6 +95,8 @@
       'components/clipboard/clipboard_efl.cc',
       'components/clipboard/clipboard_helper_efl.cc',
       'components/clipboard/clipboard_helper_efl.h',
+      'context_menu_controller_efl.cc',
+      'context_menu_controller_efl.h',
       'memory_purger.cc',
       'memory_purger.h',
       'network_delegate_efl.cc',
