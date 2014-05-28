@@ -931,7 +931,7 @@ void EWebView::DispatchPostponedGestureEvent(ui::GestureEvent* event) {
         LOG(INFO) << __PRETTY_FUNCTION__ << " TEXT";
 
       selection_controller_->SetSelectionEditable(false);
-      ClearSelection();
+      //ClearSelection();
     }
     rwhv()->HandleGesture(event);
   } else {
