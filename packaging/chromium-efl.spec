@@ -178,6 +178,9 @@ gyp_chromiumefl \
   -Dexe_dir="%{CHROMIUM_EXE_DIR}" \
   -Ddata_dir="%{CHROMIUM_DATA_DIR}" \
   -Dedje_dir="%{CHROMIUM_DATA_DIR}"/themes \
+%if 0%{?_remove_webcore_debug_symbols:1}
+  -Dremove_webcore_debug_symbols=1 \
+%endif
   -Dwebdb_dir="%{CHROMIUM_WEBDB_DIR}"/data/db
 %endif
 
