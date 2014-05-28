@@ -63,6 +63,8 @@
       'browser/renderer_host/native_web_keyboard_event_efl.cc',
       'browser/renderer_host/web_cache_manager_efl.cc',
       'browser/renderer_host/web_cache_manager_efl.h',
+      'browser/vibration/vibration_provider_client.cc',
+      'browser/vibration/vibration_provider_client.h',
       'browser_context_efl.cc',
       'browser_context_efl.h',
       'cache_params_efl.h',
