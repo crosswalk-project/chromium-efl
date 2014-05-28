@@ -110,6 +110,10 @@
       'web_contents_delegate_efl.h',
       'web_process_content_main_delegate_efl.cc',
       'web_process_content_main_delegate_efl.h',
+      'wrt/dynamicplugin.cc',
+      'wrt/dynamicplugin.h',
+      'wrt/wrtwidget.cc',
+      'wrt/wrtwidget.h',
     ],
     'cflags!': [
       # Symbol visibility controled by chromium-efl.filter
