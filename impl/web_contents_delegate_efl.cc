@@ -14,7 +14,6 @@
 #include "eweb_view_callbacks.h"
 #include "public/ewk_custom_handlers.h"
 #include "public/ewk_hit_test.h"
-#include "public/ewk_policy_decision.h"
 #include "public/ewk_view.h"
 
 #include "base/strings/utf_string_conversions.h"
@@ -114,7 +113,7 @@ bool WebContentsDelegateEfl::ShouldCreateWebContents(
     const std::string& partition_id,
     SessionStorageNamespace* session_storage_namespace) {
   // This method is called ONLY when creating a new window, no matter what type.
-  web_view_->set_policy_decision(new Ewk_Policy_Decision(this, target_url, frame_name));
+  web_view_->set_policy_decision(new _Ewk_Policy_Decision(this, target_url, frame_name));
   web_view_->SmartCallback<EWebViewCallbacks::NewWindowPolicyDecision>().call(web_view_->get_policy_decision());
   // Chromium has sync API. We cannot block this calls on UI thread.
   CHECK(!web_view_->get_policy_decision()->isSuspended());
@@ -362,14 +361,6 @@ void WebContentsDelegateEfl::RequestCertificateConfirm(WebContents* /*web_conten
   web_view_->SmartCallback<EWebViewCallbacks::RequestCertificateConfirm>().call(policy.get());
   if (!policy->isSuspended && !policy->isDecided)
     callback.Run(true);
-}
-
-void WebContentsDelegateEfl::OnHeadersReceived(PolicyResponseDelegateEfl* delegate,
-                                               const GURL& request_url,
-                                               const net::HttpResponseHeaders* original_response_headers) {
-  scoped_ptr<Ewk_Policy_Decision> policy_decision(new Ewk_Policy_Decision(request_url, original_response_headers, delegate));
-  // web_view_ takes owenership of Ewk_Policy_Decision. This is same as WK2/Tizen
-  web_view_->InvokePolicyResponseCallback(policy_decision.release());
 }
 
 void WebContentsDelegateEfl::SetContentSecurityPolicy(const std::string& policy, Ewk_CSP_Header_Type header_type) {

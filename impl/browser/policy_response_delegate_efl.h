@@ -5,9 +5,15 @@
 #include "net/base/completion_callback.h"
 #include "url/gurl.h"
 
+struct _Ewk_Policy_Decision;
+
 namespace net {
 class URLRequest;
 class HttpResponseHeaders;
+}
+
+namespace content {
+class WebContentsDelegateEfl;
 }
 
 class PolicyResponseDelegateEfl: public base::RefCountedThreadSafe<PolicyResponseDelegateEfl> {
@@ -29,12 +35,11 @@ class PolicyResponseDelegateEfl: public base::RefCountedThreadSafe<PolicyRespons
   void UseResponseOnIOThread();
   void IgnoreResponseOnIOThread();
 
-  const net::HttpResponseHeaders* original_headers_;
+  scoped_ptr<_Ewk_Policy_Decision> policy_decision_;
+  content::WebContentsDelegateEfl *delegate_;
   net::CompletionCallback callback_;
-  GURL url_;
   int render_process_id_;
   int render_frame_id_;
-  uint64 url_request_id_;
   // Should be accessed only on IO thread.
   bool processed_;
 };

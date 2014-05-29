@@ -9,6 +9,8 @@
 #include "net/base/net_errors.h"
 #include "net/http/http_response_headers.h"
 
+#include "API/ewk_policy_decision_private.h"
+
 namespace net {
 
 namespace {
@@ -81,6 +83,18 @@ void NetworkDelegateEfl::OnRawBytesRead(const URLRequest& request,
 }
 
 void NetworkDelegateEfl::OnCompleted(URLRequest* request, bool started) {
+  DCHECK(content::BrowserThread::CurrentlyOn(content::BrowserThread::IO));
+
+  ResponsePolicyDelegateTable::const_iterator found =
+      policy_response_delegate_map_.find(request->identifier());
+
+  if (found != policy_response_delegate_map_.end() &&
+      (request->status().status() == URLRequestStatus::CANCELED ||
+       request->status().status() == URLRequestStatus::FAILED)) {
+
+    found->second->HandleURLRequestDestroyedOnIOThread();
+    policy_response_delegate_map_.erase(request->identifier());
+  }
 }
 
 void NetworkDelegateEfl::OnURLRequestDestroyed(URLRequest* request) {
