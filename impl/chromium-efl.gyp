@@ -119,6 +119,7 @@
       'memory_purger.h',
       'message_pump_for_ui_efl.cc',
       'message_pump_for_ui_efl.h',
+      'navigation_policy_params.h',
       'network_delegate_efl.cc',
       'network_delegate_efl.h',
       'paths_efl.cc',
