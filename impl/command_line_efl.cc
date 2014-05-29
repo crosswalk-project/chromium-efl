@@ -63,6 +63,11 @@ content::MainFunctionParams CommandLineEfl::GetDefaultPortParams() {
 #warning "[M37] Investigae removed command line switches, are they still needed, do they have a replacement?"
   //p_command_line->AppendSwitch(switches::kForceCompositingMode);
   //p_command_line->AppendSwitch(switches::kAllowWebUICompositing);
+  // [M37] Note: The commit "Temporarily disable zero copy as it causes browser crash during regression"
+  // is to deprecate kEnableMapImage option.
+  // But it was already deprecated during fixing M37 build as no command line option with such name (see above comment)
+  // TODO: remove this commit if it turn out the option is unnecessary
+  //Disabling temporarily, as it causes browser crash ID:335 in regression
   //p_command_line->AppendSwitch(cc::switches::kEnableMapImage);
 
   p_command_line->AppendSwitch(switches::kEnableImplSidePainting);
