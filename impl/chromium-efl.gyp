@@ -193,6 +193,9 @@
       '.',
       '../ewk_api_headers',
     ],
+    'sources': [
+      'web_process.cc',
+    ],
     'dependencies': [
       'chromium-efl',
     ],
