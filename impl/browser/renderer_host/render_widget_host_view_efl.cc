@@ -991,6 +991,9 @@ void RenderWidgetHostViewEfl::HandleFocusIn() {
 
   host_->SetActive(true);
   host_->GotFocus();
+  //Will resume the videos playbacks if any were paused when Application was
+  // hidden
+  host_->WasShown();
 }
 
 void RenderWidgetHostViewEfl::HandleFocusOut() {
@@ -1027,6 +1030,16 @@ void RenderWidgetHostViewEfl::HandleEvasEvent(const Evas_Event_Mouse_Wheel* even
 void RenderWidgetHostViewEfl::HandleEvasEvent(const Evas_Event_Key_Down* event) {
   LOG(INFO) << __PRETTY_FUNCTION__ << " : " << event->key;
   bool wasFiltered = false;
+
+  if (!strcmp(event->key, "XF86Phone")) {
+    LOG(INFO) <<"Temp: host_->WasHidden() called";
+    host_->WasHidden();
+  }
+
+  if (!strcmp(event->key, "XF86PowerOff")) {
+    LOG(INFO) <<"Temp:host_->WasHidden() called";
+    host_->WasHidden();
+  }
 
 #ifdef TIZEN_CONTENTS_DETECTION
   if (!strcmp(event->key, "XF86Stop")) {
