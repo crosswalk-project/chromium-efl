@@ -29,10 +29,10 @@ class URLRequestCOntextGetterEfl;
 class Ewk_Cookie_Manager {
  public:
   static Ewk_Cookie_Manager* create(content::URLRequestContextGetterEfl* request_context_getter) {
-  	return (new Ewk_Cookie_Manager(request_context_getter));
+    return (new Ewk_Cookie_Manager(request_context_getter));
   }
 
-  ~Ewk_Cookie_Manager() {}
+  ~Ewk_Cookie_Manager() { }
 
   CookieManager* cookieManager() const {
     return cookie_manager_.get();
@@ -40,7 +40,8 @@ class Ewk_Cookie_Manager {
 
  private:
   explicit Ewk_Cookie_Manager(content::URLRequestContextGetterEfl* request_context_getter)
-    : cookie_manager_(new CookieManager(request_context_getter)) {}
+    : cookie_manager_(new CookieManager(request_context_getter)) {
+  }
 
   scoped_refptr<CookieManager> cookie_manager_;
 };
