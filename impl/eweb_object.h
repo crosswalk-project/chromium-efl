@@ -20,7 +20,6 @@
 #ifndef EWEB_OBJECT_PRIVATE
 #define EWEB_OBJECT_PRIVATE
 
-#include "base/logging.h"
 #include "base/memory/ref_counted.h"
 #include <Eina.h>
 
@@ -45,7 +44,6 @@ inline bool ewk_object_cast_check(const EWebObject* object) {
   if (!ewk_object_is_of_type<T>(object)) {
       EINA_LOG_CRIT("attempt to convert object of type %s to type %s",
           object->InstanceClassName(), reinterpret_cast<T>(0)->className());
-      NOTREACHED();
       return false;
   }
 

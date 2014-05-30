@@ -34,7 +34,6 @@
 #include "public/ewk_policy_decision.h"
 #include "public/ewk_ipc_message.h"
 
-#include "base/logging.h"
 #include <Evas.h>
 #include <Eina.h>
 
@@ -131,7 +130,6 @@ protected:
   explicit EvasObjectHolder(Evas_Object* object)
       : m_object(object)
   {
-    DCHECK(m_object);
   }
 
   Evas_Object* m_object;

@@ -24,7 +24,6 @@
 #include <Eina.h>
 #include <Evas.h>
 
-#include <base/logging.h>
 #include <base/callback.h>
 
 #include "API/ewk_security_origin_private.h"
@@ -48,7 +47,6 @@ struct _Ewk_Geolocation_Permission_Request {
   }
 
   ~_Ewk_Geolocation_Permission_Request() {
-    DCHECK(origin);
     delete origin;
   }
 };

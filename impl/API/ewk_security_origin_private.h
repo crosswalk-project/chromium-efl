@@ -23,8 +23,9 @@
 
 #include <Eina.h>
 #include <Evas.h>
+#include <assert.h>
+#include <sstream>
 
-#include "base/logging.h"
 #include "base/callback.h"
 #include "url/gurl.h"
 
@@ -56,7 +57,7 @@ struct _Ewk_Security_Origin {
     if (port != url::PORT_UNSPECIFIED)
       url << ":" << port;
     GURL result(url.str());
-    DCHECK(result.is_valid());
+    assert(result.is_valid());
     return result;
   }
 

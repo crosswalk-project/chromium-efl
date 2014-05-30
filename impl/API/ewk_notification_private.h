@@ -24,7 +24,6 @@
 #include <Eina.h>
 #include <Evas.h>
 
-#include "base/logging.h"
 #include "base/strings/utf_string_conversions.h"
 #include "content/public/common/show_desktop_notification_params.h"
 
@@ -59,7 +58,6 @@ struct _Ewk_Notification {
     eina_stringshare_del(iconURL);
     eina_stringshare_del(replaceID);
     eina_stringshare_del(title);
-    DCHECK(securityOrigin);
     delete securityOrigin;
   }
 };
@@ -80,7 +78,6 @@ struct _Ewk_Notification_Permission_Request {
   }
 
   ~_Ewk_Notification_Permission_Request() {
-    DCHECK(origin);
     delete origin;
   }
 };
