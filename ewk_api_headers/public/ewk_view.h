@@ -204,6 +204,9 @@ struct Ewk_View_Smart_Class {
     Eina_Bool (*popup_menu_hide)(Ewk_View_Smart_Data *sd);
     Eina_Bool (*popup_menu_update)(Ewk_View_Smart_Data *sd, Eina_Rectangle rect, Ewk_Text_Direction text_direction, Eina_List* items, int selected_index);
 
+    Eina_Bool (*text_selection_down)(Ewk_View_Smart_Data *sd, int x, int y);
+    Eina_Bool (*text_selection_up)(Ewk_View_Smart_Data *sd, int x, int y);
+
     Eina_Bool (*input_picker_show)(Ewk_View_Smart_Data *sd, Ewk_Input_Type inputType, const char* inputValue);
 
     // event handling:

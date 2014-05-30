@@ -192,6 +192,8 @@ bool EWebView::InitSmartClassInterface(Ewk_View_Smart_Class& api) {
   api.mouse_move = &handleMouseMove;
   api.key_down = &handleKeyDown;
   api.key_up = &handleKeyUp;
+  api.text_selection_down = &handleTextSelectionDown;
+  api.text_selection_up = &handleTextSelectionUp;
 
   // Type identifier.
   api.sc.data = SmartClassName;
@@ -766,6 +768,18 @@ Eina_Bool EWebView::handleKeyDown(Ewk_View_Smart_Data* d, const Evas_Event_Key_D
 Eina_Bool EWebView::handleKeyUp(Ewk_View_Smart_Data* d, const Evas_Event_Key_Up* event) {
   ToEWebView(d)->rwhv()->HandleEvasEvent(event);
   return true;
+}
+
+Eina_Bool EWebView::handleTextSelectionDown(Ewk_View_Smart_Data* d, int x, int y) {
+  // temporary mockup codes
+  NOTIMPLEMENTED();
+  return EINA_FALSE;
+}
+
+Eina_Bool EWebView::handleTextSelectionUp(Ewk_View_Smart_Data* d, int x, int y) {
+  // temporary mockup codes
+  NOTIMPLEMENTED();
+  return EINA_FALSE;
 }
 
 void EWebView::OnTouchDown(void* sd, Evas*, Evas_Object*, void*) {

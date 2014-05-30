@@ -325,6 +325,8 @@ class EWebView
   static Eina_Bool handleMouseMove(Ewk_View_Smart_Data* d, const Evas_Event_Mouse_Move* moveEvent);
   static Eina_Bool handleKeyDown(Ewk_View_Smart_Data* d, const Evas_Event_Key_Down* downEvent);
   static Eina_Bool handleKeyUp(Ewk_View_Smart_Data* d, const Evas_Event_Key_Up* upEvent);
+  static Eina_Bool handleTextSelectionDown(Ewk_View_Smart_Data* d, int x, int y);
+  static Eina_Bool handleTextSelectionUp(Ewk_View_Smart_Data* d, int x, int y);
 
   static void OnTouchDown(void*, Evas*, Evas_Object*, void*);
   static void OnTouchUp(void*, Evas*, Evas_Object*, void*);
