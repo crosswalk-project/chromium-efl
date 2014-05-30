@@ -12,10 +12,6 @@ class URLRequest;
 class HttpResponseHeaders;
 }
 
-namespace content {
-class WebContentsDelegateEfl;
-}
-
 class PolicyResponseDelegateEfl: public base::RefCountedThreadSafe<PolicyResponseDelegateEfl> {
  public:
   PolicyResponseDelegateEfl(net::URLRequest* request,
@@ -36,7 +32,6 @@ class PolicyResponseDelegateEfl: public base::RefCountedThreadSafe<PolicyRespons
   void IgnoreResponseOnIOThread();
 
   scoped_ptr<_Ewk_Policy_Decision> policy_decision_;
-  content::WebContentsDelegateEfl *delegate_;
   net::CompletionCallback callback_;
   int render_process_id_;
   int render_frame_id_;

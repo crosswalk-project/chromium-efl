@@ -23,10 +23,7 @@ using web_contents_utils::WebContentsFromFrameID;
 
 namespace {
 
-static content::WebContentsDelegateEfl* WebContentsDelegateFromRequest(net::URLRequest *request) {
-  int render_process_id, render_frame_id;
-  ResourceRequestInfo::GetRenderFrameForRequest(request, &render_process_id, &render_frame_id);
-
+static content::WebContentsDelegateEfl* WebContentsDelegateFromFrameId(int render_process_id, int render_frame_id) {
   WebContents* web_contents = WebContentsFromFrameID(render_process_id, render_frame_id);
   if (!web_contents)
     return NULL;
@@ -40,7 +37,6 @@ PolicyResponseDelegateEfl::PolicyResponseDelegateEfl(net::URLRequest* request,
     const net::CompletionCallback& callback,
     const net::HttpResponseHeaders* original_response_headers)
     : policy_decision_(new _Ewk_Policy_Decision(request->url(), original_response_headers, this)),
-      delegate_(WebContentsDelegateFromRequest(request)),
       callback_(callback),
       render_process_id_(0),
       render_frame_id_(0),
@@ -53,14 +49,15 @@ PolicyResponseDelegateEfl::PolicyResponseDelegateEfl(net::URLRequest* request,
 
 void PolicyResponseDelegateEfl::HandlePolicyResponseOnUIThread() {
   DCHECK(BrowserThread::CurrentlyOn(BrowserThread::UI));
-
-  if (!delegate_) {
+  // Delegate may be retrieved ONLY on UI thread
+  content::WebContentsDelegateEfl *delegate = WebContentsDelegateFromFrameId(render_process_id_, render_frame_id_);
+  if (!delegate) {
     UseResponse();
     return;
   }
 
   // web_view_ takes owenership of Ewk_Policy_Decision. This is same as WK2/Tizen
-  delegate_->web_view()->InvokePolicyResponseCallback(policy_decision_.release());
+  delegate->web_view()->InvokePolicyResponseCallback(policy_decision_.release());
 }
 
 void PolicyResponseDelegateEfl::UseResponse() {
