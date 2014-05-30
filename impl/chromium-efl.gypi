@@ -18,6 +18,8 @@
       'BUILDING_V8_SHARED=1',
       'V8_SHARED=1',
       'ENABLE_ORIENTATION_EVENTS=1'
+      'ENABLE_ORIENTATION_EVENTS=1',
+      'USE_DL_PREFIX=1'
     ],
     'cflags': [
       '<!@(<(pkg-config) --cflags ecore)',
