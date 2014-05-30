@@ -58,6 +58,8 @@
       'browser/javascript_dialog_manager_efl.h',
       'browser/javascript_modal_dialog_efl.cc',
       'browser/javascript_modal_dialog_efl.h',
+      'browser/policy_response_delegate_efl.cc',
+      'browser/policy_response_delegate_efl.h',
       # [M37] backing store support removed from chromium. Efl implementations should probably also be removed
       #'browser/renderer_host/backing_store_efl.cc',
       #'browser/renderer_host/backing_store_efl.h',
