@@ -11,6 +11,7 @@
 #include "base/strings/utf_string_conversions.h"
 #include "components/clipboard/clipboard_helper_efl.h"
 #include "third_party/skia/include/core/SkBitmap.h"
+#include "third_party/WebKit/Source/platform/clipboard/ClipboardMimeTypes.h"
 #include "ui/gfx/size.h"
 
 using base::string16;
@@ -127,10 +128,14 @@ void Clipboard::ReadAvailableTypes(ClipboardType type, std::vector<string16>* ty
     return;
   }
 
-  NOTIMPLEMENTED();
-
   types->clear();
   *contains_filenames = false;
+  if (IsFormatAvailable(GetPlainTextFormatType(), type))
+    types->push_back(base::ASCIIToUTF16(WebCore::mimeTypeTextPlain));
+  if (IsFormatAvailable(GetHtmlFormatType(), type))
+    types->push_back(base::ASCIIToUTF16(WebCore::mimeTypeTextHTML));
+  if (IsFormatAvailable(GetBitmapFormatType(), type))
+    types->push_back(base::ASCIIToUTF16(WebCore::mimeTypeImagePng));
 }
 
 void Clipboard::ReadText(ClipboardType type, string16* result) const {
