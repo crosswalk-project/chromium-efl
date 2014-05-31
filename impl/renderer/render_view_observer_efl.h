@@ -52,6 +52,7 @@ class RenderViewObserverEfl: public content::RenderViewObserver {
   void OnPrintToPdf(int width, int height, const base::FilePath& filename);
   void OnGetMHTMLData(int callback_id);
   void OnSetDrawsTransparentBackground(bool enabled);
+  void OnWebAppIconUrlGet(int callback_id);
 
   blink::WebSize max_scroll_offset_;
   float cached_min_page_scale_factor_;

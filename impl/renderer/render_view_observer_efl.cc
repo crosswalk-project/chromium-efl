@@ -6,6 +6,7 @@
 #include "base/files/file_path.h"
 #include "base/strings/string_number_conversions.h"
 #include "base/strings/string_split.h"
+#include "base/strings/string_util.h"
 #include "content/public/renderer/render_view.h"
 #include "common/render_messages_efl.h"
 #include "third_party/WebKit/public/platform/WebCString.h"
@@ -21,6 +22,7 @@
 #include "third_party/WebKit/public/web/WebHitTestResult.h"
 #include "third_party/WebKit/public/web/WebPageSerializer.h"
 #include "third_party/WebKit/public/web/WebView.h"
+#include "third_party/WebKit/public/web/WebNodeList.h"
 
 namespace {
 
@@ -130,6 +132,7 @@ bool RenderViewObserverEfl::OnMessageReceived(const IPC::Message& message)
     IPC_MESSAGE_HANDLER(EwkViewMsg_DoHitTest, OnDoHitTest)
     IPC_MESSAGE_HANDLER(EwkViewMsg_PrintToPdf, OnPrintToPdf)
     IPC_MESSAGE_HANDLER(EwkViewMsg_GetMHTMLData, OnGetMHTMLData);
+    IPC_MESSAGE_HANDLER(EwkViewMsg_WebAppIconUrlGet, OnWebAppIconUrlGet);
     IPC_MESSAGE_HANDLER(EwkViewMsg_SetDrawsTransparentBackground, OnSetDrawsTransparentBackground);
     IPC_MESSAGE_UNHANDLED(handled = false)
   IPC_END_MESSAGE_MAP()
@@ -335,6 +338,46 @@ void RenderViewObserverEfl::OnSetDrawsTransparentBackground(bool draws_transpare
       static_cast<blink::WebColor>(0x00000000) : static_cast<blink::WebColor>(0xFFFFFFFF);
 
   view->setBaseBackgroundColor(backgroundColor);
+}
+
+void RenderViewObserverEfl::OnWebAppIconUrlGet(int callback_id)
+{
+  blink::WebFrame *frame = render_view()->GetWebView()->mainFrame();
+  if (!frame) {
+    return;
+  }
+
+  blink::WebDocument document = frame->document();
+  blink::WebElement head = document.head();
+  if (head.isNull()) {
+    return;
+  }
+
+  std::string iconUrl;
+  std::string appleIconUrl;
+  blink::WebNodeList nodes = head.childNodes();
+  // We're looking for Apple style rel ("apple-touch-*")
+  // and Google style rel ("icon"), but we prefer the Apple one
+  // when both appear, as WebKit-efl was looking only for Apple style rels.
+  for (int i = 0; i < nodes.length(); ++i) {
+    blink::WebNode node = nodes.item(i);
+    if (!node.isElementNode()) {
+      continue;
+    }
+    blink::WebElement elem = node.to<blink::WebElement>();
+    if (!elem.hasHTMLTagName("link")) {
+      continue;
+    }
+    std::string rel = elem.getAttribute("rel").utf8();
+    if (LowerCaseEqualsASCII(rel, "apple-touch-icon") ||              // Apple's way
+        LowerCaseEqualsASCII(rel, "apple-touch-icon-precomposed")) {
+      appleIconUrl = document.completeURL(elem.getAttribute("href")).string().utf8();
+      break;
+    } else if (LowerCaseEqualsASCII(rel, "icon")) {                   // Google's way
+      iconUrl = document.completeURL(elem.getAttribute("href")).string().utf8();
+    }
+  }
+  Send(new EwkHostMsg_WebAppIconUrlGet(render_view()->GetRoutingID(), appleIconUrl.empty() ? iconUrl : appleIconUrl, callback_id));
 }
 
 void RenderViewObserverEfl::OrientationChangeEvent(int orientation)

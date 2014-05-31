@@ -116,6 +116,22 @@ class MHTMLCallbackDetails {
   void *user_data_;
 };
 
+class WebApplicationIconUrlGetCallback {
+ public:
+  WebApplicationIconUrlGetCallback(Ewk_Web_App_Icon_URL_Get_Callback func, void *user_data)
+    : func_(func), user_data_(user_data)
+  {}
+  void Run(const std::string &url) {
+    if (func_) {
+      (func_)(url.c_str(), user_data_);
+    }
+  }
+
+ private:
+  Ewk_Web_App_Icon_URL_Get_Callback func_;
+  void *user_data_;
+};
+
 class JavaScriptDialogManagerEfl;
 
 class EWebView
@@ -242,6 +258,8 @@ class EWebView
   bool SaveAsPdf(int width, int height, const std::string& file_name);
   void BackForwardListClear();
   void InvokeBackForwardListChangedCallback();
+  bool WebAppIconUrlGet(Ewk_Web_App_Icon_URL_Get_Callback callback, void *userData);
+  void InvokeWebAppIconUrlGetCallback(const std::string &iconUrl, int callbackId);
 
   bool GetMHTMLData(Ewk_View_MHTML_Data_Get_Callback callback, void* user_data);
   void OnMHTMLContentGet(const std::string& mhtml_content, int callback_id);
@@ -394,6 +412,7 @@ class EWebView
   double max_page_scale_factor_;
   scoped_ptr<OrientationLockCallback> orientation_lock_callback_;
   scoped_ptr<content::InputPicker> inputPicker_;
+  IDMap<WebApplicationIconUrlGetCallback, IDMapOwnPointer> web_app_icon_url_get_callback_map_;
 #ifdef TIZEN_EDGE_EFFECT
   scoped_refptr<EdgeEffect> edge_effect_;
 #endif

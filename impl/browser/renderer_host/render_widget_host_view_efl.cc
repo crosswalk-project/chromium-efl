@@ -297,6 +297,7 @@ bool RenderWidgetHostViewEfl::OnMessageReceived(const IPC::Message& message) {
   IPC_BEGIN_MESSAGE_MAP(RenderWidgetHostViewEfl, message)
     IPC_MESSAGE_HANDLER(ViewHostMsg_DidFirstVisuallyNonEmptyLayout, OnDidFirstVisuallyNonEmptyLayout)
     IPC_MESSAGE_HANDLER(EwkHostMsg_PlainTextGetContents, OnPlainTextGetContents)
+    IPC_MESSAGE_HANDLER(EwkHostMsg_WebAppIconUrlGet, OnWebAppIconUrlGet)
     IPC_MESSAGE_HANDLER(EwkHostMsg_DidChangeContentsSize, OnDidChangeContentsSize)
     IPC_MESSAGE_HANDLER(EwkHostMsg_OrientationChangeEvent, OnOrientationChangeEvent)
     IPC_MESSAGE_HANDLER(EwkViewMsg_SelectionTextStyleState, OnSelectionTextStyleState)
@@ -1231,6 +1232,11 @@ void RenderWidgetHostViewEfl::ProcessAckedTouchEvent(const TouchEventWithLatency
 void RenderWidgetHostViewEfl::OnPlainTextGetContents(const std::string& content_text, int plain_text_get_callback_id) {
   DCHECK(BrowserThread::CurrentlyOn(BrowserThread::UI));
   eweb_view()->InvokePlainTextGetCallback(content_text, plain_text_get_callback_id);
+}
+
+void RenderWidgetHostViewEfl::OnWebAppIconUrlGet(const std::string &icon_url, int callback_id) {
+  DCHECK(BrowserThread::CurrentlyOn(BrowserThread::UI));
+  eweb_view()->InvokeWebAppIconUrlGetCallback(icon_url, callback_id);
 }
 
 void RenderWidgetHostViewEfl::OnDidChangeContentsSize(int width, int height) {

@@ -229,3 +229,11 @@ IPC_MESSAGE_ROUTED1(EwkViewMsg_SetDrawsTransparentBackground,
 
 IPC_MESSAGE_ROUTED1(EwkHostMsg_OrientationChangeEvent,
                     int /* orientation */)
+
+IPC_MESSAGE_ROUTED1(EwkViewMsg_WebAppIconUrlGet,
+                    int /* callback id */)
+
+IPC_MESSAGE_ROUTED2(EwkHostMsg_WebAppIconUrlGet,
+                    std::string, /* icon url */
+                    int /* callback id */)
+

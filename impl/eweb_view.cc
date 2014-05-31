@@ -61,6 +61,8 @@
 #include <Elementary.h>
 #include <Eina.h>
 
+#include <iostream>
+
 using namespace content;
 
 namespace {
@@ -1388,6 +1390,23 @@ void EWebView::BackForwardListClear() {
 
 void EWebView::InvokeBackForwardListChangedCallback() {
   SmartCallback<EWebViewCallbacks::BackForwardListChange>().call();
+}
+
+bool EWebView::WebAppIconUrlGet(Ewk_Web_App_Icon_URL_Get_Callback callback, void* userData) {
+  RenderViewHost* renderViewHost = web_contents_delegate()->web_contents()->GetRenderViewHost();
+  if (!renderViewHost) {
+    return false;
+  }
+  WebApplicationIconUrlGetCallback *cb = new WebApplicationIconUrlGetCallback(callback, userData);
+  int callbackId = web_app_icon_url_get_callback_map_.Add(cb);
+  return renderViewHost->Send(new EwkViewMsg_WebAppIconUrlGet(renderViewHost->GetRoutingID(), callbackId));
+}
+
+void EWebView::InvokeWebAppIconUrlGetCallback(const std::string& iconUrl, int callbackId) {
+  WebApplicationIconUrlGetCallback *callback = web_app_icon_url_get_callback_map_.Lookup(callbackId);
+  if (!callback)
+    return;
+  callback->Run(iconUrl);
 }
 
 bool IsEWebViewObject(const Evas_Object* evas_object) {
