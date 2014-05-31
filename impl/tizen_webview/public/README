@@ -1,0 +1,17 @@
+Tizen WebView Public API
+========================
+
+This directory contains the public API for using Tizen WebView.
+The primary consumer of this API is chromium-ewk package,
+which is for providing Tizen's historic EWK API.
+
+The ground rule is as follows:
+- The public headers in this directory should not depend on 
+  other chromium headers outside this directory
+- Clients of chromium-efl (e.g, chromium-ewk package) should 
+  rely only on the public headers
+- The api and types defined in the public headers should be
+  under the namespace tizen_webview
+
+The convention:
+- use prefix 'tw_' for file name

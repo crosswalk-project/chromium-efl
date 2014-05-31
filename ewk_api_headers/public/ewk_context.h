@@ -97,24 +97,6 @@ typedef void (*Ewk_Web_Storage_Origins_Get_Callback)(Eina_List* origins, void* u
  */
 typedef void (*Ewk_Context_Did_Start_Download_Callback)(const char* download_url, void* user_data);
 
-
-/**
- * \enum    Ewk_Cache_Model
- *
- * @brief   Contains option for cache model
- */
-enum Ewk_Cache_Model {
-    /// Use the smallest cache capacity.
-    EWK_CACHE_MODEL_DOCUMENT_VIEWER,
-    /// Use bigger cache capacity than EWK_CACHE_MODEL_DOCUMENT_VIEWER.
-    EWK_CACHE_MODEL_DOCUMENT_BROWSER,
-    /// Use the biggest cache capacity.
-    EWK_CACHE_MODEL_PRIMARY_WEBBROWSER
-};
-
-/// Creates a type name for the Ewk_Cache_Model.
-typedef enum Ewk_Cache_Model Ewk_Cache_Model;
-
 /**
  * @typedef Ewk_Vibration_Client_Vibrate_Cb Ewk_Vibration_Client_Vibrate_Cb
  * @brief Type definition for a function that will be called back when vibrate

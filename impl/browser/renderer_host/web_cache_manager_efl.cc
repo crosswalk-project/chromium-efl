@@ -14,9 +14,11 @@
 #include "content/public/browser/notification_types.h"
 #include "content/public/browser/render_process_host.h"
 
+using namespace tizen_webview;
+
 WebCacheManagerEfl::WebCacheManagerEfl(content::BrowserContext* browser_context)
     : browser_context_(browser_context),
-      cache_model_(EWK_CACHE_MODEL_DOCUMENT_VIEWER)
+      cache_model_(TW_CACHE_MODEL_DOCUMENT_VIEWER)
 {
   registrar_.Add(this, content::NOTIFICATION_RENDERER_PROCESS_CREATED,
                  content::NotificationService::AllBrowserContextsAndSources());
@@ -63,7 +65,7 @@ void WebCacheManagerEfl::ClearCache()
   }
 }
 
-void WebCacheManagerEfl::SetRenderProcessCacheModel(Ewk_Cache_Model model, int render_process_id)
+void WebCacheManagerEfl::SetRenderProcessCacheModel(Cache_Model model, int render_process_id)
 {
   DCHECK(render_process_id);
   DCHECK(renderers_.find(render_process_id) != renderers_.end());
@@ -72,7 +74,7 @@ void WebCacheManagerEfl::SetRenderProcessCacheModel(Ewk_Cache_Model model, int r
     host->Send(new EflViewMsg_SetCache(GetCacheParamsFromModel(model)));
 }
 
-void WebCacheManagerEfl::SetCacheModel(Ewk_Cache_Model model)
+void WebCacheManagerEfl::SetCacheModel(Cache_Model model)
 {
   cache_model_ = model;
   CacheParamsEfl cache_params = GetCacheParamsFromModel(model);
@@ -84,7 +86,7 @@ void WebCacheManagerEfl::SetCacheModel(Ewk_Cache_Model model)
   }
 }
 
-CacheParamsEfl WebCacheManagerEfl::GetCacheParamsFromModel(Ewk_Cache_Model cache_model)
+CacheParamsEfl WebCacheManagerEfl::GetCacheParamsFromModel(Cache_Model cache_model)
 {
   int64 mem_size = base::SysInfo::AmountOfPhysicalMemory();
   // in chromium the limiting parameter is max file size of network cache
@@ -128,17 +130,14 @@ CacheParamsEfl WebCacheManagerEfl::GetCacheParamsFromModel(Ewk_Cache_Model cache
 
 // taken from WK2/Tizen
 // static
-void WebCacheManagerEfl::CalculateCacheSizes(Ewk_Cache_Model cache_model, int64 memory_size, int64 disk_free_size,
+void WebCacheManagerEfl::CalculateCacheSizes(Cache_Model cache_model, int64 memory_size, int64 disk_free_size,
     int64* cache_total_capacity, int64* cache_min_dead_capacity,
     int64* cache_max_dead_capacity, double* dead_decoded_data_deletion_interval,
     int64* page_cache_capacity, int64* url_cache_memory_capacity,
     int64* url_cache_disk_capacity)
 {
   switch (cache_model) {
-    case EWK_CACHE_MODEL_DOCUMENT_VIEWER: {
-      // Page cache capacity (in pages)
-      *page_cache_capacity = 0;
-
+  case TW_CACHE_MODEL_DOCUMENT_VIEWER: {
       // Object cache capacities (in bytes)
       if (memory_size >= 2048)
         *cache_total_capacity = 96 * 1024 * 1024;
@@ -158,18 +157,18 @@ void WebCacheManagerEfl::CalculateCacheSizes(Ewk_Cache_Model cache_model, int64 
       // Foundation disk cache capacity (in bytes)
       *url_cache_disk_capacity = 0;
 
-      break;
-    }
-    case EWK_CACHE_MODEL_DOCUMENT_BROWSER: {
-      // Page cache capacity (in pages)
-      if (memory_size >= 1024)
-        *page_cache_capacity = 3;
-      else if (memory_size >= 512)
-        *page_cache_capacity = 2;
-      else if (memory_size >= 256)
-        *page_cache_capacity = 1;
-      else
-        *page_cache_capacity = 0;
+    break;
+  }
+  case TW_CACHE_MODEL_DOCUMENT_BROWSER: {
+    // Page cache capacity (in pages)
+    if (memory_size >= 1024)
+      *page_cache_capacity = 3;
+    else if (memory_size >= 512)
+      *page_cache_capacity = 2;
+    else if (memory_size >= 256)
+      *page_cache_capacity = 1;
+    else
+      *page_cache_capacity = 0;
 
       // Object cache capacities (in bytes)
       if (memory_size >= 2048)
@@ -203,22 +202,22 @@ void WebCacheManagerEfl::CalculateCacheSizes(Ewk_Cache_Model cache_model, int64 
         *url_cache_disk_capacity = 30 * 1024 * 1024;
       else
         *url_cache_disk_capacity = 20 * 1024 * 1024;
+    break;
+  }// CacheModelDocumentBrowser
 
-      break;
-    }
-    case EWK_CACHE_MODEL_PRIMARY_WEBBROWSER: {
-      // Page cache capacity (in pages)
-      // (Research indicates that value / page drops substantially after 3 pages.)
-      if (memory_size >= 2048)
-        *page_cache_capacity = 5;
-      else if (memory_size >= 1024)
-        *page_cache_capacity = 4;
-      else if (memory_size >= 512)
-        *page_cache_capacity = 3;
-      else if (memory_size >= 256)
-        *page_cache_capacity = 2;
-      else
-        *page_cache_capacity = 1;
+  case TW_CACHE_MODEL_PRIMARY_WEBBROWSER: {
+    // Page cache capacity (in pages)
+    // (Research indicates that value / page drops substantially after 3 pages.)
+    if (memory_size >= 2048)
+      *page_cache_capacity = 5;
+    else if (memory_size >= 1024)
+      *page_cache_capacity = 4;
+    else if (memory_size >= 512)
+      *page_cache_capacity = 3;
+    else if (memory_size >= 256)
+      *page_cache_capacity = 2;
+    else
+      *page_cache_capacity = 1;
 
       // Object cache capacities (in bytes)
       // (Testing indicates that value / MB depends heavily on content and

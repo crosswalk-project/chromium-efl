@@ -52,6 +52,8 @@ using std::string;
 using std::pair;
 using std::map;
 
+using tizen_webview::Cache_Model;
+
 namespace {
 
 /**
@@ -275,11 +277,11 @@ void EWebContext::ClearWebkitCache() {
   web_cache_manager_->ClearCache();
 }
 
-void EWebContext::SetCacheModel(Ewk_Cache_Model model) {
+void EWebContext::SetCacheModel(Cache_Model model) {
   web_cache_manager_->SetCacheModel(model);
 }
 
-Ewk_Cache_Model EWebContext::GetCacheModel() const {
+Cache_Model EWebContext::GetCacheModel() const {
   return web_cache_manager_->GetCacheModel();
 }
 

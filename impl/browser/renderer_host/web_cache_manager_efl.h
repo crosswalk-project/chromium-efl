@@ -12,6 +12,7 @@
 #include "content/public/browser/notification_observer.h"
 #include "content/public/browser/notification_registrar.h"
 #include "public/ewk_context.h"
+#include "tizen_webview/public/tw_cache_model.h"
 
 namespace content {
 class BrowserContext;
@@ -28,24 +29,24 @@ class WebCacheManagerEfl : public content::NotificationObserver {
                        const content::NotificationSource& source,
                        const content::NotificationDetails& details) OVERRIDE;
   void ClearCache();
-  void SetCacheModel(Ewk_Cache_Model model);
-  Ewk_Cache_Model GetCacheModel() const { return cache_model_; }
+  void SetCacheModel(tizen_webview::Cache_Model model);
+  tizen_webview::Cache_Model GetCacheModel() const { return cache_model_; }
   void SetBrowserContext(content::BrowserContext* browser_context);
 
  private:
-  static void CalculateCacheSizes(Ewk_Cache_Model cache_model, int64 memory_size, int64 disk_free_size,
+  static void CalculateCacheSizes(tizen_webview::Cache_Model cache_model, int64 memory_size, int64 disk_free_size,
       int64* cache_total_capacity, int64* cache_min_dead_capacity,
       int64* cache_max_dead_capacity, double* dead_decoded_data_deletion_interval,
       int64* page_cache_capacity, int64* url_cache_memory_capacity,
       int64* url_cache_disk_capacity);
 
-  CacheParamsEfl GetCacheParamsFromModel(Ewk_Cache_Model);
-  void SetRenderProcessCacheModel(Ewk_Cache_Model model, int render_process_id);
+  CacheParamsEfl GetCacheParamsFromModel(tizen_webview::Cache_Model);
+  void SetRenderProcessCacheModel(tizen_webview::Cache_Model model, int render_process_id);
 
   content::NotificationRegistrar registrar_;
   std::set<int> renderers_;
   content::BrowserContext* browser_context_;
-  Ewk_Cache_Model cache_model_;
+  tizen_webview::Cache_Model cache_model_;
   DISALLOW_COPY_AND_ASSIGN(WebCacheManagerEfl);
 };
 

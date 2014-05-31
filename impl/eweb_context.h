@@ -23,7 +23,7 @@
 #include "eweb_object.h"
 #include "API/ewk_cookie_manager_private.h"
 #include "browser/renderer_host/web_cache_manager_efl.h"
-#include "public/ewk_context.h"
+#include "tizen_webview/public/tw_cache_model.h"
 
 typedef std::map<std::string, std::string> HTTPCustomHeadersEflMap;
 
@@ -62,8 +62,8 @@ class EWebContext : public EWebObject {
   void AddExtraPluginDir(const char *path);
   void SetCertificate(const char* certificate_file);
 
-  void SetCacheModel(Ewk_Cache_Model);
-  Ewk_Cache_Model GetCacheModel() const;
+  void SetCacheModel(tizen_webview::Cache_Model);
+  tizen_webview::Cache_Model GetCacheModel() const;
   void SetNetworkCacheEnable(bool enable);
   bool GetNetworkCacheEnable() const;
   bool HTTPCustomHeaderAdd(const char* name, const char* value);
