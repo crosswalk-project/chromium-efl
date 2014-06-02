@@ -36,6 +36,9 @@ struct NavigationPolicyParams;
 
 #include "tizen_webview/public/tw_policy_decision.h"
 
+// Basic type of authorization - 'type username:password'
+#define BASIC_AUTHORIZATION "BASIC"
+
 struct NavigationPolicyParams;
 
 
@@ -90,6 +93,18 @@ class _Ewk_Policy_Decision {
 
  private:
   void ParseUrl(const GURL& url);
+
+  /**
+   * @brief sets userID and password
+   * @param request_url requested url - user:password@address
+   */
+  void SetAuthorizationIfNecessary(const GURL& request_url);
+
+  /**
+   * @brief sets userID and password
+   * @param request contents of Authorization HTTP header
+   */
+  void SetAuthorizationIfNecessary(const std::string request);
 
   enum PolicyType {
     POLICY_RESPONSE,

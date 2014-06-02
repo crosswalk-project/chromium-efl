@@ -85,6 +85,7 @@ bool ContentRendererClientEfl::HandleNavigation(content::RenderFrame* render_fra
   params.render_view_id = render_view_id;
   params.url = request.url();
   params.referrer = content::Referrer(referrer_url, referrer_policy);
+  params.auth = request.httpHeaderField(blink::WebString::fromUTF8("Authorization"));
   params.policy = default_policy;
   params.is_main_frame = (frame->view()->mainFrame() == frame);
   params.type = type;

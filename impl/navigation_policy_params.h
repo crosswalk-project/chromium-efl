@@ -23,6 +23,7 @@
 #include "content/public/common/referrer.h"
 #include "third_party/WebKit/public/web/WebNavigationPolicy.h"
 #include "third_party/WebKit/public/web/WebNavigationType.h"
+#include "third_party/WebKit/public/platform/WebString.h"
 #include "url/gurl.h"
 
 struct NavigationPolicyParams {
@@ -31,6 +32,7 @@ struct NavigationPolicyParams {
   content::Referrer referrer;
   blink::WebNavigationPolicy policy;
   blink::WebNavigationType type;
+  blink::WebString auth;
   bool should_replace_current_entry;
   bool is_main_frame;
   bool is_redirect;

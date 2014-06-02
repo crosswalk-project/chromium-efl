@@ -24,6 +24,7 @@
 #include <content/public/browser/render_view_host.h>
 #include <net/http/http_response_headers.h>
 
+#include <algorithm>
 #include "web_contents_delegate_efl.h"
 
 using content::BrowserThread;
@@ -71,6 +72,9 @@ _Ewk_Policy_Decision::_Ewk_Policy_Decision(const GURL &request_url, const net::H
         decisionType_ = TW_POLICY_DECISION_DOWNLOAD;
     }
 
+    if (request_url.has_password() && request_url.has_username())
+      SetAuthorizationIfNecessary(request_url);
+
     std::string set_cookie_;
 
     if (response_headers->EnumerateHeader(NULL, "Set-Cookie", &set_cookie_))
@@ -104,6 +108,10 @@ _Ewk_Policy_Decision::_Ewk_Policy_Decision(const NavigationPolicyParams &params,
   , AuthPassword_(NULL)
   , type_(POLICY_NAVIGATION) {
   ParseUrl(params.url);
+  if (!params.auth.isEmpty())
+    SetAuthorizationIfNecessary(params.auth.utf8());
+  else if (params.url.has_password() && params.url.has_username())
+    SetAuthorizationIfNecessary(params.url);
 }
 
 _Ewk_Policy_Decision::_Ewk_Policy_Decision(content::WebContentsDelegateEfl* view, const GURL& url)
@@ -131,6 +139,9 @@ _Ewk_Policy_Decision::_Ewk_Policy_Decision(content::WebContentsDelegateEfl* view
   if (view && view->web_contents()) {
     view->web_contents()->GetMainFrame();
   }
+
+  if (url.has_password() && url.has_username())
+    SetAuthorizationIfNecessary(url);
 
   frame_.reset(new Ewk_Frame(rfh));
 }
@@ -242,4 +253,40 @@ void _Ewk_Policy_Decision::ParseUrl(const GURL& url) {
   url_ = eina_stringshare_add(url.spec().c_str());
   scheme_ = eina_stringshare_add(url.scheme().c_str());
   host_ = eina_stringshare_add(url.host().c_str());
+}
+
+void _Ewk_Policy_Decision::SetAuthorizationIfNecessary(const GURL& request_url) {
+  // There is no need to check if username or password is empty.
+  // It was checked befor in constructor
+  AuthPassword_ = eina_stringshare_add(request_url.password().c_str());
+  AuthUser_ = eina_stringshare_add(request_url.username().c_str());
+}
+
+void _Ewk_Policy_Decision::SetAuthorizationIfNecessary(const std::string request) {
+  std::string type = request.substr(0, request.find_first_of(' '));
+  std::transform(type.begin(), type.end(), type.begin(), ::toupper);
+
+  if (type.compare(BASIC_AUTHORIZATION)) {
+    AuthUser_ = eina_stringshare_add("");
+    AuthPassword_ = eina_stringshare_add("");
+    return;
+  }
+
+  std::size_t space = request.find(' ');
+  std::size_t colon = request.find(':');
+
+  DCHECK(space != std::string::npos && colon != std::string::npos && colon != request.length());
+  if (space == std::string::npos || colon == std::string::npos || colon == request.length())
+    return;
+
+  std::string user = request.substr(space + 1, request.length() - colon - 1);
+  std::string pass = request.substr(colon + 1);
+
+  if (user.empty() || pass.empty()) {
+    AuthUser_ = eina_stringshare_add("");
+    AuthPassword_ = eina_stringshare_add("");
+  } else {
+    AuthUser_ = eina_stringshare_add(user.c_str());
+    AuthPassword_  = eina_stringshare_add(pass.c_str());
+  }
 }
