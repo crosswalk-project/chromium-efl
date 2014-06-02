@@ -61,7 +61,7 @@ namespace {
  */
 class WebStorageGetAllOriginsDispatcher: public base::RefCountedThreadSafe<WebStorageGetAllOriginsDispatcher> {
 public:
-  WebStorageGetAllOriginsDispatcher(Ewk_Web_Storage_Origins_Get_Callback callback, void* user_data)
+  WebStorageGetAllOriginsDispatcher(tizen_webview::Web_Storage_Origins_Get_Callback callback, void* user_data)
     : callback_(callback)
     , user_data_(user_data) {
     DCHECK(callback_);
@@ -84,7 +84,7 @@ public:
   }
 
 private:
-  Ewk_Web_Storage_Origins_Get_Callback callback_;
+  tizen_webview::Web_Storage_Origins_Get_Callback callback_;
   void* user_data_;
 };
 
@@ -116,7 +116,7 @@ void DeleteApplicationCache(content::StoragePartition* partition) {
                        storage_origin, origin_matcher, begin, end, callback);
 }
 
-void OnOriginsWithApplicationCacheObtained(Ewk_Web_Application_Cache_Origins_Get_Callback callback,
+void OnOriginsWithApplicationCacheObtained(tizen_webview::Web_Application_Cache_Origins_Get_Callback callback,
                                            void* user_data,
                                            scoped_refptr<content::AppCacheInfoCollection> collection,
                                            int result) {
@@ -131,7 +131,7 @@ void OnOriginsWithApplicationCacheObtained(Ewk_Web_Application_Cache_Origins_Get
 }
 
 void OnTemporaryUsageAndQuotaObtained(
-    Ewk_Web_Application_Cache_Usage_For_Origin_Get_Callback callback,
+    tizen_webview::Web_Application_Cache_Usage_For_Origin_Get_Callback callback,
     void* user_data,
     quota::QuotaStatusCode status_code,
     int64 usage,
@@ -147,7 +147,7 @@ void OnTemporaryUsageAndQuotaObtained(
 }
 
 void OnGetWebDBOrigins(
-    Ewk_Web_Database_Origins_Get_Callback callback,
+    tizen_webview::Web_Database_Origins_Get_Callback callback,
     void* user_data,
     const std::set<GURL>& origins_ref) {
   Eina_List* origins = 0;
@@ -162,7 +162,7 @@ void OnGetWebDBOrigins(
                           base::Bind(callback, origins, user_data));
 }
 
-void GetWebDBOriginsOnDBThread(Ewk_Web_Database_Origins_Get_Callback callback,
+void GetWebDBOriginsOnDBThread(tizen_webview::Web_Database_Origins_Get_Callback callback,
                                void* user_data,
                                content::StoragePartition* partition) {
   DCHECK(BrowserThread::CurrentlyOn(BrowserThread::DB));
@@ -172,7 +172,7 @@ void GetWebDBOriginsOnDBThread(Ewk_Web_Database_Origins_Get_Callback callback,
 }
 
 void OnGetFileSystemOrigins(
-    Ewk_Local_File_System_Origins_Get_Callback callback,
+    tizen_webview::Local_File_System_Origins_Get_Callback callback,
     void* user_data,
     const std::set<GURL>& origins_ref) {
   Eina_List* origins = 0;
@@ -187,7 +187,7 @@ void OnGetFileSystemOrigins(
                           base::Bind(callback, origins, user_data));
 }
 
-void GetFileSystemOriginsOnFILEThread(Ewk_Web_Database_Origins_Get_Callback callback,
+void GetFileSystemOriginsOnFILEThread(tizen_webview::Web_Database_Origins_Get_Callback callback,
                                     void* user_data,
                                     content::StoragePartition* partition) {
   DCHECK(BrowserThread::CurrentlyOn(BrowserThread::FILE));
@@ -356,7 +356,7 @@ void EWebContext::SetProxyUri(const char* uri) {
   done.Wait();
 }
 
-void EWebContext::SetDidStartDownloadCallback(Ewk_Context_Did_Start_Download_Callback callback,
+void EWebContext::SetDidStartDownloadCallback(tizen_webview::Context_Did_Start_Download_Callback callback,
                                               void* user_data) {
   DCHECK(start_download_callback_.get() == NULL);
   start_download_callback_.reset(new EwkDidStartDownloadCallback(callback,user_data));
@@ -385,7 +385,7 @@ void EWebContext::DeleteApplicationCacheForSite(const GURL& site) {
                                 partition->GetURLRequestContext());
 }
 
-void EWebContext::GetAllOriginsWithApplicationCache(Ewk_Web_Application_Cache_Origins_Get_Callback callback,
+void EWebContext::GetAllOriginsWithApplicationCache(tizen_webview::Web_Application_Cache_Origins_Get_Callback callback,
                                                     void* user_data) {
   content::StoragePartition* partition =
       BrowserContext::GetStoragePartition(browser_context_.get(), NULL);
@@ -400,7 +400,7 @@ void EWebContext::GetAllOriginsWithApplicationCache(Ewk_Web_Application_Cache_Or
 
 void EWebContext::GetApplicationCacheUsage(
     const GURL& url,
-    Ewk_Web_Application_Cache_Usage_For_Origin_Get_Callback callback,
+    tizen_webview::Web_Application_Cache_Usage_For_Origin_Get_Callback callback,
     void* user_data) {
   content::StoragePartition* partition =
         BrowserContext::GetStoragePartition(browser_context_.get(), NULL);
@@ -427,7 +427,7 @@ void EWebContext::WebStorageDelete(const GURL& origin) {
   partition->GetDOMStorageContext()->DeleteLocalStorage(origin);
 }
 
-void EWebContext::WebStorageOriginsAllGet(Ewk_Web_Storage_Origins_Get_Callback callback,
+void EWebContext::WebStorageOriginsAllGet(tizen_webview::Web_Storage_Origins_Get_Callback callback,
                                                     void* user_data) {
   content::StoragePartition* partition =
       BrowserContext::GetStoragePartition(browser_context_.get(), NULL);
@@ -447,7 +447,7 @@ void EWebContext::WebDBDelete(const GURL& host) {
   remover->RemoveImpl(BrowsingDataRemoverEfl::REMOVE_WEBSQL, host);
 }
 
-void EWebContext::GetAllOriginsWithWebDB(Ewk_Web_Database_Origins_Get_Callback callback, void* user_data) {
+void EWebContext::GetAllOriginsWithWebDB(tizen_webview::Web_Database_Origins_Get_Callback callback, void* user_data) {
   content::StoragePartition* partition = BrowserContext::GetStoragePartition(browser_context_.get(), NULL);
   BrowserThread::PostTask(
       BrowserThread::DB,
@@ -461,7 +461,7 @@ void EWebContext::FileSystemDelete(const GURL& host) {
   remover->RemoveImpl(BrowsingDataRemoverEfl::REMOVE_FILE_SYSTEMS, host);
 }
 
-void EWebContext::GetAllOriginsWithFileSystem(Ewk_Local_File_System_Origins_Get_Callback callback, void* user_data) const {
+void EWebContext::GetAllOriginsWithFileSystem(tizen_webview::Local_File_System_Origins_Get_Callback callback, void* user_data) const {
   content::StoragePartition* partition = BrowserContext::GetStoragePartition(browser_context_.get(), NULL);
   BrowserThread::PostTask(
       BrowserThread::FILE,

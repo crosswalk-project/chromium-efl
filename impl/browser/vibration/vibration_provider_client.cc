@@ -37,8 +37,8 @@ void VibrationProviderClient::CancelVibration() {
     vibration_client_->cancel_vibration_(vibration_client_->user_data_);
 }
 
-void VibrationProviderClient::SetVibrationClientCallbacks(Ewk_Vibration_Client_Vibrate_Cb vibrate,
-    Ewk_Vibration_Client_Vibration_Cancel_Cb cancelVibration,
-    void* data) {
+void VibrationProviderClient::SetVibrationClientCallbacks(tizen_webview::Vibration_Client_Vibrate_Cb vibrate,
+                                                          tizen_webview::Vibration_Client_Vibration_Cancel_Cb cancelVibration,
+                                                          void* data) {
   vibration_client_.reset(new Ewk_Vibration_Client(vibrate, cancelVibration, data));
 }

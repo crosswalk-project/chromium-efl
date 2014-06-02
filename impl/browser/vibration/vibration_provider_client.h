@@ -16,7 +16,8 @@
 #define Vibration_Provider_Client_h
 
 #include "base/memory/scoped_ptr.h"
-#include "public/ewk_context.h"
+//#include "public/ewk_context.h"
+#include "tizen_webview/public/tw_callbacks.h"
 
 /**
  * \struct  Ewk_Vibration_Client
@@ -24,15 +25,15 @@
  */
 struct Ewk_Vibration_Client {
  public:
-  Ewk_Vibration_Client(Ewk_Vibration_Client_Vibrate_Cb vibrate,
-                       Ewk_Vibration_Client_Vibration_Cancel_Cb cancelVibration,
+  Ewk_Vibration_Client(tizen_webview::Vibration_Client_Vibrate_Cb vibrate,
+                       tizen_webview::Vibration_Client_Vibration_Cancel_Cb cancelVibration,
                        void* user_data)
     : vibrate_(vibrate),
       cancel_vibration_(cancelVibration),
       user_data_(user_data) {}
 
-  Ewk_Vibration_Client_Vibrate_Cb vibrate_;
-  Ewk_Vibration_Client_Vibration_Cancel_Cb cancel_vibration_;
+  tizen_webview::Vibration_Client_Vibrate_Cb vibrate_;
+  tizen_webview::Vibration_Client_Vibration_Cancel_Cb cancel_vibration_;
   void* user_data_;
 };
 
@@ -42,8 +43,8 @@ class VibrationProviderClient {
   static void DeleteInstance();
   void Vibrate(uint64_t vibrationTime);
   void CancelVibration();
-  void SetVibrationClientCallbacks(Ewk_Vibration_Client_Vibrate_Cb,
-                                   Ewk_Vibration_Client_Vibration_Cancel_Cb,
+  void SetVibrationClientCallbacks(tizen_webview::Vibration_Client_Vibrate_Cb,
+                                   tizen_webview::Vibration_Client_Vibration_Cancel_Cb,
                                    void*);
 
  private:
