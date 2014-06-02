@@ -25,13 +25,15 @@
 
 #include <base/memory/scoped_ptr.h>
 #include <base/memory/ref_counted.h>
-#include <base/strings/string16.h>
 #include <url/gurl.h>
 
 #include <browser/navigation_policy_handler_efl.h>
 #include <browser/policy_response_delegate_efl.h>
+
 #include <public/ewk_policy_decision.h>
-#include <public/ewk_frame.h>
+#include "ewk_frame_private.h"
+
+struct NavigationPolicyParams;
 
 namespace content {
 class WebContentsDelegateEfl;
@@ -53,7 +55,7 @@ class _Ewk_Policy_Decision {
  /**
   * Constructs _Ewk_Policy_Decision with navigation type POLICY_NEWWINDOW
   */
-  explicit _Ewk_Policy_Decision(content::WebContentsDelegateEfl* view, const GURL& url, const base::string16& frame);
+  explicit _Ewk_Policy_Decision(content::WebContentsDelegateEfl* view, const GURL& url);
 
   ~_Ewk_Policy_Decision();
 
@@ -64,7 +66,6 @@ class _Ewk_Policy_Decision {
 
   bool isDecided() const { return isDecided_; }
   bool isSuspended() const { return isSuspended_; }
-  bool isMainFrame() const { return isMainFrame_; }
   Ewk_Policy_Navigation_Type GetNavigationType() const { return navigationType_; }
   Eina_Stringshare* GetCookie() const { return cookie_; }
   Eina_Stringshare* GetAuthUser() const { return AuthUser_; }
@@ -78,7 +79,10 @@ class _Ewk_Policy_Decision {
   int GetResponseStatusCode() const { return responseStatusCode_; }
 
   NavigationPolicyHandlerEfl* GetNavigationPolicyHandler() const { return navigation_policy_handler_.get(); }
-  Ewk_Frame_Ref GetFrameRef() const;
+
+  Ewk_Frame* GetFrameRef() const;
+
+  void InitializeOnUIThread();
 
  private:
   void ParseUrl(const GURL& url);
@@ -92,8 +96,7 @@ class _Ewk_Policy_Decision {
   content::WebContentsDelegateEfl* new_window_policy_delegate_;
   scoped_refptr<PolicyResponseDelegateEfl> policy_response_delegate_;
   scoped_ptr<NavigationPolicyHandlerEfl> navigation_policy_handler_;
-  int frame_id_;
-  int process_id_;
+  scoped_ptr<Ewk_Frame> frame_;
   const char* cookie_;
   const char* url_;
   const char* host_;
@@ -102,13 +105,11 @@ class _Ewk_Policy_Decision {
   Eina_Hash* responseHeaders_;
   Ewk_Policy_Decision_Type decisionType_;
   Ewk_Policy_Navigation_Type navigationType_;
-  base::string16 frame_name_;
   bool isDecided_;
   bool isSuspended_;
   int responseStatusCode_;
   const char* AuthUser_;
   const char* AuthPassword_;
-  bool isMainFrame_;
   PolicyType type_;
 };
 

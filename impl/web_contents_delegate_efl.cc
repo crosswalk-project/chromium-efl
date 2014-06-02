@@ -108,12 +108,12 @@ bool WebContentsDelegateEfl::ShouldCreateWebContents(
     WebContents* web_contents,
     int route_id,
     WindowContainerType window_container_type,
-    const string16& frame_name,
+    const string16& /*frame_name*/,
     const GURL& target_url,
     const std::string& partition_id,
     SessionStorageNamespace* session_storage_namespace) {
-  // This method is called ONLY when creating a new window, no matter what type.
-  web_view_->set_policy_decision(new _Ewk_Policy_Decision(this, target_url, frame_name));
+  // this method is called ONLY when creating new window - no matter what type
+  web_view_->set_policy_decision(new _Ewk_Policy_Decision(this, target_url));
   web_view_->SmartCallback<EWebViewCallbacks::NewWindowPolicyDecision>().call(web_view_->get_policy_decision());
   // Chromium has sync API. We cannot block this calls on UI thread.
   CHECK(!web_view_->get_policy_decision()->isSuspended());

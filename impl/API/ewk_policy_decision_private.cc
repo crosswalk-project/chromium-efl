@@ -28,6 +28,7 @@
 
 using content::BrowserThread;
 using content::RenderFrameHost;
+using content::RenderViewHost;
 
 namespace {
   void FreeStringShare(void *data) {
@@ -35,11 +36,9 @@ namespace {
   }
 }
 
-_Ewk_Policy_Decision::_Ewk_Policy_Decision(const GURL& request_url, const net::HttpResponseHeaders* response_headers, PolicyResponseDelegateEfl* delegate)
+_Ewk_Policy_Decision::_Ewk_Policy_Decision(const GURL &request_url, const net::HttpResponseHeaders* response_headers, PolicyResponseDelegateEfl* delegate)
   : new_window_policy_delegate_(NULL)
   , policy_response_delegate_(delegate)
-  , frame_id_(-1)
-  , process_id_(-1)
   , cookie_(NULL)
   , url_(NULL)
   , host_(NULL)
@@ -53,15 +52,9 @@ _Ewk_Policy_Decision::_Ewk_Policy_Decision(const GURL& request_url, const net::H
   , responseStatusCode_(0)
   , AuthUser_(NULL)
   , AuthPassword_(NULL)
-  , isMainFrame_(true)
   , type_(POLICY_RESPONSE) {
   DCHECK(response_headers);
   DCHECK(delegate);
-
-  if (delegate) {
-    frame_id_ = delegate->GetRenderFrameId();
-    process_id_ = delegate->GetRenderProcessId();
-  }
 
   ParseUrl(request_url);
 
@@ -94,8 +87,7 @@ _Ewk_Policy_Decision::_Ewk_Policy_Decision(const GURL& request_url, const net::H
 _Ewk_Policy_Decision::_Ewk_Policy_Decision(const NavigationPolicyParams &params, content::RenderViewHost* rvh)
   : new_window_policy_delegate_(NULL)
   , navigation_policy_handler_(new NavigationPolicyHandlerEfl(rvh, params))
-  , frame_id_(params.frame_id)
-  , process_id_(-1)
+  , frame_(new Ewk_Frame(params))
   , cookie_(NULL)
   , url_(NULL)
   , host_(NULL)
@@ -109,18 +101,12 @@ _Ewk_Policy_Decision::_Ewk_Policy_Decision(const NavigationPolicyParams &params,
   , responseStatusCode_(0)
   , AuthUser_(NULL)
   , AuthPassword_(NULL)
-  , isMainFrame_(params.is_main_frame)
   , type_(POLICY_NAVIGATION) {
   ParseUrl(params.url);
-
-  if (rvh)
-    process_id_ = rvh->GetProcess()->GetID();
 }
 
-_Ewk_Policy_Decision::_Ewk_Policy_Decision(content::WebContentsDelegateEfl* view, const GURL& url, const base::string16& frame)
+_Ewk_Policy_Decision::_Ewk_Policy_Decision(content::WebContentsDelegateEfl* view, const GURL& url)
   : new_window_policy_delegate_(view)
-  , frame_id_(-1)
-  , process_id_(-1)
   , cookie_(NULL)
   , url_(NULL)
   , host_(NULL)
@@ -129,27 +115,23 @@ _Ewk_Policy_Decision::_Ewk_Policy_Decision(content::WebContentsDelegateEfl* view
   , responseHeaders_(NULL)
   , decisionType_(EWK_POLICY_DECISION_USE)
   , navigationType_(EWK_POLICY_NAVIGATION_TYPE_OTHER)
-  , frame_name_(frame)
   , isDecided_(false)
   , isSuspended_(false)
   , responseStatusCode_(0)
   , AuthUser_(NULL)
   , AuthPassword_(NULL)
-  , isMainFrame_(true)
   , type_(POLICY_NEWWINDOW) {
+  DCHECK(BrowserThread::CurrentlyOn(BrowserThread::UI));
   DCHECK(view);
   ParseUrl(url);
 
+  RenderFrameHost* rfh = NULL;
   // we can use main frame here
   if (view && view->web_contents()) {
-    RenderFrameHost* rfh = view->web_contents()->GetMainFrame();
-
-    if (rfh) {
-      // not sure if it's right to use GetRoutingID
-      frame_id_ = rfh->GetRoutingID();
-      process_id_ = rfh->GetProcess()->GetID();
-    }
+    view->web_contents()->GetMainFrame();
   }
+
+  frame_.reset(new Ewk_Frame(rfh));
 }
 
 _Ewk_Policy_Decision::~_Ewk_Policy_Decision() {
@@ -221,10 +203,38 @@ void _Ewk_Policy_Decision::Suspend() {
   isSuspended_ = true;
 }
 
-Ewk_Frame_Ref _Ewk_Policy_Decision::GetFrameRef() const {
+void _Ewk_Policy_Decision::InitializeOnUIThread() {
+  DCHECK(type_ == Ewk_Policy_Decision::POLICY_RESPONSE);
+  DCHECK(policy_response_delegate_);
+
+  if (policy_response_delegate_) {
+    RenderFrameHost *host = RenderFrameHost::FromID(policy_response_delegate_->GetRenderProcessId(), policy_response_delegate_->GetRenderFrameId());
+
+    // Download request has no render frame id, they're detached. We override it with main frame from render view id
+    if (!host) {
+      RenderViewHost *viewhost = RenderViewHost::FromID(policy_response_delegate_->GetRenderProcessId(), policy_response_delegate_->GetRenderViewId());
+
+      //DCHECK(viewhost);
+      if (viewhost) {
+        host = viewhost->GetMainFrame();
+      }
+    }
+
+    if (host) {
+      /*
+       * In some situations there is no renderer associated to the response
+       * Such case can be observed while running TC utc_blink_ewk_geolocation_permission_request_suspend_func
+       */
+      frame_.reset(new Ewk_Frame(host));
+    }
+  }
+}
+
+Ewk_Frame* _Ewk_Policy_Decision::GetFrameRef() const {
   DCHECK(BrowserThread::CurrentlyOn(BrowserThread::UI));
-  RenderFrameHost* host = RenderFrameHost::FromID(process_id_, frame_id_);
-  return static_cast<Ewk_Frame_Ref>(host);
+  // Ups, forgot to initialize something?
+  DCHECK(frame_.get());
+  return frame_.get();
 }
 
 void _Ewk_Policy_Decision::ParseUrl(const GURL& url) {

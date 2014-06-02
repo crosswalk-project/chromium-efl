@@ -54,6 +54,8 @@
       'API/ewk_context_menu_private.h',
       'API/ewk_cookie_manager_private.h',
       'API/ewk_error_private.h',
+      'API/ewk_frame_private.h',
+      'API/ewk_frame_private.cc',
       'API/ewk_geolocation_private.h',
       'API/ewk_hit_test_private.cc',
       'API/ewk_hit_test_private.h',

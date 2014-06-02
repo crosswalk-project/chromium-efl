@@ -23,6 +23,7 @@ class PolicyResponseDelegateEfl: public base::RefCountedThreadSafe<PolicyRespons
 
   int GetRenderProcessId() const { return render_process_id_; }
   int GetRenderFrameId() const { return render_frame_id_; }
+  int GetRenderViewId() const { return render_view_id_; }
 
  private:
   friend class base::RefCountedThreadSafe<PolicyResponseDelegateEfl>;
@@ -35,6 +36,7 @@ class PolicyResponseDelegateEfl: public base::RefCountedThreadSafe<PolicyRespons
   net::CompletionCallback callback_;
   int render_process_id_;
   int render_frame_id_;
+  int render_view_id_;
   // Should be accessed only on IO thread.
   bool processed_;
 };

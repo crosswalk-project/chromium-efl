@@ -21,6 +21,7 @@
 #define ewk_policy_decision_h
 
 #include <Eina.h>
+
 #include "ewk_export.h"
 
 #ifdef __cplusplus
@@ -207,10 +208,16 @@ EAPI Ewk_Policy_Navigation_Type ewk_policy_decision_navigation_type_get(const Ew
  *
  * @return frame reference on success, or NULL on failure
  */
-  //TODO: This API is not available for now. We shall look at it later.
-  // We only have frame name not a reference to frame.
-  // Not sure if it can be made to work interchangeably.
 //EAPI Ewk_Frame_Ref ewk_policy_decision_frame_get(Ewk_Policy_Decision* policy_decision);
+
+/**
+ * Checks if frame requested in policy decision is main frame.
+ *
+ * @param policy_decision policy decision object
+ *
+ * @return @c EINA_TRUE or @c EINA_FALSE
+ */
+EAPI Eina_Bool ewk_policy_decision_is_main_frame(const Ewk_Policy_Decision* policy_decision);
 
 #ifdef __cplusplus
 }

@@ -7,7 +7,6 @@
 #include "content/public/browser/resource_dispatcher_host.h"
 #include "content/public/browser/resource_request_info.h"
 #include "content/public/browser/web_contents.h"
-#include "net/url_request/url_request.h"
 
 #include "web_contents_delegate_efl.h"
 #include "common/web_contents_utils.h"
@@ -40,15 +39,35 @@ PolicyResponseDelegateEfl::PolicyResponseDelegateEfl(net::URLRequest* request,
       callback_(callback),
       render_process_id_(0),
       render_frame_id_(0),
+      render_view_id_(0),
       processed_(false) {
   DCHECK(BrowserThread::CurrentlyOn(BrowserThread::IO));
-  ResourceRequestInfo::GetRenderFrameForRequest(request, &render_process_id_, &render_frame_id_);
+
+  const ResourceRequestInfo* info = ResourceRequestInfo::ForRequest(request);
+
+  if (info) {
+    info->GetAssociatedRenderFrame(&render_process_id_, &render_frame_id_);
+    render_view_id_ = info->GetRouteID();
+
+  } else {
+    ResourceRequestInfo::GetRenderFrameForRequest(request, &render_process_id_, &render_frame_id_);
+  }
+
+  /*
+   * In some situations there is no render_process and render_frame associated with
+   * request. Such situation happens in TC utc_blink_ewk_geolocation_permission_request_suspend_func
+   */
+  //DCHECK(render_process_id_ > 0);
+  //DCHECK(render_frame_id_ > 0 || render_view_id_ > 0);
   BrowserThread::PostTask(BrowserThread::UI, FROM_HERE,
-      base::Bind(&PolicyResponseDelegateEfl::HandlePolicyResponseOnUIThread, this));
+        base::Bind(&PolicyResponseDelegateEfl::HandlePolicyResponseOnUIThread, this));
 }
 
 void PolicyResponseDelegateEfl::HandlePolicyResponseOnUIThread() {
   DCHECK(BrowserThread::CurrentlyOn(BrowserThread::UI));
+  DCHECK(policy_decision_.get());
+
+  policy_decision_->InitializeOnUIThread();
   // Delegate may be retrieved ONLY on UI thread
   content::WebContentsDelegateEfl *delegate = WebContentsDelegateFromFrameId(render_process_id_, render_frame_id_);
   if (!delegate) {
