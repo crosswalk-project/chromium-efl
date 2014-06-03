@@ -334,10 +334,7 @@ EWebView::EWebView(tizen_webview::WebContext* context, Evas_Object* object)
 }
 
 EWebView::~EWebView() {
-  if (inspector_server_) {
-    inspector_server_->Stop();
-    inspector_server_ = NULL;
-  }
+  StopInspectorServer(); // inside is check to Inspector is running
   EWebEventHandler<EVAS_CALLBACK_FOCUS_IN>::Unsubscribe(evas_object());
   EWebEventHandler<EVAS_CALLBACK_FOCUS_OUT>::Unsubscribe(evas_object());
   EWebEventHandler<EVAS_CALLBACK_KEY_DOWN>::Unsubscribe(evas_object());
@@ -2014,6 +2011,15 @@ int EWebView::StartInspectorServer(int port) {
   }
   inspector_server_ = new content::DevToolsDelegateEfl(port);
   return inspector_server_ ? inspector_server_->port() : 0;
+}
+
+bool EWebView::StopInspectorServer() {
+  if (!inspector_server_) {
+    return false;
+  }
+  inspector_server_->Stop(); // Asynchronous releas inside Stop()
+  inspector_server_ = NULL;
+  return true;
 }
 
 #if defined(OS_TIZEN_MOBILE)

@@ -366,8 +366,10 @@ class EWebView
 
   bool IsIMEShow();
   gfx::Rect GetIMERect();
+
   // Returns TCP port number with Inspector, or 0 if error.
   int StartInspectorServer(int = 0);
+  bool StopInspectorServer();
 
   std::string GetErrorPage(const std::string& invalidUrl);
   void UpdateMagnifierScreen(const SkBitmap& bitmap);
