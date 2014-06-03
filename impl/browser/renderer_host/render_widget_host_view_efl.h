@@ -6,10 +6,12 @@
 #define RENDER_WIDGET_HOST_VIEW_EFL
 
 #include "base/basictypes.h"
+#include "base/format_macros.h"
 #include "content/browser/renderer_host/render_widget_host_view_base.h"
 #include "content/common/content_export.h"
 #include "eweb_view.h"
 #include <Evas.h>
+#include <Ecore_Evas.h>
 
 namespace ui {
 class GestureEvent;
@@ -27,7 +29,7 @@ class RenderWidgetHostImpl;
 class RenderWidgetHostView;
 
 // RenderWidgetHostView class hierarchy described in render_widget_host_view.h.
-class RenderWidgetHostViewEfl : public RenderWidgetHostViewBase {
+class RenderWidgetHostViewEfl : public RenderWidgetHostViewBase, public IPC::Sender {
  public:
   // RenderWidgetHostViewBase implementation.
   explicit RenderWidgetHostViewEfl(RenderWidgetHost*);
@@ -52,7 +54,9 @@ class RenderWidgetHostViewEfl : public RenderWidgetHostViewBase {
   virtual void WasHidden() OVERRIDE;
   virtual void Focus() OVERRIDE;
   virtual bool HasFocus() const OVERRIDE;
-  virtual void MovePluginWindows(const gfx::Vector2d&, const std::vector<WebPluginGeometry>&) OVERRIDE;
+  void MovePluginContainer(const WebPluginGeometry&);
+  virtual void MovePluginWindows(
+      const std::vector<WebPluginGeometry>&) OVERRIDE;
   virtual void Blur() OVERRIDE;
   virtual void UpdateCursor(const WebCursor&) OVERRIDE;
   virtual void SetIsLoading(bool) OVERRIDE;
@@ -107,6 +111,8 @@ class RenderWidgetHostViewEfl : public RenderWidgetHostViewBase {
 
   virtual bool IsEditingCommandEnabled(int) OVERRIDE { return false; }
   virtual void ExecuteEditingCommand(int) OVERRIDE {}
+  // IPC::Sender implementation:
+  virtual bool Send(IPC::Message*) OVERRIDE;
 
   void OnDidFirstVisuallyNonEmptyLayout();
   void OnSelectionTextStyleState(const SelectionStylePrams&);
@@ -159,6 +165,9 @@ class RenderWidgetHostViewEfl : public RenderWidgetHostViewBase {
   Evas* evas_;
   Evas_Object* content_image_;
   scoped_ptr<EflWebview::ScrollDetector> scroll_detector_;
+
+  typedef std::map<gfx::PluginWindowHandle, Ecore_X_Window> PluginWindowToWidgetMap;
+  PluginWindowToWidgetMap plugin_window_to_widget_map_;
 
   // The touch-event. Its touch-points are updated as necessary. A new
   // touch-point is added from an ET_TOUCH_PRESSED event, and a touch-point is

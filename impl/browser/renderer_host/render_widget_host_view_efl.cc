@@ -90,6 +90,10 @@ bool RenderWidgetHostViewEfl::OnMessageReceived(const IPC::Message& message) {
   return handled;
 }
 
+bool RenderWidgetHostViewEfl::Send(IPC::Message* message) {
+  return host_->Send(message);
+}
+
 void RenderWidgetHostViewEfl::OnDidFirstVisuallyNonEmptyLayout() {
   web_view_->SmartCallback<EWebViewCallbacks::LoadNonEmptyLayoutFinished>().call();
 }
@@ -189,9 +193,34 @@ bool RenderWidgetHostViewEfl::HasFocus() const {
   return web_view_->HasFocus();
 }
 
-void RenderWidgetHostViewEfl::MovePluginWindows(const gfx::Vector2d&, const std::vector<WebPluginGeometry>& moves) {
-  if (moves.size() > 0)
-    NOTIMPLEMENTED();
+void RenderWidgetHostViewEfl::MovePluginContainer(const WebPluginGeometry& move) {
+  Ecore_X_Window surface_window = 0;
+  PluginWindowToWidgetMap::const_iterator i = plugin_window_to_widget_map_.find(move.window);
+
+  if (i != plugin_window_to_widget_map_.end())
+    surface_window = i->second;
+
+  if (!surface_window)
+    return;
+
+  if (!move.visible) {
+    ecore_x_window_hide(surface_window);
+    return;
+  }
+
+  ecore_x_window_show(surface_window);
+
+  if (!move.rects_valid)
+    return;
+
+  ecore_x_window_move(surface_window, move.window_rect.x(), move.window_rect.y());
+  ecore_x_window_resize(surface_window, move.window_rect.width(), move.window_rect.height());
+}
+
+void RenderWidgetHostViewEfl::MovePluginWindows(
+    const std::vector<WebPluginGeometry>& moves) {
+  for (size_t i = 0; i < moves.size(); i++)
+    MovePluginContainer(moves[i]);
 }
 
 void RenderWidgetHostViewEfl::Blur() {
