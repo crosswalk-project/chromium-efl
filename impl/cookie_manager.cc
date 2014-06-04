@@ -38,14 +38,18 @@
 
 #include <Eina.h>
 
+#include "tizen_webview/public/tw_cookie_accept_policy.h"
+
 using content::BrowserThread;
 using net::CookieList;
 using net::CookieMonster;
 using base::AutoLock;
 
+using namespace tizen_webview;
+
 namespace {
 
-void TriggerHostPolicyGetCallbackAsyncOnUIThread(Ewk_Cookie_Accept_Policy policy,
+void TriggerHostPolicyGetCallbackAsyncOnUIThread(tizen_webview::Cookie_Accept_Policy policy,
                                                  CookieManager::AsyncPolicyGetCb callback,
                                                  void *data) {
   DCHECK(BrowserThread::CurrentlyOn(BrowserThread::UI));
@@ -77,40 +81,40 @@ class CookieManager::EwkGetHostCallback {
   }
 
  private:
-	AsyncHostnamesGetCb callback_;
+    AsyncHostnamesGetCb callback_;
     void* user_data_;
 };
 
 CookieManager::CookieManager(content::URLRequestContextGetterEfl* request_context_getter)
     : is_clearing_(false),
       request_context_getter_(request_context_getter),
-      cookie_policy_(EWK_COOKIE_ACCEPT_POLICY_ALWAYS)
+      cookie_policy_(TW_COOKIE_ACCEPT_POLICY_ALWAYS)
 {
 }
 
 void CookieManager::DeleteCookiesAsync(const std::string& url,
-                								  	   const std::string& cookie_name)
+                                                       const std::string& cookie_name)
 {
   DCHECK(BrowserThread::CurrentlyOn(BrowserThread::UI));
   BrowserThread::PostTask(BrowserThread::IO, FROM_HERE,
-    					            base::Bind(&CookieManager::DeleteCookiesOnIOThread,
-                         						 this,
-                         						 url,
-                         						 cookie_name));
+                                    base::Bind(&CookieManager::DeleteCookiesOnIOThread,
+                                                 this,
+                                                 url,
+                                                 cookie_name));
 }
 
 void CookieManager::DeleteCookiesOnIOThread(const std::string& url,
-	                                          const std::string& cookie_name) {
+                                              const std::string& cookie_name) {
   DCHECK(BrowserThread::CurrentlyOn(BrowserThread::IO));
   scoped_refptr<net::CookieMonster> cookie_monster =
       request_context_getter_->GetURLRequestContext()->
-        	  cookie_store()->GetCookieMonster();
+              cookie_store()->GetCookieMonster();
   if (url.empty()) { // Delete all cookies.
     cookie_monster->DeleteAllAsync(net::CookieMonster::DeleteCallback());
   }
   GURL gurl(url);
   if (!gurl.is_valid())
-   	return;
+    return;
   if (cookie_name.empty()) {
     // Delete all matching host cookies.
     cookie_monster->DeleteAllForHostAsync(gurl,
@@ -122,24 +126,24 @@ void CookieManager::DeleteCookiesOnIOThread(const std::string& url,
 }
 
 void CookieManager::SetStoragePath(const std::string& path,
-                  							   bool persist_session_cookies,
-                  							   bool file_storage_type) {
-	DCHECK(BrowserThread::CurrentlyOn(BrowserThread::UI));
-	BrowserThread::PostTask(BrowserThread::IO, FROM_HERE,
-      						        base::Bind(&CookieManager::SetStoragePathOnIOThread,
-                         						 this,
-                         						 path,
-                         						 persist_session_cookies,
-                         						 file_storage_type));
+                                               bool persist_session_cookies,
+                                               bool file_storage_type) {
+    DCHECK(BrowserThread::CurrentlyOn(BrowserThread::UI));
+    BrowserThread::PostTask(BrowserThread::IO, FROM_HERE,
+                                    base::Bind(&CookieManager::SetStoragePathOnIOThread,
+                                                 this,
+                                                 path,
+                                                 persist_session_cookies,
+                                                 file_storage_type));
 }
 
 void CookieManager::GetAcceptPolicyAsync(AsyncPolicyGetCb callback, void *data) {
   AutoLock lock(lock_);
   BrowserThread::PostTask(BrowserThread::UI, FROM_HERE,
-              					  base::Bind(&TriggerHostPolicyGetCallbackAsyncOnUIThread,
-                           					 cookie_policy_,
-                           					 callback,
-                           					 data));
+                                  base::Bind(&TriggerHostPolicyGetCallbackAsyncOnUIThread,
+                                             cookie_policy_,
+                                             callback,
+                                             data));
 }
 
 void CookieManager::GetHostNamesWithCookiesAsync(AsyncHostnamesGetCb callback, void *data) {
@@ -163,24 +167,24 @@ void CookieManager::FetchCookiesOnIOThread() {
 void CookieManager::OnFetchComplete(const net::CookieList& cookies) {
   if (!BrowserThread::CurrentlyOn(BrowserThread::UI)) {
     BrowserThread::PostTask(BrowserThread::UI, FROM_HERE,
-                  					base::Bind(&CookieManager::OnFetchComplete,
-                      							   this,
-                      							   cookies));
+                                    base::Bind(&CookieManager::OnFetchComplete,
+                                                   this,
+                                                   cookies));
     return;
   }
   if (!host_callback_queue_.empty()) {
-  	EwkGetHostCallback* host_callback = host_callback_queue_.front();
-  	if (host_callback) {
+    EwkGetHostCallback* host_callback = host_callback_queue_.front();
+    if (host_callback) {
       host_callback->TriggerCallback(cookies);
       delete host_callback;
-  	}
-  	host_callback_queue_.pop();
+    }
+    host_callback_queue_.pop();
   }
 }
 
 void CookieManager::SetStoragePathOnIOThread(const std::string& path,
                                              bool persist_session_cookies,
-                                             bool file_storage_type) {	
+                                             bool file_storage_type) {  
   DCHECK(BrowserThread::CurrentlyOn(BrowserThread::IO));
   base::FilePath storage_path(path);
   request_context_getter_->SetCookieStoragePath(storage_path, persist_session_cookies);
@@ -188,17 +192,23 @@ void CookieManager::SetStoragePathOnIOThread(const std::string& path,
 
 bool CookieManager::GetGlobalAllowAccess() {
   AutoLock lock(lock_);
-  return (cookie_policy_ == EWK_COOKIE_ACCEPT_POLICY_ALWAYS);
+  if (TW_COOKIE_ACCEPT_POLICY_ALWAYS == cookie_policy_)
+    return true;
+  else
+    return false;
 }
 
-void CookieManager::SetCookiePolicy(Ewk_Cookie_Accept_Policy policy) {
+void CookieManager::SetCookiePolicy(tizen_webview::Cookie_Accept_Policy policy) {
   AutoLock lock(lock_);
   cookie_policy_ = policy;
 }
 
 bool CookieManager::ShouldBlockThirdPartyCookies() {
   AutoLock lock(lock_);
-  return (cookie_policy_ == EWK_COOKIE_ACCEPT_POLICY_NO_THIRD_PARTY);
+  if (TW_COOKIE_ACCEPT_POLICY_NO_THIRD_PARTY == cookie_policy_)
+    return true;
+  else
+    return false;
 }
 
 bool CookieManager::AllowCookies(const GURL& url,
@@ -287,11 +297,11 @@ std::string CookieManager::GetCookiesForURL(const std::string& url) {
   std::string cookie_value;
   base::WaitableEvent completion(false, false);
   BrowserThread::PostTask(BrowserThread::IO, FROM_HERE,
-      					          base::Bind(&CookieManager::GetCookieValueOnIOThread,
-                  					  			 this,
-                  					  			 GURL(url),
-                  					  			 &cookie_value,
-                  					  			 &completion));
+                                  base::Bind(&CookieManager::GetCookieValueOnIOThread,
+                                                 this,
+                                                 GURL(url),
+                                                 &cookie_value,
+                                                 &completion));
   //allow wait temporarily
   base::ThreadRestrictions::ScopedAllowWait allow_wait;
   completion.Wait();

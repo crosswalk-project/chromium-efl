@@ -17,7 +17,6 @@
 
 #include "base/synchronization/lock.h"
 #include "base/basictypes.h"
-#include "public/ewk_cookie_manager.h"
 #include "url_request_context_getter_efl.h"
 #include "net/url_request/url_request_context.h"
 #include "net/url_request/url_request_context_getter.h"
@@ -29,6 +28,8 @@
 #include <queue>
 #include <Eina.h>
 
+#include "tizen_webview/public/tw_cookie_accept_policy.h"
+
 namespace content {
 class ResourceContext;
 }
@@ -38,7 +39,7 @@ struct _Ewk_Error;
 class CookieManager 
   : public base::RefCountedThreadSafe<CookieManager> {
 public:
-  typedef void (*AsyncPolicyGetCb)(Ewk_Cookie_Accept_Policy, _Ewk_Error*, void *);
+  typedef void (*AsyncPolicyGetCb)(tizen_webview::Cookie_Accept_Policy, _Ewk_Error*, void *);
 	typedef void (*AsyncHostnamesGetCb)(Eina_List*, _Ewk_Error*, void *);
 
   explicit CookieManager(content::URLRequestContextGetterEfl* request_context_getter);
@@ -67,7 +68,7 @@ public:
   // These manage the global access state shared across requests regardless of
   // source (i.e. network or JavaScript).
   bool GetGlobalAllowAccess();
-  void SetCookiePolicy(Ewk_Cookie_Accept_Policy policy);
+  void SetCookiePolicy(tizen_webview::Cookie_Accept_Policy policy);
   // These are the functions called when operating over cookies from the
   // network. See NetworkDelegate for further descriptions.
   bool OnCanGetCookies(const net::URLRequest& request,
@@ -131,7 +132,7 @@ private:
   scoped_refptr<content::URLRequestContextGetterEfl> request_context_getter_;
   //cookie policy information
   base::Lock lock_;
-  Ewk_Cookie_Accept_Policy cookie_policy_;
+  tizen_webview::Cookie_Accept_Policy cookie_policy_;
   // This only mutates on the UI thread.
   std::queue< EwkGetHostCallback* > host_callback_queue_;
 
