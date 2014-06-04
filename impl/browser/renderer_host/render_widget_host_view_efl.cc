@@ -251,8 +251,13 @@ void RenderWidgetHostViewEfl::SetIsLoading(bool) {
 }
 
 void RenderWidgetHostViewEfl::TextInputTypeChanged(ui::TextInputType type, ui::TextInputMode input_mode, bool can_compose_inline) {
-  if (im_context_)
+  if (im_context_) {
     im_context_->UpdateInputMethodState(type, can_compose_inline, input_mode);
+    // Make Empty Rect for inputFieldZoom Gesture
+    // Finally, the empty rect is not used.
+    gfx::Rect empty_rect = gfx::Rect(0, 0, 0, 0);
+    host_->ScrollFocusedEditableNodeIntoRect(empty_rect);
+  }
 
   //FIXME : Currently checking for input here. Later to be changed.
   // Currently in device the virtual keyboard is not appering. Once the IMF
