@@ -20,7 +20,8 @@
 #ifndef popup_picker_h
 #define popup_picker_h
 
-typedef struct _Evas_Object Evas_Object;
+#include <Evas.h>
+
 typedef struct _Elm_Object_Item Elm_Object_Item;
 typedef struct _Eina_List Eina_List;
 typedef struct Popup_Menu_Item Popup_Menu_Item;

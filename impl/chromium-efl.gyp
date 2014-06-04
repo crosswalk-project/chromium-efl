@@ -68,6 +68,8 @@
       'API/ewk_text_style_private.h',
       'API/ewk_user_media_private.h',
       'API/ewk_view_private.h',
+      'API/ewk_web_application_icon_data_private.h',
+      'API/ewk_web_application_icon_data_private.cc',
       'EdgeEffect.cpp',
       'EdgeEffect.h',
       'browser/device_sensors/data_fetcher_impl_tizen.cc',
