@@ -31,31 +31,31 @@
 
 #include <content/public/common/web_preferences.h>
 
-#include "public/ewk_settings.h"
+#include "tizen_webview/public/tw_legacy_font_size_mode.h"
 
 
 class Ewk_Settings {
   public:
     Ewk_Settings(Evas_Object* evas_object, content::WebPreferences preferences)
-        : m_preferences(preferences),
-          m_autofillPasswordForm(false),
-          m_formCandidateData(false),
-          m_autofillProfileForm(false),
-          m_textSelectionEnabled(true),
-          m_autoClearTextSelection(true),
-          m_autoSelectWord(false),
-          m_edgeEffectEnabled(true),
-          m_textZoomEnabled(true),
-          m_loadRemoteImages(true),
-          m_currentLegacyFontSizeMode(EWK_LEGACY_FONT_SIZE_MODE_ONLY_IF_PIXEL_VALUES_MATCH),
-          m_pasteImageUriEnabled(true),
-          m_defaultKeypadEnabled(true),
-          m_useKeyPadWithoutUserAction(true),
-          m_textStyleState(true),
-          m_autoFitting(false),
-          m_linkEffectEnabled(true),
-          m_detectContentsAutomatically(false),
-          m_evas_object(evas_object) { }
+        : m_preferences(preferences)
+        , m_autofillPasswordForm(false)
+        , m_formCandidateData(false)
+        , m_autofillProfileForm(false)
+        , m_textSelectionEnabled(true)
+        , m_autoClearTextSelection(true)
+        , m_autoSelectWord(false)
+        , m_edgeEffectEnabled(true)
+        , m_textZoomEnabled(true)
+        , m_loadRemoteImages(true)
+        , m_currentLegacyFontSizeMode(tizen_webview::TW_LEGACY_FONT_SIZE_MODE_ONLY_IF_PIXEL_VALUES_MATCH)
+        , m_pasteImageUriEnabled(true)
+        , m_defaultKeypadEnabled(true)
+        , m_useKeyPadWithoutUserAction(true)
+        , m_textStyleState(true)
+        , m_autoFitting(false)
+        , m_linkEffectEnabled(true)
+        , m_evas_object(evas_object)
+    { }
 
     const char* defaultTextEncoding() const { return m_defaultTextEncoding; }
     void setDefaultTextEncoding(const char*);
@@ -77,10 +77,10 @@ class Ewk_Settings {
     bool textZoomEnabled() const { return m_textZoomEnabled; }
     void setLoadRemoteImages(bool loadRemoteImages) { m_loadRemoteImages = loadRemoteImages; }
     bool loadRemoteImages() const { return m_loadRemoteImages; }
-    void setCurrentLegacyFontSizeMode(Ewk_Legacy_Font_Size_Mode mode) {
-      m_currentLegacyFontSizeMode = mode;
+    void setCurrentLegacyFontSizeMode(tizen_webview::Legacy_Font_Size_Mode mode) {
+        m_currentLegacyFontSizeMode = mode;
     }
-    Ewk_Legacy_Font_Size_Mode currentLegacyFontSizeMode() const { return m_currentLegacyFontSizeMode; }
+    tizen_webview::Legacy_Font_Size_Mode currentLegacyFontSizeMode() const { return m_currentLegacyFontSizeMode; }
     void setPasteImageUriEnabled(bool enable) { m_pasteImageUriEnabled = enable; }
     bool pasteImageUriEnabled() const {return m_pasteImageUriEnabled;}
     bool defaultKeypadEnabled() const { return m_defaultKeypadEnabled; }
@@ -113,7 +113,7 @@ class Ewk_Settings {
     bool m_edgeEffectEnabled;
     bool m_textZoomEnabled;
     bool m_loadRemoteImages;
-    Ewk_Legacy_Font_Size_Mode m_currentLegacyFontSizeMode;
+    tizen_webview::Legacy_Font_Size_Mode m_currentLegacyFontSizeMode;
     bool m_pasteImageUriEnabled;
     bool m_defaultKeypadEnabled;
     bool m_useKeyPadWithoutUserAction;
