@@ -226,3 +226,6 @@ IPC_MESSAGE_ROUTED2(EwkHostMsg_DidChangePageScaleRange,
 
 IPC_MESSAGE_ROUTED1(EwkViewMsg_SetDrawsTransparentBackground,
                     bool /* enabled */)
+
+IPC_MESSAGE_ROUTED1(EwkHostMsg_OrientationChangeEvent,
+                    int /* orientation */)

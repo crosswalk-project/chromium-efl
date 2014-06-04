@@ -33,6 +33,7 @@ class RenderViewObserverEfl: public content::RenderViewObserver {
   bool OnMessageReceived(const IPC::Message& message) OVERRIDE;
   virtual void DidCreateDocumentElement(blink::WebFrame* frame) OVERRIDE;
   virtual void DidChangeContentsSize(blink::WebFrame* frame, const blink::WebSize& size) OVERRIDE;
+  virtual void OrientationChangeEvent(int orientation) OVERRIDE;
   virtual void DidChangePageScaleFactor() OVERRIDE;
 
   //Changes in PageScaleFactorLimits are applied when layoutUpdated is called

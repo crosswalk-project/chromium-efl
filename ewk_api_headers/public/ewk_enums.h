@@ -50,7 +50,8 @@ enum _Ewk_Screen_Orientation_Degrees {
     EWK_SCREEN_ORIENTATION_NATURAL = 0,
     EWK_SCREEN_ORIENTATION_90 = 90,
     EWK_SCREEN_ORIENTATION_MINUS_90 = -90,
-    EWK_SCREEN_ORIENTATION_180 = 180
+    EWK_SCREEN_ORIENTATION_180 = 180,
+    EWK_SCREEN_ORIENTATION_270 = 270
 };
 typedef enum _Ewk_Screen_Orientation_Degrees Ewk_Screen_Orientation_Degrees;
 //#endif

@@ -484,7 +484,8 @@ void EWebView::SendOrientationChangeEventIfNeeded(int orientation) {
   if ((orientation != EWK_SCREEN_ORIENTATION_NATURAL)
       && (orientation != EWK_SCREEN_ORIENTATION_90)
       && (orientation != EWK_SCREEN_ORIENTATION_MINUS_90)
-      && (orientation != EWK_SCREEN_ORIENTATION_180))
+      && (orientation != EWK_SCREEN_ORIENTATION_180)
+      && (orientation != EWK_SCREEN_ORIENTATION_270))
     return;
   //return if no change in orientation from previous state
   if (GetCurrentOrientation() == orientation)

@@ -762,6 +762,10 @@ void RenderWidgetHostViewEfl::OnDidChangeContentsSize(int width, int height) {
   web_view_->DidChangeContentsSize(width, height);
 }
 
+void RenderWidgetHostViewEfl::OnOrientationChangeEvent(int orientation) {
+  current_orientation_ = orientation;
+}
+
 void RenderWidgetHostViewEfl::OnDidChangeMaxScrollOffset(int maxScrollX, int maxScrollY) {
   scroll_detector_->SetMaxScroll(maxScrollX, maxScrollY);
 }

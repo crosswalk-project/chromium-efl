@@ -206,6 +206,7 @@ class RenderWidgetHostViewEfl
   virtual ~RenderWidgetHostViewEfl();
 
   void OnDidChangeContentsSize(int, int);
+  void OnOrientationChangeEvent(int);
   void OnDidChangePageScaleFactor(double);
   void OnDidChangePageScaleRange(double, double);
 
@@ -253,6 +254,8 @@ class RenderWidgetHostViewEfl
   // touch-point is added from an ET_TOUCH_PRESSED event, and a touch-point is
   // removed from the list on an ET_TOUCH_RELEASED event.
   blink::WebTouchEvent touch_event_;
+
+  int current_orientation_;
 
   DISALLOW_COPY_AND_ASSIGN(RenderWidgetHostViewEfl);
 };

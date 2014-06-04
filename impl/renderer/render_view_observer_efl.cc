@@ -336,3 +336,8 @@ void RenderViewObserverEfl::OnSetDrawsTransparentBackground(bool draws_transpare
 
   view->setBaseBackgroundColor(backgroundColor);
 }
+
+void RenderViewObserverEfl::OrientationChangeEvent(int orientation)
+{
+  Send(new EwkHostMsg_OrientationChangeEvent(render_view()->GetRoutingID(), orientation));
+}
