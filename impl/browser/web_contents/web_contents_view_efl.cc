@@ -82,8 +82,10 @@ gfx::NativeView WebContentsViewEfl::GetNativeView() const {
 }
 
 gfx::NativeView WebContentsViewEfl::GetContentNativeView() const {
-  NOTIMPLEMENTED();
-  return 0;
+  RenderWidgetHostView* rwhv = web_contents_->GetRenderWidgetHostView();
+  if (!rwhv)
+    return NULL;
+  return rwhv->GetNativeView();
 }
 
 gfx::NativeWindow WebContentsViewEfl::GetTopLevelNativeWindow() const {
@@ -103,7 +105,9 @@ void WebContentsViewEfl::OnTabCrashed(base::TerminationStatus status, int error_
 }
 
 void WebContentsViewEfl::SizeContents(const gfx::Size& size) {
-  NOTIMPLEMENTED();
+  RenderWidgetHostView* rwhv = web_contents_->GetRenderWidgetHostView();
+  if (rwhv)
+    rwhv->SetSize(size);
 }
 
 void WebContentsViewEfl::Focus() {

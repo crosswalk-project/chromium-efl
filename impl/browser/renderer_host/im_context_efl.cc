@@ -247,8 +247,14 @@ void IMContextEfl::HidePanel() {
   ecore_imf_context_input_panel_hide(context_);
 }
 
-void IMContextEfl::UpdateCaretBounds(const gfx::Rect& /*caret_bounds*/) {
-  NOTIMPLEMENTED();
+void IMContextEfl::UpdateCaretBounds(const gfx::Rect& caret_bounds) {
+  if (enabled_) {
+    int x = caret_bounds.x();
+    int y = caret_bounds.y();
+    int w = caret_bounds.width();
+    int h = caret_bounds.height();
+    ecore_imf_context_cursor_location_set(context_, x, y, w, h);
+  }
 }
 
 void IMContextEfl::OnFocusIn() {
