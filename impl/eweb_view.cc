@@ -528,6 +528,9 @@ void EWebView::ExecuteEditCommand(const char* command, const char* value) {
   RenderViewHostImpl* rvhi = static_cast<RenderViewHostImpl*>(web_contents->GetRenderViewHost());
 
   rvhi->ExecuteEditCommand(command, value);
+
+  if(!strcmp(command, "InsertOrderedList") || !strcmp(command, "InsertUnorderedList"))
+    QuerySelectionStyle();
 }
 
 void EWebView::SendOrientationChangeEventIfNeeded(int orientation) {
