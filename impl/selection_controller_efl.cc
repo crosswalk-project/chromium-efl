@@ -26,7 +26,11 @@
 namespace content {
 
 static bool IsRectEmpty(const gfx::Rect& rect) {
-  return (rect.x() == 0 && rect.y() == 0 && rect.height() == 0 && rect.width() == 0);
+  if (rect.x() == 0 && rect.y() == 0 && rect.height() == 0 && rect.width() == 0) {
+    LOG(INFO) << "SelectionControllerEfl:IsRectEmpty : true";
+    return true;
+  }
+  return false;
 }
 
 SelectionControllerEfl::SelectionControllerEfl(EWebView* parent_view)
@@ -42,19 +46,33 @@ SelectionControllerEfl::SelectionControllerEfl(EWebView* parent_view)
 }
 
 void SelectionControllerEfl::SetSelectionStatus(bool enable) {
+  LOG(INFO) << "SelectionControllerEfl::SetSelectionStatus " << enable;
   selection_data_->SetStatus(enable);
 }
 
 bool SelectionControllerEfl::GetSelectionStatus() const {
+  LOG(INFO) << "SelectionControllerEfl::GetSelectionStatus " << selection_data_->GetStatus();
   return selection_data_->GetStatus();
 }
 
 void SelectionControllerEfl::SetSelectionEditable(bool enable) {
+  LOG(INFO) << "SelectionControllerEfl::SetSelectionEditable" << enable;
   selection_data_->SetEditable(enable);
 }
 
 bool SelectionControllerEfl::GetSelectionEditable() const {
+  LOG(INFO) << "SelectionControllerEfl::GetSelectionEditable " << selection_data_->GetEditable();
   return selection_data_->GetEditable();
+}
+
+void SelectionControllerEfl::SetCaretSelectionStatus(const bool enable) {
+  LOG(INFO) << "SelectionControllerEfl::SetCaretSelectionStatus : " << enable;
+  selection_data_->SetCaretSelectionStatus(enable);
+}
+
+bool SelectionControllerEfl::GetCaretSelectionStatus() const {
+  LOG(INFO) << "SelectionControllerEfl::GetCaretSelectionStatus : " << selection_data_->GetCaretSelectionStatus();
+  return selection_data_->GetCaretSelectionStatus();
 }
 
 void SelectionControllerEfl::UpdateSelectionData(const base::string16& text) {
@@ -66,12 +84,13 @@ void SelectionControllerEfl::UpdateMagnifierScreen(const SkBitmap& display_image
 }
 
 void SelectionControllerEfl::UpdateSelectionDataAndShow(const gfx::Rect& left_rect, const gfx::Rect& right_rect, bool is_anchor_first) {
+  selection_data_->UpdateRectData(left_rect, right_rect, is_anchor_first);
+
   if (!IsSelectionValid(left_rect, right_rect)) {
     Clear();
     return;
   }
 
-  selection_data_->UpdateRectData(left_rect, right_rect, is_anchor_first);
   // Do not show the context menu and handlers untill long mouse press is released
   if (long_mouse_press_)
     return;
@@ -80,19 +99,18 @@ void SelectionControllerEfl::UpdateSelectionDataAndShow(const gfx::Rect& left_re
 }
 
 void SelectionControllerEfl::ShowHandleAndContextMenuIfRequired() {
+  LOG(INFO) << "SelectionControllerEfl::ShowHandleAndContextMenuIfRequired: ";
   if (!selection_data_->GetStatus())
     return;
 
   // Is in edit field and no text is selected. show only single handle
-  if (selection_data_->IsInEditField()) {
+  if (selection_data_->IsInEditField() && GetCaretSelectionStatus()) {
     gfx::Rect left = selection_data_->GetLeftRect();
     input_handle_->SetBasePosition(gfx::Point(left.x(), left.y()));
     input_handle_->Move(gfx::Point(left.x(), left.y() + left.height()));
     input_handle_->SetCursorHandlerStatus(true);
+    input_handle_->Show();
 
-    // Do not show the context menu during selection extend
-    if (!mouse_press_)
-      parent_view_->ShowContextMenu(*(selection_data_->GetContextMenuParams()), MENU_TYPE_SELECTION);
     return;
   }
 
@@ -112,6 +130,11 @@ void SelectionControllerEfl::ShowHandleAndContextMenuIfRequired() {
   if (!mouse_press_)
     parent_view_->ShowContextMenu(*(selection_data_->GetContextMenuParams()), MENU_TYPE_SELECTION);
   parent_view_->QuerySelectionStyle();
+}
+
+void SelectionControllerEfl::HideHandle() {
+  SetCaretSelectionStatus(false);
+  Clear();
 }
 
 void SelectionControllerEfl::Clear() {
@@ -160,14 +183,27 @@ void SelectionControllerEfl::HandleLongPressEvent(const gfx::Point& touch_point)
 
 void SelectionControllerEfl::HandleLongPressMoveEvent(const gfx::Point& touch_point) {
   parent_view_->SelectClosestWord(touch_point);
+
+  if (selection_data_->GetCaretSelectionStatus()) {
+    parent_view_->MoveCaret(touch_point);
+    SetSelectionStatus(true);
+    ShowHandleAndContextMenuIfRequired();
+  } else{
+    parent_view_->SelectClosestWord(touch_point);
+  }
 }
 
 void SelectionControllerEfl::HandleLongPressEndEvent() {
   long_mouse_press_ = false;
+  if (selection_data_->GetCaretSelectionStatus()) {
+    SetSelectionStatus(true);
+    SetSelectionEditable(true);
+  }
   ShowHandleAndContextMenuIfRequired();
 }
 
 bool SelectionControllerEfl::IsSelectionValid(const gfx::Rect& left_rect, const gfx::Rect& right_rect) {
+  LOG(INFO) << "SelectionControllerEfl::IsSelectionValid, l_x = " << left_rect.x() << " l_y = " << left_rect.y() << " r_x = " << right_rect.x() << " r_y = " << right_rect.y();
   // For all normal cases the widht will be 0 and we want to check empty which Implies
   // x, y, h w all to be 0
   if ((IsRectEmpty(left_rect) || IsRectEmpty(right_rect))) {
@@ -187,15 +223,19 @@ bool SelectionControllerEfl::IsSelectionValid(const gfx::Rect& left_rect, const 
     return false;
   }
 
+  LOG(INFO) << "SelectionControllerEfl::IsSelectionValid true";
   if (!GetSelectionStatus())
     SetSelectionStatus(true);
   return true;
 }
 
 void SelectionControllerEfl::ClearSelection() {
+  LOG(INFO) << "SelectionControllerEfl::ClearSelection";
   Clear();
   parent_view_->CancelContextMenu(0);
   selection_data_->SetStatus(false);
+  SetSelectionEditable(false);
+  SetCaretSelectionStatus(false);
 }
 
 void SelectionControllerEfl::OnParentParentViewMove() {

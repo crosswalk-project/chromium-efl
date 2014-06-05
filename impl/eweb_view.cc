@@ -799,11 +799,22 @@ bool EWebView::CanDispatchToConsumer(ui::GestureConsumer* consumer) {
 }
 
 void EWebView::DispatchPostponedGestureEvent(ui::GestureEvent* event) {
+  Ewk_Settings* settings = GetSettings();
+  LOG(INFO) << "DispatchPostponedGestureEvent :: " << event->details().type();
   if (event->details().type() == ui::ET_GESTURE_LONG_PRESS) {
-    Ewk_Settings* settings = GetSettings();
+    LOG(INFO) << "DispatchPostponedGestureEvent :: ET_GESTURE_LONG_PRESS";
+    if (selection_controller_->GetSelectionEditable())
+      ClearSelection();
+
     if (settings && settings->textSelectionEnabled()) {
       _Ewk_Hit_Test* hit_test_data = RequestHitTestDataAt(event->x(), event->y(), EWK_HIT_TEST_MODE_DEFAULT);
-      if (hit_test_data
+      if (hit_test_data && hit_test_data->context & EWK_HIT_TEST_RESULT_CONTEXT_EDITABLE) {
+        LOG(INFO) << "DispatchPostponedGestureEvent :: hit_test EWK_HIT_TEST_RESULT_CONTEXT_EDITABLE";
+        selection_controller_->SetSelectionStatus(true);
+        selection_controller_->SetCaretSelectionStatus(true);
+        selection_controller_->SetSelectionEditable(true);
+        selection_controller_->HandleLongPressEvent(gfx::Point(event->x(), event->y()));
+      } else if (hit_test_data
           && !(hit_test_data->context & EWK_HIT_TEST_RESULT_CONTEXT_LINK)
           && !(hit_test_data->context & EWK_HIT_TEST_RESULT_CONTEXT_IMAGE)
           && !(hit_test_data->context & EWK_HIT_TEST_RESULT_CONTEXT_MEDIA)
@@ -811,9 +822,34 @@ void EWebView::DispatchPostponedGestureEvent(ui::GestureEvent* event) {
         selection_controller_->SetSelectionStatus(true);
         selection_controller_->HandleLongPressEvent(gfx::Point(event->x(), event->y()));
         delete hit_test_data;
+        LOG(INFO) << "DispatchPostponedGestureEvent :: !link, !image, !media, text";
+      } else if (hit_test_data && hit_test_data->context & EWK_HIT_TEST_RESULT_CONTEXT_DOCUMENT) {
+        LOG(INFO) << "DispatchPostponedGestureEvent :: EWK_HIT_TEST_RESULT_CONTEXT_DOCUMENT";
+      } else if (hit_test_data && hit_test_data->context & EWK_HIT_TEST_RESULT_CONTEXT_IMAGE) {
+        LOG(INFO) << "DispatchPostponedGestureEvent :: EWK_HIT_TEST_RESULT_CONTEXT_IMAGE";
+      } else if (hit_test_data && hit_test_data->context & EWK_HIT_TEST_RESULT_CONTEXT_LINK) {
+        ClearSelection();
+        LOG(INFO) << "DispatchPostponedGestureEvent :: EWK_HIT_TEST_RESULT_CONTEXT_LINK";
+      } else {
+        LOG(INFO) << "DispatchPostponedGestureEvent :: hit_test = " << hit_test_data->context;
       }
       rwhv()->HandleGesture(event);
     }
+  } else if (event->details().type() == ui::ET_GESTURE_SHOW_PRESS) {
+    _Ewk_Hit_Test* hit_test_data = RequestHitTestDataAt(event->x(), event->y(), EWK_HIT_TEST_MODE_DEFAULT);
+    if (hit_test_data && hit_test_data->context & EWK_HIT_TEST_RESULT_CONTEXT_EDITABLE) {
+      LOG(INFO) << "DispatchPostponedGestureEvent :: EWK_HIT_TEST_RESULT_CONTEXT_EDITABLE";
+      selection_controller_->SetSelectionStatus(true);
+      if (selection_controller_->GetSelectionEditable())
+        selection_controller_->SetCaretSelectionStatus(true);
+      else
+        selection_controller_->SetSelectionEditable(true);
+      delete hit_test_data;
+    } else {
+        selection_controller_->SetSelectionEditable(false);
+        ClearSelection();
+    }
+    rwhv()->HandleGesture(event);
   } else {
     ClearSelection();
     rwhv()->HandleGesture(event);
@@ -1149,11 +1185,14 @@ bool EWebView::GetSelectionRange(Eina_Rectangle* left_rect, Eina_Rectangle* righ
 }
 
 bool EWebView::ClearSelection() {
+    LOG(INFO) << "EWebView::ClearSelection";
     bool retval = false;
     if (selection_controller_->GetSelectionStatus()) {
-        selection_controller_->ClearSelection();
-        retval = true;
+      selection_controller_->ClearSelection();
+      retval = true;
     }
+    selection_controller_->SetSelectionEditable(false);
+    selection_controller_->SetCaretSelectionStatus(false);
 
     ExecuteEditCommand("Unselect", NULL);
     return retval;
@@ -1181,7 +1220,7 @@ void EWebView::UpdateHitTestData(const Ewk_Hit_Test& hit_test_data, const NodeAt
 }
 
 void EWebView::OnCopyFromBackingStore(bool success, const SkBitmap& bitmap) {
-  if (selection_controller_->GetSelectionStatus())
+  if (selection_controller_->GetSelectionStatus() || selection_controller_->GetCaretSelectionStatus())
     selection_controller_->UpdateMagnifierScreen(bitmap);
 }
 

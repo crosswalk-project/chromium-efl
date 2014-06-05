@@ -258,13 +258,6 @@ void RenderWidgetHostViewEfl::TextInputTypeChanged(ui::TextInputType type, ui::T
     gfx::Rect empty_rect = gfx::Rect(0, 0, 0, 0);
     host_->ScrollFocusedEditableNodeIntoRect(empty_rect);
   }
-
-  //FIXME : Currently checking for input here. Later to be changed.
-  // Currently in device the virtual keyboard is not appering. Once the IMF
-  // implementation is in place set the selection content editable.
-  SelectionControllerEfl* controller = web_view_->GetSelectionController();
-  if (controller && controller->GetSelectionStatus())
-    controller->SetSelectionEditable(true);
 }
 
 void RenderWidgetHostViewEfl::ImeCancelComposition() {
@@ -324,6 +317,7 @@ void RenderWidgetHostViewEfl::SelectionChanged(const base::string16& text,
 
 void RenderWidgetHostViewEfl::SelectionBoundsChanged(
   const ViewHostMsg_SelectionBounds_Params& params) {
+  LOG(INFO) << "RenderWidgetHostViewEfl::SelectionBoundsChanged";
   if (im_context_)
     im_context_->UpdateCaretBounds(gfx::UnionRects(params.anchor_rect, params.focus_rect));
 
@@ -689,6 +683,8 @@ void RenderWidgetHostViewEfl::HandleGesture(ui::GestureEvent* event) {
   const gfx::Point root_point = event->root_location();
   gesture.globalX = root_point.x();
   gesture.globalY = root_point.y();
+
+  LOG(INFO) << "RenderWidgetHostViewEfl::HandleGesture : type = " << event->type();
 
   if (event->type() == ui::ET_GESTURE_TAP_DOWN) {
     // Webkit does not stop a fling-scroll on tap-down. So explicitly send an

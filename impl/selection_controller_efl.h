@@ -54,6 +54,7 @@ class SelectionControllerEfl {
   // Set if selection is in edit field
   void SetSelectionEditable(bool enable);
   bool GetSelectionEditable() const;
+
   // To update the selection string
   void UpdateSelectionData(const base::string16& text);
   // To update the bitmap Image to show the magnifier
@@ -66,9 +67,13 @@ class SelectionControllerEfl {
   void OnMouseMove(const gfx::Point& touch_point, bool on_curson_handle);
   void OnMouseUp(const gfx::Point& touch_point);
 
+  void SetCaretSelectionStatus(const bool enable);
+  bool GetCaretSelectionStatus() const;
+
   // Clears the selection and hides context menu and handles
   void ClearSelection();
   EWebView* GetParentView() { return parent_view_; }
+  void HideHandle();
 
  private:
   void ShowHandleAndContextMenuIfRequired();

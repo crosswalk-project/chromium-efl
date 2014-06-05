@@ -26,6 +26,7 @@ SelectionBoxEfl::SelectionBoxEfl(EWebView* parent_view)
   : status_(false),
     editable_(false),
     is_anchor_first_(true),
+    is_caret_selection_(false),
     context_params_(new ContextMenuParams()),
     parent_view_(parent_view) {
 }
@@ -45,6 +46,7 @@ void SelectionBoxEfl::UpdateSelectStringData(const base::string16& text) {
 }
 
 void SelectionBoxEfl::UpdateRectData(const gfx::Rect& left_rect, const gfx::Rect& right_rect, bool is_anchor_first) {
+  LOG(INFO) << "SelectionBoxEfl::UpdateRectData : l_x = " << left_rect.x() << " l_y = " << left_rect.y() << " r_x = " << right_rect.x() << " r_y = " << right_rect.y();
   is_anchor_first_ = is_anchor_first;
   left_rect_ = left_rect;
   right_rect_ = right_rect;
@@ -58,7 +60,12 @@ void SelectionBoxEfl::UpdateRectData(const gfx::Rect& left_rect, const gfx::Rect
 }
 
 bool SelectionBoxEfl::IsInEditField() const {
-  return (editable_ && !(left_rect_.width() && !(left_rect_.height())));
+  if (editable_ && !(left_rect_.width() && !(left_rect_.height()))) {
+    LOG(INFO) << "SelectionBoxEfl::IsInEditField : true";
+    return true;
+  }
+  LOG(INFO) << "SelectionBoxEfl::IsInEditField : false";
+  return false;
 }
 
 }
