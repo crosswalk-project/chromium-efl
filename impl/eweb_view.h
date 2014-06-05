@@ -204,11 +204,6 @@ class EWebView
   {
     return EWebViewCallbacks::CallBack<callbackType>(evas_object_);
   }
-  //return current orientation of device
-  Ewk_Screen_Orientation_Degrees GetCurrentOrientation() const
-  {
-    return orientation_;
-  }
 
   void set_magnifier(bool status);
 
@@ -442,14 +437,6 @@ class EWebView
   scoped_ptr<Ewk_Settings> settings_;
   scoped_ptr<Ewk_Policy_Decision> window_policy_;
   Evas_Object* evas_object_;
-/*
- * orientation will be 0 degrees when the device is oriented to natural position,
- *                     90 degrees when it's left side is at the top,
- *                    -90 degrees when it's right side is at the top,
- *                     180 degrees when it is upside down.
- */
-  Ewk_Screen_Orientation_Degrees orientation_;//current orientation of device in degrees
-
   bool touch_events_enabled_;
   bool mouse_events_enabled_;
   scoped_ptr<ui::GestureRecognizer> gesture_recognizer_;

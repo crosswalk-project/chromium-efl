@@ -33,23 +33,6 @@ enum _Ewk_Gesture_Type {
 };
 typedef enum _Ewk_Gesture_Type Ewk_Gesture_Type;
 
-enum _Ewk_Screen_Orientation {
-    EWK_SCREEN_ORIENTATION_PORTRAIT_PRIMARY = 1,
-    EWK_SCREEN_ORIENTATION_LANDSCAPE_PRIMARY = 1 << 1,
-    EWK_SCREEN_ORIENTATION_PORTRAIT_SECONDARY = 1 << 2,
-    EWK_SCREEN_ORIENTATION_LANDSCAPE_SECONDARY = 1 << 3
-};
-typedef enum _Ewk_Screen_Orientation Ewk_Screen_Orientation;
-
-enum _Ewk_Screen_Orientation_Degrees {
-    EWK_SCREEN_ORIENTATION_NATURAL = 0,
-    EWK_SCREEN_ORIENTATION_90 = 90,
-    EWK_SCREEN_ORIENTATION_MINUS_90 = -90,
-    EWK_SCREEN_ORIENTATION_180 = 180,
-    EWK_SCREEN_ORIENTATION_270 = 270
-};
-typedef enum _Ewk_Screen_Orientation_Degrees Ewk_Screen_Orientation_Degrees;
-
 #ifdef __cplusplus
 }
 #endif

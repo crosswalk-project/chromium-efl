@@ -70,6 +70,7 @@
 #include <iostream>
 
 using namespace content;
+using namespace tizen_webview;
 
 namespace {
 
@@ -260,7 +261,6 @@ void EWebView::set_renderer_crashed() {
 EWebView::EWebView(EWebContext* context, Evas_Object* object)
     : context_(context),
       evas_object_(object),
-      orientation_(EWK_SCREEN_ORIENTATION_NATURAL),
       touch_events_enabled_(false),
       mouse_events_enabled_(false),
       gesture_recognizer_(ui::GestureRecognizer::Create()),
@@ -553,24 +553,13 @@ void EWebView::ExecuteEditCommand(const char* command, const char* value) {
 }
 
 void EWebView::SendOrientationChangeEventIfNeeded(int orientation) {
-  if ((orientation != EWK_SCREEN_ORIENTATION_NATURAL)
-      && (orientation != EWK_SCREEN_ORIENTATION_90)
-      && (orientation != EWK_SCREEN_ORIENTATION_MINUS_90)
-      && (orientation != EWK_SCREEN_ORIENTATION_180)
-      && (orientation != EWK_SCREEN_ORIENTATION_270))
-    return;
-  //return if no change in orientation from previous state
-  if (GetCurrentOrientation() == orientation)
-    return;
-  //set the new orientation value
-  orientation_ = static_cast<Ewk_Screen_Orientation_Degrees>(orientation);
   WebContents* web_contents = web_contents_delegate_->web_contents();
   RenderViewHostImpl* rvhi = static_cast<RenderViewHostImpl*>(
                              web_contents->GetRenderViewHost());
 #warning "[M37] Fix screen orientation"
 #if 0
   //send new orientation value to RenderView Host to pass to renderer
-  if (rvhi)
+  if(rvhi && rvhi->GetOrientation() != orientation)
     rvhi->SendOrientationChangeEvent(orientation);
 #endif
 }
