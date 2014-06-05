@@ -920,27 +920,27 @@ void EWebView::DispatchPostponedGestureEvent(ui::GestureEvent* event) {
       ClearSelection();
 
     if (settings && settings->textSelectionEnabled()) {
-      _Ewk_Hit_Test* hit_test_data = RequestHitTestDataAt(event->x(), event->y(), EWK_HIT_TEST_MODE_DEFAULT);
-      if (hit_test_data && hit_test_data->context & EWK_HIT_TEST_RESULT_CONTEXT_EDITABLE) {
+      _Ewk_Hit_Test* hit_test_data = RequestHitTestDataAt(event->x(), event->y(), TW_HIT_TEST_MODE_DEFAULT);
+      if (hit_test_data && hit_test_data->context & TW_HIT_TEST_RESULT_CONTEXT_EDITABLE) {
         selection_controller_->SetSelectionStatus(true);
         selection_controller_->SetCaretSelectionStatus(true);
         selection_controller_->SetSelectionEditable(true);
         selection_controller_->HandleLongPressEvent(rwhv()->ConvertPointInViewPix(gfx::Point(event->x(), event->y())));
       } else if (hit_test_data
-          && !(hit_test_data->context & EWK_HIT_TEST_RESULT_CONTEXT_LINK)
-          && !(hit_test_data->context & EWK_HIT_TEST_RESULT_CONTEXT_IMAGE)
-          && !(hit_test_data->context & EWK_HIT_TEST_RESULT_CONTEXT_MEDIA)
-          && hit_test_data->context & EWK_HIT_TEST_RESULT_CONTEXT_TEXT) {
+          && !(hit_test_data->context & TW_HIT_TEST_RESULT_CONTEXT_LINK)
+          && !(hit_test_data->context & TW_HIT_TEST_RESULT_CONTEXT_IMAGE)
+          && !(hit_test_data->context & TW_HIT_TEST_RESULT_CONTEXT_MEDIA)
+          && hit_test_data->context & TW_HIT_TEST_RESULT_CONTEXT_TEXT) {
         selection_controller_->SetSelectionStatus(true);
         selection_controller_->HandleLongPressEvent(rwhv()->ConvertPointInViewPix(gfx::Point(event->x(), event->y())));
         LOG(INFO) << __PRETTY_FUNCTION__ << ":: link, !image, !media, text";
-      } else if (hit_test_data && hit_test_data->context & EWK_HIT_TEST_RESULT_CONTEXT_DOCUMENT) {
-        LOG(INFO) << __PRETTY_FUNCTION__ << ":: EWK_HIT_TEST_RESULT_CONTEXT_DOCUMENT";
-      } else if (hit_test_data && hit_test_data->context & EWK_HIT_TEST_RESULT_CONTEXT_IMAGE) {
-        LOG(INFO) << __PRETTY_FUNCTION__ << ":: EWK_HIT_TEST_RESULT_CONTEXT_IMAGE";
-      } else if (hit_test_data && hit_test_data->context & EWK_HIT_TEST_RESULT_CONTEXT_LINK) {
+      } else if (hit_test_data && hit_test_data->context & TW_HIT_TEST_RESULT_CONTEXT_DOCUMENT) {
+        LOG(INFO) << __PRETTY_FUNCTION__ << ":: TW_HIT_TEST_RESULT_CONTEXT_DOCUMENT";
+      } else if (hit_test_data && hit_test_data->context & TW_HIT_TEST_RESULT_CONTEXT_IMAGE) {
+        LOG(INFO) << __PRETTY_FUNCTION__ << ":: TW_HIT_TEST_RESULT_CONTEXT_IMAGE";
+      } else if (hit_test_data && hit_test_data->context & TW_HIT_TEST_RESULT_CONTEXT_LINK) {
         ClearSelection();
-        LOG(INFO) << __PRETTY_FUNCTION__ << ":: EWK_HIT_TEST_RESULT_CONTEXT_LINK";
+        LOG(INFO) << __PRETTY_FUNCTION__ << ":: TW_HIT_TEST_RESULT_CONTEXT_LINK";
       } else {
         LOG(INFO) << __PRETTY_FUNCTION__ << ":: hit_test = " << hit_test_data->context;
       }
@@ -948,10 +948,10 @@ void EWebView::DispatchPostponedGestureEvent(ui::GestureEvent* event) {
       rwhv()->HandleGesture(event);
     }
   } else if ((event->details().type() == ui::ET_GESTURE_TAP) || (event->details().type() == ui::ET_GESTURE_SHOW_PRESS))  {
-    _Ewk_Hit_Test* hit_test_data = RequestHitTestDataAt(event->x(), event->y(), EWK_HIT_TEST_MODE_DEFAULT);
+    _Ewk_Hit_Test* hit_test_data = RequestHitTestDataAt(event->x(), event->y(), TW_HIT_TEST_MODE_DEFAULT);
     LOG(INFO) << __PRETTY_FUNCTION__ << " hit_test = " << hit_test_data;
-    if (hit_test_data && hit_test_data->context & EWK_HIT_TEST_RESULT_CONTEXT_EDITABLE) {
-      LOG(INFO) << "DispatchPostponedGestureEvent :: EWK_HIT_TEST_RESULT_CONTEXT_EDITABLE";
+    if (hit_test_data && hit_test_data->context & TW_HIT_TEST_RESULT_CONTEXT_EDITABLE) {
+      LOG(INFO) << "DispatchPostponedGestureEvent :: TW_HIT_TEST_RESULT_CONTEXT_EDITABLE";
       selection_controller_->SetSelectionStatus(true);
       if (selection_controller_->GetSelectionEditable()) {
         selection_controller_->HideHandle();
@@ -959,9 +959,9 @@ void EWebView::DispatchPostponedGestureEvent(ui::GestureEvent* event) {
       } else
         selection_controller_->SetSelectionEditable(true);
     } else {
-      if (hit_test_data && hit_test_data->context & EWK_HIT_TEST_RESULT_CONTEXT_DOCUMENT)
+      if (hit_test_data && hit_test_data->context & TW_HIT_TEST_RESULT_CONTEXT_DOCUMENT)
         LOG(INFO) << __PRETTY_FUNCTION__ << " DOCUMENT";
-      if (hit_test_data && hit_test_data->context & EWK_HIT_TEST_RESULT_CONTEXT_TEXT)
+      if (hit_test_data && hit_test_data->context & TW_HIT_TEST_RESULT_CONTEXT_TEXT)
         LOG(INFO) << __PRETTY_FUNCTION__ << " TEXT";
 
       selection_controller_->SetSelectionEditable(false);
@@ -1469,7 +1469,7 @@ bool EWebView::ClearSelection() {
     return retval;
 }
 
-Ewk_Hit_Test* EWebView::RequestHitTestDataAt(int x, int y, Ewk_Hit_Test_Mode mode) {
+Ewk_Hit_Test* EWebView::RequestHitTestDataAt(int x, int y, tizen_webview::Hit_Test_Mode mode) {
   RenderViewHost* render_view_host = web_contents_delegate()->web_contents()->GetRenderViewHost();
   DCHECK(render_view_host);
 

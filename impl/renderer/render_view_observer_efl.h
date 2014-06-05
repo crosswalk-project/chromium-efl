@@ -6,9 +6,9 @@
 #include "public/ewk_view.h"
 #include "renderer/print_web_view_helper_efl.h"
 #include "content/public/renderer/render_view_observer.h"
-#include "public/ewk_hit_test.h"
 #include "API/ewk_hit_test_private.h"
 #include "third_party/WebKit/public/platform/WebSize.h"
+#include "tizen_webview/public/tw_hit_test.h"
 
 namespace base {
 class FilePath;
@@ -48,7 +48,7 @@ class RenderViewObserverEfl: public content::RenderViewObserver {
   void OnPlainTextGet(int plain_text_get_callback_id);
   void OnGetSelectionStyle();
   void OnSelectClosestWord(int x, int y);
-  void OnDoHitTest(int x, int y, Ewk_Hit_Test_Mode mode);
+  void OnDoHitTest(int x, int y, tizen_webview::Hit_Test_Mode mode);
   void OnPrintToPdf(int width, int height, const base::FilePath& filename);
   void OnGetMHTMLData(int callback_id);
   void OnSetDrawsTransparentBackground(bool enabled);

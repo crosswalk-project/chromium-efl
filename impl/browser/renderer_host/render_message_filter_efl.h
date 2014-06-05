@@ -23,7 +23,7 @@
 #include "API/ewk_hit_test_private.h"
 #include "base/compiler_specific.h"
 #include "content/public/browser/browser_message_filter.h"
-#include "public/ewk_hit_test.h"
+#include "API/ewk_hit_test_private.h"
 #include "third_party/WebKit/public/web/WebNavigationPolicy.h"
 #include "third_party/WebKit/public/web/WebNavigationType.h"
 #include "url/gurl.h"

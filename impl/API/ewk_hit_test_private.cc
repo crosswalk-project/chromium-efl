@@ -20,15 +20,16 @@
 
 #include "ewk_hit_test_private.h"
 
+using namespace tizen_webview;
+
 static void FreeHitTestAttributeHashData(void* data) {
-  eina_stringshare_del(static_cast<Eina_Stringshare*>(data));
-}
+   eina_stringshare_del(static_cast<Eina_Stringshare*>(data));
+ }
 
 _Ewk_Hit_Test::_Ewk_Hit_Test()
-    : context(EWK_HIT_TEST_RESULT_CONTEXT_DOCUMENT),
-      isEditable(false),
-      mode(EWK_HIT_TEST_MODE_DEFAULT) {
-
+  : context(TW_HIT_TEST_RESULT_CONTEXT_DOCUMENT),
+    isEditable(false),
+    mode(TW_HIT_TEST_MODE_DEFAULT) {
 }
 
 _Ewk_Hit_Test::_Ewk_Hit_Test(const _Ewk_Hit_Test& other)

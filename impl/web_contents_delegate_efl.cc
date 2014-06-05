@@ -13,7 +13,6 @@
 #include "eweb_view.h"
 #include "eweb_view_callbacks.h"
 #include "public/ewk_custom_handlers.h"
-#include "public/ewk_hit_test.h"
 #include "public/ewk_view.h"
 #include "public/ewk_policy_decision.h"
 

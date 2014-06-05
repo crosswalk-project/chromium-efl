@@ -28,6 +28,8 @@
 #include "third_party/WebKit/Source/config.h"
 #include "third_party/WebKit/Source/platform/fonts/FontCache.h"
 
+using namespace tizen_webview;
+
 namespace {
 
 bool GetGRBAValuesFromString(const std::string& input, int* r, int* g, int* b, int* a)
@@ -66,7 +68,7 @@ void PopulateEwkHitTestData(const blink::WebHitTestResult& web_hit_test, Ewk_Hit
   ewk_hit_test->linkTitle = web_hit_test.titleDisplayString().utf8();
   ewk_hit_test->isEditable = web_hit_test.isContentEditable();
 
-  int context = EWK_HIT_TEST_RESULT_CONTEXT_DOCUMENT;
+  int context = TW_HIT_TEST_RESULT_CONTEXT_DOCUMENT;
   if (!web_hit_test.absoluteLinkURL().isEmpty())
     context |= TW_HIT_TEST_RESULT_CONTEXT_LINK;
   if (!web_hit_test.absoluteImageURL().isEmpty())
@@ -74,22 +76,22 @@ void PopulateEwkHitTestData(const blink::WebHitTestResult& web_hit_test, Ewk_Hit
   if (!web_hit_test.absoluteMediaURL().isEmpty())
     context |= TW_HIT_TEST_RESULT_CONTEXT_MEDIA;;
   if (web_hit_test.isSelected())
-    context |= EWK_HIT_TEST_RESULT_CONTEXT_SELECTION;
+    context |= TW_HIT_TEST_RESULT_CONTEXT_SELECTION;
   if (web_hit_test.isContentEditable())
-    context |= EWK_HIT_TEST_RESULT_CONTEXT_EDITABLE;
+    context |= TW_HIT_TEST_RESULT_CONTEXT_EDITABLE;
   if (web_hit_test.node().isTextNode())
-    context |= EWK_HIT_TEST_RESULT_CONTEXT_TEXT;
+    context |= TW_HIT_TEST_RESULT_CONTEXT_TEXT;
 
-  ewk_hit_test->context = static_cast<Ewk_Hit_Test_Result_Context>(context);
+  ewk_hit_test->context = static_cast<tizen_webview::Hit_Test_Result_Context>(context);
   ewk_hit_test->nodeData.attributeHash = 0;
 
-  if (ewk_hit_test->mode & EWK_HIT_TEST_MODE_NODE_DATA) {
+  if (ewk_hit_test->mode & TW_HIT_TEST_MODE_NODE_DATA) {
     ewk_hit_test->nodeData.tagName = web_hit_test.node().nodeName().utf8();
     ewk_hit_test->nodeData.nodeValue = web_hit_test.node().nodeValue().utf8();
   }
 
-  if ((ewk_hit_test->mode & EWK_HIT_TEST_MODE_IMAGE_DATA) &&
-      (ewk_hit_test->context & EWK_HIT_TEST_RESULT_CONTEXT_IMAGE)) {
+  if ((ewk_hit_test->mode & TW_HIT_TEST_MODE_IMAGE_DATA) &&
+      (ewk_hit_test->context & TW_HIT_TEST_RESULT_CONTEXT_IMAGE)) {
     blink::WebElement hit_element = web_hit_test.node().toConst<blink::WebElement>();
     ewk_hit_test->imageData.imageBitmap = hit_element.imageContents().getSkBitmap();
     ewk_hit_test->imageData.fileNameExtension = hit_element.imageFilenameExtension().utf8();
@@ -265,7 +267,7 @@ void RenderViewObserverEfl::OnSelectClosestWord(int x, int y)
   frame->selectClosestWord(x, y);
 }
 
-void RenderViewObserverEfl::OnDoHitTest(int view_x, int view_y, Ewk_Hit_Test_Mode mode)
+void RenderViewObserverEfl::OnDoHitTest(int view_x, int view_y, tizen_webview::Hit_Test_Mode mode)
 {
   if (!render_view() || !render_view()->GetWebView())
     return;
@@ -278,7 +280,7 @@ void RenderViewObserverEfl::OnDoHitTest(int view_x, int view_y, Ewk_Hit_Test_Mod
 
   PopulateEwkHitTestData(web_hit_test_result, &ewk_hit_test_result);
   NodeAttributesMap attributes;
-  if (ewk_hit_test_result.mode & EWK_HIT_TEST_MODE_NODE_DATA)
+  if (ewk_hit_test_result.mode & TW_HIT_TEST_MODE_NODE_DATA)
     PopulateNodeAttributesMapFromHitTest(web_hit_test_result, &attributes);
 
   Send(new EwkViewHostMsg_HitTestReply(routing_id(), ewk_hit_test_result, attributes));

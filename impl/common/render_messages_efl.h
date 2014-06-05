@@ -11,13 +11,14 @@
 #include "API/ewk_ipc_message_private.h"
 #include "cache_params_efl.h"
 #include "public/ewk_view.h"
-#include "public/ewk_hit_test.h"
 #include "navigation_policy_params.h"
 #include "public/ewk_ipc_message.h"
 #include "renderer/print_pages_params.h"
 #include "third_party/WebKit/public/web/WebNavigationPolicy.h"
 #include "third_party/WebKit/public/web/WebNavigationType.h"
 #include "url/gurl.h"
+
+#include "tizen_webview/public/tw_hit_test.h"
 
 #include <string>
 #include <map>
@@ -79,8 +80,8 @@ IPC_STRUCT_TRAITS_BEGIN(SelectionStylePrams)
   IPC_STRUCT_TRAITS_MEMBER(has_composition)
 IPC_STRUCT_TRAITS_END()
 
-IPC_ENUM_TRAITS(Ewk_Hit_Test_Mode)
-IPC_ENUM_TRAITS(Ewk_Hit_Test_Result_Context)
+IPC_ENUM_TRAITS(tizen_webview::Hit_Test_Mode)
+IPC_ENUM_TRAITS(tizen_webview::Hit_Test_Result_Context)
 
 IPC_STRUCT_TRAITS_BEGIN(Ewk_Hit_Test::Hit_Test_Node_Data)
   IPC_STRUCT_TRAITS_MEMBER(tagName)
@@ -155,7 +156,7 @@ IPC_MESSAGE_ROUTED2(EwkViewMsg_SetScroll,
 IPC_MESSAGE_ROUTED3(EwkViewMsg_DoHitTest,
                     int, /* horizontal position */
                     int, /* vertical position */
-                    Ewk_Hit_Test_Mode /* mode */)
+                    tizen_webview::Hit_Test_Mode /* mode */)
 
 IPC_MESSAGE_ROUTED3(EwkViewMsg_PrintToPdf,
                     int, /* width */

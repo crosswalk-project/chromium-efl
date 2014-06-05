@@ -10,7 +10,6 @@
 #include "browser_context_efl.h"
 #include "eweb_view.h"
 #include "public/ewk_ipc_message.h"
-#include "public/ewk_hit_test.h"
 #include "content/public/browser/web_contents.h"
 #include "content/public/browser/web_contents_delegate.h"
 #include "content/public/common/frame_navigate_params.h"

@@ -58,6 +58,8 @@
 #include "ui/gfx/size.h"
 #include "browser/inputpicker/InputPicker.h"
 #include "third_party/WebKit/Source/platform/text/TextDirection.h"
+#include "tizen_webview/public/tw_hit_test.h"
+
 #ifdef TIZEN_CONTENTS_DETECTION
 #include "popup_controller_efl.h"
 #endif
@@ -289,7 +291,7 @@ class EWebView
       NavigationPolicyParams params, bool* handled);
   void UseSettingsFont();
 
-  Ewk_Hit_Test* RequestHitTestDataAt(int x, int y, Ewk_Hit_Test_Mode mode);
+  Ewk_Hit_Test* RequestHitTestDataAt(int x, int y, tizen_webview::Hit_Test_Mode mode);
   void UpdateHitTestData(const Ewk_Hit_Test& hit_test_data, const NodeAttributesMap& node_attributes);
 
   int current_find_request_id() const { return current_find_request_id_; }

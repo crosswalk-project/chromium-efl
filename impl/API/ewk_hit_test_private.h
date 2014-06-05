@@ -29,6 +29,7 @@
 #include "third_party/skia/include/core/SkBitmap.h"
 
 #include "public/ewk_hit_test.h"
+#include "tizen_webview/public/tw_hit_test.h"
 
 typedef std::map<std::string, std::string> NodeAttributesMap;
 
@@ -37,14 +38,14 @@ struct _Ewk_Hit_Test {
   _Ewk_Hit_Test();
   _Ewk_Hit_Test(const _Ewk_Hit_Test& other);
 
-  Ewk_Hit_Test_Result_Context context;
+  tizen_webview::Hit_Test_Result_Context context;
   std::string linkURI;
   std::string linkTitle; // the title of link
   std::string linkLabel; // the text of the link
   std::string imageURI;
   std::string mediaURI;
   bool isEditable;
-  Ewk_Hit_Test_Mode mode;
+  tizen_webview::Hit_Test_Mode mode;
 
   // store node attributes in a map
   struct Hit_Test_Node_Data {
