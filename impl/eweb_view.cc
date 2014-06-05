@@ -274,7 +274,8 @@ EWebView::EWebView(tizen_webview::WebContext* context, Evas_Object* object)
       hit_test_completion_(false, false),
       page_scale_factor_(1.0),
       min_page_scale_factor_(-1.0),
-      max_page_scale_factor_(-1.0)
+      max_page_scale_factor_(-1.0),
+      inspector_server_(NULL)
 #ifdef TIZEN_EDGE_EFFECT
       , edge_effect_(EdgeEffect::create(object))
 #endif
@@ -333,6 +334,10 @@ EWebView::EWebView(tizen_webview::WebContext* context, Evas_Object* object)
 }
 
 EWebView::~EWebView() {
+  if (inspector_server_) {
+    inspector_server_->Stop();
+    inspector_server_ = NULL;
+  }
   EWebEventHandler<EVAS_CALLBACK_FOCUS_IN>::Unsubscribe(evas_object());
   EWebEventHandler<EVAS_CALLBACK_FOCUS_OUT>::Unsubscribe(evas_object());
   EWebEventHandler<EVAS_CALLBACK_KEY_DOWN>::Unsubscribe(evas_object());
@@ -2003,8 +2008,12 @@ std::string EWebView::GetErrorPage(const std::string& invalidUrl) {
    return html;
 }
 
-int EWebView::StartInspectorServer() {
-  return content::DevToolsDelegateEfl::StartDevTools();
+int EWebView::StartInspectorServer(int port) {
+  if (inspector_server_) {
+    inspector_server_->Stop(); // Asynchronous releas inside Stop()
+  }
+  inspector_server_ = new content::DevToolsDelegateEfl(port);
+  return inspector_server_ ? inspector_server_->port() : 0;
 }
 
 #if defined(OS_TIZEN_MOBILE)

@@ -82,6 +82,7 @@ class RenderViewHost;
 class RenderWidgetHostViewEfl;
 class WebContentsDelegateEfl;
 class ContextMenuControllerEfl;
+class DevToolsDelegateEfl;
 #ifdef TIZEN_CONTENTS_DETECTION
 class PopupControllerEfl;
 #endif
@@ -365,7 +366,8 @@ class EWebView
 
   bool IsIMEShow();
   gfx::Rect GetIMERect();
-  int StartInspectorServer();
+  // Returns TCP port number with Inspector, or 0 if error.
+  int StartInspectorServer(int = 0);
 
   std::string GetErrorPage(const std::string& invalidUrl);
   void UpdateMagnifierScreen(const SkBitmap& bitmap);
@@ -494,6 +496,7 @@ class EWebView
   IDMap<WebApplicationIconUrlGetCallback, IDMapOwnPointer> web_app_icon_url_get_callback_map_;
   IDMap<WebApplicationIconUrlsGetCallback, IDMapOwnPointer> web_app_icon_urls_get_callback_map_;
   IDMap<WebApplicationCapableGetCallback, IDMapOwnPointer> web_app_capable_get_callback_map_;
+  content::DevToolsDelegateEfl* inspector_server_;
 #ifdef TIZEN_EDGE_EFFECT
   scoped_refptr<EdgeEffect> edge_effect_;
 #endif

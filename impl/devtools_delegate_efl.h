@@ -17,7 +17,7 @@ class DevToolsHttpHandler;
 class DevToolsDelegateEfl : public DevToolsHttpHandlerDelegate {
  public:
   // explicit ChromiumEflDevToolsDelegate();
-  explicit DevToolsDelegateEfl();
+  explicit DevToolsDelegateEfl(int = 0);
   virtual ~DevToolsDelegateEfl();
 
   // Stops http server.
@@ -36,10 +36,12 @@ class DevToolsDelegateEfl : public DevToolsHttpHandlerDelegate {
   DevToolsHttpHandler* devtools_http_handler() {
     return devtools_http_handler_;
   }
-  static int StartDevTools();
+  int port() const {
+    return port_;
+  }
 
  private:
-
+  int port_;
   BrowserContext* browser_context_;
   DevToolsHttpHandler* devtools_http_handler_;
 
