@@ -34,6 +34,7 @@ namespace net {
 class URLRequestContextGetter;
 }
 namespace content {
+class AppCacheService;
 class BrowserContext;
 class DOMStorageContext;
 struct LocalStorageUsageInfo;
@@ -50,9 +51,10 @@ class BrowsingDataRemoverEfl {
   // Mask used for Remove.
   enum RemoveDataMask {
     REMOVE_LOCAL_STORAGE = 1 << 0,
-    REMOVE_INDEXEDDB = 1 << 1,
-    REMOVE_WEBSQL = 1 << 2,
-    REMOVE_FILE_SYSTEMS = 1 << 3,
+    REMOVE_INDEXEDDB     = 1 << 1,
+    REMOVE_WEBSQL        = 1 << 2,
+    REMOVE_FILE_SYSTEMS  = 1 << 3,
+    REMOVE_APPCACHE      = 1 << 4,
   };
 
   static BrowsingDataRemoverEfl* CreateForUnboundedRange(content::BrowserContext*);
@@ -62,8 +64,11 @@ class BrowsingDataRemoverEfl {
   virtual ~BrowsingDataRemoverEfl();
   void ClearNetworkCache();
 
+  // deletes app cache for given origin
+  void DeleteAppCachesForOrigin(const GURL& origin);
+
  protected:
-  BrowsingDataRemoverEfl(content::BrowserContext*, base::Time, base::Time);
+  BrowsingDataRemoverEfl(content::BrowserContext*, base::Time start, base::Time end);
 
   // Quota managed data uses a different bitmask for types than
   // BrowsingDataRemover uses. This method generates that mask.
@@ -107,6 +112,7 @@ class BrowsingDataRemoverEfl {
   void DeleteIfDone();
 
   content::BrowserContext* browser_context_;
+  content::AppCacheService* app_cache_service_;
 
   // The QuotaManager is owned by the profile; we can use a raw pointer here,
   // and rely on the profile to destroy the object whenever it's reasonable.

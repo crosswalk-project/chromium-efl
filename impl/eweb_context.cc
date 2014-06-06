@@ -104,24 +104,6 @@ void SetProxyConfigCallbackOnIOThread(base::WaitableEvent* done,
   done->Signal();
 }
 
-void DeleteApplicationCacheCallback() {
-  // no implementation needed; callback is just to prevent segmentation fault caused by null callback
-}
-
-void DeleteApplicationCache(content::StoragePartition* partition) {
-  const GURL storage_origin;
-  const content::StoragePartition::OriginMatcherFunction origin_matcher;
-  const base::Time begin;
-  const base::Time end;
-  const base::Closure callback = base::Bind(&DeleteApplicationCacheCallback);
-
-  // FIXME: M34 API change demands above values to be passed as arguments.
-  //        For now, not sure how to get/set the values, so passing dummy values.
-  partition->ClearData(content::StoragePartition::REMOVE_DATA_MASK_APPCACHE,
-                       content::StoragePartition::QUOTA_MANAGED_STORAGE_MASK_ALL,
-                       storage_origin, origin_matcher, begin, end, callback);
-}
-
 void OnOriginsWithApplicationCacheObtained(tizen_webview::Web_Application_Cache_Origins_Get_Callback callback,
                                            void* user_data,
                                            scoped_refptr<content::AppCacheInfoCollection> collection,
@@ -346,7 +328,8 @@ Ewk_Cookie_Manager* EWebContext::ewkCookieManager() {
 }
 
 void EWebContext::DeleteAllApplicationCache() {
-  BrowserContext::ForEachStoragePartition(browser_context_.get(), base::Bind(&DeleteApplicationCache));
+  BrowsingDataRemoverEfl* remover = BrowsingDataRemoverEfl::CreateForUnboundedRange(browser_context_.get());
+  remover->RemoveImpl(BrowsingDataRemoverEfl::REMOVE_APPCACHE, GURL());
 }
 
 void EWebContext::DeleteApplicationCacheForSite(const tizen_webview::URL& site) {

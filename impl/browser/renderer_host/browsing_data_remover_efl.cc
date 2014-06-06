@@ -31,6 +31,7 @@
 #include "content/public/browser/notification_types.h"
 #include "content/public/browser/render_process_host.h"
 #include "content/public/browser/storage_partition.h"
+#include "net/base/completion_callback.h"
 #include "net/base/net_errors.h"
 #include "net/disk_cache/disk_cache.h"
 #include "net/http/http_cache.h"
@@ -38,6 +39,7 @@
 #include "net/url_request/url_request_context_getter.h"
 #include "webkit/browser/quota/quota_manager.h"
 #include "webkit/common/quota/quota_types.h"
+#include "content/browser/appcache/appcache_service_impl.h"
 
 BrowsingDataRemoverEfl* BrowsingDataRemoverEfl::CreateForUnboundedRange(content::BrowserContext* profile) {
   return new BrowsingDataRemoverEfl(profile, base::Time(), base::Time::Max());
@@ -63,17 +65,23 @@ int BrowsingDataRemoverEfl::GenerateQuotaClientMask(int remove_mask) {
 BrowsingDataRemoverEfl::BrowsingDataRemoverEfl(content::BrowserContext* browser_context, base::Time delete_begin,
   base::Time delete_end)
   : browser_context_(browser_context)
+  , app_cache_service_(NULL)
   , quota_manager_(NULL)
   , dom_storage_context_(NULL)
   , delete_begin_(delete_begin)
   , delete_end_(delete_end)
   , next_cache_state_(STATE_NONE)
   , cache_(NULL)
-  , main_context_getter_(browser_context->GetRequestContext())
-  , media_context_getter_(browser_context->GetMediaRequestContext())
+  , main_context_getter_(NULL)
+  , media_context_getter_(NULL)
   , waiting_for_clear_cache_(false)
   , waiting_for_clear_local_storage_(false)
   , waiting_for_clear_quota_managed_data_(false) {
+  if (browser_context_) {
+    app_cache_service_ = browser_context->GetStoragePartition(browser_context_, NULL)->GetAppCacheService();
+    main_context_getter_ = browser_context->GetRequestContext();
+    media_context_getter_ = browser_context->GetMediaRequestContext();
+  }
 }
 
 BrowsingDataRemoverEfl::~BrowsingDataRemoverEfl() {
@@ -187,33 +195,69 @@ void BrowsingDataRemoverEfl::DeleteIfDone() {
   base::MessageLoop::current()->DeleteSoon(FROM_HERE, this);
 }
 
+typedef void (*Application_Cache_Origins_Get_Callback)(void* origins, void* user_data);
+
+void OnGotOriginsWithApplicationCache(Application_Cache_Origins_Get_Callback callback,
+                                      void* user_data,
+                                      scoped_refptr<content::AppCacheInfoCollection> collection,
+                                      int result){
+   BrowsingDataRemoverEfl* BRDE = static_cast<BrowsingDataRemoverEfl*>(user_data);
+   //information about end of process is not needed so cb left empty
+   net::CompletionCallback cb;
+   for (map<GURL, content::AppCacheInfoVector>::iterator iter = collection->infos_by_origin.begin();
+       iter != collection->infos_by_origin.end();
+       ++iter) {
+     BRDE->DeleteAppCachesForOrigin(iter->first);
+   }
+}
+
 void BrowsingDataRemoverEfl::RemoveImpl(int remove_mask,
                                         const GURL& origin) {
   DCHECK(content::BrowserThread::CurrentlyOn(content::BrowserThread::UI));
-
   remove_mask_ = remove_mask;
   remove_origin_ = origin;
 
   if (remove_mask & REMOVE_LOCAL_STORAGE) {
     waiting_for_clear_local_storage_ = true;
-
-    if (!dom_storage_context_)
+    if (!dom_storage_context_) {
       dom_storage_context_ = content::BrowserContext::GetStoragePartition(browser_context_, NULL)->GetDOMStorageContext();
-      ClearLocalStorageOnUIThread();
+    }
+    ClearLocalStorageOnUIThread();
   }
 
-  if (remove_mask & REMOVE_INDEXEDDB
-      || remove_mask & REMOVE_WEBSQL
-      || remove_mask & REMOVE_FILE_SYSTEMS) {
-    if (!quota_manager_)
+  if (remove_mask & REMOVE_INDEXEDDB || remove_mask & REMOVE_WEBSQL ||
+      remove_mask & REMOVE_FILE_SYSTEMS) {
+    if (!quota_manager_) {
       quota_manager_ = content::BrowserContext::GetStoragePartition(browser_context_, NULL)->GetQuotaManager();
-
+    }
     waiting_for_clear_quota_managed_data_ = true;
     content::BrowserThread::PostTask(
-      content::BrowserThread::IO, FROM_HERE,
-      base::Bind(&BrowsingDataRemoverEfl::ClearQuotaManagedDataOnIOThread,
-                 base::Unretained(this)));
+        content::BrowserThread::IO, FROM_HERE,
+        base::Bind(&BrowsingDataRemoverEfl::ClearQuotaManagedDataOnIOThread,
+                   base::Unretained(this)));
   }
+  if (remove_mask & REMOVE_APPCACHE) {
+    DCHECK(app_cache_service_);
+    if (!app_cache_service_) {
+      return;
+    }
+
+    if (origin.is_valid()) {
+       DeleteAppCachesForOrigin(origin);
+    }
+    else {
+      //if origin is empty delete all app cache (actual deletion in OnGotOriginsWithApplicationCache)
+      Application_Cache_Origins_Get_Callback cb = NULL;
+      scoped_refptr<content::AppCacheInfoCollection> collection(new content::AppCacheInfoCollection());
+      app_cache_service_->GetAllAppCacheInfo(collection, base::Bind(&OnGotOriginsWithApplicationCache,
+                                                                    cb, this, collection));
+    }
+  }
+}
+
+void BrowsingDataRemoverEfl::DeleteAppCachesForOrigin(const GURL& origin) {
+  net::CompletionCallback rm_app_catche_cb;
+  static_cast<content::AppCacheServiceImpl*>(app_cache_service_)->DeleteAppCachesForOrigin(origin, rm_app_catche_cb);
 }
 
 void BrowsingDataRemoverEfl::ClearLocalStorageOnUIThread() {
