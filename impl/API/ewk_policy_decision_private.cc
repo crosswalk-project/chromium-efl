@@ -29,6 +29,7 @@
 using content::BrowserThread;
 using content::RenderFrameHost;
 using content::RenderViewHost;
+using namespace tizen_webview;
 
 namespace {
   void FreeStringShare(void *data) {
@@ -45,8 +46,8 @@ _Ewk_Policy_Decision::_Ewk_Policy_Decision(const GURL &request_url, const net::H
   , scheme_(NULL)
   , responseMime_(NULL)
   , responseHeaders_(NULL)
-  , decisionType_(EWK_POLICY_DECISION_USE)
-  , navigationType_(EWK_POLICY_NAVIGATION_TYPE_OTHER)
+  , decisionType_(TW_POLICY_DECISION_USE)
+  , navigationType_(TW_POLICY_NAVIGATION_TYPE_OTHER)
   , isDecided_(false)
   , isSuspended_(false)
   , responseStatusCode_(0)
@@ -67,7 +68,7 @@ _Ewk_Policy_Decision::_Ewk_Policy_Decision(const GURL &request_url, const net::H
       responseMime_ = eina_stringshare_add(mime_type.c_str());
 
       if (!net::IsSupportedMimeType(mime_type))
-        decisionType_ = EWK_POLICY_DECISION_DOWNLOAD;
+        decisionType_ = TW_POLICY_DECISION_DOWNLOAD;
     }
 
     std::string set_cookie_;
@@ -94,8 +95,8 @@ _Ewk_Policy_Decision::_Ewk_Policy_Decision(const NavigationPolicyParams &params,
   , scheme_(NULL)
   , responseMime_(NULL)
   , responseHeaders_(NULL)
-  , decisionType_(EWK_POLICY_DECISION_USE)
-  , navigationType_(static_cast<Ewk_Policy_Navigation_Type>(params.type))
+  , decisionType_(TW_POLICY_DECISION_USE)
+  , navigationType_(static_cast<tizen_webview::Policy_Navigation_Type>(params.type))
   , isDecided_(false)
   , isSuspended_(false)
   , responseStatusCode_(0)
@@ -113,8 +114,8 @@ _Ewk_Policy_Decision::_Ewk_Policy_Decision(content::WebContentsDelegateEfl* view
   , scheme_(NULL)
   , responseMime_(NULL)
   , responseHeaders_(NULL)
-  , decisionType_(EWK_POLICY_DECISION_USE)
-  , navigationType_(EWK_POLICY_NAVIGATION_TYPE_OTHER)
+  , decisionType_(TW_POLICY_DECISION_USE)
+  , navigationType_(TW_POLICY_NAVIGATION_TYPE_OTHER)
   , isDecided_(false)
   , isSuspended_(false)
   , responseStatusCode_(0)

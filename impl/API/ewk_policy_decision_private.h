@@ -35,6 +35,11 @@
 
 struct NavigationPolicyParams;
 
+#include "tizen_webview/public/tw_policy_decision.h"
+
+struct NavigationPolicyParams;
+
+
 namespace content {
 class WebContentsDelegateEfl;
 class RenderViewHost;
@@ -66,7 +71,7 @@ class _Ewk_Policy_Decision {
 
   bool isDecided() const { return isDecided_; }
   bool isSuspended() const { return isSuspended_; }
-  Ewk_Policy_Navigation_Type GetNavigationType() const { return navigationType_; }
+  tizen_webview::Policy_Navigation_Type GetNavigationType() const { return navigationType_; }
   Eina_Stringshare* GetCookie() const { return cookie_; }
   Eina_Stringshare* GetAuthUser() const { return AuthUser_; }
   Eina_Stringshare* GetAuthPassword() const { return AuthPassword_; }
@@ -74,7 +79,7 @@ class _Ewk_Policy_Decision {
   Eina_Stringshare* GetScheme() const { return scheme_; }
   Eina_Stringshare* GetHost() const { return host_; }
   Eina_Stringshare* GetResponseMime() const { return responseMime_; }
-  Ewk_Policy_Decision_Type GetDecisionType() const { return decisionType_; }
+  tizen_webview::Policy_Decision_Type GetDecisionType() const { return decisionType_; }
   Eina_Hash* GetResponseHeaders() const { return responseHeaders_; }
   int GetResponseStatusCode() const { return responseStatusCode_; }
 
@@ -103,8 +108,8 @@ class _Ewk_Policy_Decision {
   const char* scheme_;
   const char* responseMime_;
   Eina_Hash* responseHeaders_;
-  Ewk_Policy_Decision_Type decisionType_;
-  Ewk_Policy_Navigation_Type navigationType_;
+  tizen_webview::Policy_Decision_Type decisionType_;
+  tizen_webview::Policy_Navigation_Type navigationType_;
   bool isDecided_;
   bool isSuspended_;
   int responseStatusCode_;
