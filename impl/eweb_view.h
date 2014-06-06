@@ -26,6 +26,7 @@
 #include "base/memory/scoped_ptr.h"
 #include "base/synchronization/waitable_event.h"
 #include "content/public/common/context_menu_params.h"
+#include "content/public/common/file_chooser_params.h"
 #include "content/browser/renderer_host/event_with_latency_info.h"
 #include "content/common/input/input_event_ack_state.h"
 #include "base/id_map.h"
@@ -44,6 +45,7 @@
 #include "web_contents_delegate_efl.h"
 #include "ui/events/gestures/gesture_types.h"
 #include "context_menu_controller_efl.h"
+#include "file_chooser_controller_efl.h"
 #include "ui/gfx/point.h"
 #include "ui/gfx/size.h"
 
@@ -238,6 +240,8 @@ class EWebView
   void SetDrawsTransparentBackground(bool enabled);
   void ProcessAckedTouchEvent(const content::TouchEventWithLatencyInfo& touch,
                               content::InputEventAckState ack_result);
+  void ShowFileChooser(const content::FileChooserParams&);
+
  private:
   EWebView(EWebContext*, Evas_Object* smart_object);
   ~EWebView();
@@ -324,6 +328,7 @@ class EWebView
   scoped_ptr<_Ewk_Auth_Challenge> auth_challenge_;
   scoped_ptr<Ewk_Policy_Decision> policy_decision_;
   scoped_ptr<content::ContextMenuControllerEfl> context_menu_;
+  scoped_ptr<content::FileChooserControllerEfl> file_chooser_;
   scoped_ptr<content::SelectionControllerEfl> selection_controller_;
   base::string16 previous_text_;
   int current_find_request_id_;

@@ -1534,3 +1534,12 @@ bool EWebView::GetTiltZoomEnabled() {
   return false;
 }
 #endif // OS_TIZEN
+
+void EWebView::ShowFileChooser(const content::FileChooserParams& params) {
+  RenderViewHost* render_view_host = web_contents_delegate()->web_contents()->GetRenderViewHost();
+  if (!render_view_host)
+    return;
+
+  file_chooser_.reset(new content::FileChooserControllerEfl(render_view_host, &params));
+  file_chooser_->open();
+}

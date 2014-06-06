@@ -143,6 +143,7 @@ class WebContentsDelegateEfl
                                    const base::string16& message,
                                    int32 line_no,
                                    const base::string16& source_id) OVERRIDE;
+  void RunFileChooser(WebContents* web_contents, const FileChooserParams& params);
 
  private:
   void OnGetContentSecurityPolicy(IPC::Message* reply_msg);

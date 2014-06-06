@@ -152,6 +152,8 @@
       'eweb_view.cc',
       'eweb_view.h',
       'eweb_view_callbacks.h',
+      'file_chooser_controller_efl.cc',
+      'file_chooser_controller_efl.h',
       'memory_purger.cc',
       'memory_purger.h',
       'message_pump_for_ui_efl.cc',

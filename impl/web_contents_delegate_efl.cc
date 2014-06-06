@@ -422,4 +422,8 @@ bool WebContentsDelegateEfl::AddMessageToConsole(WebContents* source,
   return true;
 }
 
+void WebContentsDelegateEfl::RunFileChooser(WebContents* web_contents, const FileChooserParams& params) {
+  web_view_->ShowFileChooser(params);
+}
+
 } //namespace content
