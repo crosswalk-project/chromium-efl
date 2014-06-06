@@ -82,10 +82,10 @@
 #define ewk_view_h
 
 #include <Evas.h>
-#include "ewk_enums.h"
 #include "ewk_touch.h"
 #include "ewk_security_origin.h"
 //#include "ewk_intercept_request.h"
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -110,20 +110,6 @@ typedef struct Ewk_View_Smart_Class Ewk_View_Smart_Class;
 
 // FIXME: these should be moved elsewhere.
 typedef struct Ewk_Page_Group Ewk_Page_Group;
-
-// #if PLATFORM(TIZEN)
-/// Creates a type name for _Ewk_Event_Gesture.
-typedef struct Ewk_Event_Gesture Ewk_Event_Gesture;
-
-/// Represents a gesture event.
-struct Ewk_Event_Gesture {
-    Ewk_Gesture_Type type; /**< type of the gesture event */
-    Evas_Coord_Point position; /**< position of the gesture event */
-    Evas_Point velocity; /**< velocity of the gesture event. The unit is pixel per second. */
-    double scale; /**< scale of the gesture event */
-    int count; /**< count of the gesture */
-    unsigned int timestamp; /**< timestamp of the gesture */
-};
 
 // #if ENABLE(TIZEN_FOCUS_UI)
 enum Ewk_Unfocus_Direction {
@@ -217,9 +203,11 @@ struct Ewk_View_Smart_Class {
     Eina_Bool (*formdata_candidate_update_data)(Ewk_View_Smart_Data *sd, Eina_List *dataList);
     Eina_Bool (*formdata_candidate_is_showing)(Ewk_View_Smart_Data *sd);
 
-    Eina_Bool (*gesture_start)(Ewk_View_Smart_Data *sd, const Ewk_Event_Gesture *ev);
-    Eina_Bool (*gesture_end)(Ewk_View_Smart_Data *sd, const Ewk_Event_Gesture *ev);
-    Eina_Bool (*gesture_move)(Ewk_View_Smart_Data *sd, const Ewk_Event_Gesture *ev);
+    // gesture_* are unused in chromium-efl.
+    // Note: temporarily replaced arg Ewk_Event_Gesture with void for break dependency.
+    Eina_Bool (*gesture_start)(Ewk_View_Smart_Data *sd, const void *ev) __attribute__((deprecated));
+    Eina_Bool (*gesture_end)(Ewk_View_Smart_Data *sd, const void *ev) __attribute__((deprecated));
+    Eina_Bool (*gesture_move)(Ewk_View_Smart_Data *sd, const void *ev) __attribute__((deprecated));
 
     void (*selection_handle_down)(Ewk_View_Smart_Data *sd, Ewk_Selection_Handle_Type handleType, int x, int y);
     void (*selection_handle_move)(Ewk_View_Smart_Data *sd, Ewk_Selection_Handle_Type handleType, int x, int y);
