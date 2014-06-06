@@ -72,6 +72,9 @@
 #include "browser/selectpicker/popup_picker.h"
 #endif
 
+#include "tizen_webview/public/tw_hit_test.h"
+#include "tizen_webview/public/tw_touch_event.h"
+
 namespace content {
 class RenderViewHost;
 class RenderWidgetHostViewEfl;
@@ -232,7 +235,7 @@ class EWebView
   void SetTouchEventsEnabled(bool enabled);
   bool MouseEventsEnabled() const;
   void SetMouseEventsEnabled(bool enabled);
-  void HandleTouchEvents(Ewk_Touch_Event_Type type, const Eina_List *points, const Evas_Modifier *modifiers);
+  void HandleTouchEvents(tizen_webview::Touch_Event_Type type, const Eina_List *points, const Evas_Modifier *modifiers);
   void Show();
   void Hide();
   bool ExecuteJavaScript(const char* script, Ewk_View_Script_Execute_Callback callback, void* userdata);
@@ -395,7 +398,7 @@ class EWebView
     service_result_e result, void* data);
 #endif
 
-  void HandleTouchEvents(Ewk_Touch_Event_Type);
+  void HandleTouchEvents(tizen_webview::Touch_Event_Type);
 
   void SubscribeMouseEvents();
   void UnsubscribeMouseEvents();

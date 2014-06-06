@@ -32,14 +32,6 @@
 extern "C" {
 #endif
 
-/// Represents types of touch event.
-typedef enum {
-    EWK_TOUCH_START,
-    EWK_TOUCH_MOVE,
-    EWK_TOUCH_END,
-    EWK_TOUCH_CANCEL
-} Ewk_Touch_Event_Type;
-
 /// Creates a type name for Ewk_Touch_Point.
 typedef struct _Ewk_Touch_Point Ewk_Touch_Point;
 

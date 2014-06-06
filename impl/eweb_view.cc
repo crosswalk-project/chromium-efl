@@ -801,18 +801,18 @@ unsigned long long EWebView::handleExceededDatabaseQuota(Ewk_View_Smart_Data *sd
 }
 
 void EWebView::OnTouchDown(void* sd, Evas*, Evas_Object*, void*) {
-  ToEWebView(static_cast<Ewk_View_Smart_Data*>(sd))->HandleTouchEvents(EWK_TOUCH_START);
+  ToEWebView(static_cast<Ewk_View_Smart_Data*>(sd))->HandleTouchEvents(TW_TOUCH_START);
 }
 
 void EWebView::OnTouchUp(void* sd, Evas*, Evas_Object*, void*) {
-  ToEWebView(static_cast<Ewk_View_Smart_Data*>(sd))->HandleTouchEvents(EWK_TOUCH_END);
+  ToEWebView(static_cast<Ewk_View_Smart_Data*>(sd))->HandleTouchEvents(TW_TOUCH_END);
 }
 
 void EWebView::OnTouchMove(void* sd, Evas*, Evas_Object*, void*) {
-  ToEWebView(static_cast<Ewk_View_Smart_Data*>(sd))->HandleTouchEvents(EWK_TOUCH_MOVE);
+  ToEWebView(static_cast<Ewk_View_Smart_Data*>(sd))->HandleTouchEvents(TW_TOUCH_MOVE);
 }
 
-void EWebView::HandleTouchEvents(Ewk_Touch_Event_Type type, const Eina_List *points, const Evas_Modifier *modifiers) {
+void EWebView::HandleTouchEvents(tizen_webview::Touch_Event_Type type, const Eina_List *points, const Evas_Modifier *modifiers) {
   const Eina_List* l;
   void* data;
   EINA_LIST_FOREACH(points, l, data) {
@@ -842,7 +842,7 @@ void EWebView::ProcessAckedTouchEvent(const TouchEventWithLatencyInfo& touch,
   }
 }
 
-void EWebView::HandleTouchEvents(Ewk_Touch_Event_Type type) {
+void EWebView::HandleTouchEvents(tizen_webview::Touch_Event_Type type) {
   // These constants are used to map multi touch's touch id(s).
   // The poorly-written Tizen API document says:
   //  "0 for Mouse Event and device id for Multi Event."
@@ -879,22 +879,22 @@ void EWebView::HandleTouchEvents(Ewk_Touch_Event_Type type) {
     pt.x = point->x;
     pt.y = point->y;
     point->state = evas_touch_point_list_nth_state_get(sd->base.evas, i);
-    if (type == EWK_TOUCH_CANCEL)
+    if (type == TW_TOUCH_CANCEL)
       point->state = EVAS_TOUCH_POINT_CANCEL;
     points = eina_list_append(points, point);
   }
 
-  if (type == EWK_TOUCH_START)
+  if (type == TW_TOUCH_START)
     SetFocus(EINA_TRUE);
 
   HandleTouchEvents(type, points, evas_key_modifier_get(sd->base.evas));
 
 #ifdef OS_TIZEN
-  if (count >= 2) {
-    if (type == EWK_TOUCH_START) {
+  if (count >=2) {
+    if (type == TW_TOUCH_START) {
       LOG(ERROR) << " wkext_motion_tilt_start";
       wkext_motion_tilt_start(evas_object(), &pt);
-    } else if (type == EWK_TOUCH_END) {
+    } else if (type == TW_TOUCH_END) {
       wkext_motion_tilt_stop();
     }
   }
