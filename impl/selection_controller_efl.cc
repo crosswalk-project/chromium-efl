@@ -166,7 +166,7 @@ void SelectionControllerEfl::OnMouseUp(const gfx::Point& touch_point) {
   selection_data_->UpdateHandleData();
   mouse_press_ = false;
   magnifier_->Hide();
-  ShowHandleAndContextMenuIfRequired();
+  parent_view_->ShowContextMenu(*(selection_data_->GetContextMenuParams()), MENU_TYPE_SELECTION);
 }
 
 void SelectionControllerEfl::GetSelectionBounds(gfx::Rect* left, gfx::Rect* right) {

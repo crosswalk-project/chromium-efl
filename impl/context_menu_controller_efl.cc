@@ -88,17 +88,30 @@ void ContextMenuControllerEfl::GetProposedContextMenu() {
                          std::string(),
                          std::string(),
                          std::string());
+  if (params_.is_editable) {
+    AddItemToPropsedList(MENU_ITEM_TYPE_ACTION,
+                         MENU_ITEM_SELECT_WORD,
+                         std::string("Select"),
+                         std::string(),
+                         std::string(),
+                         std::string());
+    AddItemToPropsedList(MENU_ITEM_TYPE_ACTION,
+                         MENU_ITEM_SELECT_ALL,
+                         std::string("Select All"),
+                         std::string(),
+                         std::string(),
+                         std::string());
+    AddItemToPropsedList(MENU_ITEM_TYPE_ACTION,
+                         MENU_ITEM_PASTE,
+                         std::string("Paste"),
+                         std::string(),
+                         std::string(),
+                         std::string());
+  }
   if (!params_.selection_text.empty())
     AddItemToPropsedList(MENU_ITEM_TYPE_ACTION,
                          MENU_ITEM_COPY,
                          std::string("Copy"),
-                         std::string(),
-                         std::string(),
-                         std::string());
-  if (params_.is_editable)
-    AddItemToPropsedList(MENU_ITEM_TYPE_ACTION,
-                         MENU_ITEM_PASTE,
-                         std::string("Paste"),
                          std::string(),
                          std::string(),
                          std::string());
@@ -260,6 +273,22 @@ void ContextMenuControllerEfl::MenuItemSelected(ContextMenuItemEfl *menu_item) {
       Evas_Coord x, y;
       evas_object_geometry_get(view->evas_object(), &x, &y, 0, 0);
       view->SelectLinkText(gfx::Point(params_.x - x, params_.y - y));
+      break;
+    }
+    case MENU_ITEM_SELECT_WORD: {
+      Evas_Coord x, y;
+      evas_object_geometry_get(view->evas_object(), &x, &y, 0, 0);
+      view->SelectClosestWord(gfx::Point(params_.x - x, params_.y - y));
+      SelectionControllerEfl* controller = view->GetSelectionController();
+      if (controller)
+        controller->HideHandle();
+      break;
+    }
+    case MENU_ITEM_SELECT_ALL: {
+      view->ExecuteEditCommand("SelectAll", NULL);
+      SelectionControllerEfl* controller = view->GetSelectionController();
+      if (controller)
+        controller->HideHandle();
       break;
     }
     case MENU_ITEM_PASTE: {

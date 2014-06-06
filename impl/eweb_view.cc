@@ -886,9 +886,10 @@ void EWebView::DispatchPostponedGestureEvent(ui::GestureEvent* event) {
     if (hit_test_data && hit_test_data->context & EWK_HIT_TEST_RESULT_CONTEXT_EDITABLE) {
       LOG(INFO) << "DispatchPostponedGestureEvent :: EWK_HIT_TEST_RESULT_CONTEXT_EDITABLE";
       selection_controller_->SetSelectionStatus(true);
-      if (selection_controller_->GetSelectionEditable())
+      if (selection_controller_->GetSelectionEditable()) {
+        selection_controller_->HideHandle();
         selection_controller_->SetCaretSelectionStatus(true);
-      else
+      } else
         selection_controller_->SetSelectionEditable(true);
       delete hit_test_data;
     } else {
