@@ -66,9 +66,11 @@ WebContentsDelegateEfl::WebContentsDelegateEfl(EWebView* view)
 
 #ifdef TIZEN_AUTOFILL_SUPPORT
   AutofillManagerDelegateEfl::CreateForWebContents(web_contents_.get());
+  AutofillManagerDelegateEfl * autofill_manager =
+    AutofillManagerDelegateEfl::FromWebContents(web_contents_.get());
+  autofill_manager->SetEWebView(view);
   AutofillDriverImpl::CreateForWebContentsAndDelegate(web_contents_.get(),
-      AutofillManagerDelegateEfl::FromWebContents(web_contents_.get()),
-      "en-US", AutofillManager::DISABLE_AUTOFILL_DOWNLOAD_MANAGER);
+    autofill_manager, view->GetPlatformLocale(), AutofillManager::DISABLE_AUTOFILL_DOWNLOAD_MANAGER);
   PasswordManagerClientEfl::CreateForWebContents(web_contents_.get());
 #endif
 }
