@@ -187,13 +187,15 @@ class RenderWidgetHostViewEfl
   Evas* evas() const {
     DCHECK(evas_);
     return evas_;
-  } 
+  }
 
   void Init_EvasGL(int width, int height);
 
   void set_eweb_view(EWebView*);
   EWebView* eweb_view() const { return web_view_; }
   RenderWidgetHostImpl* host() const { return host_; }
+
+  float device_scale_factor() const { return device_scale_factor_; }
 
   void HandleShow();
   void HandleHide();
@@ -247,6 +249,7 @@ class RenderWidgetHostViewEfl
 
   static void EvasObjectImagePixelsGetCallback(void*, Evas_Object*);
   void initializeProgram();
+  gfx::Rect GetViewBoundsInPix() const;
 
   RenderWidgetHostImpl* host_;
   EWebView* web_view_;
@@ -256,6 +259,7 @@ class RenderWidgetHostViewEfl
   Evas_Object* content_image_;
   scoped_ptr<EflWebview::ScrollDetector> scroll_detector_;
   int m_IsEvasGLInit;
+  float device_scale_factor_;
 
   typedef std::map<gfx::PluginWindowHandle, Ecore_X_Window> PluginWindowToWidgetMap;
   PluginWindowToWidgetMap plugin_window_to_widget_map_;

@@ -294,22 +294,22 @@ static inline WebInputEvent::Modifiers EvasToWebModifiers(const Evas_Modifier* m
   return static_cast<WebInputEvent::Modifiers>(result);
 }
 
-blink::WebMouseEvent WebEventFactoryEfl::toWebMouseEvent(Evas* evas, Evas_Object* web_view, const Evas_Event_Mouse_Down* ev) {
+blink::WebMouseEvent WebEventFactoryEfl::toWebMouseEvent(Evas* evas, Evas_Object* web_view, const Evas_Event_Mouse_Down* ev, float scale_factor) {
   WebMouseEvent webKitEvent;
   webKitEvent.timeStampSeconds = (double)ev->timestamp / 1000;
   webKitEvent.button = EvasToWebMouseButton(ev->button);
   webKitEvent.modifiers = EvasToWebModifiers(ev->modifiers);
 
-  webKitEvent.windowX = ev->canvas.x;
-  webKitEvent.windowY = ev->canvas.y;
+  webKitEvent.windowX = (ev->canvas.x) / scale_factor;
+  webKitEvent.windowY = (ev->canvas.y) / scale_factor;
 
   TranslateEvasCoordToWebKitCoord(web_view, webKitEvent.windowX, webKitEvent.windowY);
 
   webKitEvent.x = webKitEvent.windowX;
   webKitEvent.y = webKitEvent.windowY;
 
-  webKitEvent.globalX = evas_coord_world_x_to_screen(evas, ev->canvas.x);
-  webKitEvent.globalY = evas_coord_world_y_to_screen(evas, ev->canvas.y);
+  webKitEvent.globalX = (evas_coord_world_x_to_screen(evas, ev->canvas.x)) / scale_factor;
+  webKitEvent.globalY = (evas_coord_world_y_to_screen(evas, ev->canvas.y)) / scale_factor;
   webKitEvent.type = WebInputEvent::MouseDown;
 
   webKitEvent.clickCount = 1;
@@ -317,22 +317,22 @@ blink::WebMouseEvent WebEventFactoryEfl::toWebMouseEvent(Evas* evas, Evas_Object
   return webKitEvent;
 }
 
-blink::WebMouseEvent WebEventFactoryEfl::toWebMouseEvent(Evas* evas, Evas_Object* web_view, const Evas_Event_Mouse_Up* ev) {
+blink::WebMouseEvent WebEventFactoryEfl::toWebMouseEvent(Evas* evas, Evas_Object* web_view, const Evas_Event_Mouse_Up* ev, float scale_factor) {
   WebMouseEvent webKitEvent;
   webKitEvent.timeStampSeconds = (double)ev->timestamp / 1000;
   webKitEvent.button = EvasToWebMouseButton(ev->button);
   webKitEvent.modifiers = EvasToWebModifiers(ev->modifiers);
 
-  webKitEvent.windowX = ev->canvas.x;
-  webKitEvent.windowY = ev->canvas.y;
+  webKitEvent.windowX = (ev->canvas.x) / scale_factor;
+  webKitEvent.windowY = (ev->canvas.y) / scale_factor;
 
   TranslateEvasCoordToWebKitCoord(web_view, webKitEvent.windowX, webKitEvent.windowY);
 
   webKitEvent.x = webKitEvent.windowX;
   webKitEvent.y = webKitEvent.windowY;
 
-  webKitEvent.globalX = evas_coord_world_x_to_screen(evas, ev->canvas.x);
-  webKitEvent.globalY = evas_coord_world_y_to_screen(evas, ev->canvas.y);
+  webKitEvent.globalX = (evas_coord_world_x_to_screen(evas, ev->canvas.x)) / scale_factor;
+  webKitEvent.globalY = (evas_coord_world_y_to_screen(evas, ev->canvas.y)) / scale_factor;
   webKitEvent.type = WebInputEvent::MouseUp;
 
   webKitEvent.clickCount = 1;
@@ -340,41 +340,41 @@ blink::WebMouseEvent WebEventFactoryEfl::toWebMouseEvent(Evas* evas, Evas_Object
   return webKitEvent;
 }
 
-blink::WebMouseEvent WebEventFactoryEfl::toWebMouseEvent(Evas* evas, Evas_Object* web_view, const Evas_Event_Mouse_Move* ev) {
+blink::WebMouseEvent WebEventFactoryEfl::toWebMouseEvent(Evas* evas, Evas_Object* web_view, const Evas_Event_Mouse_Move* ev, float scale_factor) {
   WebMouseEvent webKitEvent;
   webKitEvent.timeStampSeconds = (double)ev->timestamp / 1000;
   webKitEvent.modifiers = EvasToWebModifiers(ev->modifiers);
 
-  webKitEvent.windowX = ev->cur.canvas.x;
-  webKitEvent.windowY = ev->cur.canvas.y;
+  webKitEvent.windowX = (ev->cur.canvas.x) / scale_factor;
+  webKitEvent.windowY = (ev->cur.canvas.y) / scale_factor;
 
   TranslateEvasCoordToWebKitCoord(web_view, webKitEvent.windowX, webKitEvent.windowY);
 
   webKitEvent.x = webKitEvent.windowX;
   webKitEvent.y = webKitEvent.windowY;
 
-  webKitEvent.globalX = evas_coord_world_x_to_screen(evas, ev->cur.canvas.x);
-  webKitEvent.globalY = evas_coord_world_y_to_screen(evas, ev->cur.canvas.y);
+  webKitEvent.globalX = (evas_coord_world_x_to_screen(evas, ev->cur.canvas.x)) / scale_factor;
+  webKitEvent.globalY = (evas_coord_world_y_to_screen(evas, ev->cur.canvas.y)) / scale_factor;
   webKitEvent.type = WebInputEvent::MouseMove;
 
   return webKitEvent;
 }
 
-blink::WebMouseWheelEvent WebEventFactoryEfl::toWebMouseEvent(Evas* evas, Evas_Object* web_view, const Evas_Event_Mouse_Wheel* ev) {
+blink::WebMouseWheelEvent WebEventFactoryEfl::toWebMouseEvent(Evas* evas, Evas_Object* web_view, const Evas_Event_Mouse_Wheel* ev, float scale_factor) {
   WebMouseWheelEvent webKitEvent;
   webKitEvent.timeStampSeconds = (double)ev->timestamp / 1000;
   webKitEvent.modifiers = EvasToWebModifiers(ev->modifiers);
 
-  webKitEvent.windowX = ev->canvas.x;
-  webKitEvent.windowY = ev->canvas.y;
+  webKitEvent.windowX = (ev->canvas.x) / scale_factor;
+  webKitEvent.windowY = (ev->canvas.y) / scale_factor;
 
   TranslateEvasCoordToWebKitCoord(web_view, webKitEvent.windowX, webKitEvent.windowY);
 
   webKitEvent.x = webKitEvent.windowX;
   webKitEvent.y = webKitEvent.windowY;
 
-  webKitEvent.globalX = evas_coord_world_x_to_screen(evas, ev->canvas.x);
-  webKitEvent.globalY = evas_coord_world_y_to_screen(evas, ev->canvas.y);
+  webKitEvent.globalX = (evas_coord_world_x_to_screen(evas, ev->canvas.x)) / scale_factor;
+  webKitEvent.globalY = (evas_coord_world_y_to_screen(evas, ev->canvas.y)) / scale_factor;
   webKitEvent.type = WebInputEvent::MouseWheel;
 
   if (ev->direction) {
@@ -442,12 +442,12 @@ static ui::EventType EvasTouchEventTypeToUI(Evas_Touch_Point_State evas_touch) {
 
 }
 
-ui::TouchEvent WebEventFactoryEfl::toUITouchEvent(Ewk_Touch_Point* p, Evas_Object* web_view) {
+ui::TouchEvent WebEventFactoryEfl::toUITouchEvent(Ewk_Touch_Point* p, Evas_Object* web_view, float scale_factor) {
   int x = p->x, y = p->y;
 
   TranslateEvasCoordToWebKitCoord(web_view, x, y);
   return ui::TouchEvent(EvasTouchEventTypeToUI(p->state),
-                        gfx::Point(x, y),
+                        gfx::Point(x / scale_factor, y / scale_factor),
                         p->id, base::TimeDelta::FromMilliseconds(ecore_time_get() * 1000));
 }
 

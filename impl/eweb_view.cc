@@ -748,7 +748,7 @@ void EWebView::HandleTouchEvents(Ewk_Touch_Event_Type type, const Eina_List *poi
   const Eina_List* l;
   void* data;
   EINA_LIST_FOREACH(points, l, data) {
-    ui::TouchEvent touch_event = WebEventFactoryEfl::toUITouchEvent(static_cast<Ewk_Touch_Point*>(data), evas_object());
+    ui::TouchEvent touch_event = WebEventFactoryEfl::toUITouchEvent(static_cast<Ewk_Touch_Point*>(data), evas_object(), rwhv()->device_scale_factor());
     rwhv()->HandleTouchEvent(&touch_event);
   }
 }
@@ -1216,14 +1216,15 @@ void EWebView::OnQuerySelectionStyleReply(const SelectionStylePrams& params) {
 }
 
 void EWebView::SelectClosestWord(const gfx::Point& touch_point) {
+  float device_scale_factor = rwhv()->device_scale_factor();
   RenderViewHost* render_view_host = web_contents_delegate_->web_contents()->GetRenderViewHost();
-  render_view_host->Send(new EwkViewMsg_SelectClosestWord(render_view_host->GetRoutingID(), touch_point.x(), touch_point.y()));
+  render_view_host->Send(new EwkViewMsg_SelectClosestWord(render_view_host->GetRoutingID(), touch_point.x() / device_scale_factor, touch_point.y() / device_scale_factor));
 }
 
 void EWebView::SelectLinkText(const gfx::Point& touch_point) {
   float device_scale_factor = rwhv()->device_scale_factor();
   RenderViewHost* render_view_host = web_contents_delegate_->web_contents()->GetRenderViewHost();
-  render_view_host->Send(new ViewMsg_SelectLinkText(render_view_host->GetRoutingID(), gfx::Point(touch_point.x()/device_scale_factor, touch_point.y()/device_scale_factor)));
+  render_view_host->Send(new ViewMsg_SelectLinkText(render_view_host->GetRoutingID(), gfx::Point(touch_point.x() / device_scale_factor, touch_point.y() / device_scale_factor)));
 }
 
 bool EWebView::GetSelectionRange(Eina_Rectangle* left_rect, Eina_Rectangle* right_rect) {

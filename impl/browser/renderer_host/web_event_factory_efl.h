@@ -49,14 +49,14 @@ class WebEventFactoryEfl {
 
   static content::NativeWebKeyboardEvent toWebKeyboardEvent(const Ecore_Event_Key*, bool pressed);
 
-  static blink::WebMouseEvent toWebMouseEvent(Evas*, Evas_Object*, const Evas_Event_Mouse_Down*);
-  static blink::WebMouseEvent toWebMouseEvent(Evas*, Evas_Object*,  const Evas_Event_Mouse_Up*);
-  static blink::WebMouseEvent toWebMouseEvent(Evas*,  Evas_Object*, const Evas_Event_Mouse_Move*);
-  static blink::WebMouseWheelEvent toWebMouseEvent(Evas*,  Evas_Object*, const Evas_Event_Mouse_Wheel*);
+  static blink::WebMouseEvent toWebMouseEvent(Evas*, Evas_Object*, const Evas_Event_Mouse_Down*, float scale_factor);
+  static blink::WebMouseEvent toWebMouseEvent(Evas*, Evas_Object*,  const Evas_Event_Mouse_Up*, float scale_factor);
+  static blink::WebMouseEvent toWebMouseEvent(Evas*,  Evas_Object*, const Evas_Event_Mouse_Move*, float scale_factor);
+  static blink::WebMouseWheelEvent toWebMouseEvent(Evas*,  Evas_Object*, const Evas_Event_Mouse_Wheel*, float scale_factor);
   static content::NativeWebKeyboardEvent toWebKeyboardEvent(Evas*, const Evas_Event_Key_Down*);
   static content::NativeWebKeyboardEvent toWebKeyboardEvent(Evas*, const Evas_Event_Key_Up*);
 
-  static ui::TouchEvent toUITouchEvent(Ewk_Touch_Point*, Evas_Object* evas_object);
+  static ui::TouchEvent toUITouchEvent(Ewk_Touch_Point*, Evas_Object* evas_object, float scale_factor);
 };
 
 }

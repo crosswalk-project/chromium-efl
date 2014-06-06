@@ -74,15 +74,30 @@ RenderWidgetHostViewEfl::RenderWidgetHostViewEfl(RenderWidgetHost* widget)
     content_image_(NULL),
     scroll_detector_(new EflWebview::ScrollDetector()),
     m_IsEvasGLInit(0),
+    device_scale_factor_(1.0f),
     egl_image_(0),
     current_pixmap_id_(0),
     next_pixmap_id_(0) {
   host_->SetView(this);
+
+  static bool scale_factor_initialized = false;
+  if (!scale_factor_initialized) {
+    std::vector<ui::ScaleFactor> supported_scale_factors;
+    supported_scale_factors.push_back(ui::SCALE_FACTOR_100P);
+    supported_scale_factors.push_back(ui::SCALE_FACTOR_200P);
+    ui::SetSupportedScaleFactors(supported_scale_factors);
+  }
 }
 
 RenderWidgetHostViewEfl::~RenderWidgetHostViewEfl() {
   if (im_context_)
     delete im_context_;
+}
+
+gfx::Rect RenderWidgetHostViewEfl::GetViewBoundsInPix() const {
+  int x, y, w, h;
+  evas_object_geometry_get(content_image_, &x, &y, &w, &h);
+  return gfx::Rect(x, y, w, h);
 }
 
 static const char* vertexShaderSourceSimple =
@@ -130,7 +145,7 @@ void RenderWidgetHostViewEfl::EvasObjectImagePixelsGetCallback(void* data, Evas_
 
   evas_gl_make_current(rwhv_efl->evas_gl_, rwhv_efl->evas_gl_surface_, rwhv_efl->evas_gl_context_);
 
-  gfx::Rect bounds = rwhv_efl->GetViewBounds();
+  gfx::Rect bounds = rwhv_efl->GetViewBoundsInPix();
   gl_api->glViewport(0, 0, bounds.width(), bounds.height());
   gl_api->glClearColor(1.0, 1.0, 1.0, 1.0);
   gl_api->glClear(GL_COLOR_BUFFER_BIT);
@@ -242,7 +257,7 @@ void RenderWidgetHostViewEfl::Init_EvasGL(int width, int height) {
 
   initializeProgram();
 
-  m_IsEvasGLInit=1;
+  m_IsEvasGLInit = 1;
 }
 
 void RenderWidgetHostViewEfl::set_eweb_view(EWebView* view) {
@@ -254,8 +269,8 @@ void RenderWidgetHostViewEfl::set_eweb_view(EWebView* view) {
   DCHECK(content_image_);
 
 #ifdef OS_TIZEN
-  gfx::Rect bounds = GetViewBounds();
-  if(bounds.width() == 0 && bounds.height() == 0) {
+  gfx::Rect bounds = GetViewBoundsInPix();
+  if (bounds.width() == 0 && bounds.height() == 0) {
     LOG(ERROR) << "set_eweb_view -- view width and height set to '0' --> skip to configure evasgl";
   } else {
     Init_EvasGL(bounds.width(), bounds.height());
@@ -360,9 +375,7 @@ bool RenderWidgetHostViewEfl::IsShowing() {
 }
 
 gfx::Rect RenderWidgetHostViewEfl::GetViewBounds() const {
-  int x, y, w, h;
-  evas_object_geometry_get(content_image_, &x, &y, &w, &h);
-  return gfx::Rect(x, y, w, h);
+  return ConvertRectToDIP(device_scale_factor_, GetViewBoundsInPix());
 }
 
 bool RenderWidgetHostViewEfl::LockMouse() {
@@ -500,13 +513,16 @@ void RenderWidgetHostViewEfl::SelectionChanged(const base::string16& text,
 
 void RenderWidgetHostViewEfl::SelectionBoundsChanged(
   const ViewHostMsg_SelectionBounds_Params& params) {
-  LOG(INFO) << "RenderWidgetHostViewEfl::SelectionBoundsChanged";
+  ViewHostMsg_SelectionBounds_Params guest_params(params);
+  guest_params.anchor_rect = ConvertRectToPixel(device_scale_factor_, params.anchor_rect);
+  guest_params.focus_rect = ConvertRectToPixel(device_scale_factor_, params.focus_rect);
+
   if (im_context_)
-    im_context_->UpdateCaretBounds(gfx::UnionRects(params.anchor_rect, params.focus_rect));
+    im_context_->UpdateCaretBounds(gfx::UnionRects(guest_params.anchor_rect, guest_params.focus_rect));
 
   SelectionControllerEfl* controller = web_view_->GetSelectionController();
   if (controller)
-    controller->UpdateSelectionDataAndShow(params.anchor_rect, params.focus_rect, params.is_anchor_first);
+    controller->UpdateSelectionDataAndShow(guest_params.anchor_rect, guest_params.focus_rect, guest_params.is_anchor_first);
 }
 
 void RenderWidgetHostViewEfl::ScrollOffsetChanged() {
@@ -761,7 +777,20 @@ bool RenderWidgetHostViewEfl::HasAcceleratedSurface(const gfx::Size&) {
 
 void RenderWidgetHostViewEfl::GetScreenInfo(
     blink::WebScreenInfo* results) {
-  return GetDefaultScreenInfo(results);
+  gfx::Screen* screen = gfx::Screen::GetNativeScreen();
+  if (!screen)
+    return;
+
+  const gfx::Display display = screen->GetPrimaryDisplay();
+  results->rect = display.bounds();
+  results->availableRect = display.work_area();
+
+  device_scale_factor_ = display.device_scale_factor();
+  results->deviceScaleFactor = device_scale_factor_;
+
+  // TODO(derat|oshima): Don't hardcode this. Get this from display object.
+  results->depth = 24;
+  results->depthPerComponent = 8;
 }
 
 gfx::Rect RenderWidgetHostViewEfl::GetBoundsInRootWindow() {
@@ -834,22 +863,22 @@ void RenderWidgetHostViewEfl::HandleFocusOut() {
 }
 
 void RenderWidgetHostViewEfl::HandleEvasEvent(const Evas_Event_Mouse_Down* event) {
-  host_->ForwardMouseEvent(WebEventFactoryEfl::toWebMouseEvent(web_view_->GetEvas(), web_view_->evas_object(), event));
+  host_->ForwardMouseEvent(WebEventFactoryEfl::toWebMouseEvent(web_view_->GetEvas(), web_view_->evas_object(), event, device_scale_factor_));
 }
 
 void RenderWidgetHostViewEfl::HandleEvasEvent(const Evas_Event_Mouse_Up* event) {
   if (im_context_)
     im_context_->Reset();
 
-  host_->ForwardMouseEvent(WebEventFactoryEfl::toWebMouseEvent(web_view_->GetEvas(), web_view_->evas_object(), event));
+  host_->ForwardMouseEvent(WebEventFactoryEfl::toWebMouseEvent(web_view_->GetEvas(), web_view_->evas_object(), event, device_scale_factor_));
 }
 
 void RenderWidgetHostViewEfl::HandleEvasEvent(const Evas_Event_Mouse_Move* event) {
-  host_->ForwardMouseEvent(WebEventFactoryEfl::toWebMouseEvent(web_view_->GetEvas(), web_view_->evas_object(), event));
+  host_->ForwardMouseEvent(WebEventFactoryEfl::toWebMouseEvent(web_view_->GetEvas(), web_view_->evas_object(), event, device_scale_factor_));
 }
 
 void RenderWidgetHostViewEfl::HandleEvasEvent(const Evas_Event_Mouse_Wheel* event) {
-  host_->ForwardWheelEvent(WebEventFactoryEfl::toWebMouseEvent(web_view_->GetEvas(), web_view_->evas_object(), event));
+  host_->ForwardWheelEvent(WebEventFactoryEfl::toWebMouseEvent(web_view_->GetEvas(), web_view_->evas_object(), event, device_scale_factor_));
 }
 
 void RenderWidgetHostViewEfl::HandleEvasEvent(const Evas_Event_Key_Down* event) {
@@ -992,14 +1021,15 @@ void RenderWidgetHostViewEfl::OnDidChangeMaxScrollOffset(int maxScrollX, int max
 }
 
 void RenderWidgetHostViewEfl::SelectRange(const gfx::Point& start, const gfx::Point& end) {
-#warning "[M37] SelectRange was moved somewhere, figure out how to access it."
-#if 0
-  host_->SelectRange(start, end);
-#endif
+  RenderViewHost* rvh =  RenderViewHost::From(host_);
+  WebContentsImpl* wci = static_cast<WebContentsImpl*>(
+        content::WebContents::FromRenderViewHost(rvh));
+  wci->SelectRange(gfx::Point(start.x() / device_scale_factor_, start.y() / device_scale_factor_),
+                   gfx::Point(end.x() / device_scale_factor_, end.y() / device_scale_factor_));
 }
 
 void RenderWidgetHostViewEfl::MoveCaret(const gfx::Point& point) {
-  host_->MoveCaret(point);
+  host_->MoveCaret(gfx::Point(point.x() / device_scale_factor_, point.y() / device_scale_factor_));
 }
 
 void RenderWidgetHostViewEfl::OnMHTMLContentGet(const std::string& mhtml_content, int callback_id) {

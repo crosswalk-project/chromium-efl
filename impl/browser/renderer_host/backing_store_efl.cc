@@ -37,14 +37,15 @@ static const int kMaxVideoLayerSize = 23170;
 BackingStoreEfl::BackingStoreEfl(RenderWidgetHost* widget, Evas_Object* content_image, const gfx::Size& size)
     : BackingStore(widget, size)
     , content_image_(content_image)
-    , device_scale_factor_(1.)
-{
-#if 0
+    , device_scale_factor_(1.) {
   device_scale_factor_ =
-    ui::GetScaleFactorScale(GetScaleFactorForView(widget->GetView()));
+      ui::GetImageScale(GetScaleFactorForView(widget->GetView()));
   gfx::Size pixel_size = ToPixelSize(size, device_scale_factor_);
-#endif
-  gfx::Size pixel_size = size;
+  int width, height;
+  evas_object_image_size_get(content_image_, &width, &height);
+  if (pixel_size.width() < width || pixel_size.height() < height)
+    pixel_size = gfx::Size(width, height);
+
   bitmap_.setConfig(SkBitmap::kARGB_8888_Config,
     pixel_size.width(), pixel_size.height());
   bitmap_.allocPixels();
@@ -95,12 +96,8 @@ void BackingStoreEfl::ScaleFactorChanged(float device_scale_factor)
 #endif
 }
 
-size_t BackingStoreEfl::MemorySize()
-{
-#if 0
+size_t BackingStoreEfl::MemorySize() {
   return ToPixelSize(size(), device_scale_factor_).GetArea() * 4;
-#endif
-  return size().GetArea() * 4;
 }
 
 void BackingStoreEfl::PaintToBackingStore(
@@ -149,11 +146,8 @@ void BackingStoreEfl::PaintToBackingStore(
       pixel_copy_rect.width(),
       pixel_copy_rect.height());
 
-#if 0
     const gfx::Rect pixel_copy_dst_rect = gfx::ToEnclosingRect(
       gfx::ScaleRect(copy_rects[i], device_scale_factor_));
-#endif
-    const gfx::Rect pixel_copy_dst_rect = copy_rects[i];
     SkRect dstrect = SkRect::MakeXYWH(
       SkIntToScalar(pixel_copy_dst_rect.x()),
       SkIntToScalar(pixel_copy_dst_rect.y()),
@@ -192,19 +186,14 @@ void BackingStoreEfl::PaintToBackingStore(
 
 void BackingStoreEfl::ScrollBackingStore(const gfx::Vector2d& delta,
                                          const gfx::Rect& clip_rect,
-                                         const gfx::Size& view_size)
-{
+                                         const gfx::Size& view_size) {
   if (!CheckSizeConsistency())
     return;
 
-#if 0
   gfx::Rect pixel_rect = gfx::ToEnclosingRect(
     gfx::ScaleRect(clip_rect, device_scale_factor_));
   gfx::Vector2d pixel_delta = gfx::ToFlooredVector2d(
     gfx::ScaleVector2d(delta, device_scale_factor_));
-#endif
-  gfx::Rect pixel_rect = clip_rect;
-  gfx::Vector2d pixel_delta = delta;
 
   // FIXME: this is from backing_store_aura.cc but the math seems strange.
   int x = std::min(pixel_rect.x(), pixel_rect.x() - pixel_delta.x());
@@ -219,16 +208,12 @@ void BackingStoreEfl::ScrollBackingStore(const gfx::Vector2d& delta,
                                     rect.width(), rect.height());
 }
 
-bool BackingStoreEfl::CopyFromBackingStore(const gfx::Rect& rect, skia::PlatformBitmap* output)
-{
-#if 0
+bool BackingStoreEfl::CopyFromBackingStore(const gfx::Rect& rect, skia::PlatformBitmap* output) {
   const int width =
-    std::min(size().width(), rect.width()) * device_scale_factor_;
+      std::min(size().width(), rect.width()) * device_scale_factor_;
   const int height =
-    std::min(size().height(), rect.height()) * device_scale_factor_;
-#endif
-  const int width = std::min(size().width(), rect.width());
-  const int height = std::min(size().height(), rect.height());
+      std::min(size().height(), rect.height()) * device_scale_factor_;
+
   if (!output->Allocate(width, height, true))
     return false;
 

@@ -9,8 +9,6 @@
 #include "content/browser/renderer_host/backing_store.h"
 #include "third_party/skia/include/core/SkBitmap.h"
 
-class SkCanvas;
-
 typedef struct _Evas_Object Evas_Object;
 
 namespace gfx {

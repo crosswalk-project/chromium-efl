@@ -21,7 +21,7 @@ class EflScreen : public gfx::Screen {
   }
 
   virtual bool IsDIPEnabled() OVERRIDE {
-    return false;
+    return true;
   }
 
   virtual gfx::Point GetCursorScreenPoint() OVERRIDE {
@@ -78,6 +78,10 @@ class EflScreen : public gfx::Screen {
 
     static gfx::Display display(0,
         gfx::Rect(0, 0, WidthOfScreen(screen), HeightOfScreen(screen)));
+
+    if (!gfx::Display::HasForceDeviceScaleFactor())
+      display.set_device_scale_factor(2.0f);//TODO:remove hardcoding
+
     return display;
   }
 
