@@ -137,6 +137,7 @@ bool RenderViewObserverEfl::OnMessageReceived(const IPC::Message& message)
     IPC_MESSAGE_HANDLER(EwkViewMsg_PrintToPdf, OnPrintToPdf)
     IPC_MESSAGE_HANDLER(EwkViewMsg_GetMHTMLData, OnGetMHTMLData);
     IPC_MESSAGE_HANDLER(EwkViewMsg_WebAppIconUrlGet, OnWebAppIconUrlGet);
+    IPC_MESSAGE_HANDLER(EwkViewMsg_WebAppIconUrlsGet, OnWebAppIconUrlsGet);
     IPC_MESSAGE_HANDLER(EwkViewMsg_WebAppCapableGet, OnWebAppCapableGet);
     IPC_MESSAGE_HANDLER(EwkViewMsg_SetDrawsTransparentBackground, OnSetDrawsTransparentBackground);
     IPC_MESSAGE_HANDLER(EwkViewMsg_SetBrowserFont, OnSetBrowserFont);
@@ -383,6 +384,42 @@ void RenderViewObserverEfl::OnWebAppIconUrlGet(int callback_id)
     }
   }
   Send(new EwkHostMsg_WebAppIconUrlGet(render_view()->GetRoutingID(), appleIconUrl.empty() ? iconUrl : appleIconUrl, callback_id));
+}
+
+void RenderViewObserverEfl::OnWebAppIconUrlsGet(int callback_id) {
+  blink::WebFrame *frame = render_view()->GetWebView()->mainFrame();
+  if (!frame) {
+    return;
+  }
+
+  blink::WebDocument document = frame->document();
+  blink::WebElement head = document.head();
+  if (head.isNull()) {
+    return;
+  }
+
+  std::map<std::string, std::string> iconUrls;
+  blink::WebNodeList nodes = head.childNodes();
+  for (int i = 0; i < nodes.length(); ++i) {
+    blink::WebNode node = nodes.item(i);
+    if (!node.isElementNode()) {
+      continue;
+    }
+    blink::WebElement elem = node.to<blink::WebElement>();
+    if (!elem.hasHTMLTagName("link")) {
+      continue;
+    }
+    std::string rel = elem.getAttribute("rel").utf8();
+    if (LowerCaseEqualsASCII(rel, "apple-touch-icon") ||              // Apple's way
+        LowerCaseEqualsASCII(rel, "apple-touch-icon-precomposed") ||  // same here
+        LowerCaseEqualsASCII(rel, "icon")) {                          // Google's way
+      std::string iconSize = elem.getAttribute("sizes").utf8();
+      std::string iconUrl = document.completeURL(elem.getAttribute("href")).string().utf8();
+
+      iconUrls[iconSize] = iconUrl;
+    }
+  }
+  Send(new EwkHostMsg_WebAppIconUrlsGet(render_view()->GetRoutingID(), iconUrls, callback_id));
 }
 
 void RenderViewObserverEfl::OnWebAppCapableGet(int callback_id) {

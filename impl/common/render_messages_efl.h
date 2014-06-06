@@ -20,6 +20,9 @@
 #include "url/gurl.h"
 
 #include <string>
+#include <map>
+
+typedef std::map<std::string, std::string> StringMap;
 
 //-----------------------------------------------------------------------------
 // RenderView messages
@@ -239,6 +242,13 @@ IPC_MESSAGE_ROUTED1(EwkViewMsg_WebAppIconUrlGet,
 
 IPC_MESSAGE_ROUTED2(EwkHostMsg_WebAppIconUrlGet,
                     std::string, /* icon url */
+                    int /* callback id */)
+
+IPC_MESSAGE_ROUTED1(EwkViewMsg_WebAppIconUrlsGet,
+                    int /* callback id */)
+
+IPC_MESSAGE_ROUTED2(EwkHostMsg_WebAppIconUrlsGet,
+                    StringMap, /* icon urls */
                     int /* callback id */)
 
 IPC_MESSAGE_ROUTED1(EwkViewMsg_WebAppCapableGet,

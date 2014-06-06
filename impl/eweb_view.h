@@ -44,6 +44,7 @@
 #include "API/ewk_policy_decision_private.h"
 #include "API/ewk_view_private.h"
 #include "API/ewk_settings_private.h"
+#include "API/ewk_web_application_icon_data_private.h"
 #include "eweb_view_callbacks.h"
 #include "public/ewk_hit_test.h"
 #include "public/ewk_policy_decision.h"
@@ -135,6 +136,27 @@ class WebApplicationIconUrlGetCallback {
 
  private:
   Ewk_Web_App_Icon_URL_Get_Callback func_;
+  void *user_data_;
+};
+
+class WebApplicationIconUrlsGetCallback {
+ public:
+  WebApplicationIconUrlsGetCallback(Ewk_Web_App_Icon_URLs_Get_Callback func, void *user_data)
+    : func_(func), user_data_(user_data)
+  {}
+  void Run(const std::map<std::string, std::string> &urls) {
+    if (func_) {
+      Eina_List *list = NULL;
+      for (std::map<std::string, std::string>::const_iterator it = urls.begin(); it != urls.end(); ++it) {
+        _Ewk_Web_App_Icon_Data *data = ewkWebAppIconDataCreate(it->first, it->second);
+        list = eina_list_append(list, data);
+      }
+      (func_)(list, user_data_);
+    }
+  }
+
+ private:
+  Ewk_Web_App_Icon_URLs_Get_Callback func_;
   void *user_data_;
 };
 
@@ -291,8 +313,10 @@ class EWebView
   void InvokeBackForwardListChangedCallback();
   bool WebAppCapableGet(Ewk_Web_App_Capable_Get_Callback callback, void *userData);
   bool WebAppIconUrlGet(Ewk_Web_App_Icon_URL_Get_Callback callback, void *userData);
+  bool WebAppIconUrlsGet(Ewk_Web_App_Icon_URLs_Get_Callback callback, void *userData);
   void InvokeWebAppCapableGetCallback(bool capable, int callbackId);
   void InvokeWebAppIconUrlGetCallback(const std::string &iconUrl, int callbackId);
+  void InvokeWebAppIconUrlsGetCallback(const std::map<std::string, std::string> &iconUrls, int callbackId);
 
   bool GetMHTMLData(Ewk_View_MHTML_Data_Get_Callback callback, void* user_data);
   void OnMHTMLContentGet(const std::string& mhtml_content, int callback_id);
@@ -468,6 +492,7 @@ class EWebView
   scoped_ptr<OrientationLockCallback> orientation_lock_callback_;
   scoped_ptr<content::InputPicker> inputPicker_;
   IDMap<WebApplicationIconUrlGetCallback, IDMapOwnPointer> web_app_icon_url_get_callback_map_;
+  IDMap<WebApplicationIconUrlsGetCallback, IDMapOwnPointer> web_app_icon_urls_get_callback_map_;
   IDMap<WebApplicationCapableGetCallback, IDMapOwnPointer> web_app_capable_get_callback_map_;
 #ifdef TIZEN_EDGE_EFFECT
   scoped_refptr<EdgeEffect> edge_effect_;

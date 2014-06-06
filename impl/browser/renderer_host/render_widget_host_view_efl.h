@@ -206,9 +206,10 @@ class RenderWidgetHostViewEfl
   void OnPlainTextGetContents(const std::string&, int);
   void OnWebAppCapableGet(bool capable, int callback_id);
   void OnWebAppIconUrlGet(const std::string &icon_url, int callback_id);
-  void SelectRange(const gfx::Point&, const gfx::Point&);
-  void MoveCaret(const gfx::Point&);
-  void OnMHTMLContentGet(const std::string&, int);
+  void OnWebAppIconUrlsGet(const std::map<std::string, std::string> &icon_urls, int callback_id);
+  void SelectRange(const gfx::Point& start, const gfx::Point& end);
+  void MoveCaret(const gfx::Point& point);
+  void OnMHTMLContentGet(const std::string& mhtml_content, int callback_id);
 
   Evas_GL_API* evasGlApi() { return evas_gl_api_; }
   gfx::Point ConvertPointInViewPix(gfx::Point point);

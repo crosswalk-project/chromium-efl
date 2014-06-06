@@ -1588,6 +1588,16 @@ bool EWebView::WebAppIconUrlGet(Ewk_Web_App_Icon_URL_Get_Callback callback, void
   return renderViewHost->Send(new EwkViewMsg_WebAppIconUrlGet(renderViewHost->GetRoutingID(), callbackId));
 }
 
+bool EWebView::WebAppIconUrlsGet(Ewk_Web_App_Icon_URLs_Get_Callback callback, void *userData) {
+  RenderViewHost* renderViewHost = web_contents_delegate()->web_contents()->GetRenderViewHost();
+  if (!renderViewHost) {
+    return false;
+  }
+  WebApplicationIconUrlsGetCallback *cb = new WebApplicationIconUrlsGetCallback(callback, userData);
+  int callbackId = web_app_icon_urls_get_callback_map_.Add(cb);
+  return renderViewHost->Send(new EwkViewMsg_WebAppIconUrlsGet(renderViewHost->GetRoutingID(), callbackId));
+}
+
 void EWebView::InvokeWebAppCapableGetCallback(bool capable, int callbackId) {
   WebApplicationCapableGetCallback *callback = web_app_capable_get_callback_map_.Lookup(callbackId);
   if (!callback)
@@ -1600,6 +1610,14 @@ void EWebView::InvokeWebAppIconUrlGetCallback(const std::string& iconUrl, int ca
   if (!callback)
     return;
   callback->Run(iconUrl);
+}
+
+void EWebView::InvokeWebAppIconUrlsGetCallback(const StringMap &iconUrls, int callbackId) {
+  WebApplicationIconUrlsGetCallback *callback = web_app_icon_urls_get_callback_map_.Lookup(callbackId);
+  if (!callback) {
+    return;
+  }
+  callback->Run(iconUrls);
 }
 
 bool IsEWebViewObject(const Evas_Object* evas_object) {
