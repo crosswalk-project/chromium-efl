@@ -278,6 +278,7 @@ class EWebView
   void SetScale(double scale_factor, int x, int y);
   void GetScrollPosition(int* x, int* y) const;
   void SetScroll(int x, int y);
+  void UrlRequestSet(const char* url, std::string method, Eina_Hash* headers, const char* body);
 
   content::SelectionControllerEfl* GetSelectionController() const { return selection_controller_.get(); }
 #ifdef TIZEN_CONTENTS_DETECTION

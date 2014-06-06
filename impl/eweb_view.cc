@@ -18,6 +18,7 @@
 */
 
 #include "eweb_view.h"
+#include <config.h>
 
 #include "base/pickle.h"
 #include "base/threading/thread_restrictions.h"
@@ -2123,3 +2124,29 @@ bool EWebView::LaunchCamera(base::string16 mimetype)
   return true;
 }
 #endif
+
+void EWebView::UrlRequestSet(const char* url, std::string method, Eina_Hash* headers, const char* body) {
+  net::URLRequestContext context;
+  net::URLRequest request(GURL(url), net::DEFAULT_PRIORITY, NULL, &context);
+  request.set_method(method);
+
+  if (headers) {
+    net::HttpRequestHeaders* header;
+    Eina_Iterator* it = eina_hash_iterator_tuple_new(headers);
+    void* data;
+    while (eina_iterator_next(it, &data)) {
+      Eina_Hash_Tuple* t = static_cast<Eina_Hash_Tuple*>(data);
+      const char* name = static_cast<const char*>(t->key);
+      const char* value = static_cast<const char*>(t->data);
+      header->SetHeader(base::StringPiece(name), base::StringPiece(value));
+      request.SetExtraRequestHeaders(*header);
+    }
+    eina_iterator_free(it);
+  }
+
+  if (body) {
+    std::string str = body;
+    request.EnableChunkedUpload();
+    request.AppendChunkToUpload(str.c_str(), str.length(), true);
+  }
+}
