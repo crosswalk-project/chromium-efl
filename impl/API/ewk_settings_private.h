@@ -77,9 +77,7 @@ class Ewk_Settings {
     bool textZoomEnabled() const { return m_textZoomEnabled; }
     void setLoadRemoteImages(bool loadRemoteImages) { m_loadRemoteImages = loadRemoteImages; }
     bool loadRemoteImages() const { return m_loadRemoteImages; }
-    void setCurrentLegacyFontSizeMode(tizen_webview::Legacy_Font_Size_Mode mode) {
-        m_currentLegacyFontSizeMode = mode;
-    }
+    void setCurrentLegacyFontSizeMode(tizen_webview::Legacy_Font_Size_Mode mode);
     tizen_webview::Legacy_Font_Size_Mode currentLegacyFontSizeMode() const { return m_currentLegacyFontSizeMode; }
     void setPasteImageUriEnabled(bool enable) { m_pasteImageUriEnabled = enable; }
     bool pasteImageUriEnabled() const {return m_pasteImageUriEnabled;}

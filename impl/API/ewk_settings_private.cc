@@ -7,3 +7,7 @@ void Ewk_Settings::setSpdyEnabled(bool flag)
   net::HttpStreamFactory::set_spdy_enabled(flag);
 }
 
+void Ewk_Settings::setCurrentLegacyFontSizeMode(tizen_webview::Legacy_Font_Size_Mode mode) {
+    m_currentLegacyFontSizeMode = mode;
+    m_preferences.current_legacy_font_size_mode = static_cast<content::LegacyFontSizeMode>(mode);
+}
