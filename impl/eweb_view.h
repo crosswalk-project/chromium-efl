@@ -74,6 +74,7 @@
 
 #include "tizen_webview/public/tw_hit_test.h"
 #include "tizen_webview/public/tw_touch_event.h"
+#include "tizen_webview/public/tw_input_type.h"
 
 namespace content {
 class RenderViewHost;
@@ -345,7 +346,7 @@ class EWebView
   void RequestColorPicker(int r, int g, int b, int a);
   void DismissColorPicker();
   bool SetColorPickerColor(int r, int g, int b, int a);
-  void InputPickerShow(Ewk_Input_Type inputType, const char* inputValue);
+  void InputPickerShow(tizen_webview::Input_Type inputType, const char* inputValue);
 
 #ifdef TIZEN_EDGE_EFFECT
   void SetSettingsGetCallback(Ewk_View_Settings_Get callback, void* user_data);

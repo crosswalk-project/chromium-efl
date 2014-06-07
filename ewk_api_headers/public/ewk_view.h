@@ -96,29 +96,6 @@ typedef struct Ewk_View_Smart_Class Ewk_View_Smart_Class;
 // FIXME: these should be moved elsewhere.
 typedef struct Ewk_Page_Group Ewk_Page_Group;
 
-// #if ENABLE(TIZEN_INPUT_TAG_EXTENSION)
-/**
- * \enum    Ewk_Input_Type
- * @brief   Provides type of focused input element
- */
-enum Ewk_Input_Type {
-    EWK_INPUT_TYPE_TEXT,
-    EWK_INPUT_TYPE_TELEPHONE,
-    EWK_INPUT_TYPE_NUMBER,
-    EWK_INPUT_TYPE_EMAIL,
-    EWK_INPUT_TYPE_URL,
-    EWK_INPUT_TYPE_PASSWORD,
-    EWK_INPUT_TYPE_COLOR,
-    EWK_INPUT_TYPE_DATE,
-    EWK_INPUT_TYPE_DATETIME,
-    EWK_INPUT_TYPE_DATETIMELOCAL,
-    EWK_INPUT_TYPE_MONTH,
-    EWK_INPUT_TYPE_TIME,
-    EWK_INPUT_TYPE_WEEK
-};
-typedef enum Ewk_Input_Type Ewk_Input_Type;
-
-
 /// Ewk view's class, to be overridden by sub-classes.
 struct Ewk_View_Smart_Class {
     Evas_Smart_Class sc; /**< all but 'data' is free to be changed. */
@@ -133,7 +110,8 @@ struct Ewk_View_Smart_Class {
     Eina_Bool (*text_selection_down)(Ewk_View_Smart_Data *sd, int x, int y);
     Eina_Bool (*text_selection_up)(Ewk_View_Smart_Data *sd, int x, int y);
     // input_picker_* are unused in chromium-efl.
-    Eina_Bool(*input_picker_show)(Ewk_View_Smart_Data *sd, Ewk_Input_Type inputType, const char* inputValue) __attribute__((deprecated));
+    // Note: temporarily replaced arg Ewk_Input_Type with int for break dependency.
+    Eina_Bool(*input_picker_show)(Ewk_View_Smart_Data *sd, int inputType, const char* inputValue) __attribute__((deprecated));
 
     // event handling:
     //  - returns true if handled

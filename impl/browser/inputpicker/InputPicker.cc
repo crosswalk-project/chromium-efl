@@ -39,6 +39,8 @@
 extern void* EflAssistHandle;
 #endif
 
+using namespace tizen_webview;
+
 namespace content {
 
 static const unsigned maxDatetimeLength = 32;
@@ -208,20 +210,20 @@ void InputPicker::_edit_end_cb(void* data, Evas_Object* obj, void* event_info)
 }
 #endif
 
-void InputPicker::show(Ewk_Input_Type inputType, const char* inputValue) {
+void InputPicker::show(tizen_webview::Input_Type inputType, const char* inputValue) {
   web_contents_delegate_->web_view()->ExecuteEditCommand("Unselect", 0);
 
-  if (inputType == EWK_INPUT_TYPE_DATE)
+  if (inputType == TW_INPUT_TYPE_DATE)
     ewk_date_popup(inputValue);
-  else if (inputType == EWK_INPUT_TYPE_TIME)
+  else if (inputType == TW_INPUT_TYPE_TIME)
     ewk_time_popup(inputValue);
-  else if (inputType == EWK_INPUT_TYPE_DATETIME)
+  else if (inputType == TW_INPUT_TYPE_DATETIME)
     ewk_datetime_popup(inputValue, false);
-  else if (inputType == EWK_INPUT_TYPE_DATETIMELOCAL)
+  else if (inputType == TW_INPUT_TYPE_DATETIMELOCAL)
     ewk_datetime_popup(inputValue, true);
-  else if (inputType == EWK_INPUT_TYPE_MONTH)
+  else if (inputType == TW_INPUT_TYPE_MONTH)
     ewk_month_popup(inputValue);
-  else if (inputType == EWK_INPUT_TYPE_WEEK)
+  else if (inputType == TW_INPUT_TYPE_WEEK)
     ewk_week_popup(inputValue);
 }
 

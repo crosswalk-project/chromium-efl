@@ -28,6 +28,7 @@
 #include "printing/pdf_metafile_skia.h"
 #include "url/gurl.h"
 #include "browser/favicon/favicon_service.h"
+#include "tizen_webview/public/tw_input_type.h"
 
 #ifdef TIZEN_AUTOFILL_SUPPORT
 #include "browser/autofill/autofill_manager_delegate_efl.h"
@@ -42,6 +43,7 @@ using autofill::AutofillManagerDelegateEfl;
 #endif
 
 using base::string16;
+using namespace tizen_webview;
 
 namespace content {
 
@@ -536,42 +538,42 @@ void WebContentsDelegateEfl::OpenDateTimeDialog(
 
   switch (dialog_type) {
     case ui::TEXT_INPUT_TYPE_DATE:
-      inputPickerType = EWK_INPUT_TYPE_DATE;
+      inputPickerType = TW_INPUT_TYPE_DATE;
       inputMethodHints = "date";
       break;
     case ui::TEXT_INPUT_TYPE_DATE_TIME:
-      inputPickerType = EWK_INPUT_TYPE_DATETIME;
+      inputPickerType = TW_INPUT_TYPE_DATETIME;
       inputMethodHints = "datetime";
       break;
     case ui::TEXT_INPUT_TYPE_DATE_TIME_LOCAL:
-      inputPickerType = EWK_INPUT_TYPE_DATETIMELOCAL;
+      inputPickerType = TW_INPUT_TYPE_DATETIMELOCAL;
       inputMethodHints = "datetime-local";
       break;
     case ui::TEXT_INPUT_TYPE_TIME:
-      inputPickerType = EWK_INPUT_TYPE_TIME;
+      inputPickerType = TW_INPUT_TYPE_TIME;
       inputMethodHints = "time";
       break;
     case ui::TEXT_INPUT_TYPE_WEEK:
-      inputPickerType = EWK_INPUT_TYPE_WEEK;
+      inputPickerType = TW_INPUT_TYPE_WEEK;
       inputMethodHints = "week";
       break;
     case ui::TEXT_INPUT_TYPE_CONTENT_EDITABLE:
-      inputPickerType = EWK_INPUT_TYPE_TEXT;
+      inputPickerType = TW_INPUT_TYPE_TEXT;
       inputMethodHints = "date";
       break;
     case ui::TEXT_INPUT_TYPE_DATE_TIME_FIELD:
-      inputPickerType = EWK_INPUT_TYPE_DATETIME;
+      inputPickerType = TW_INPUT_TYPE_DATETIME;
       inputMethodHints = "datetime";
       break;
     case ui::TEXT_INPUT_TYPE_MONTH:
-      inputPickerType = EWK_INPUT_TYPE_MONTH;
+      inputPickerType = TW_INPUT_TYPE_MONTH;
       inputMethodHints = "month";
       break;
     default:
-      inputPickerType = EWK_INPUT_TYPE_TEXT;
+      inputPickerType = TW_INPUT_TYPE_TEXT;
       inputMethodHints = "";
       break;
   }
-  web_view_->InputPickerShow(static_cast<Ewk_Input_Type>(inputPickerType), inputMethodHints.c_str());
+  web_view_->InputPickerShow(static_cast<tizen_webview::Input_Type>(inputPickerType), inputMethodHints.c_str());
 }
 } //namespace content

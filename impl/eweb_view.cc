@@ -1928,7 +1928,7 @@ bool EWebView::SetColorPickerColor(int r, int g, int b, int a) {
   return true;
 }
 
-void EWebView::InputPickerShow(Ewk_Input_Type inputType, const char* inputValue) {
+void EWebView::InputPickerShow(tizen_webview::Input_Type inputType, const char* inputValue) {
   inputPicker_.reset(new InputPicker(web_contents_delegate()->web_contents()));
   inputPicker_->show(inputType, inputValue);
 }
