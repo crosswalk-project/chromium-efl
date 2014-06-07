@@ -233,6 +233,9 @@
       'selection_handle_efl.h',
       'selection_magnifier_efl.cc',
       'selection_magnifier_efl.h',
+      # tizen_webview
+      '<(chrome_src_dir)/tizen_webview/public/tw_custom_handlers.h',
+      '<(chrome_src_dir)/tizen_webview/public/tw_custom_handlers.cc',
       'url_request_context_getter_efl.cc',
       'url_request_context_getter_efl.h',
       'web_contents_delegate_efl.cc',

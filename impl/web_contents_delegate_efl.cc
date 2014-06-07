@@ -12,7 +12,6 @@
 #include "common/render_messages_efl.h"
 #include "eweb_view.h"
 #include "eweb_view_callbacks.h"
-#include "public/ewk_custom_handlers.h"
 #include "public/ewk_view.h"
 #include "public/ewk_policy_decision.h"
 
@@ -161,8 +160,9 @@ bool WebContentsDelegateEfl::IsFullscreenForTabOrPending(
 
 void WebContentsDelegateEfl::RegisterProtocolHandler(WebContents* web_contents,
         const std::string& protocol, const GURL& url, const string16& title, bool user_gesture) {
-  scoped_ptr<Ewk_Custom_Handlers_Data> protocol_data(new Ewk_Custom_Handlers_Data(protocol.c_str(), url.host().c_str(),
-      url.spec().c_str(), UTF16ToUTF8(title).c_str()));
+  scoped_ptr<tizen_webview::Custom_Handlers_Data> protocol_data(
+      new tizen_webview::Custom_Handlers_Data(protocol.c_str(),
+          url.host().c_str(), url.spec().c_str(), UTF16ToUTF8(title).c_str()));
   web_view_->SmartCallback<EWebViewCallbacks::RegisterProtocolHandler>().call(protocol_data.get());
 }
 

@@ -29,10 +29,10 @@
 #include "API/ewk_geolocation_private.h"
 #include "API/ewk_certificate_private.h"
 #include "API/ewk_user_media_private.h"
-#include "public/ewk_custom_handlers.h"
 #include "public/ewk_notification.h"
 #include "public/ewk_policy_decision.h"
 #include "public/ewk_ipc_message.h"
+#include "tizen_webview/public/tw_custom_handlers.h"
 
 #include <Evas.h>
 #include <Eina.h>
@@ -231,7 +231,7 @@ DECLARE_EWK_VIEW_CALLBACK(TooltipTextSet, "tooltip,text,set", const char*);
 DECLARE_EWK_VIEW_CALLBACK(EnterFullscreen, "fullscreen,enterfullscreen", void);
 DECLARE_EWK_VIEW_CALLBACK(ExitFullscreen, "fullscreen,exitfullscreen", void);
 DECLARE_EWK_VIEW_CALLBACK(UserMediaPermission, "usermedia,permission,request", _Ewk_User_Media_Permission_Request*);
-DECLARE_EWK_VIEW_CALLBACK(RegisterProtocolHandler, "protocolhandler,registration,requested", Ewk_Custom_Handlers_Data*);
+DECLARE_EWK_VIEW_CALLBACK(RegisterProtocolHandler, "protocolhandler,registration,requested", tizen_webview::Custom_Handlers_Data*);
 DECLARE_EWK_VIEW_CALLBACK(IMEInputPanelShow, "editorclient,ime,opened", void);
 DECLARE_EWK_VIEW_CALLBACK(IMEInputPanelHide, "editorclient,ime,closed", void);
 DECLARE_EWK_VIEW_CALLBACK(IMECandidatePanelShow, "editorclient,candidate,opened", void);
