@@ -90,39 +90,11 @@
 extern "C" {
 #endif
 
-/// Enum values containing text directionality values.
-typedef enum {
-    EWK_TEXT_DIRECTION_RIGHT_TO_LEFT,
-    EWK_TEXT_DIRECTION_LEFT_TO_RIGHT
-} Ewk_Text_Direction;
-
-enum Ewk_Password_Popup_Option {
-    EWK_PASSWORD_POPUP_SAVE,
-    EWK_PASSWORD_POPUP_NOT_NOW,
-    EWK_PASSWORD_POPUP_NEVER,
-    EWK_PASSWORD_POPUP_OK = EWK_PASSWORD_POPUP_SAVE,
-    EWK_PASSWORD_POPUP_CANCEL =EWK_PASSWORD_POPUP_NOT_NOW
-};
-typedef enum Ewk_Password_Popup_Option Ewk_Password_Popup_Option;
-
 typedef struct Ewk_View_Smart_Data Ewk_View_Smart_Data;
 typedef struct Ewk_View_Smart_Class Ewk_View_Smart_Class;
 
 // FIXME: these should be moved elsewhere.
 typedef struct Ewk_Page_Group Ewk_Page_Group;
-
-// #if ENABLE(TIZEN_FOCUS_UI)
-enum Ewk_Unfocus_Direction {
-    EWK_UNFOCUS_DIRECTION_NONE = 0,
-    EWK_UNFOCUS_DIRECTION_FORWARD,
-    EWK_UNFOCUS_DIRECTION_BACKWARD,
-    EWK_UNFOCUS_DIRECTION_UP,
-    EWK_UNFOCUS_DIRECTION_DOWN,
-    EWK_UNFOCUS_DIRECTION_LEFT,
-    EWK_UNFOCUS_DIRECTION_RIGHT,
-};
-typedef enum Ewk_Unfocus_Direction Ewk_Unfocus_Direction;
-// #endif
 
 // #if ENABLE(TIZEN_INPUT_TAG_EXTENSION)
 /**
@@ -145,35 +117,23 @@ enum Ewk_Input_Type {
     EWK_INPUT_TYPE_WEEK
 };
 typedef enum Ewk_Input_Type Ewk_Input_Type;
-// #endif // ENABLE(TIZEN_INPUT_TAG_EXTENSION)
 
-// #if ENABLE(TIZEN_WEBKIT2_TEXT_SELECTION)
-/**
- * \enum    Ewk_Selection_Handle_Type
- * @brief   Provides type of selection handle
- */
-enum Ewk_Selection_Handle_Type {
-    EWK_SELECTION_HANDLE_TYPE_LEFT,
-    EWK_SELECTION_HANDLE_TYPE_RIGHT,
-    EWK_SELECTION_HANDLE_TYPE_LARGE
-};
-typedef enum Ewk_Selection_Handle_Type Ewk_Selection_Handle_Type;
-// #endif // ENABLE(TIZEN_WEBKIT2_TEXT_SELECTION)
-// #endif // #if PLATFORM(TIZEN)
 
 /// Ewk view's class, to be overridden by sub-classes.
 struct Ewk_View_Smart_Class {
     Evas_Smart_Class sc; /**< all but 'data' is free to be changed. */
     unsigned long version;
 
-    Eina_Bool (*popup_menu_show)(Ewk_View_Smart_Data *sd, Eina_Rectangle rect, Ewk_Text_Direction text_direction, double page_scale_factor, Eina_List* items, int selected_index);
-    Eina_Bool (*popup_menu_hide)(Ewk_View_Smart_Data *sd);
-    Eina_Bool (*popup_menu_update)(Ewk_View_Smart_Data *sd, Eina_Rectangle rect, Ewk_Text_Direction text_direction, Eina_List* items, int selected_index);
+    // popup_menu_* are unused in chromium-efl.
+    // Note: temporarily replaced arg Ewk_Text_Direction with int for break dependency.
+    Eina_Bool (*popup_menu_show)(Ewk_View_Smart_Data *sd, Eina_Rectangle rect, int text_direction, double page_scale_factor, Eina_List* items, int selected_index) __attribute__((deprecated));
+    Eina_Bool (*popup_menu_hide)(Ewk_View_Smart_Data *sd) __attribute__((deprecated));
+    Eina_Bool (*popup_menu_update)(Ewk_View_Smart_Data *sd, Eina_Rectangle rect, int text_direction, Eina_List* items, int selected_index) __attribute__((deprecated));
 
     Eina_Bool (*text_selection_down)(Ewk_View_Smart_Data *sd, int x, int y);
     Eina_Bool (*text_selection_up)(Ewk_View_Smart_Data *sd, int x, int y);
-
-    Eina_Bool (*input_picker_show)(Ewk_View_Smart_Data *sd, Ewk_Input_Type inputType, const char* inputValue);
+    // input_picker_* are unused in chromium-efl.
+    Eina_Bool(*input_picker_show)(Ewk_View_Smart_Data *sd, Ewk_Input_Type inputType, const char* inputValue) __attribute__((deprecated));
 
     // event handling:
     //  - returns true if handled
@@ -191,17 +151,17 @@ struct Ewk_View_Smart_Class {
 
     // color picker:
     //   - Shows and hides color picker.
-    Eina_Bool (*input_picker_color_request)(Ewk_View_Smart_Data *sd, int r, int g, int b, int a);
-    Eina_Bool (*input_picker_color_dismiss)(Ewk_View_Smart_Data *sd);
+    Eina_Bool(*input_picker_color_request)(Ewk_View_Smart_Data *sd, int r, int g, int b, int a) __attribute__((deprecated));
+    Eina_Bool(*input_picker_color_dismiss)(Ewk_View_Smart_Data *sd)  __attribute__((deprecated));
 
     // storage:
     //   - Web database.
     unsigned long long (*exceeded_database_quota)(Ewk_View_Smart_Data *sd, const char *databaseName, const char *displayName, unsigned long long currentQuota, unsigned long long currentOriginUsage, unsigned long long currentDatabaseUsage, unsigned long long expectedUsage);
-
-    Eina_Bool (*formdata_candidate_show)(Ewk_View_Smart_Data *sd, int x, int y, int w, int h);
-    Eina_Bool (*formdata_candidate_hide)(Ewk_View_Smart_Data *sd);
-    Eina_Bool (*formdata_candidate_update_data)(Ewk_View_Smart_Data *sd, Eina_List *dataList);
-    Eina_Bool (*formdata_candidate_is_showing)(Ewk_View_Smart_Data *sd);
+    // formdata_candidate_* are unused in chromium-efl.
+    Eina_Bool (*formdata_candidate_show)(Ewk_View_Smart_Data *sd, int x, int y, int w, int h) __attribute__((deprecated));
+    Eina_Bool (*formdata_candidate_hide)(Ewk_View_Smart_Data *sd) __attribute__((deprecated));
+    Eina_Bool (*formdata_candidate_update_data)(Ewk_View_Smart_Data *sd, Eina_List *dataList) __attribute__((deprecated));
+    Eina_Bool (*formdata_candidate_is_showing)(Ewk_View_Smart_Data *sd) __attribute__((deprecated));
 
     // gesture_* are unused in chromium-efl.
     // Note: temporarily replaced arg Ewk_Event_Gesture with void for break dependency.
@@ -209,12 +169,15 @@ struct Ewk_View_Smart_Class {
     Eina_Bool (*gesture_end)(Ewk_View_Smart_Data *sd, const void *ev) __attribute__((deprecated));
     Eina_Bool (*gesture_move)(Ewk_View_Smart_Data *sd, const void *ev) __attribute__((deprecated));
 
-    void (*selection_handle_down)(Ewk_View_Smart_Data *sd, Ewk_Selection_Handle_Type handleType, int x, int y);
-    void (*selection_handle_move)(Ewk_View_Smart_Data *sd, Ewk_Selection_Handle_Type handleType, int x, int y);
-    void (*selection_handle_up)(Ewk_View_Smart_Data *sd, Ewk_Selection_Handle_Type handleType, int x, int y);
+    // selection_handle_* are unused in chromium-efl.
+    // Note: temporarily replaced arg Ewk_Selection_Handle_Type with int for break dependency.
+    void(*selection_handle_down)(Ewk_View_Smart_Data *sd, int handleType, int x, int y) __attribute__((deprecated));
+    void(*selection_handle_move)(Ewk_View_Smart_Data *sd, int handleType, int x, int y)  __attribute__((deprecated));
+    void(*selection_handle_up)(Ewk_View_Smart_Data *sd, int handleType, int x, int y)  __attribute__((deprecated));
 
-    Eina_Bool (*window_geometry_set)(Ewk_View_Smart_Data *sd, Evas_Coord x, Evas_Coord y, Evas_Coord width, Evas_Coord height);
-    Eina_Bool (*window_geometry_get)(Ewk_View_Smart_Data *sd, Evas_Coord *x, Evas_Coord *y, Evas_Coord *width, Evas_Coord *height);
+    // window_geometry_* are unused in chromium-efl.
+    Eina_Bool(*window_geometry_set)(Ewk_View_Smart_Data *sd, Evas_Coord x, Evas_Coord y, Evas_Coord width, Evas_Coord height)  __attribute__((deprecated));
+    Eina_Bool (*window_geometry_get)(Ewk_View_Smart_Data *sd, Evas_Coord *x, Evas_Coord *y, Evas_Coord *width, Evas_Coord *height)  __attribute__((deprecated));
 };
 
 // #if PLATFORM(TIZEN)
@@ -331,22 +294,6 @@ enum _Ewk_Find_Options {
   EWK_FIND_OPTIONS_SHOW_HIGHLIGHT = 1 << 7 /**< show highlight */
 };
 typedef enum _Ewk_Find_Options Ewk_Find_Options;
-
-enum Ewk_Page_Visibility_State {
-    EWK_PAGE_VISIBILITY_STATE_VISIBLE,
-    EWK_PAGE_VISIBILITY_STATE_HIDDEN,
-    EWK_PAGE_VISIBILITY_STATE_PRERENDER
-};
-typedef enum Ewk_Page_Visibility_State Ewk_Page_Visibility_State;
-
-enum Ewk_Http_Method {
-    EWK_HTTP_METHOD_GET,
-    EWK_HTTP_METHOD_HEAD,
-    EWK_HTTP_METHOD_POST,
-    EWK_HTTP_METHOD_PUT,
-    EWK_HTTP_METHOD_DELETE,
-};
-typedef enum Ewk_Http_Method Ewk_Http_Method;
 
 enum _Ewk_CSP_Header_Type {
   EWK_REPORT_ONLY,
