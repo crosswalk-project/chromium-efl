@@ -40,6 +40,7 @@
     ],
     'defines': [
       'CHROMIUMCORE_IMPLEMENTATION=1',
+      'TIZEN_WEBVIEW_IMPLEMENTATION=1',
       'DATA_DIR="<(data_dir)"',
       'EXE_DIR="<(exe_dir)"',
       'EDJE_DIR="<(edje_dir)"',
