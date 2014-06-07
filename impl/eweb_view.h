@@ -75,6 +75,7 @@
 #include "tizen_webview/public/tw_hit_test.h"
 #include "tizen_webview/public/tw_touch_event.h"
 #include "tizen_webview/public/tw_input_type.h"
+#include "tizen_webview/public/tw_find_options.h"
 
 namespace content {
 class RenderViewHost;
@@ -251,7 +252,7 @@ class EWebView
   void LoadPlainTextString(const char* plain_text);
   void LoadData(const char* data, size_t size, const char* mime_type, const char* encoding, const char* base_uri, const char* unreachable_uri = NULL);
   void InvokeAuthCallback(LoginDelegateEfl* login_delegate, const GURL& url, const std::string& realm);
-  void Find(const char* text, Ewk_Find_Options);
+  void Find(const char* text, tizen_webview::Find_Options);
   void InvokeAuthCallbackOnUI(_Ewk_Auth_Challenge* auth_challenge);
   void set_auth_challenge(_Ewk_Auth_Challenge* ac) { auth_challenge_.reset(ac); }
   _Ewk_Auth_Challenge* get_auth_challenge() const { return auth_challenge_.get(); }

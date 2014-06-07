@@ -1330,7 +1330,7 @@ void EWebView::CancelContextMenu(int request_id) {
   context_menu_.reset();
 }
 
-void EWebView::Find(const char* text, Ewk_Find_Options ewk_find_options) {
+void EWebView::Find(const char* text, tizen_webview::Find_Options find_options) {
   base::string16 find_text = base::UTF8ToUTF16(text);
   bool find_next = (previous_text_ == find_text);
 
@@ -1340,8 +1340,8 @@ void EWebView::Find(const char* text, Ewk_Find_Options ewk_find_options) {
   }
 
   blink::WebFindOptions web_find_options;
-  web_find_options.forward = !(ewk_find_options & EWK_FIND_OPTIONS_BACKWARDS);
-  web_find_options.matchCase = !(ewk_find_options & EWK_FIND_OPTIONS_CASE_INSENSITIVE);
+  web_find_options.forward = !(find_options & TW_FIND_OPTIONS_BACKWARDS);
+  web_find_options.matchCase = !(find_options & TW_FIND_OPTIONS_CASE_INSENSITIVE);
   web_find_options.findNext = find_next;
 
   web_contents_delegate_->web_contents()->Find(current_find_request_id_, find_text, web_find_options);

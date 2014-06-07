@@ -255,24 +255,6 @@ struct Ewk_View_Smart_Data {
     } changed;
 };
 
-/**
- * Enum values used to specify search options.
- * @brief   Provides option to find text
- * @info    Keep this in sync with WKFindOptions.h
- */
-enum _Ewk_Find_Options {
-  EWK_FIND_OPTIONS_NONE, /**< no search flags, this means a case sensitive, no wrap, forward only search. */
-  EWK_FIND_OPTIONS_CASE_INSENSITIVE = 1 << 0, /**< case insensitive search. */
-  EWK_FIND_OPTIONS_BACKWARDS = 1 << 3, /**< search backwards. */
-  EWK_FIND_OPTIONS_AT_WORD_STARTS = 1 << 1, /**< search text only at the beginning of the words. */
-  EWK_FIND_OPTIONS_TREAT_MEDIAL_CAPITAL_AS_WORD_START = 1 << 2, /**< treat capital letters in the middle of words as word start. */
-  EWK_FIND_OPTIONS_WRAP_AROUND = 1 << 4, /**< if not present search will stop at the end of the document. */
-  EWK_FIND_OPTIONS_SHOW_OVERLAY = 1 << 5, /**< show overlay */
-  EWK_FIND_OPTIONS_SHOW_FIND_INDICATOR = 1 << 6, /**< show indicator */
-  EWK_FIND_OPTIONS_SHOW_HIGHLIGHT = 1 << 7 /**< show highlight */
-};
-typedef enum _Ewk_Find_Options Ewk_Find_Options;
-
 enum _Ewk_CSP_Header_Type {
   EWK_REPORT_ONLY,
   EWK_ENFORCE_POLICY,
