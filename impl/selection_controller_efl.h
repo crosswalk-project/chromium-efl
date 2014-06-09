@@ -75,6 +75,9 @@ class SelectionControllerEfl {
   EWebView* GetParentView() { return parent_view_; }
   void HideHandle();
 
+  void SetScrollStatus(const bool enable);
+  bool GetScrollStatus();
+
  private:
   void ShowHandleAndContextMenuIfRequired();
   void Clear();
@@ -88,8 +91,11 @@ class SelectionControllerEfl {
   // Is required to send back selction points and range extenstion co-ordinates
   EWebView* parent_view_;
 
-  // Saves state so that context menu is not displyed during extending selection
+  // Saves state so that context menu is not displayed during extending selection
   bool mouse_press_;
+
+  // Saves state so that context menu is not displayed during page scrolling
+  bool scrolling_;
 
   // Saves state so that handlers and context menu is not shown when seletion change event occurs.
   bool long_mouse_press_;

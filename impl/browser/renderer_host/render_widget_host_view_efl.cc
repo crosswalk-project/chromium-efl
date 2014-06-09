@@ -474,12 +474,9 @@ bool RenderWidgetHostViewEfl::GetCompositionCharacterBounds(uint32 index, gfx::R
 void RenderWidgetHostViewEfl::ImeCompositionRangeChanged(
     const gfx::Range& range,
     const std::vector<gfx::Rect>& character_bounds) {
-  SelectionControllerEfl* controller = web_view_->GetSelectionController();
-  if (controller) {
-    if (controller->GetCaretSelectionStatus()){
-      controller->SetCaretSelectionStatus(false);
-    }
-  }
+  SelectionControllerEfl* controller = GetSelectionController();
+  if (controller && controller->GetCaretSelectionStatus())
+    controller->SetCaretSelectionStatus(false);
 
   composition_character_bounds_ = character_bounds;
 }
@@ -506,7 +503,7 @@ void RenderWidgetHostViewEfl::SetTooltipText(const base::string16& text) {
 void RenderWidgetHostViewEfl::SelectionChanged(const base::string16& text,
   size_t offset,
   const gfx::Range& range) {
-  SelectionControllerEfl* controller = web_view_->GetSelectionController();
+  SelectionControllerEfl* controller = GetSelectionController();
   if (controller)
     controller->UpdateSelectionData(text);
 }
@@ -520,13 +517,19 @@ void RenderWidgetHostViewEfl::SelectionBoundsChanged(
   if (im_context_)
     im_context_->UpdateCaretBounds(gfx::UnionRects(guest_params.anchor_rect, guest_params.focus_rect));
 
-  SelectionControllerEfl* controller = web_view_->GetSelectionController();
+  SelectionControllerEfl* controller = GetSelectionController();
   if (controller)
     controller->UpdateSelectionDataAndShow(guest_params.anchor_rect, guest_params.focus_rect, guest_params.is_anchor_first);
 }
 
 void RenderWidgetHostViewEfl::ScrollOffsetChanged() {
   NOTIMPLEMENTED();
+}
+
+void RenderWidgetHostViewEfl::DidStopFlinging() {
+  // Unhide Selection UI when scrolling with fling gesture
+  if (GetSelectionController() && GetSelectionController()->GetScrollStatus())
+    GetSelectionController()->SetScrollStatus(false);
 }
 
 void RenderWidgetHostViewEfl::CopyFromCompositingSurface(
@@ -939,6 +942,14 @@ void RenderWidgetHostViewEfl::HandleGesture(ui::GestureEvent* event) {
     fling_cancel.type = blink::WebInputEvent::GestureFlingCancel;
     fling_cancel.sourceDevice = blink::WebGestureDeviceTouchscreen;
     host_->ForwardGestureEvent(fling_cancel);
+  } else if (event->type() == ui::ET_GESTURE_SCROLL_BEGIN) {
+    if (GetSelectionController())
+      GetSelectionController()->SetScrollStatus(true);
+  } else if (event->type() == ui::ET_GESTURE_SCROLL_END) {
+    if (GetSelectionController() && GetSelectionController()->GetScrollStatus())
+      GetSelectionController()->SetScrollStatus(false);
+  } else if (event->type() == ui::ET_GESTURE_END) {
+    // Gesture end event is received (1) After scroll end (2) After Fling start
   }
 
 #ifdef OS_TIZEN
@@ -1042,6 +1053,10 @@ void RenderWidgetHostViewEfl::OnDidChangePageScaleFactor(double scale_factor) {
 
 void RenderWidgetHostViewEfl::OnDidChangePageScaleRange(double min_scale, double max_scale) {
   eweb_view()->DidChangePageScaleRange(min_scale, max_scale);
+}
+
+SelectionControllerEfl* RenderWidgetHostViewEfl::GetSelectionController() {
+  return web_view_->GetSelectionController();
 }
 
 }  // namespace content

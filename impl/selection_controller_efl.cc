@@ -37,6 +37,7 @@ SelectionControllerEfl::SelectionControllerEfl(EWebView* parent_view)
     :  parent_view_(parent_view),
        mouse_press_(false),
        long_mouse_press_(false),
+       scrolling_(false),
        selection_data_(new SelectionBoxEfl(parent_view)),
        start_handle_(new SelectionHandleEfl(this, SelectionHandleEfl::HANDLE_TYPE_LEFT, parent_view->evas_object())),
        end_handle_(new SelectionHandleEfl(this, SelectionHandleEfl::HANDLE_TYPE_RIGHT, parent_view->evas_object())),
@@ -75,6 +76,20 @@ bool SelectionControllerEfl::GetCaretSelectionStatus() const {
   return selection_data_->GetCaretSelectionStatus();
 }
 
+void SelectionControllerEfl::SetScrollStatus(const bool enable) {
+  LOG(INFO) << __PRETTY_FUNCTION__ << " enable : " << enable;
+  scrolling_ = enable;
+  if (enable)
+    Clear();
+  else
+    ShowHandleAndContextMenuIfRequired();
+}
+
+bool SelectionControllerEfl::GetScrollStatus() {
+  LOG(INFO) << __PRETTY_FUNCTION__ << " " << scrolling_;
+  return scrolling_;
+}
+
 void SelectionControllerEfl::UpdateSelectionData(const base::string16& text) {
   selection_data_->UpdateSelectStringData(text);
 }
@@ -93,6 +108,10 @@ void SelectionControllerEfl::UpdateSelectionDataAndShow(const gfx::Rect& left_re
 
   // Do not show the context menu and handlers untill long mouse press is released
   if (long_mouse_press_)
+    return;
+
+  // Do not show the context menu and handlers while page is scrolling
+  if (scrolling_)
     return;
 
   ShowHandleAndContextMenuIfRequired();
@@ -138,6 +157,7 @@ void SelectionControllerEfl::HideHandle() {
 }
 
 void SelectionControllerEfl::Clear() {
+  parent_view_->CancelContextMenu(0);
   start_handle_->Hide();
   end_handle_->Hide();
   input_handle_->Hide();
@@ -230,15 +250,15 @@ bool SelectionControllerEfl::IsSelectionValid(const gfx::Rect& left_rect, const 
 }
 
 void SelectionControllerEfl::ClearSelection() {
-  LOG(INFO) << "SelectionControllerEfl::ClearSelection";
+  LOG(INFO) << __PRETTY_FUNCTION__;
   Clear();
-  parent_view_->CancelContextMenu(0);
   selection_data_->SetStatus(false);
   SetSelectionEditable(false);
   SetCaretSelectionStatus(false);
 }
 
 void SelectionControllerEfl::OnParentParentViewMove() {
+  LOG(INFO) << __PRETTY_FUNCTION__;
   parent_view_->CancelContextMenu(0);
   start_handle_->Move(start_handle_->GetBasePosition());
   end_handle_->Move(end_handle_->GetBasePosition());

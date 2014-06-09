@@ -174,6 +174,7 @@ class RenderWidgetHostViewEfl
   virtual void OnCandidateWindowShown() OVERRIDE {}
   virtual void OnCandidateWindowUpdated() OVERRIDE {}
   virtual void OnCandidateWindowHidden() OVERRIDE {}
+  virtual void DidStopFlinging() OVERRIDE;
 
   void OnDidFirstVisuallyNonEmptyLayout();
   void OnSelectionTextStyleState(const SelectionStylePrams&);
@@ -229,6 +230,8 @@ class RenderWidgetHostViewEfl
   void OnOrientationChangeEvent(int);
   void OnDidChangePageScaleFactor(double);
   void OnDidChangePageScaleRange(double, double);
+
+  SelectionControllerEfl* GetSelectionController();
 
   static void CopyFromCompositingSurfaceHasResultForVideo(
       base::WeakPtr<RenderWidgetHostViewEfl> rwhvefl,
