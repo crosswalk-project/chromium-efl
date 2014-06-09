@@ -236,6 +236,8 @@
       # tizen_webview
       '<(chrome_src_dir)/tizen_webview/public/tw_custom_handlers.h',
       '<(chrome_src_dir)/tizen_webview/public/tw_custom_handlers.cc',
+      '<(chrome_src_dir)/tizen_webview/public/tw_touch_point.h',
+      '<(chrome_src_dir)/tizen_webview/public/tw_touch_point.cc',
       'url_request_context_getter_efl.cc',
       'url_request_context_getter_efl.h',
       'web_contents_delegate_efl.cc',

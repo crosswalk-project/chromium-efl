@@ -57,6 +57,8 @@
 #include "ui/base/l10n/l10n_util.h"
 #include "devtools_delegate_efl.h"
 
+#include "tizen_webview/public/tw_touch_point.h"
+
 #ifdef OS_TIZEN
 #include <vconf.h>
 #include "browser/selectpicker/popup_menu_item.h"
@@ -816,7 +818,7 @@ void EWebView::HandleTouchEvents(tizen_webview::Touch_Event_Type type, const Ein
   const Eina_List* l;
   void* data;
   EINA_LIST_FOREACH(points, l, data) {
-    ui::TouchEvent touch_event = WebEventFactoryEfl::toUITouchEvent(static_cast<Ewk_Touch_Point*>(data), evas_object(), rwhv()->device_scale_factor());
+    ui::TouchEvent touch_event = WebEventFactoryEfl::toUITouchEvent(static_cast<tizen_webview::Touch_Point*>(data), evas_object(), rwhv()->device_scale_factor());
     rwhv()->HandleTouchEvent(&touch_event);
   }
 }
@@ -862,7 +864,7 @@ void EWebView::HandleTouchEvents(tizen_webview::Touch_Event_Type type) {
   Evas_Coord_Point pt;
   Eina_List* points = 0;
   for (unsigned i = 0; i < count; ++i) {
-    Ewk_Touch_Point* point = new Ewk_Touch_Point;
+    tizen_webview::Touch_Point* point = new tizen_webview::Touch_Point;
     // evas_touch_point_list_nth_id_get returns [0] or [13, )
     // Multi touch's touch id [[0], [13, 23]] should be mapped to [[0], [1, 11]]
     // Internet Blame URL:
@@ -905,7 +907,7 @@ void EWebView::HandleTouchEvents(tizen_webview::Touch_Event_Type type) {
 
   void* data;
   EINA_LIST_FREE(points, data)
-  delete static_cast<Ewk_Touch_Point*>(data);
+  delete static_cast<Touch_Point*>(data);
 }
 
 bool EWebView::CanDispatchToConsumer(ui::GestureConsumer* consumer) {

@@ -21,7 +21,6 @@
 
 #include "base/time/time.h"
 #include "base/strings/utf_string_conversions.h"
-#include "public/ewk_touch.h"
 #include "third_party/WebKit/public/web/WebInputEvent.h"
 #include "ui/events/keycodes/keyboard_codes.h"
 #include "ui/events/keycodes/keyboard_code_conversion_x.h"
@@ -33,7 +32,10 @@
 #include <X11/Xutil.h>
 #include <X11/keysym.h>
 
+#include "tizen_webview/public/tw_touch_point.h"
+
 using namespace blink;
+using namespace tizen_webview;
 
 namespace {
 
@@ -323,7 +325,7 @@ static ui::EventType EvasTouchEventTypeToUI(Evas_Touch_Point_State evas_touch) {
 
 }
 
-ui::TouchEvent WebEventFactoryEfl::toUITouchEvent(Ewk_Touch_Point* p, Evas_Object* web_view, float scale_factor) {
+ui::TouchEvent WebEventFactoryEfl::toUITouchEvent(tizen_webview::Touch_Point* p, Evas_Object* web_view, float scale_factor) {
   int x = p->x, y = p->y;
 
   TranslateEvasCoordToWebKitCoord(web_view, x, y);

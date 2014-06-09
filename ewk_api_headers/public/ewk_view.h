@@ -82,7 +82,6 @@
 #define ewk_view_h
 
 #include <Evas.h>
-#include "ewk_touch.h"
 #include "ewk_security_origin.h"
 //#include "ewk_intercept_request.h"
 

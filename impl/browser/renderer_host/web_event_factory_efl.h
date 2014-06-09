@@ -27,7 +27,9 @@
 
 #include <Evas.h>
 
-typedef struct _Ewk_Touch_Point          Ewk_Touch_Point;
+namespace tizen_webview {
+struct Touch_Point;
+}
 
 namespace content {
 
@@ -40,7 +42,7 @@ class WebEventFactoryEfl {
   static content::NativeWebKeyboardEvent toWebKeyboardEvent(Evas*, const Evas_Event_Key_Down*);
   static content::NativeWebKeyboardEvent toWebKeyboardEvent(Evas*, const Evas_Event_Key_Up*);
 
-  static ui::TouchEvent toUITouchEvent(Ewk_Touch_Point*, Evas_Object* evas_object, float scale_factor);
+  static ui::TouchEvent toUITouchEvent(tizen_webview::Touch_Point*, Evas_Object* evas_object, float scale_factor);
 };
 
 }
