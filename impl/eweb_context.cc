@@ -39,10 +39,12 @@
 #include "browser_context_efl.h"
 #include "ewk_global_data.h"
 #include "memory_purger.h"
-#include "API/ewk_security_origin_private.h"
 #include "browser/renderer_host/browsing_data_remover_efl.h"
 #include "browser/vibration/vibration_provider_client.h"
 #include "common/render_messages_efl.h"
+
+#include "tizen_webview/public/tw_security_origin.h"
+#include "tizen_webview/tw_misc_utility.h"
 
 using content::BrowserThread;
 using content::BrowserContext;
@@ -53,6 +55,9 @@ using std::pair;
 using std::map;
 
 using tizen_webview::Cache_Model;
+using tizen_webview::Security_Origin;
+using tizen_webview::GetGURL;
+using tizen_webview::GetURL;
 
 namespace {
 
@@ -76,7 +81,7 @@ public:
     std::vector<content::LocalStorageUsageInfo>::const_iterator it;
 
     for (it = local_storage.begin(); it != local_storage.end(); it++) {
-      _Ewk_Security_Origin* origin = new _Ewk_Security_Origin(it->origin);
+      Security_Origin* origin = new Security_Origin(GetURL(it->origin));
       lorigins = eina_list_append(lorigins, origin);
     }
 
@@ -124,7 +129,7 @@ void OnOriginsWithApplicationCacheObtained(tizen_webview::Web_Application_Cache_
   for (map<GURL, content::AppCacheInfoVector>::iterator iter = collection->infos_by_origin.begin();
       iter != collection->infos_by_origin.end();
       ++iter) {
-    _Ewk_Security_Origin* origin = new _Ewk_Security_Origin(iter->first);
+    Security_Origin* origin = new Security_Origin(GetURL(iter->first));
     origins = eina_list_append(origins, origin);
   }
   callback(origins, user_data);
@@ -154,7 +159,7 @@ void OnGetWebDBOrigins(
   for (std::set<GURL>::iterator iter =
          origins_ref.begin();
          iter != origins_ref.end(); ++iter) {
-      _Ewk_Security_Origin* sec_origin = new _Ewk_Security_Origin(*iter);
+      Security_Origin* sec_origin = new Security_Origin(GetURL(*iter));
       origins = eina_list_append(origins, sec_origin);
   }
   BrowserThread::PostTask(BrowserThread::UI,
@@ -179,7 +184,7 @@ void OnGetFileSystemOrigins(
   for (std::set<GURL>::iterator iter =
          origins_ref.begin();
          iter != origins_ref.end(); ++iter) {
-      _Ewk_Security_Origin* sec_origin = new _Ewk_Security_Origin(*iter);
+      Security_Origin* sec_origin = new Security_Origin(GetURL(*iter));
       origins = eina_list_append(origins, sec_origin);
   }
   BrowserThread::PostTask(BrowserThread::UI,
@@ -376,12 +381,12 @@ void EWebContext::DeleteAllApplicationCache() {
   BrowserContext::ForEachStoragePartition(browser_context_.get(), base::Bind(&DeleteApplicationCache));
 }
 
-void EWebContext::DeleteApplicationCacheForSite(const GURL& site) {
+void EWebContext::DeleteApplicationCacheForSite(const tizen_webview::URL& site) {
   content::StoragePartition* partition = BrowserContext::GetStoragePartitionForSite(browser_context_.get(),
-                                                                                    site);
+                                                                                    GetGURL(site));
   partition->ClearDataForOrigin(content::StoragePartition::REMOVE_DATA_MASK_APPCACHE,
                                 content::StoragePartition::QUOTA_MANAGED_STORAGE_MASK_ALL,
-                                site,
+                                GetGURL(site),
                                 partition->GetURLRequestContext());
 }
 
@@ -399,7 +404,7 @@ void EWebContext::GetAllOriginsWithApplicationCache(tizen_webview::Web_Applicati
 }
 
 void EWebContext::GetApplicationCacheUsage(
-    const GURL& url,
+    const tizen_webview::URL& url,
     tizen_webview::Web_Application_Cache_Usage_For_Origin_Get_Callback callback,
     void* user_data) {
   content::StoragePartition* partition =
@@ -410,7 +415,7 @@ void EWebContext::GetApplicationCacheUsage(
       FROM_HERE,
       base::Bind(&quota::QuotaManager::GetUsageAndQuota,
                  partition->GetQuotaManager(),
-                 url,
+                 GetGURL(url),
                  quota::kStorageTypeTemporary,
                  base::Bind(&OnTemporaryUsageAndQuotaObtained, callback, user_data)));
 }
@@ -420,11 +425,11 @@ void EWebContext::WebStorageDelete() {
   remover->RemoveImpl(BrowsingDataRemoverEfl::REMOVE_LOCAL_STORAGE, GURL());
 }
 
-void EWebContext::WebStorageDelete(const GURL& origin) {
+void EWebContext::WebStorageDelete(const tizen_webview::URL& origin) {
   content::StoragePartition* partition =
       BrowserContext::GetStoragePartition(browser_context_.get(), NULL);
 
-  partition->GetDOMStorageContext()->DeleteLocalStorage(origin);
+  partition->GetDOMStorageContext()->DeleteLocalStorage(GetGURL(origin));
 }
 
 void EWebContext::WebStorageOriginsAllGet(tizen_webview::Web_Storage_Origins_Get_Callback callback,
@@ -442,9 +447,9 @@ void EWebContext::IndexedDBDelete() {
   remover->RemoveImpl(BrowsingDataRemoverEfl::REMOVE_INDEXEDDB, GURL());
 }
 
-void EWebContext::WebDBDelete(const GURL& host) {
+void EWebContext::WebDBDelete(const tizen_webview::URL& host) {
   BrowsingDataRemoverEfl* remover = BrowsingDataRemoverEfl::CreateForUnboundedRange(browser_context_.get());
-  remover->RemoveImpl(BrowsingDataRemoverEfl::REMOVE_WEBSQL, host);
+  remover->RemoveImpl(BrowsingDataRemoverEfl::REMOVE_WEBSQL, GetGURL(host));
 }
 
 void EWebContext::GetAllOriginsWithWebDB(tizen_webview::Web_Database_Origins_Get_Callback callback, void* user_data) {
@@ -456,9 +461,9 @@ void EWebContext::GetAllOriginsWithWebDB(tizen_webview::Web_Database_Origins_Get
                  callback, user_data, partition));
 }
 
-void EWebContext::FileSystemDelete(const GURL& host) {
+void EWebContext::FileSystemDelete(const tizen_webview::URL& host) {
   BrowsingDataRemoverEfl* remover = BrowsingDataRemoverEfl::CreateForUnboundedRange(browser_context_.get());
-  remover->RemoveImpl(BrowsingDataRemoverEfl::REMOVE_FILE_SYSTEMS, host);
+  remover->RemoveImpl(BrowsingDataRemoverEfl::REMOVE_FILE_SYSTEMS, GetGURL(host));
 }
 
 void EWebContext::GetAllOriginsWithFileSystem(tizen_webview::Local_File_System_Origins_Get_Callback callback, void* user_data) const {
@@ -491,3 +496,4 @@ Evas_Object *EWebContext::AddFaviconObject(const char* uri, Evas* canvas) const 
 
   return favicon;
 }
+

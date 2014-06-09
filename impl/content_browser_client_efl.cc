@@ -37,6 +37,8 @@
 #include "browser/geolocation/location_provider_efl.h"
 #endif
 
+#include "tizen_webview/public/tw_security_origin.h"
+
 using web_contents_utils::WebContentsFromFrameID;
 using web_contents_utils::WebContentsFromViewID;
 
@@ -135,7 +137,7 @@ void ContentBrowserClientEfl::RequestDesktopNotificationPermission(
          delegate->web_view()->evas_object(), callback_context, source_origin);
 
   if (browser_context->GetNotificationController()->
-        IsDefaultAllowed(notification_permission->origin->host)) {
+        IsDefaultAllowed(notification_permission->origin->GetHost())) {
     browser_context->GetNotificationController()->
         SetPermissionForNotification(notification_permission, true);
     delete notification_permission;

@@ -82,8 +82,12 @@
 #define ewk_view_h
 
 #include <Evas.h>
-#include "ewk_security_origin.h"
 //#include "ewk_intercept_request.h"
+
+namespace tizen_webview {
+class Security_Origin;
+}
+typedef class tizen_webview::Security_Origin Ewk_Security_Origin;
 
 #ifdef __cplusplus
 extern "C" {

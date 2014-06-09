@@ -26,6 +26,10 @@
 #include "tizen_webview/public/tw_cache_model.h"
 #include "tizen_webview/public/tw_callbacks.h"
 
+namespace tizen_webview {
+class URL;
+}
+
 typedef std::map<std::string, std::string> HTTPCustomHeadersEflMap;
 
 class CookieManager;
@@ -84,20 +88,20 @@ class EWebContext : public EWebObject {
                                    void* user_data);
   EwkDidStartDownloadCallback* DidStartDownloadCallback();
   void DeleteAllApplicationCache();
-  void DeleteApplicationCacheForSite(const GURL&);
+  void DeleteApplicationCacheForSite(const tizen_webview::URL&);
   void GetAllOriginsWithApplicationCache(tizen_webview::Web_Application_Cache_Origins_Get_Callback callback,
                                          void* user_data);
   void GetApplicationCacheUsage(
-      const GURL& url,
+      const tizen_webview::URL& url,
       tizen_webview::Web_Application_Cache_Usage_For_Origin_Get_Callback callback,
       void* user_data);
   void GetAllOriginsWithWebDB(tizen_webview::Web_Database_Origins_Get_Callback callback, void* user_data);
-  void WebDBDelete(const GURL& host);
+  void WebDBDelete(const tizen_webview::URL& host);
   void IndexedDBDelete();
   void WebStorageDelete();
-  void WebStorageDelete(const GURL& origin);
+  void WebStorageDelete(const tizen_webview::URL& origin);
   void WebStorageOriginsAllGet(tizen_webview::Web_Storage_Origins_Get_Callback callback, void* user_data);
-  void FileSystemDelete(const GURL& host);
+  void FileSystemDelete(const tizen_webview::URL& host);
   void GetAllOriginsWithFileSystem(tizen_webview::Local_File_System_Origins_Get_Callback callback, void* user_data) const;
   bool SetFaviconDatabasePath(const char* path);
   Evas_Object *AddFaviconObject(const char* uri, Evas* canvas) const;

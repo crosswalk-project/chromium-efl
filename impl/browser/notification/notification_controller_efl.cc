@@ -28,9 +28,15 @@
 #include "content/browser/renderer_host/render_view_host_impl.h"
 #include "content/public/browser/web_contents.h"
 
-#include "API/ewk_security_origin_private.h"
 #include "API/ewk_notification_private.h"
 #include "eweb_view.h"
+
+#include "tizen_webview/public/tw_security_origin.h"
+#include "tizen_webview/tw_misc_utility.h"
+
+using tizen_webview::Security_Origin;
+using tizen_webview::GetGURL;
+using tizen_webview::GetURL;
 
 namespace content {
 
@@ -100,13 +106,13 @@ void NotificationControllerEfl::RemoveStoredOrigins(Eina_List* origins) {
   Eina_List* origin_iterator = NULL;
   void* origin_data = NULL;
   EINA_LIST_FOREACH(origins, origin_iterator, origin_data) {
-    _Ewk_Security_Origin* origin = static_cast<_Ewk_Security_Origin*>(origin_data);
+    Security_Origin* origin = static_cast<Security_Origin*>(origin_data);
     Eina_List* permission_list_iterator = NULL;
     Eina_List* permission_list_iterator_next = NULL;
     void* permission_data = NULL;
     EINA_LIST_FOREACH_SAFE(ewk_notification_permissions_, permission_list_iterator, permission_list_iterator_next, permission_data) {
       Ewk_Notification_Permission* notification_permission = static_cast<Ewk_Notification_Permission*>(permission_data);
-      if (!strcmp(notification_permission->origin, origin->host)) {
+      if (!strcmp(notification_permission->origin, origin->GetHost())) {
         delete notification_permission;
         ewk_notification_permissions_ = eina_list_remove_list(ewk_notification_permissions_, permission_list_iterator);
       }
