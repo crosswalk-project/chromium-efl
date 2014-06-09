@@ -26,6 +26,11 @@ bool JavaScriptModalCallbacksData::Run(Evas_Object* obj, const char* message_tex
           return prompt_callback_(obj, message_text, default_text, user_data_);
       break;
     }
+    case content::JAVASCRIPT_MESSAGE_TYPE_NAVIGATION_PROMPT: {
+      if (prompt_callback_)
+        return prompt_callback_(obj, message_text, default_text, user_data_);
+      break;
+    }
   }
   return false;
 }
@@ -104,4 +109,11 @@ void JavaScriptDialogManagerEfl::SetPromptCallback(Ewk_View_JavaScript_Prompt_Ca
 void JavaScriptDialogManagerEfl::ExecuteDialogClosedCallBack(bool result, const std::string prompt_data)
 {
   dialog_closed_callback_.Run(result, base::UTF8ToUTF16(prompt_data));
+}
+
+void JavaScriptDialogManagerEfl::RunBeforeUnloadDialog(content::WebContents* web_contents,
+                                     const base::string16& message_text,
+                                     bool is_reload,
+                                     const DialogClosedCallback& callback) {
+  RunJavaScriptDialog(web_contents, GURL(), std::string(), content::JAVASCRIPT_MESSAGE_TYPE_NAVIGATION_PROMPT, base::UTF8ToUTF16(std::string("Confirm Navigation")), message_text, callback, &is_reload);
 }

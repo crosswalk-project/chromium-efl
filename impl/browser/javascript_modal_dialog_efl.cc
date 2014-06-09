@@ -94,7 +94,34 @@ bool JavaScriptModalDialogEfl::ShowJavaScriptDialog() {
     elm_object_part_content_set(popup_, "button2", ok_button_);
     evas_object_focus_set(ok_button_, true);
     evas_object_smart_callback_add(ok_button_, "clicked", OkButtonHandlerForPrompt, this);
-  } else if(javascript_message_type_ == content::JAVASCRIPT_MESSAGE_TYPE_ALERT) {
+
+  } else if (javascript_message_type_ == content::JAVASCRIPT_MESSAGE_TYPE_NAVIGATION_PROMPT) {
+    LOG(INFO) << "JAVASCRIPT_MESSAGE_TYPE_NAVIGATION_PROMPT() ";
+
+    if (message_text_.c_str())
+      elm_object_part_text_set(popup_, "title,text", UTF16ToUTF8(message_text_).c_str());
+
+    std::string message;
+    if (default_prompt_text_.c_str())
+      message = std::string(UTF16ToUTF8(default_prompt_text_).c_str()) + std::string("\nLeave this page?");
+    else
+      message = std::string("Leave this page?");
+
+    setLabelText(message.c_str());
+
+    cancel_button_ = elm_button_add(popup_);
+    elm_object_style_set(cancel_button_, "popup");
+    elm_object_text_set(cancel_button_, "Leave");
+    elm_object_part_content_set(popup_, "button1", cancel_button_);
+    evas_object_focus_set(cancel_button_, true);
+    evas_object_smart_callback_add(cancel_button_, "clicked", OkButtonHandlerForPrompt, this);
+
+    ok_button_ = elm_button_add(popup_);
+    elm_object_style_set(ok_button_, "popup");
+    elm_object_text_set(ok_button_, "Stay");
+    elm_object_part_content_set(popup_, "button2", ok_button_);
+    evas_object_smart_callback_add(ok_button_, "clicked", CancelButtonHandlerForPrompt, this);
+  } else if (javascript_message_type_ == content::JAVASCRIPT_MESSAGE_TYPE_ALERT) {
     LOG(INFO) << "JAVASCRIPT_MESSAGE_TYPE_ALERT() ";
     if (!setLabelText(UTF16ToUTF8(message_text_).c_str()))
       return false;

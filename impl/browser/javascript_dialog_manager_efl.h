@@ -53,10 +53,7 @@ class JavaScriptDialogManagerEfl: public content::JavaScriptDialogManager {
   virtual void RunBeforeUnloadDialog(content::WebContents* web_contents,
                                      const base::string16& message_text,
                                      bool is_reload,
-                                     const DialogClosedCallback& callback) OVERRIDE
-  {
-    NOTIMPLEMENTED();
-  }
+                                     const DialogClosedCallback& callback) OVERRIDE;
 
   virtual bool HandleJavaScriptDialog(content::WebContents* web_contents,
                                       bool accept,
