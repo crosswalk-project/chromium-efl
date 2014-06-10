@@ -38,6 +38,8 @@ class ClipboardHelperEfl {
   void OpenClipboardWindow(EWebView* view, bool richly_editable);
   void CloseClipboardWindow();
   bool IsClipboardWindowOpened();
+  bool getSelectedCbhmItem(Ecore_X_Atom* pDataType);
+  static void connectClipboardWindow();
 
  private:
   ClipboardHelperEfl();
@@ -47,8 +49,12 @@ class ClipboardHelperEfl {
   bool SendCbhmMessage(const std::string& message);
   bool SetClipboardItem(Ecore_X_Atom data_type, const std::string& data);
   std::string GetCbhmReply(Ecore_X_Window xwin, Ecore_X_Atom property, Ecore_X_Atom* data_type);
+  void clearClipboardHandler();
+  void initializeAtomList();
   DISALLOW_COPY_AND_ASSIGN(ClipboardHelperEfl);
 
+  Ecore_Event_Handler* m_selectionClearHandler;
+  Ecore_Event_Handler* m_selectionNotifyHandler;
 };
 
 #endif /* CLIPBOARD_HELPER_EFL_H_ */

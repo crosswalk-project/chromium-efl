@@ -201,7 +201,7 @@ class ContextMenuControllerEfl {
                             std::string image_url,
                             std::string link_url,
                             std::string icon_path);
-
+  void HideSelectionHandle();
   Evas_Object* evas_object_;
   Evas_Object* popup_;
   Eina_List* menu_items_;

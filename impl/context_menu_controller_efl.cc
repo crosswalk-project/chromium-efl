@@ -223,6 +223,16 @@ bool ContextMenuControllerEfl::ShowContextMenu() {
   return true;
 }
 
+void ContextMenuControllerEfl::HideSelectionHandle() {
+  EWebView* view = ToEWebView(evas_object_);
+  if (!view)
+    return;
+
+  SelectionControllerEfl* controller = view->GetSelectionController();
+  if (controller)
+    controller->HideHandle();
+}
+
 void ContextMenuControllerEfl::MenuItemSelected(ContextMenuItemEfl *menu_item) {
   EWebView* view = ToEWebView(evas_object_);
   if (!view)
@@ -253,10 +263,7 @@ void ContextMenuControllerEfl::MenuItemSelected(ContextMenuItemEfl *menu_item) {
     case MENU_ITEM_COPY: {
       view->ExecuteEditCommand("copy", NULL);
       if (params_.is_editable) {
-        SelectionControllerEfl* controller = view->GetSelectionController();
-        if (controller)
-          controller->HideHandle();
-
+        HideSelectionHandle();
         Eina_Rectangle left_rect, right_rect;
         Eina_Bool result = view->GetSelectionRange(&left_rect, &right_rect);
         Evas_Coord x, y;
@@ -279,20 +286,17 @@ void ContextMenuControllerEfl::MenuItemSelected(ContextMenuItemEfl *menu_item) {
       Evas_Coord x, y;
       evas_object_geometry_get(view->evas_object(), &x, &y, 0, 0);
       view->SelectClosestWord(gfx::Point(params_.x - x, params_.y - y));
-      SelectionControllerEfl* controller = view->GetSelectionController();
-      if (controller)
-        controller->HideHandle();
+      HideSelectionHandle();
       break;
     }
     case MENU_ITEM_SELECT_ALL: {
       view->ExecuteEditCommand("SelectAll", NULL);
-      SelectionControllerEfl* controller = view->GetSelectionController();
-      if (controller)
-        controller->HideHandle();
+      HideSelectionHandle();
       break;
     }
     case MENU_ITEM_PASTE: {
       view->ExecuteEditCommand("paste", NULL);
+      HideSelectionHandle();
       break;
     }
     case MENU_ITEM_CUT: {
