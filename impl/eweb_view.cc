@@ -1916,15 +1916,18 @@ void EWebView::ShowFileChooser(const content::FileChooserParams& params) {
   if (!render_view_host)
     return;
 #if defined(OS_TIZEN_MOBILE)
-  //If capture type is camcorder, launch camera instead of file chooser.
   if (params.capture) {
-    std::vector<base::string16>::iterator it;
-    std::vector<base::string16> accept_types = params.accept_types;
-    it = accept_types.begin();
-    base::string16 filechoosertype = *it;
-    filechooser_mode_ = params.mode;
-    LaunchCamera(filechoosertype);
-    return;
+    const std::string capture_types[] = {"video/*", "audio/*", "image/*"};
+    unsigned int capture_types_num = sizeof(capture_types)/sizeof(*capture_types);
+    for (unsigned int i = 0; i < capture_types_num; ++i) {
+      for (unsigned int j = 0; j < params.accept_types.size(); ++j) {
+        if (UTF16ToUTF8(params.accept_types[j]) == capture_types[i]) {
+          filechooser_mode_ = params.mode;
+          LaunchCamera(params.accept_types[j]);
+          return;
+        }
+      }
+    }
   }
 #endif
   file_chooser_.reset(new content::FileChooserControllerEfl(render_view_host, &params));
