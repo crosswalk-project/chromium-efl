@@ -146,6 +146,7 @@ void RenderWidgetHostViewEfl::EvasObjectImagePixelsGetCallback(void* data, Evas_
   evas_gl_make_current(rwhv_efl->evas_gl_, rwhv_efl->evas_gl_surface_, rwhv_efl->evas_gl_context_);
 
   gfx::Rect bounds = rwhv_efl->GetViewBoundsInPix();
+
   gl_api->glViewport(0, 0, bounds.width(), bounds.height());
   gl_api->glClearColor(1.0, 1.0, 1.0, 1.0);
   gl_api->glClear(GL_COLOR_BUFFER_BIT);
@@ -530,6 +531,38 @@ void RenderWidgetHostViewEfl::DidStopFlinging() {
   // Unhide Selection UI when scrolling with fling gesture
   if (GetSelectionController() && GetSelectionController()->GetScrollStatus())
     GetSelectionController()->SetScrollStatus(false);
+}
+
+void RenderWidgetHostViewEfl::SaveImage(Evas_Object **img, const gfx::Rect &bounds) {
+  int width = bounds.width();
+  int height = bounds.height();
+  int x = bounds.x();
+  int y = GetViewBounds().height() - bounds.y() + height; // correction of Y axis to take proper snapshot from GL
+
+  Evas_GL_API* gl_api = evasGlApi();
+  DCHECK(gl_api);
+
+  int size = width * height;
+  GLubyte* tmp  = new GLubyte[size * 4];
+  GLubyte* bits = new GLubyte[size * 4];
+  gl_api->glFinish(); // Finish all commands of OpenGL
+  gl_api->glReadPixels(x, y, width, height, GL_RGBA, GL_UNSIGNED_BYTE, bits);
+  // Flip data after reading
+  for (int i = 0; i < height; i++) {
+      memcpy(&tmp[i * width * 4],
+             &bits[(height - i - 1) * width * 4],
+             width * 4 * sizeof(unsigned char));
+  }
+
+  *img = evas_object_image_filled_add(evas_);
+
+  evas_object_image_size_set(*img, width, height);
+  evas_object_image_alpha_set(*img, EINA_TRUE);
+  evas_object_image_data_copy_set(*img, tmp);
+  evas_object_resize(*img, width, height);
+
+  delete(bits);
+  delete(tmp);
 }
 
 void RenderWidgetHostViewEfl::CopyFromCompositingSurface(

@@ -87,6 +87,8 @@ class RenderWidgetHostViewEfl
   virtual void SetIsLoading(bool) OVERRIDE;
   virtual void TextInputTypeChanged(ui::TextInputType, ui::TextInputMode, bool) OVERRIDE;
 
+  void SaveImage(Evas_Object** img, const gfx::Rect& bounds);
+
   virtual void ImeCancelComposition() OVERRIDE;
   virtual void ImeCompositionRangeChanged(const gfx::Range&, const std::vector<gfx::Rect>&) OVERRIDE;
   virtual void DidUpdateBackingStore(const gfx::Rect&,

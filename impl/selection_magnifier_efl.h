@@ -38,7 +38,7 @@ class SelectionMagnifierEfl {
 
   void HandleLongPress(const gfx::Point& touch_point);
   void UpdateLocation(const gfx::Point& location);
-  void UpdateScreen(const SkBitmap& display_image);
+  void UpdateScreen(Evas_Object* img);
   void Move(const gfx::Point& location);
   void Show();
   void Hide();
@@ -46,6 +46,7 @@ class SelectionMagnifierEfl {
  private:
   static Eina_Bool MoveAnimatorCallback(void* data);
   static void OnAnimatorUp(void* data, Evas*, Evas_Object*, void*);
+  bool IsNeedToMoveVerticaly(const gfx::Point& touch_point);
 
   // Parent to send back mouse events
   content::SelectionControllerEfl* controller_;

@@ -1149,7 +1149,6 @@ void EWebView::GetScrollPosition(int* x, int* y) const {
   DCHECK(x);
   DCHECK(y);
   const gfx::Vector2d scroll_position = rwhv()->host()->GetLastScrollOffset();
-
   *x = scroll_position.x();
   *y = scroll_position.y();
 }
@@ -1274,15 +1273,20 @@ void EWebView::UpdateHitTestData(const Ewk_Hit_Test& hit_test_data, const NodeAt
 }
 
 void EWebView::OnCopyFromBackingStore(bool success, const SkBitmap& bitmap) {
-  if (selection_controller_->GetSelectionStatus() || selection_controller_->GetCaretSelectionStatus())
-    selection_controller_->UpdateMagnifierScreen(bitmap);
+#warning "[M37] Need proper implementation for OnCopyFromBackingStore"
+  // if (selection_controller_->GetSelectionStatus() || selection_controller_->GetCaretSelectionStatus())
+  //   selection_controller_->UpdateMagnifierScreen(bitmap);
 }
 
 void EWebView::GetSnapShotForRect(const gfx::Rect& display) {
-  RenderViewHost* render_view_host = web_contents_delegate_->web_contents()->GetRenderViewHost();
-  render_view_host->GetSnapshotFromRenderer(display,
-                                            base::Bind(&EWebView::OnCopyFromBackingStore,
-                                                       base::Unretained(this)));
+#warning "[M37] Need proper implementation for GetSnapShotForRect"
+  // RenderViewHost* render_view_host = web_contents_delegate_->web_contents()->GetRenderViewHost();
+  // render_view_host->GetSnapshotFromRenderer(display,
+  //                                           base::Bind(&EWebView::OnCopyFromBackingStore,
+  //                                           base::Unretained(this)));
+  Evas_Object *magnifImg = NULL;
+  rwhv()->SaveImage(&magnifImg, display);
+  selection_controller_->UpdateMagnifierScreen(magnifImg);
 }
 
 bool EWebView::GetSnapshot(Eina_Rectangle rect, Evas_Object *image) {

@@ -75,6 +75,10 @@ void SelectionMagnifierEfl::HandleLongPress(const gfx::Point& touch_point) {
   animator_ = ecore_animator_add(&SelectionMagnifierEfl::MoveAnimatorCallback, this);
 }
 
+bool SelectionMagnifierEfl::IsNeedToMoveVerticaly(const gfx::Point& touch_point) {
+  return (height_ < touch_point.y()) /*|| check buttom bounds*/;
+}
+
 Eina_Bool SelectionMagnifierEfl::MoveAnimatorCallback(void* data) {
   SelectionMagnifierEfl* magnifier_data = static_cast<SelectionMagnifierEfl*>(data);
 
@@ -125,23 +129,23 @@ void SelectionMagnifierEfl::UpdateLocation(const gfx::Point& location) {
   controller_->GetParentView()->GetSnapShotForRect(content_rect);
 }
 
-void SelectionMagnifierEfl::UpdateScreen(const SkBitmap& display_image) {
+void SelectionMagnifierEfl::UpdateScreen(Evas_Object* img) {
   if (content_image_) {
     evas_object_del(content_image_);
     content_image_ = 0;
   }
 
-  Evas* evas = evas_object_evas_get(controller_->GetParentView()->evas_object());
-  content_image_ = evas_object_image_filled_add(evas);
+  //Evas* evas = evas_object_evas_get(controller_->GetParentView()->evas_object());
+  content_image_ = img; //evas_object_image_filled_add(evas);
 
-  evas_object_image_colorspace_set(content_image_, EVAS_COLORSPACE_ARGB8888);
-  evas_object_image_size_set(content_image_, width_, height_);
-  evas_object_image_alpha_set(content_image_, EINA_TRUE);
+  //evas_object_image_colorspace_set(content_image_, EVAS_COLORSPACE_ARGB8888);
+  // evas_object_image_size_set(content_image_, width_, height_);
+  // evas_object_image_alpha_set(content_image_, EINA_TRUE);
 
-  evas_object_image_data_copy_set(content_image_, display_image.getPixels());
+  // evas_object_image_data_copy_set(content_image_, display_image.getPixels());
   evas_object_size_hint_min_set(content_image_, width_, height_);
-  evas_object_resize(content_image_, width_, height_);
-  evas_object_image_filled_set(content_image_, true);
+  // evas_object_resize(content_image_, width_, height_);
+  // evas_object_image_filled_set(content_image_, true);
   evas_object_show(content_image_);
 
   elm_object_part_content_set(container_, "swallow", content_image_);
@@ -173,7 +177,6 @@ void SelectionMagnifierEfl::Move(const gfx::Point& location) {
   // will always be on top of the touch point so no need to consider
   if (magnifier_location.y() < device_y)
     magnifier_location.set_y(device_y);
-
   evas_object_move(container_, magnifier_location.x(), magnifier_location.y());
 }
 

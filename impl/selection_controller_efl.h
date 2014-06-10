@@ -58,10 +58,10 @@ class SelectionControllerEfl {
   // To update the selection string
   void UpdateSelectionData(const base::string16& text);
   // To update the bitmap Image to show the magnifier
-  void UpdateMagnifierScreen(const SkBitmap& display_image);
+  void UpdateMagnifierScreen(Evas_Object* img);
   // To update the selection bounds
   void UpdateSelectionDataAndShow(const gfx::Rect& left_rect, const gfx::Rect& right_rect, bool is_anchor_first);
-  void GetSelectionBounds(gfx::Rect *left, gfx::Rect *right);
+  void GetSelectionBounds(gfx::Rect* left, gfx::Rect* right);
   // Handles the mouse press,move and relase events on selection handles
   void OnMouseDown(const gfx::Point& touch_point);
   void OnMouseMove(const gfx::Point& touch_point, bool on_curson_handle);
