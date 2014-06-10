@@ -135,6 +135,8 @@ class EWebView
     return orientation_;
   }
 
+  void set_magnifier(bool status);
+
   // ewk_view api
   void SetURL(const char* url_string);
   const char* GetURL() const;

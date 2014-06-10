@@ -75,6 +75,7 @@ RenderWidgetHostViewEfl::RenderWidgetHostViewEfl(RenderWidgetHost* widget)
     scroll_detector_(new EflWebview::ScrollDetector()),
     m_IsEvasGLInit(0),
     device_scale_factor_(1.0f),
+    m_magnifier(false),
     egl_image_(0),
     current_pixmap_id_(0),
     next_pixmap_id_(0) {
@@ -918,6 +919,10 @@ void RenderWidgetHostViewEfl::HandleFocusOut() {
   host_->LostCapture();
 }
 
+void RenderWidgetHostViewEfl::set_magnifier(bool status) {
+   m_magnifier = status;
+}
+
 void RenderWidgetHostViewEfl::HandleEvasEvent(const Evas_Event_Mouse_Down* event) {
   host_->ForwardMouseEvent(WebEventFactoryEfl::toWebMouseEvent(web_view_->GetEvas(), web_view_->evas_object(), event, device_scale_factor_));
 }
@@ -1002,6 +1007,9 @@ void RenderWidgetHostViewEfl::HandleGesture(ui::GestureEvent* event) {
     fling_cancel.type = blink::WebInputEvent::GestureFlingCancel;
     fling_cancel.sourceDevice = blink::WebGestureDeviceTouchscreen;
     host_->ForwardGestureEvent(fling_cancel);
+  } else if (event->type() == ui::ET_GESTURE_SCROLL_UPDATE) {
+    if (m_magnifier)
+      return;
   } else if (event->type() == ui::ET_GESTURE_SCROLL_BEGIN) {
     if (GetSelectionController())
       GetSelectionController()->SetScrollStatus(true);

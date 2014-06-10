@@ -194,6 +194,8 @@ class RenderWidgetHostViewEfl
     return evas_;
   }
 
+  void set_magnifier(bool status);
+
   void Init_EvasGL(int width, int height);
 
   void set_eweb_view(EWebView*);
@@ -275,6 +277,8 @@ class RenderWidgetHostViewEfl
 
   // The current composition character bounds.
   std::vector<gfx::Rect> composition_character_bounds_;
+
+  bool m_magnifier;
 
   // YUV readback pipeline.
   scoped_ptr<content::ReadbackYUVInterface>

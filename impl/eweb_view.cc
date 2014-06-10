@@ -1030,6 +1030,10 @@ bool EWebView::SetUserAgentAppName(const char* application_name) {
   return true;
 }
 
+void EWebView::set_magnifier(bool status) {
+  rwhv()->set_magnifier(status);
+}
+
 const char* EWebView::GetUserAgent() const {
 #warning "[M37] Fix GetUserAgent"
 // NOTE: web_contents_delegate_->web_contents()->GetUserAgentOverride();

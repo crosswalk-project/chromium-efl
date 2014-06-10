@@ -183,12 +183,14 @@ void SelectionMagnifierEfl::Move(const gfx::Point& location) {
 void SelectionMagnifierEfl::Show() {
   evas_object_show(container_);
   controller_->GetParentView()->SmartCallback<EWebViewCallbacks::MagnifierShow>().call();
+  controller_->GetParentView()->set_magnifier(true);
 }
 
 void SelectionMagnifierEfl::Hide() {
   evas_object_hide(content_image_);
   evas_object_hide(container_);
   controller_->GetParentView()->SmartCallback<EWebViewCallbacks::MagnifierHide>().call();
+  controller_->GetParentView()->set_magnifier(false);
 }
 
 }
