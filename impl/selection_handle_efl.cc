@@ -50,7 +50,8 @@ SelectionHandleEfl::SelectionHandleEfl(SelectionControllerEfl* controller, Handl
     diff_point_(0,0),
     controller_(controller),
     is_cursor_handle_(false),
-    is_mouse_downed_(false) {
+    is_mouse_downed_(false),
+    is_top_(false) {
 
   Evas* evas = evas_object_evas_get(parent);
   handle_ = edje_object_add(evas);
@@ -111,11 +112,15 @@ void SelectionHandleEfl::Move(const gfx::Point& point) {
       || (handleType == HANDLE_TYPE_RIGHT && (movePoint.x() >= deviceWidth - reverseMargin))) {
     if ((movePoint.y() + handleHeight) > (y + deviceHeight)) {
       movePoint.set_y(movePoint.y() - selectionRect.height());
-      if (!is_mouse_downed_)
+      if (!is_mouse_downed_) {
         ChangeObjectDirection(handleType, DirectionTopReverse);
+        is_top_ = true;
+      }
     } else {
-      if (!is_mouse_downed_)
+      if (!is_mouse_downed_) {
         ChangeObjectDirection(handleType, DirectionBottomReverse);
+        is_top_ = false;
+      }
     }
   } else {
     if ((movePoint.y() + handleHeight) > (y + deviceHeight)) {
@@ -127,6 +132,7 @@ void SelectionHandleEfl::Move(const gfx::Point& point) {
             ChangeObjectDirection(handleType, DirectionTopNormal);
           else
             ChangeObjectDirection(handleType, DirectionTopNormal);
+          is_top_ = true;
         }
         MoveObject(movePoint);
         return;
@@ -138,6 +144,7 @@ void SelectionHandleEfl::Move(const gfx::Point& point) {
         ChangeObjectDirection(handleType, DirectionBottomNormal);
       else
         ChangeObjectDirection(handleType, DirectionBottomNormal);
+      is_top_ = false;
     }
   }
 

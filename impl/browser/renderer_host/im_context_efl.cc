@@ -24,7 +24,6 @@
 #include "base/strings/utf_string_conversions.h"
 #include "content/browser/renderer_host/render_widget_host_impl.h"
 #include "browser/renderer_host/render_widget_host_view_efl.h"
-#include "ui/gfx/rect.h"
 
 #include <Ecore_Evas.h>
 #include <Ecore_IMF_Evas.h>
@@ -405,6 +404,8 @@ void IMContextEfl::OnInputPanelGeometryChanged() {
   Eina_Rectangle rect;
   ecore_imf_context_input_panel_geometry_get(context_, &rect.x, &rect.y, &rect.w, &rect.h);
   view_->eweb_view()->SmartCallback<EWebViewCallbacks::IMEInputMethodChanged>().call(&rect);
+
+  SetIMERect(gfx::Rect(rect.x, rect.y, rect.w, rect.h));
 }
 
 void IMContextEfl::OnCandidateInputPanelStateChanged(int state) {
@@ -430,6 +431,10 @@ void IMContextEfl::OnCandidateInputPanelLanguageChanged(Ecore_IMF_Context* /*con
   Reset();
   RenderWidgetHostImpl::From(view_->GetRenderWidgetHost())->ImeConfirmComposition(composition_.text, gfx::Range::InvalidRange(), false);
   composition_.Clear();
+}
+
+bool IMContextEfl::IsShow() {
+  return (context_ && focused_ && ecore_imf_context_input_panel_state_get(context_) != ECORE_IMF_INPUT_PANEL_STATE_HIDE);
 }
 
 } // namespace content

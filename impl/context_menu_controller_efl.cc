@@ -43,6 +43,7 @@ ContextMenuControllerEfl::~ContextMenuControllerEfl() {
 }
 
 bool ContextMenuControllerEfl::PopulateAndShowContextMenu(const ContextMenuParams &params) {
+  LOG(INFO) << __PRETTY_FUNCTION__;
   EWebView* view = ToEWebView(evas_object_);
   if (!view)
     return false;
@@ -203,21 +204,69 @@ bool ContextMenuControllerEfl::ShowContextMenu() {
   if (!popup_)
     return false;
 
-  evas_object_move(popup_, params_.x, params_.y);
-#if defined(OS_TIZEN)
-  // In device context menu is supported as per the platform efl theme.
-  // So this supports horizontal popup and on this popup style is applied.
-  // But style is not there on desktop version so using default provided by efl
+  LOG(INFO) << __PRETTY_FUNCTION__ << "param.x = " << params_.x << " params.y = " << params_.y;
+
   if (type_ == MENU_TYPE_SELECTION) {
-    elm_ctxpopup_horizontal_set(popup_, EINA_TRUE);
-    elm_ctxpopup_direction_priority_set(popup_,
-                                        ELM_CTXPOPUP_DIRECTION_UP,
-                                        ELM_CTXPOPUP_DIRECTION_DOWN,
-                                        ELM_CTXPOPUP_DIRECTION_LEFT,
-                                        ELM_CTXPOPUP_DIRECTION_RIGHT);
+    int webViewX, webViewY, webViewWidth, webViewHeight;
+    Evas_Point point;
+
+    gfx::Point popupPosition = gfx::Point(params_.x, params_.y);
+
+    EWebView* view = ToEWebView(evas_object_);
+    if (!view)
+      return false;
+
+    evas_object_geometry_get(view->evas_object(), &webViewX, &webViewY, &webViewWidth, &webViewHeight);
+    popupPosition.set_x(popupPosition.x() + webViewX);
+    popupPosition.set_y(popupPosition.y() + webViewY);
+
+    point.x = popupPosition.x();
+    point.y = popupPosition.y();
+
+    evas_object_smart_callback_call(view->evas_object(), "contextmenu,willshow", &point);
+
+    bool allowed = true;
+    evas_object_smart_callback_call(view->evas_object(), "contextmenu,allowed", &allowed);
+    if (!allowed) {
+      evas_object_del(popup_);
+      return false;
+    }
+
     elm_object_style_set(popup_, "copypaste");
-  }
+    elm_ctxpopup_horizontal_set(popup_, EINA_TRUE);
+
+    int drawDirection;
+    SelectionControllerEfl* controller = view->GetSelectionController();
+
+    if (!controller) {
+      evas_object_del(popup_);
+      return false;
+    }
+
+    controller->ChangeContextMenuPosition(popupPosition, drawDirection);
+    switch(drawDirection) {
+      case 0:
+        elm_ctxpopup_direction_priority_set(popup_, ELM_CTXPOPUP_DIRECTION_DOWN, ELM_CTXPOPUP_DIRECTION_DOWN, ELM_CTXPOPUP_DIRECTION_DOWN, ELM_CTXPOPUP_DIRECTION_DOWN);
+        break;
+      case 1:
+        elm_ctxpopup_direction_priority_set(popup_, ELM_CTXPOPUP_DIRECTION_UP, ELM_CTXPOPUP_DIRECTION_UP, ELM_CTXPOPUP_DIRECTION_UP, ELM_CTXPOPUP_DIRECTION_UP);
+        break;
+      case 2:
+        elm_ctxpopup_direction_priority_set(popup_, ELM_CTXPOPUP_DIRECTION_LEFT, ELM_CTXPOPUP_DIRECTION_LEFT, ELM_CTXPOPUP_DIRECTION_LEFT, ELM_CTXPOPUP_DIRECTION_LEFT);
+        break;
+      case 3:
+        elm_ctxpopup_direction_priority_set(popup_, ELM_CTXPOPUP_DIRECTION_RIGHT, ELM_CTXPOPUP_DIRECTION_RIGHT, ELM_CTXPOPUP_DIRECTION_RIGHT, ELM_CTXPOPUP_DIRECTION_RIGHT);
+        break;
+      default:
+        elm_ctxpopup_direction_priority_set(popup_, ELM_CTXPOPUP_DIRECTION_UP, ELM_CTXPOPUP_DIRECTION_DOWN, ELM_CTXPOPUP_DIRECTION_LEFT, ELM_CTXPOPUP_DIRECTION_RIGHT);
+    };
+    evas_object_move(popup_, popupPosition.x(), popupPosition.y());
+#ifdef OS_TIZEN_MOBILE
+    elm_ctxpopup_auto_hide_disabled_set(popup_, EINA_TRUE);
 #endif
+  } else {
+    evas_object_move(popup_, params_.x, params_.y);
+  }
   evas_object_smart_callback_add(popup_, "dismissed", contextMenuCancelCallback, 0);
   evas_object_show(popup_);
   return true;

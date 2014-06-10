@@ -22,6 +22,7 @@
 #include "content/browser/compositor/owned_mailbox.h"
 #include "ui/base/ime/text_input_client.h"
 #include "eweb_view.h"
+#include "browser/renderer_host/im_context_efl.h"
 #include <Evas.h>
 #include <Ecore_Evas.h>
 #include <Evas_GL.h>
@@ -208,6 +209,7 @@ class RenderWidgetHostViewEfl
   void set_eweb_view(EWebView*);
   EWebView* eweb_view() const { return web_view_; }
   RenderWidgetHostImpl* host() const { return host_; }
+  IMContextEfl* im_context() const { return im_context_; }
 
   float device_scale_factor() const { return device_scale_factor_; }
 

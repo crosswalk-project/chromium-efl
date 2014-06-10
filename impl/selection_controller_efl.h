@@ -41,6 +41,15 @@ namespace content {
 // Hnadlers are shown to extent selection, On handler move touch points are sent to engine
 // by SelectRange to extend the selection
 class SelectionControllerEfl {
+
+  enum ContextMenuDirection {
+    DirectionDown = 0,
+    DirectionUp,
+    DirectionLeft,
+    DirectionRight,
+    DirectionNone,
+  };
+
  public:
   explicit SelectionControllerEfl(EWebView* parent_view);
 
@@ -82,6 +91,8 @@ class SelectionControllerEfl {
 
   gfx::Rect GetLeftRect();
   gfx::Rect GetRightRect();
+
+  void ChangeContextMenuPosition(gfx::Point& position, int& drawDirection);
 
  private:
   void ShowHandleAndContextMenuIfRequired();

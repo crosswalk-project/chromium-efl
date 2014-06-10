@@ -1616,3 +1616,11 @@ bool EWebView::SetColorPickerColor(int r, int g, int b, int a) {
   web_contents_delegate()->web_contents()->DidChooseColorInColorChooser(SkColorSetARGB(a, r, g, b));
   return true;
 }
+
+bool EWebView::IsIMEShow() {
+  return rwhv()->im_context()->IsShow();
+}
+
+gfx::Rect EWebView::GetIMERect() {
+  return rwhv()->im_context()->GetIMERect();
+}

@@ -23,6 +23,7 @@
 #include "ui/base/ime/text_input_mode.h"
 #include "ui/base/ime/text_input_type.h"
 #include "ui/base/ime/composition_text.h"
+#include "ui/gfx/rect.h"
 
 #include <Evas.h>
 
@@ -58,6 +59,8 @@ class IMContextEfl {
   void CancelComposition();
   void ConfirmComposition();
   void SetIsInFormTag(bool is_in_form_tag);
+  bool IsShow();
+  gfx::Rect GetIMERect() const { return ime_rect_; }
 
  private:
   IMContextEfl(RenderWidgetHostViewEfl*, Ecore_IMF_Context*);
@@ -67,6 +70,8 @@ class IMContextEfl {
 
   void ShowPanel(ui::TextInputType, ui::TextInputMode, bool is_user_action = false);
   void HidePanel();
+
+  void SetIMERect(const gfx::Rect& rect) { ime_rect_ = rect; }
 
   // callbacks
   static void IMFCommitCallback(void* data, Ecore_IMF_Context*, void* event_info) { reinterpret_cast<IMContextEfl*>(data)->OnCommit(event_info); }
@@ -115,6 +120,8 @@ class IMContextEfl {
   bool is_in_form_tag_;
 
   ui::CompositionText composition_;
+
+  gfx::Rect ime_rect_;
 };
 
 } // namespace content

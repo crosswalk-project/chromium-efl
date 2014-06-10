@@ -257,6 +257,9 @@ class EWebView
   scoped_refptr<EdgeEffect> edgeEffect() { return edge_effect_; }
 #endif
 
+  bool IsIMEShow();
+  gfx::Rect GetIMERect();
+
  private:
   EWebView(EWebContext*, Evas_Object* smart_object);
   ~EWebView();

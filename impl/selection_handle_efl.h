@@ -47,6 +47,14 @@ class SelectionHandleEfl {
     DirectionTopReverse,
   };
 
+  enum ContextMenuDirection {
+    DirectionDown,
+    DirectionUp,
+    DirectionLeft,
+    DirectionRight,
+    DirectionNone,
+  };
+
   SelectionHandleEfl(SelectionControllerEfl* controller, HandleType type, Evas_Object* parent);
   ~SelectionHandleEfl();
   void Show();
@@ -56,6 +64,8 @@ class SelectionHandleEfl {
   void SetBasePosition(const gfx::Point& point) { base_point_ = point; }
   gfx::Point GetBasePosition() const { return base_point_; }
   void SetCursorHandlerStatus(bool enable) { is_cursor_handle_ = enable; }
+  bool IsTop() { return is_top_; }
+  Evas_Object* evas_object() const { return handle_; }
 
  private:
   static void OnMouseDown(void* data, Evas*, Evas_Object*, void* event_info);
@@ -91,6 +101,9 @@ class SelectionHandleEfl {
 
   // Is mouse down
   bool is_mouse_downed_;
+
+  // Direction of handle
+  bool is_top_;
 };
 
 } // namespace

@@ -23,7 +23,17 @@
 #include "selection_box_efl.h"
 #include "selection_magnifier_efl.h"
 
+#include <Edje.h>
+
 namespace content {
+
+const int menuHeight = 140;// The Height fo the context menu.
+const int menuPadding = 60;// This is padding for deciding when to modify context menu position.
+//const int spacePadding = 24;// This is for making context menu closer to the handles.
+const int spacePadding = 0;// This is for making context menu closer to the handles.
+const int textSelectionScrollSize = 50;// Scroll step when selection handler is moving out of viewport.
+static int s_magnifierMaxYOffsetDelta = 50;// Magnifier should not show the image below the viewport
+static int s_textSelectionMargin = 5;
 
 static bool IsRectEmpty(const gfx::Rect& rect) {
   if (rect.x() == 0 && rect.y() == 0 && rect.height() == 0 && rect.width() == 0) {
@@ -298,6 +308,136 @@ gfx::Rect SelectionControllerEfl::GetLeftRect() {
 
 gfx::Rect SelectionControllerEfl::GetRightRect() {
   return selection_data_->GetRightRect();
+}
+
+void SelectionControllerEfl::ChangeContextMenuPosition(gfx::Point& position, int& drawDirection) {
+  drawDirection = DirectionNone; // Giving default Direction.
+  int handleHeight, webViewX, webViewY, webViewWidth, webViewHeight;
+  gfx::Rect imeRect;
+  edje_object_part_geometry_get(input_handle_->evas_object(), "handle", 0, 0, 0, &handleHeight);
+  evas_object_geometry_get(GetParentView()->evas_object(), &webViewX, &webViewY, &webViewWidth, &webViewHeight);
+  gfx::Rect viewportRect = gfx::Rect(webViewX, webViewY, webViewWidth, webViewHeight);
+
+  if (GetParentView()->IsIMEShow()) { // Get the Visible Rect .
+    imeRect = GetParentView()->GetIMERect();
+    if ((viewportRect.y() + viewportRect.height()) > imeRect.y())
+        viewportRect.set_height(imeRect.y() - viewportRect.y());
+  }
+
+  gfx::Rect leftHandleRect = selection_data_->GetLeftRect();
+  leftHandleRect.set_x(webViewX + leftHandleRect.x());
+  leftHandleRect.set_y(webViewY + leftHandleRect.y());
+
+  if (!GetCaretSelectionStatus()) {
+    gfx::Rect rightHandleRect = selection_data_->GetRightRect();
+    rightHandleRect.set_x(webViewX + rightHandleRect.x());
+    rightHandleRect.set_y(webViewY + rightHandleRect.y());
+    gfx::Rect oldLeftHandleRect = leftHandleRect;
+    gfx::Rect oldRightHandleRect = rightHandleRect;
+    gfx::Rect effectiveRect;
+    bool isEffecrtiveRectAvailable = false;
+
+    bool isTop = false;
+    bool isRightHandle = false;
+    bool doConsiderRightHandle = false;
+    bool doNotConsiderMenuUpward = false;
+
+    //if (leftHandleRect.x() < 0)
+    //    leftHandleRect.set_x(0);
+    //if (leftHandleRect.y() < 0)
+    //    leftHandleRect.set_y(0);
+
+    // Giving first preference to left handle.
+    if (leftHandleRect.IsEmpty() && viewportRect.Contains(leftHandleRect.x(), leftHandleRect.y())) {
+      isTop = start_handle_->IsTop();
+      effectiveRect = leftHandleRect;
+      isEffecrtiveRectAvailable = true;
+      // Check whether Menu will overlap the right handle or not.
+      if (leftHandleRect != rightHandleRect) {
+        if (!isTop) {
+          // If there is sufficient space above the handler that Menu can be placed. then shift context menu
+          // then no need to change effectiveRect from leftHandleRect to rightHandleRect.
+          bool directionUp = effectiveRect.y() - menuHeight > viewportRect.y() && (effectiveRect.y() - (viewportRect.y() + menuHeight) > menuPadding);
+          if (!directionUp && ((leftHandleRect.y() + leftHandleRect.height()) + menuHeight) > rightHandleRect.y()) {
+            doConsiderRightHandle = true;
+            doNotConsiderMenuUpward = true; // As if we draw the direction is UP it will overlap with left Handle.
+          }
+        }
+      }
+    } else {
+      doConsiderRightHandle = true;
+    }
+
+    if (doConsiderRightHandle && rightHandleRect.IsEmpty() && viewportRect.Contains(rightHandleRect.x(), rightHandleRect.y())) {
+      effectiveRect = rightHandleRect;
+      isEffecrtiveRectAvailable = true;
+      isTop = end_handle_->IsTop();
+      isRightHandle = true;
+    }
+
+    if (isEffecrtiveRectAvailable) {
+      //We will go for UpWard, DownWard, Left, Right directions.
+      if (effectiveRect.y() - menuHeight > viewportRect.y() && (effectiveRect.y() - (viewportRect.y() + menuHeight) > menuPadding) && !doNotConsiderMenuUpward) {
+        if (isTop) {
+          if (isRightHandle) {
+            position.set_y(effectiveRect.y() - spacePadding - handleHeight);
+          } else {
+            position.set_y(effectiveRect.y() - spacePadding - handleHeight);
+            //position.set_y(position.y() - effectiveRect.height());
+          }
+        } else {
+          position.set_y(effectiveRect.y() - spacePadding);
+        }
+        drawDirection = DirectionUp;
+      } else if ((effectiveRect.y() + effectiveRect.height()) + menuHeight < (viewportRect.y() + viewportRect.height())) {
+        position.set_y((effectiveRect.y() + effectiveRect.height()) - spacePadding + handleHeight);
+        drawDirection = DirectionDown;
+      } else if (effectiveRect.x() < (viewportRect.x() + viewportRect.width()/2)) {
+        position.set_x((effectiveRect.x() + effectiveRect.width()) + spacePadding + handleHeight);
+        position.set_y(effectiveRect.CenterPoint().y());
+        drawDirection = DirectionLeft;
+      } else {
+        position.set_x(effectiveRect.x());
+        position.set_y(effectiveRect.CenterPoint().y());
+        drawDirection = DirectionRight;
+      }
+    } else {
+      if (oldLeftHandleRect.y() < viewportRect.y() && oldRightHandleRect.y() > (viewportRect.y() + viewportRect.height()) && viewportRect.height() <= webViewHeight) {
+        position.set_y(viewportRect.CenterPoint().y() - spacePadding);
+      } else {
+        position.set_y(position.y() + spacePadding + handleHeight);// This value is chosen based on the how much close the context menu arrow should come to word.
+      }
+      drawDirection = DirectionNone;
+    }
+
+    return;
+  }
+
+  if (!selection_data_->IsInEditField())
+    return;
+
+  position.set_y(leftHandleRect.y() - spacePadding);
+
+  if (input_handle_->IsTop()) {
+    position.set_y(position.y() - leftHandleRect.height() - handleHeight);
+    return;
+  }
+
+  // The Width of the context menu is menuHeight so comapairing current position with the viewport point plus menuHeight.
+  // If position is less than this value then set new position for the contextmenu.
+  if ((position.y() <= (webViewY + menuHeight)) || ((position.y() - (webViewY + menuHeight)) <= menuPadding)) {
+    if (leftHandleRect.IsEmpty()) {
+      position.set_y(position.y() + spacePadding + handleHeight);// This value is chosen based on the how much close the context menu arrow should come to word.
+      drawDirection = DirectionDown;
+     return;
+    }
+
+    position.set_y((leftHandleRect.y() + leftHandleRect.height()) - spacePadding + handleHeight);
+    drawDirection = DirectionDown;
+    return;
+  }
+
+  return;
 }
 
 }
