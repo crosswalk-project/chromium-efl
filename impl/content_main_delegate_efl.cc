@@ -26,6 +26,7 @@
 #include "content/browser/gpu/gpu_process_host.h"
 #include "content/gpu/in_process_gpu_thread.h"
 #include "content/public/common/content_switches.h"
+#include "browser/resource_dispatcher_host_delegate_efl.h"
 
 namespace content {
 
