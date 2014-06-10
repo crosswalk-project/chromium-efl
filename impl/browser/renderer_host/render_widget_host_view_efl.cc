@@ -23,6 +23,7 @@
 #include "content/browser/renderer_host/event_with_latency_info.h"
 #include "content/public/browser/browser_thread.h"
 #include "content/browser/renderer_host/dip_util.h"
+#include "content/common/cursors/webcursor_efl.h"
 #include "content/common/gpu/client/gl_helper.h"
 #include "content/public/browser/render_widget_host_view_frame_subscriber.h"
 #include "content/public/common/content_switches.h"
@@ -50,6 +51,9 @@
 #include <Ecore_Input.h>
 #include <Ecore_X.h>
 
+#define EFL_MAX_WIDTH 10000
+#define EFL_MAX_HEIGHT 10000  // borrowed from GTK+ port
+
 namespace content {
 
 void RenderWidgetHostViewBase::GetDefaultScreenInfo(blink::WebScreenInfo* results) {
@@ -75,6 +79,7 @@ RenderWidgetHostViewEfl::RenderWidgetHostViewEfl(RenderWidgetHost* widget)
     scroll_detector_(new EflWebview::ScrollDetector()),
     m_IsEvasGLInit(0),
     device_scale_factor_(1.0f),
+    is_loading_(false),
     m_magnifier(false),
     egl_image_(0),
     current_pixmap_id_(0),
@@ -328,9 +333,29 @@ RenderWidgetHost* RenderWidgetHostViewEfl::GetRenderWidgetHost() const {
   return host_;
 }
 
+Ecore_X_Window RenderWidgetHostViewEfl::GetEcoreXWindow() const {
+  Ecore_Evas* ee = ecore_evas_ecore_evas_get(evas_);
+  return ecore_evas_gl_x11_window_get(ee);
+}
+
 void RenderWidgetHostViewEfl::SetSize(const gfx::Size& size) {
-  // FIXME: what is the purpose of this? Why would the engine resize us?
-  NOTIMPLEMENTED();
+  // This is a hack. See WebContentsView::SizeContents
+  int width = std::min(size.width(), EFL_MAX_WIDTH);
+  int height = std::min(size.height(), EFL_MAX_HEIGHT);
+  if (popup_type_ != blink::WebPopupTypeNone) {
+    // We're a popup, honor the size request.
+    ecore_x_window_resize(GetEcoreXWindow(), width, height);
+  }
+
+  // Update the size of the RWH.
+  //if (requested_size_.width() != width ||
+  //    requested_size_.height() != height) {
+    // Disabled for now, will enable it while implementing InitAsPopUp (P1) API
+   //equested_size_ = gfx::Size(width, height);
+    host_->SendScreenRects();
+    host_->WasResized();
+  //}
+
 }
 
 void RenderWidgetHostViewEfl::SetBounds(const gfx::Rect& rect) {
@@ -441,12 +466,25 @@ void RenderWidgetHostViewEfl::Blur() {
   host_->Blur();
 }
 
-void RenderWidgetHostViewEfl::UpdateCursor(const WebCursor&) {
-  NOTIMPLEMENTED();
+void RenderWidgetHostViewEfl::UpdateCursor(const WebCursor& webcursor) {
+  if (is_loading_) {
+    // Setting native Loading cursor
+    ecore_x_window_cursor_set(GetEcoreXWindow(), ecore_x_cursor_shape_get(ECORE_X_CURSOR_CLOCK));
+  } else {
+    WebCursor::CursorInfo cursor_info;
+    webcursor.GetCursorInfo(&cursor_info);
+
+    int cursor_type = GetCursorType(cursor_info.type);
+    ecore_x_window_cursor_set(GetEcoreXWindow(), ecore_x_cursor_shape_get(cursor_type));
+  }
+  // Need to check for cursor visibility
+  //ecore_x_window_cursor_show(GetEcoreXWindow(), true);
+
 }
 
-void RenderWidgetHostViewEfl::SetIsLoading(bool) {
-  NOTIMPLEMENTED();
+void RenderWidgetHostViewEfl::SetIsLoading(bool is_loading) {
+  is_loading_ = is_loading;
+  UpdateCursor(WebCursor());
 }
 
 void RenderWidgetHostViewEfl::TextInputTypeChanged(ui::TextInputType type, ui::TextInputMode input_mode, bool can_compose_inline) {

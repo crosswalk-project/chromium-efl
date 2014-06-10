@@ -262,6 +262,8 @@ class RenderWidgetHostViewEfl
   void initializeProgram();
   gfx::Rect GetViewBoundsInPix() const;
 
+  Ecore_X_Window GetEcoreXWindow() const;
+
   RenderWidgetHostImpl* host_;
   EWebView* web_view_;
   IMContextEfl* im_context_;
@@ -279,6 +281,9 @@ class RenderWidgetHostViewEfl
   std::vector<gfx::Rect> composition_character_bounds_;
 
   bool m_magnifier;
+
+  // Whether we are currently loading.
+  bool is_loading_;
 
   // YUV readback pipeline.
   scoped_ptr<content::ReadbackYUVInterface>
