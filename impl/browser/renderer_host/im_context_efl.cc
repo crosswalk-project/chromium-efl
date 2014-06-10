@@ -118,9 +118,9 @@ IMContextEfl::~IMContextEfl() {
 }
 
 void IMContextEfl::Reset() {
-  ecore_imf_context_reset(context_);
   ClearQueues();
   view_->ClearQueues();
+  ecore_imf_context_reset(context_);
 }
 
 void IMContextEfl::HandleKeyDownEvent(const Evas_Event_Key_Down* event, bool* wasFiltered) {
@@ -151,10 +151,9 @@ void IMContextEfl::UpdateInputMethodState(ui::TextInputType input_type,
   bool enabled = input_type != ui::TEXT_INPUT_TYPE_NONE;
 
   enabled_ = enabled;
-  ecore_imf_context_reset(context_);
-
   ClearQueues();
   view_->ClearQueues();
+  ecore_imf_context_reset(context_);
 
   // This can only be called when having focus since we disable IME messages in OnFocusOut.
   DCHECK(focused_);
@@ -180,6 +179,8 @@ void IMContextEfl::UpdateInputMethodState(ui::TextInputType input_type) {
   input_type_ = input_type;
   bool enabled = input_type != ui::TEXT_INPUT_TYPE_NONE;
   enabled_ = enabled;
+  ClearQueues();
+  view_->ClearQueues();
 
   bool is_showing = ecore_imf_context_input_panel_state_get(context_) ==
                     ECORE_IMF_INPUT_PANEL_STATE_SHOW;
@@ -297,9 +298,6 @@ void IMContextEfl::UpdateCaretBounds(const gfx::Rect& caret_bounds) {
 void IMContextEfl::OnFocusIn() {
   CancelComposition();
 
-  ClearQueues();
-  view_->ClearQueues();
-
   if (focused_)
     return;
 
@@ -327,6 +325,9 @@ void IMContextEfl::OnFocusOut() {
   // XXX Gtk calls ConfirmComposition here.
   // Consider whether we need it to avoid data loss.
 
+  ClearQueues();
+  view_->ClearQueues();
+
   ecore_imf_context_reset(context_);
   ecore_imf_context_focus_out(context_);
   ecore_imf_context_input_panel_hide(context_);
@@ -334,13 +335,12 @@ void IMContextEfl::OnFocusOut() {
   // Disable RenderWidget's IME related events to save bandwidth.
   if (view_->GetRenderWidgetHost())
     RenderWidgetHostImpl::From(view_->GetRenderWidgetHost())->SetInputMethodActive(false);
-
-  ClearQueues();
-  view_->ClearQueues();
 }
 
 void IMContextEfl::CancelComposition() {
   IM_CTX_LOG;
+  ClearQueues();
+  view_->ClearQueues();
   ecore_imf_context_reset(context_);
 }
 

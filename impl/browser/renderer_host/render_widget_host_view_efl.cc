@@ -528,8 +528,20 @@ void RenderWidgetHostViewEfl::TextInputTypeChanged(ui::TextInputType type, ui::T
 
 void RenderWidgetHostViewEfl::TextInputStateChanged(
     const ViewHostMsg_TextInputState_Params& params) {
+  LOG(INFO) << "RenderWidgetHostViewEfl::TextInputStateChanged";
+  if (!params.show_ime_if_needed && !eweb_view()->GetSettings()->useKeyPadWithoutUserAction())
+    return;
+
   if (im_context_) {
     im_context_->UpdateInputMethodState(params.type);
+  }
+
+  if (GetSelectionController()) {
+    GetSelectionController()->SetSelectionEditable(
+        params.type == ui::TEXT_INPUT_TYPE_TEXT ||
+        params.type == ui::TEXT_INPUT_TYPE_PASSWORD ||
+        params.type == ui::TEXT_INPUT_TYPE_TEXT_AREA ||
+        params.type == ui::TEXT_INPUT_TYPE_CONTENT_EDITABLE);
   }
 }
 
@@ -546,6 +558,14 @@ void RenderWidgetHostViewEfl::OnTextInputInFormStateChanged(bool is_in_form_tag)
 void RenderWidgetHostViewEfl::ImeCompositionRangeChanged(
   const gfx::Range& range,
   const std::vector<gfx::Rect>& character_bounds) {
+  SelectionControllerEfl* controller = web_view_->GetSelectionController();
+  if (controller) {
+    controller->SetCaretSelectionStatus(false);
+    controller->HideHandleAndContextMenu();
+  }
+}
+
+void RenderWidgetHostViewEfl::FocusedNodeChanged(bool is_editable_node, long node_id) {
   SelectionControllerEfl* controller = web_view_->GetSelectionController();
   if (controller) {
     controller->SetCaretSelectionStatus(false);
