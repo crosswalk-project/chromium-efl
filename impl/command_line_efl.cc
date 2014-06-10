@@ -61,7 +61,12 @@ content::MainFunctionParams CommandLineEfl::GetDefaultPortParams() {
   p_command_line->AppendSwitch(switches::kAllowWebUICompositing);
   p_command_line->AppendSwitch(switches::kEnablePinch);
 
+  // FIXME: Crash is observed if this switch below is applied for TV. So for now enabling
+  //        it only for mobile. More specifically, below line causes rendering issues in
+  //        chromium upversion (M34_1809-> M34_1847).
+#if defined(OS_TIZEN_MOBILE)
   p_command_line->AppendSwitch(cc::switches::kEnableMapImage);
+#endif
   p_command_line->AppendSwitch(cc::switches::kEnableImplSidePainting);
 
   // XXX: Skia benchmarking should be only used for testing,
