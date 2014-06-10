@@ -881,7 +881,7 @@ void EWebView::DispatchPostponedGestureEvent(ui::GestureEvent* event) {
       }
       rwhv()->HandleGesture(event);
     }
-  } else if (event->details().type() == ui::ET_GESTURE_SHOW_PRESS) {
+  } else if (event->details().type() == ui::ET_GESTURE_TAP) {
     _Ewk_Hit_Test* hit_test_data = RequestHitTestDataAt(event->x(), event->y(), EWK_HIT_TEST_MODE_DEFAULT);
     if (hit_test_data && hit_test_data->context & EWK_HIT_TEST_RESULT_CONTEXT_EDITABLE) {
       LOG(INFO) << "DispatchPostponedGestureEvent :: EWK_HIT_TEST_RESULT_CONTEXT_EDITABLE";
@@ -897,6 +897,7 @@ void EWebView::DispatchPostponedGestureEvent(ui::GestureEvent* event) {
         ClearSelection();
     }
     rwhv()->HandleGesture(event);
+  } else if (event->details().type() == ui::ET_GESTURE_TAP) {
   } else {
     ClearSelection();
     rwhv()->HandleGesture(event);
