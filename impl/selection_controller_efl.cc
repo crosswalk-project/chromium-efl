@@ -133,6 +133,9 @@ void SelectionControllerEfl::ShowHandleAndContextMenuIfRequired() {
     input_handle_->Move(gfx::Point(left.x(), left.y() + left.height()));
     input_handle_->Show();
 
+    if (!mouse_press_)
+      parent_view_->ShowContextMenu(*(selection_data_->GetContextMenuParams()), MENU_TYPE_SELECTION);
+
     return;
   }
 
@@ -180,7 +183,7 @@ void SelectionControllerEfl::OnMouseDown(const gfx::Point& touch_point) {
   mouse_press_ = true;
   magnifier_->UpdateLocation(touch_point);
   magnifier_->Move(touch_point);
-  magnifier_->Show();
+  ShowHandleAndContextMenuIfRequired();
 }
 
 void SelectionControllerEfl::OnMouseMove(const gfx::Point& touch_point, bool on_curson_handle) {
