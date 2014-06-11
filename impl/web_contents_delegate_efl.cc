@@ -137,6 +137,7 @@ void WebContentsDelegateEfl::RequestMediaAccessPermission(
         WebContents* web_contents,
         const MediaStreamRequest& request,
         const MediaResponseCallback& callback) {
+#if 0
   _Ewk_User_Media_Permission_Request* media_permission_request =
       new _Ewk_User_Media_Permission_Request(web_view_, request);
 
@@ -161,6 +162,16 @@ void WebContentsDelegateEfl::RequestMediaAccessPermission(
     // Nothing was approved by user, so send an empty list.
     callback.Run(MediaStreamDevices(), scoped_ptr<MediaStreamUI>());
   }
+#else
+  // FIXME This should be changed to the devices to which the user has granted
+  //       access.
+  MediaStreamDevices devices;
+  if (request.audio_type == content::MEDIA_DEVICE_AUDIO_CAPTURE)
+    devices.push_back(MediaStreamDevice(request.audio_type, "default", "Default"));
+  if (request.video_type == content::MEDIA_DEVICE_VIDEO_CAPTURE)
+    devices.push_back(MediaStreamDevice(request.video_type, "1", "1"));
+  callback.Run(devices, scoped_ptr<MediaStreamUI>());
+#endif
 }
 
 void WebContentsDelegateEfl::OnAuthRequired(net::URLRequest* request,
