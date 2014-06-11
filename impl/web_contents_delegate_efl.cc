@@ -301,7 +301,7 @@ void WebContentsDelegateEfl::SetContentSecurityPolicy(const std::string& policy,
   }
 }
 
-void WebContentsDelegateEfl::ShowContextMenu(const ContextMenuParams& params) {
+void WebContentsDelegateEfl::ShowContextMenu(RenderFrameHost* render_frame_host, const ContextMenuParams& params) {
   web_view_->ShowContextMenu(params);
 }
 

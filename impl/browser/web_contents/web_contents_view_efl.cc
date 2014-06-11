@@ -185,10 +185,10 @@ void WebContentsViewEfl::ShowPopupMenu(const gfx::Rect& bounds,
   NOTIMPLEMENTED();
 }
 
-void WebContentsViewEfl::ShowContextMenu(const ContextMenuParams& params) {
+void WebContentsViewEfl::ShowContextMenu(RenderFrameHost* render_frame_host, const ContextMenuParams& params) {
   WebContentsDelegateEfl* delegate = static_cast<WebContentsDelegateEfl*>(web_contents_->GetDelegate());
   if (delegate)
-    delegate->ShowContextMenu(params);
+    delegate->ShowContextMenu(render_frame_host, params);
 }
 
 void WebContentsViewEfl::CancelContextMenu(int request_id) {

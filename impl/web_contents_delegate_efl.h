@@ -126,7 +126,7 @@ class WebContentsDelegateEfl
   void OnHeadersReceived(PolicyResponseDelegateEfl* delegate,
                          const GURL& request,
                          const net::HttpResponseHeaders* original_response_headers);
-  virtual void ShowContextMenu(const ContextMenuParams& params) OVERRIDE;
+  virtual void ShowContextMenu(RenderFrameHost* render_frame_host, const ContextMenuParams& params) OVERRIDE;
   virtual void CancelContextMenu(int request_id) OVERRIDE;
   void set_new_window_policy(bool policy) { should_open_new_window_ = policy; }
   bool get_new_window_policy() const { return should_open_new_window_; }
