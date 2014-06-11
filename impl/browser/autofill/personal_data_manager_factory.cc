@@ -21,6 +21,7 @@
 
 #include "browser/autofill/personal_data_manager_factory.h"
 
+#include "eweb_view.h"
 #include "base/memory/scoped_ptr.h"
 #include "browser/webdata/web_data_service_factory.h"
 #include "components/autofill/core/browser/personal_data_manager.h"
@@ -47,7 +48,7 @@ class PersonalDataManagerServiceImpl : public PersonalDataManagerService {
 };
 
 PersonalDataManagerServiceImpl::PersonalDataManagerServiceImpl() {
-  personal_data_manager_.reset(new PersonalDataManager("en-US"));
+  personal_data_manager_.reset(new PersonalDataManager(EWebView::GetPlatformLocale()));
   personal_data_manager_->Init(
       WebDataServiceFactory::GetAutofillWebDataForProfile(), false);
 }

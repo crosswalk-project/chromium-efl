@@ -2005,6 +2005,18 @@ std::string EWebView::GetErrorPage(const std::string& invalidUrl) {
    return html;
 }
 
+std::string EWebView::GetPlatformLocale() {
+  char* local_default = setlocale(LC_CTYPE, 0);
+  if (!local_default)
+    return std::string("en-US");
+  std::string locale = std::string(local_default);
+  locale.replace(locale.find('_'),1,"-");
+  size_t position = locale.find('.');
+  if (position != std::string::npos)
+    locale = locale.substr(0,position);
+  return locale;
+}
+
 int EWebView::StartInspectorServer(int port) {
   if (inspector_server_) {
     inspector_server_->Stop(); // Asynchronous releas inside Stop()

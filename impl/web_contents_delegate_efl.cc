@@ -72,7 +72,7 @@ WebContentsDelegateEfl::WebContentsDelegateEfl(EWebView* view)
     AutofillManagerDelegateEfl::FromWebContents(web_contents_.get());
   autofill_manager->SetEWebView(view);
   AutofillDriverImpl::CreateForWebContentsAndDelegate(web_contents_.get(),
-    autofill_manager, view->GetPlatformLocale(), AutofillManager::DISABLE_AUTOFILL_DOWNLOAD_MANAGER);
+    autofill_manager, EWebView::GetPlatformLocale(), AutofillManager::DISABLE_AUTOFILL_DOWNLOAD_MANAGER);
   PasswordManagerClientEfl::CreateForWebContents(web_contents_.get());
 #endif
 }

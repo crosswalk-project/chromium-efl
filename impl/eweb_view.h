@@ -28,6 +28,7 @@
 #include <map>
 #include <string>
 #include <Evas.h>
+#include <locale.h>
 
 #include "base/memory/scoped_ptr.h"
 #include "base/synchronization/waitable_event.h"
@@ -372,6 +373,7 @@ class EWebView
   bool StopInspectorServer();
 
   std::string GetErrorPage(const std::string& invalidUrl);
+  static std::string GetPlatformLocale();
   void UpdateMagnifierScreen(const SkBitmap& bitmap);
 
  private:
