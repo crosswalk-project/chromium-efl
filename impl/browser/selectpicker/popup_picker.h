@@ -25,10 +25,7 @@
 typedef struct _Elm_Object_Item Elm_Object_Item;
 typedef struct _Eina_List Eina_List;
 typedef struct Popup_Menu_Item Popup_Menu_Item;
-// DJKim : FIXME
-#if 0 //ENABLE(TIZEN_MULTIPLE_SELECT)
 typedef struct _Eina_Inarray Eina_Inarray;
-#endif
 
 namespace WebKit {
 class WebPopupMenuProxyEfl;
@@ -46,11 +43,8 @@ struct _Popup_Picker {
     Eina_List* m_genlist_callback_data_list;
     Elm_Object_Item* firstItem;
     int selectedIndex;
-// DJKim : FIXME
-#if 0 //ENABLE(TIZEN_MULTIPLE_SELECT)
     Eina_Bool multiSelect;
     Eina_Inarray* changedList;
-#endif
 };
 typedef struct _Popup_Picker Popup_Picker;
 
@@ -61,19 +55,14 @@ typedef struct _genlist_callback_data {
     Popup_Menu_Item* menuItem;
 } genlist_callback_data;
 
-// DJKim : FIXME
-#if 0 //ENABLE(TIZEN_MULTIPLE_SELECT)
-Popup_Picker* popup_picker_new(Evas_Object* parent, Eina_List* items, int selectedIndex, Eina_Bool multiple);
-#else
-Popup_Picker* popup_picker_new(EWebView* web_view, Evas_Object* parent, Eina_List* items, int selectedIndex);
-#endif
+Popup_Picker* popup_picker_new(EWebView* web_view, Evas_Object* parent, Eina_List* items, int selectedIndex, Eina_Bool multiple);
 void popup_picker_resize(Popup_Picker* picker);
 void popup_picker_del(Popup_Picker* picker);
 void popup_picker_update(Evas_Object* parent, Popup_Picker* picker, Eina_List* items, int selectedIndex);
 void listClosed(void *data, Evas_Object *obj, const char *emission, const char *source);
 void popup_picker_buttons_update(Popup_Picker* picker, int position, int count, bool enable);
 void view_popup_menu_select(EWebView* web_view, int selectedIndex);
+void view_popup_menu_multiple_select(EWebView* web_view, Eina_Inarray* changeList);
 void view_popup_menu_close(EWebView* web_view);
-
 
 #endif // popup_picker_h

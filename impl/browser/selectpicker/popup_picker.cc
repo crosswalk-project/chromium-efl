@@ -39,14 +39,11 @@
 extern void* EflAssistHandle;
 #endif
 
-// DJKim : FIXME
-#if 0 //ENABLE(TIZEN_MULTIPLE_SELECT)
 int compareChangedItems(const void* a, const void* b) {
   const int* left = static_cast<const int*>(a);
   const int* right = static_cast<const int*>(b);
   return (*left - *right);
 }
-#endif
 
 static void __picker_radio_icon_changed_cb(void* data, Evas_Object* obj, void* event_info) {
   genlist_callback_data *callback_data = static_cast<genlist_callback_data*>(data);
@@ -117,8 +114,6 @@ void menuItemActivated(void* data, Evas_Object* obj, void* event_info) {
   Elm_Object_Item* selected = static_cast<Elm_Object_Item*>(event_info);
   int index = elm_genlist_item_index_get(selected);
 
-// DJKim : FIXME
-#if 0 // ENABLE(TIZEN_MULTIPLE_SELECT)
   if (picker->multiSelect) {
     int pos = eina_inarray_search(picker->changedList, &index, compareChangedItems);
     if (pos == -1)
@@ -127,13 +122,10 @@ void menuItemActivated(void* data, Evas_Object* obj, void* event_info) {
       eina_inarray_remove(picker->changedList, &index);
     return;
   }
-#endif
   picker->selectedIndex = index;
   view_popup_menu_select(picker->web_view_, index);
 }
 
-// DJKim : FIXME
-#if 0 //ENABLE(TIZEN_MULTIPLE_SELECT)
 void menuItemDeactivated(void* data, Evas_Object* obj, void* event_info) {
   Popup_Picker* picker = static_cast<Popup_Picker*>(data);
   Elm_Object_Item* deselectedItem = static_cast<Elm_Object_Item*>(event_info);
@@ -146,25 +138,18 @@ void menuItemDeactivated(void* data, Evas_Object* obj, void* event_info) {
   else
     eina_inarray_remove(picker->changedList, &deselectedIndex);
 }
-#endif
 
 void listClosed(void* data, Evas_Object* obj, const char* emission, const char* source) {
   Popup_Picker* picker = static_cast<Popup_Picker*>(data);
 
-// DJKim : FIXME
-#if 0 //ENABLE(TIZEN_MULTIPLE_SELECT)
   if (picker->multiSelect)
-    ewk_view_popup_menu_multiple_select(picker->parent, picker->changedList);
+    view_popup_menu_multiple_select(picker->web_view_, picker->changedList);
   else
     view_popup_menu_select(picker->web_view_, picker->selectedIndex);
   eina_inarray_free(picker->changedList);
-#else
-  view_popup_menu_select(picker->web_view_, picker->selectedIndex);
-#endif
 
   // FIXME: remove this check
-  // DJKim : FIXME
-  if (1) //(!picker->multiSelect)
+  if (!picker->multiSelect)
     clear_genlist_callback_data(picker);
 
   view_popup_menu_close(picker->web_view_);
@@ -187,12 +172,8 @@ void navigateToPrev(void *data, Evas_Object *obj, const char *emission, const ch
 static char* _listLabelGet(void* data, Evas_Object* obj, const char* part)
 {
   Popup_Menu_Item* menuItem = static_cast<Popup_Menu_Item*>(data);
-// DJKim : FIXME
-#if 0 //ENABLE(TIZEN_MULTIPLE_SELECT)
+
   if (!strncmp(part, "elm.text", strlen("elm.text")) && popup_menu_item_text_get(menuItem))
-#else
-  if (!strncmp(part, "elm.text", strlen("elm.text")))
-#endif
     return strdup(popup_menu_item_text_get(menuItem));
   return 0;
 }
@@ -209,14 +190,11 @@ static void createAndShowPopupList(Evas_Object* win, Popup_Picker* picker, Eina_
   evas_object_size_hint_weight_set(picker->popupList, EVAS_HINT_EXPAND, EVAS_HINT_EXPAND);
   evas_object_size_hint_align_set(picker->popupList, EVAS_HINT_FILL, EVAS_HINT_FILL);
 
-// DJKim : FIXME
-#if 0 //ENABLE(TIZEN_MULTIPLE_SELECT)
   if (picker->multiSelect)
   {
     eina_inarray_flush(picker->changedList);
     elm_genlist_multi_select_set(picker->popupList, true);
   }
-#endif
   static Elm_Genlist_Item_Class itemClass;
   void* itemv;
   const Eina_List* l;
@@ -226,8 +204,7 @@ static void createAndShowPopupList(Evas_Object* win, Popup_Picker* picker, Eina_
 
   // If it is multiselect, use the old implementation.
   //FIXME: remove this check, once picker with buttons is implemented for multiselect.
-  // DJKim : FIXME
-  if (1) { //(!picker->multiSelect)
+  if (!picker->multiSelect) {
     picker->radioMain = elm_radio_add(picker->popupList);
     if (!picker->radioMain) {
       LOG(ERROR) << "elm_radio_add failed. ";
@@ -291,24 +268,20 @@ static void createAndShowPopupList(Evas_Object* win, Popup_Picker* picker, Eina_
       Elm_Object_Item* itemObject = elm_genlist_item_append(picker->popupList, &itemClass, menuItem, 0, ELM_GENLIST_ITEM_NONE, 0, 0);
       if (!index)
         picker->firstItem = itemObject;
-// DJKim : FIXME
-#if 0 //ENABLE(TIZEN_MULTIPLE_SELECT)
-      if (menuItem->isSelected)
-#else
-      if (selectedIndex == index)
-#endif
+
+      if (popup_menu_item_selected_get(menuItem)) {
+        eina_inarray_push(picker->changedList, &index);
         elm_genlist_item_selected_set(itemObject, true);
+      }
       if (!(popup_menu_item_enabled_get(menuItem)))
         elm_object_item_disabled_set(itemObject, EINA_TRUE);
       index++;
     }
 
     evas_object_smart_callback_add(picker->popupList, "selected", menuItemActivated, picker);
-// DJKim : FIXME
-#if 0 //ENABLE(TIZEN_MULTIPLE_SELECT)
+
     if (picker->multiSelect)
       evas_object_smart_callback_add(picker->popupList, "unselected", menuItemDeactivated, picker);
-#endif
   }
 
   elm_object_focus_allow_set(picker->popupList, false);
@@ -333,21 +306,12 @@ static void resizeAndShowPicker(Popup_Picker* picker) {
   evas_object_show(picker->container);
 }
 
-// DJKim : FIXME
-#if 0 //ENABLE(TIZEN_MULTIPLE_SELECT)
-Popup_Picker* popup_picker_new(Evas_Object* parent, Eina_List* items, int selectedIndex, Eina_Bool multiple) {
-#else
-Popup_Picker* popup_picker_new(EWebView* web_view, Evas_Object* parent, Eina_List* items, int selectedIndex) {
-#endif
+Popup_Picker* popup_picker_new(EWebView* web_view, Evas_Object* parent, Eina_List* items, int selectedIndex, Eina_Bool multiple) {
   Popup_Picker* picker = new Popup_Picker;
   picker->parent = parent;
   picker->web_view_ = web_view;
-
-// DJKim : FIXME
-#if 0 //ENABLE(TIZEN_MULTIPLE_SELECT)
   picker->multiSelect = multiple;
   picker->changedList = eina_inarray_new(sizeof(int), 0);
-#endif
 
   Evas_Object* topParent = elm_object_top_widget_get(elm_object_parent_widget_get(parent));
   picker->win = elm_win_add(topParent, "combo_box Window", ELM_WIN_BASIC);
@@ -413,9 +377,7 @@ void popup_picker_resize(Popup_Picker* picker) {
 }
 
 void popup_picker_del(Popup_Picker* picker) {
-    //FIXME: remove this check, once picker with buttons is implemented for multiselect.
-  // DJKim : FIXME
-  if (1) { //(!picker->multiSelect)
+  if (!picker->multiSelect) {
     evas_object_smart_callback_del(picker->popupList, "changed", __picker_radio_icon_changed_cb);
     clear_genlist_callback_data(picker);
   }
@@ -437,11 +399,7 @@ void popup_picker_update(Evas_Object* parent, Popup_Picker* picker, Eina_List* i
   // the list is replaced directly.
   evas_object_del(picker->popupList);
 
-// DJKim : FIXME
-#if 0 //ENABLE(TIZEN_MULTIPLE_SELECT)
   picker->changedList = eina_inarray_new(sizeof(int), 0);
-#endif
-
   createAndShowPopupList(picker->win, picker, items, selectedIndex);
 }
 
@@ -474,6 +432,21 @@ void popup_picker_buttons_update(Popup_Picker* picker, int position, int count, 
 
 void view_popup_menu_select(EWebView* web_view, int selectedIndex) {
   web_view->DidSelectPopupMenuItem(selectedIndex);
+}
+
+void view_popup_menu_multiple_select(EWebView* web_view, Eina_Inarray* changeList) {
+  std::vector<int> selectedIndex;
+  Eina_Iterator* itr;
+  void* data;
+  itr = eina_inarray_iterator_new(changeList);
+
+  EINA_ITERATOR_FOREACH(itr, data) {
+    int* pData = static_cast<int*>(data);
+    selectedIndex.push_back(*pData);
+  }
+  eina_iterator_free(itr);
+
+  web_view->DidMultipleSelectPopupMenuItem(selectedIndex);
 }
 
 void view_popup_menu_close(EWebView* web_view) {

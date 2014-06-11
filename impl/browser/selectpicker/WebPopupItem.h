@@ -27,8 +27,12 @@ namespace blink {
 
 struct WebPopupItem {
     enum Type {
+        Option,
+        CheckableOption,
+        Group,
         Separator,
-        Item
+        SubMenu,
+        Unknown = -1
     };
 
     WebPopupItem();

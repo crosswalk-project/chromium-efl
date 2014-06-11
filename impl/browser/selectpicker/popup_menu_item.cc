@@ -35,7 +35,7 @@ Popup_Menu_Item::Popup_Menu_Item(const blink::WebPopupItem& item)
 }
 
 Popup_Menu_Item_Type popup_menu_item_type_get(const Popup_Menu_Item* item) {
-    EINA_SAFETY_ON_NULL_RETURN_VAL(item, EWK_POPUP_MENU_UNKNOWN);
+    EINA_SAFETY_ON_NULL_RETURN_VAL(item, POPUP_MENU_UNKNOWN);
 
     return item->type;
 }

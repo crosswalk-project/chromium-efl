@@ -378,8 +378,8 @@ void WebContentsDelegateEfl::SetContentSecurityPolicy(const std::string& policy,
   }
 }
 
-void WebContentsDelegateEfl::ShowPopupMenu(const gfx::Rect& rect, WebCore::TextDirection textDirection, double pageScaleFactor, const std::vector<MenuItem>& items, int data, int selectedIndex) {
-  web_view_->ShowPopupMenu(rect, textDirection, pageScaleFactor, items, data, selectedIndex);
+void WebContentsDelegateEfl::ShowPopupMenu(const gfx::Rect& rect, WebCore::TextDirection textDirection, double pageScaleFactor, const std::vector<MenuItem>& items, int data, int selectedIndex, bool multiple) {
+  web_view_->ShowPopupMenu(rect, textDirection, pageScaleFactor, items, data, selectedIndex, multiple);
 }
 
 void WebContentsDelegateEfl::HidePopupMenu() {

@@ -31,9 +31,12 @@ extern "C" {
 
 /** Enum values containing type of popup menu item. */
 typedef enum {
-    EWK_POPUP_MENU_SEPARATOR,
-    EWK_POPUP_MENU_ITEM,
-    EWK_POPUP_MENU_UNKNOWN = -1
+    POPUP_MENU_OPTION,
+    POPUP_MENU_CHECKABLE_OPTION,
+    POPUP_MENU_GROUP,
+    POPUP_MENU_SEPARATOR,
+    POPUP_MENU_SUBMENU,
+    POPUP_MENU_UNKNOWN = -1
 } Popup_Menu_Item_Type;
 
 /** Creates a type name for Ewk_Popup_Menu_Item */
@@ -46,7 +49,7 @@ typedef struct Popup_Menu_Item Popup_Menu_Item;
  *
  * @return the type of the @a item or @c EWK_POPUP_MENU_UNKNOWN in case of error.
  */
-EAPI Popup_Menu_Item_Type popup_menu_item_type_get(const Popup_Menu_Item *item);
+Popup_Menu_Item_Type popup_menu_item_type_get(const Popup_Menu_Item *item);
 
 /**
  * Returns text of the popup menu item.
@@ -59,7 +62,7 @@ EAPI Popup_Menu_Item_Type popup_menu_item_type_get(const Popup_Menu_Item *item);
  *         eina_stringshare_ref() instead of eina_stringshare_add() or
  *         strdup()
  */
-EAPI const char *popup_menu_item_text_get(const Popup_Menu_Item *item);
+const char *popup_menu_item_text_get(const Popup_Menu_Item *item);
 
 /**
  * Returns text direction of the popup menu item.
@@ -68,7 +71,7 @@ EAPI const char *popup_menu_item_text_get(const Popup_Menu_Item *item);
  *
  * @return the text direction of the @a item.
  */
-EAPI WebCore::TextDirection popup_menu_item_text_direction_get(const Popup_Menu_Item *item);
+WebCore::TextDirection popup_menu_item_text_direction_get(const Popup_Menu_Item *item);
 
 /**
  * Returns whether the popup menu item has text direction override.
@@ -78,7 +81,7 @@ EAPI WebCore::TextDirection popup_menu_item_text_direction_get(const Popup_Menu_
  * @return @c EINA_TRUE if the popup menu item has text direction override,
  *         @c EINA_FALSE otherwise.
  */
-EAPI Eina_Bool popup_menu_item_text_direction_override_get(const Popup_Menu_Item *item);
+Eina_Bool popup_menu_item_text_direction_override_get(const Popup_Menu_Item *item);
 
 /**
  * Returns tooltip of the popup menu item.
@@ -91,7 +94,7 @@ EAPI Eina_Bool popup_menu_item_text_direction_override_get(const Popup_Menu_Item
  *         eina_stringshare_ref() instead of eina_stringshare_add() or
  *         strdup()
  */
-EAPI const char *popup_menu_item_tooltip_get(const Popup_Menu_Item *item);
+const char *popup_menu_item_tooltip_get(const Popup_Menu_Item *item);
 
 /**
  * Returns accessibility text of the popup menu item.
@@ -104,7 +107,7 @@ EAPI const char *popup_menu_item_tooltip_get(const Popup_Menu_Item *item);
  *         eina_stringshare_ref() instead of eina_stringshare_add() or
  *         strdup()
  */
-EAPI const char *popup_menu_item_accessibility_text_get(const Popup_Menu_Item *item);
+const char *popup_menu_item_accessibility_text_get(const Popup_Menu_Item *item);
 
 /**
  * Returns whether the popup menu item is enabled or not.
@@ -113,7 +116,7 @@ EAPI const char *popup_menu_item_accessibility_text_get(const Popup_Menu_Item *i
  *
  * @return @c EINA_TRUE if the popup menu item is enabled, @c EINA_FALSE otherwise.
  */
-EAPI Eina_Bool popup_menu_item_enabled_get(const Popup_Menu_Item *item);
+Eina_Bool popup_menu_item_enabled_get(const Popup_Menu_Item *item);
 
 /**
  * Returns whether the popup menu item is label or not.
@@ -122,7 +125,7 @@ EAPI Eina_Bool popup_menu_item_enabled_get(const Popup_Menu_Item *item);
  *
  * @return @c EINA_TRUE if the popup menu item is label, @c EINA_FALSE otherwise.
  */
-EAPI Eina_Bool popup_menu_item_is_label_get(const Popup_Menu_Item *item);
+Eina_Bool popup_menu_item_is_label_get(const Popup_Menu_Item *item);
 
 /**
  * Returns whether the popup menu item is selected or not.
@@ -131,7 +134,7 @@ EAPI Eina_Bool popup_menu_item_is_label_get(const Popup_Menu_Item *item);
  *
  * @return @c EINA_TRUE if the popup menu item is selected, @c EINA_FALSE otherwise.
  */
-EAPI Eina_Bool popup_menu_item_selected_get(const Popup_Menu_Item *item);
+Eina_Bool popup_menu_item_selected_get(const Popup_Menu_Item *item);
 
 #ifdef __cplusplus
 }

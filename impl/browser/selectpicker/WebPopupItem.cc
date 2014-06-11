@@ -24,7 +24,7 @@ using namespace WebCore;
 namespace blink {
 
 WebPopupItem::WebPopupItem()
-    : m_type(Item)
+    : m_type(Unknown)
     , m_textDirection(LTR)
     , m_hasTextDirectionOverride(false)
     , m_isEnabled(true)

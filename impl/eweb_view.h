@@ -265,13 +265,14 @@ class EWebView
   void set_auth_challenge(_Ewk_Auth_Challenge* ac) { auth_challenge_.reset(ac); }
   _Ewk_Auth_Challenge* get_auth_challenge() const { return auth_challenge_.get(); }
   void SetContentSecurityPolicy(const char* policy, tizen_webview::ContentSecurityPolicyType type);
-  void ShowPopupMenu(const gfx::Rect& rect, WebCore::TextDirection textDirection, double pageScaleFactor, const std::vector<content::MenuItem>& items, int data, int selectedIndex);
+  void ShowPopupMenu(const gfx::Rect& rect, WebCore::TextDirection textDirection, double pageScaleFactor, const std::vector<content::MenuItem>& items, int data, int selectedIndex, bool multiple);
   Eina_Bool HidePopupMenu();
   bool FormIsNavigating() const { return formIsNavigating_; }
   void SetFormIsNavigating(bool formIsNavigating);
   Eina_Bool PopupMenuUpdate(Eina_List* items, int selectedIndex);
   Eina_Bool DidSelectPopupMenuItem(int selectedindex);
- Eina_Bool PopupMenuClose();
+  Eina_Bool DidMultipleSelectPopupMenuItem(std::vector<int>& selectedindex);
+  Eina_Bool PopupMenuClose();
   void ShowContextMenu(const content::ContextMenuParams& params, content::ContextMenuType type = content::MENU_TYPE_LINK);
   void CancelContextMenu(int request_id);
   void SetScale(double scale_factor, int x, int y);

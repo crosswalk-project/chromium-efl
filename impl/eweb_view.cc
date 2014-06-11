@@ -1196,12 +1196,12 @@ void EWebView::LoadData(const char* data, size_t size, const char* mime_type, co
   web_contents->GetController().LoadURLWithParams(data_params);
 }
 
-void EWebView::ShowPopupMenu(const gfx::Rect& rect, WebCore::TextDirection textDirection, double pageScaleFactor, const std::vector<content::MenuItem>& items, int data, int selectedIndex) {
+void EWebView::ShowPopupMenu(const gfx::Rect& rect, WebCore::TextDirection textDirection, double pageScaleFactor, const std::vector<content::MenuItem>& items, int data, int selectedIndex, bool multiple) {
 #if defined(OS_TIZEN)
   Eina_List* popupItems = 0;
   const size_t size = items.size();
   for (size_t i = 0; i < size; ++i) {
-    popupItems = eina_list_append(popupItems, Popup_Menu_Item::create(blink::WebPopupItem(blink::WebPopupItem::Type(1), base::UTF16ToUTF8(items[i].label), WebCore::TextDirection(items[i].rtl), items[i].has_directional_override, base::UTF16ToUTF8(items[i].tool_tip), base::UTF16ToUTF8(items[i].label), items[i].enabled, true, items[i].checked)).leakPtr());
+    popupItems = eina_list_append(popupItems, Popup_Menu_Item::create(blink::WebPopupItem(blink::WebPopupItem::Type(items[i].type), base::UTF16ToUTF8(items[i].label), WebCore::TextDirection(items[i].rtl), items[i].has_directional_override, base::UTF16ToUTF8(items[i].tool_tip), base::UTF16ToUTF8(items[i].label), items[i].enabled, true, items[i].checked)).leakPtr());
   }
   popupMenuItems_ = popupItems;
 
@@ -1216,11 +1216,14 @@ void EWebView::ShowPopupMenu(const gfx::Rect& rect, WebCore::TextDirection textD
     return;
   }
 #endif
-  // DJKim : FIXME
-  //if (popupPicker_)
-    //popup_picker_del(popupPicker_);
+  if (popupPicker_)
+    popup_picker_del(popupPicker_);
+  popupPicker_ = 0;
 
-  popupPicker_ = popup_picker_new(this, evas_object(), popupMenuItems_, selectedIndex);
+  if (multiple)
+    popupPicker_ = popup_picker_new(this, evas_object(), popupMenuItems_, 0, multiple);
+  else
+    popupPicker_ = popup_picker_new(this, evas_object(), popupMenuItems_, selectedIndex, multiple);
   // DJKim : FIXME
   //popup_picker_buttons_update(popupPicker_, formNavigation.position, formNavigation.count, false);
 #endif
@@ -1313,6 +1316,20 @@ Eina_Bool EWebView::DidSelectPopupMenuItem(int selectedindex) {
     return false;
 
   render_view_host->DidSelectPopupMenuItem(selectedindex);
+#endif
+  return true;
+}
+
+Eina_Bool EWebView::DidMultipleSelectPopupMenuItem(std::vector<int>& selectedindex) {
+#if defined(OS_TIZEN)
+  RenderViewHostImpl* render_view_host = static_cast<RenderViewHostImpl*>(web_contents_delegate_->web_contents()->GetRenderViewHost());
+  if (!render_view_host)
+    return false;
+
+  if (!popupMenuItems_)
+    return false;
+
+  render_view_host->DidMultipleSelectPopupMenuItem(selectedindex);
 #endif
   return true;
 }
