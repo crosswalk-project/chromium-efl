@@ -232,6 +232,7 @@ class RenderWidgetHostViewEfl
   void OnMHTMLContentGet(const std::string&, int);
 
   Evas_GL_API* evasGlApi() { return evas_gl_api_; }
+  gfx::Point ConvertPointInViewPix(gfx::Point point);
 
   void OnTextInputInFormStateChanged(bool is_in_form_tag);
 

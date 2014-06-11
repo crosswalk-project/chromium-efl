@@ -75,10 +75,6 @@ void SelectionMagnifierEfl::HandleLongPress(const gfx::Point& touch_point) {
   animator_ = ecore_animator_add(&SelectionMagnifierEfl::MoveAnimatorCallback, this);
 }
 
-bool SelectionMagnifierEfl::IsNeedToMoveVerticaly(const gfx::Point& touch_point) {
-  return (height_ < touch_point.y()) /*|| check buttom bounds*/;
-}
-
 Eina_Bool SelectionMagnifierEfl::MoveAnimatorCallback(void* data) {
   SelectionMagnifierEfl* magnifier_data = static_cast<SelectionMagnifierEfl*>(data);
 

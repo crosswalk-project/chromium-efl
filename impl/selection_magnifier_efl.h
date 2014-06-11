@@ -46,7 +46,6 @@ class SelectionMagnifierEfl {
  private:
   static Eina_Bool MoveAnimatorCallback(void* data);
   static void OnAnimatorUp(void* data, Evas*, Evas_Object*, void*);
-  bool IsNeedToMoveVerticaly(const gfx::Point& touch_point);
 
   // Parent to send back mouse events
   content::SelectionControllerEfl* controller_;

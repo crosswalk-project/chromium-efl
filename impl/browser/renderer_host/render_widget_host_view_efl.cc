@@ -100,6 +100,10 @@ RenderWidgetHostViewEfl::~RenderWidgetHostViewEfl() {
     delete im_context_;
 }
 
+gfx::Point RenderWidgetHostViewEfl::ConvertPointInViewPix(gfx::Point point) {
+  return gfx::ToFlooredPoint(gfx::ScalePoint(point, device_scale_factor_));
+}
+
 gfx::Rect RenderWidgetHostViewEfl::GetViewBoundsInPix() const {
   int x, y, w, h;
   evas_object_geometry_get(content_image_, &x, &y, &w, &h);
@@ -599,7 +603,7 @@ void RenderWidgetHostViewEfl::SaveImage(Evas_Object **img, const gfx::Rect &boun
   int width = bounds.width();
   int height = bounds.height();
   int x = bounds.x();
-  int y = GetViewBounds().height() - bounds.y() + height; // correction of Y axis to take proper snapshot from GL
+  int y = GetViewBoundsInPix().height() - bounds.y() + height; // correction of Y axis to take proper snapshot from GL
 
   Evas_GL_API* gl_api = evasGlApi();
   DCHECK(gl_api);

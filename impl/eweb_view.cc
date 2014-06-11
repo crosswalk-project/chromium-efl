@@ -851,25 +851,23 @@ void EWebView::DispatchPostponedGestureEvent(ui::GestureEvent* event) {
   Ewk_Settings* settings = GetSettings();
   LOG(INFO) << "DispatchPostponedGestureEvent :: " << event->details().type();
   if (event->details().type() == ui::ET_GESTURE_LONG_PRESS) {
-    LOG(INFO) << "DispatchPostponedGestureEvent :: ET_GESTURE_LONG_PRESS";
     if (selection_controller_->GetSelectionEditable())
       ClearSelection();
 
     if (settings && settings->textSelectionEnabled()) {
       _Ewk_Hit_Test* hit_test_data = RequestHitTestDataAt(event->x(), event->y(), EWK_HIT_TEST_MODE_DEFAULT);
       if (hit_test_data && hit_test_data->context & EWK_HIT_TEST_RESULT_CONTEXT_EDITABLE) {
-        LOG(INFO) << "DispatchPostponedGestureEvent :: hit_test EWK_HIT_TEST_RESULT_CONTEXT_EDITABLE";
         selection_controller_->SetSelectionStatus(true);
         selection_controller_->SetCaretSelectionStatus(true);
         selection_controller_->SetSelectionEditable(true);
-        selection_controller_->HandleLongPressEvent(gfx::Point(event->x(), event->y()));
+        selection_controller_->HandleLongPressEvent(rwhv()->ConvertPointInViewPix(gfx::Point(event->x(), event->y())));
       } else if (hit_test_data
           && !(hit_test_data->context & EWK_HIT_TEST_RESULT_CONTEXT_LINK)
           && !(hit_test_data->context & EWK_HIT_TEST_RESULT_CONTEXT_IMAGE)
           && !(hit_test_data->context & EWK_HIT_TEST_RESULT_CONTEXT_MEDIA)
           && hit_test_data->context & EWK_HIT_TEST_RESULT_CONTEXT_TEXT) {
         selection_controller_->SetSelectionStatus(true);
-        selection_controller_->HandleLongPressEvent(gfx::Point(event->x(), event->y()));
+        selection_controller_->HandleLongPressEvent(rwhv()->ConvertPointInViewPix(gfx::Point(event->x(), event->y())));
         delete hit_test_data;
         LOG(INFO) << __PRETTY_FUNCTION__ << ":: link, !image, !media, text";
       } else if (hit_test_data && hit_test_data->context & EWK_HIT_TEST_RESULT_CONTEXT_DOCUMENT) {
@@ -1127,8 +1125,18 @@ void EWebView::LoadData(const char* data, size_t size, const char* mime_type, co
 }
 
 void EWebView::ShowContextMenu(const content::ContextMenuParams& params, content::ContextMenuType type) {
+  // fix for context menu coordinates type: MENU_TYPE_LINK (introduced by CBGRAPHICS-235),
+  // this menu is created in renderer process and it does not now anything about
+  // view scaling factor and it has another calling sequence, so coordinates is not updated
+  content::ContextMenuParams convertedParams = params;
+  if (type == MENU_TYPE_LINK) {
+    gfx::Point convertedPoint = rwhv()->ConvertPointInViewPix(gfx::Point(params.x, params.y));
+    convertedParams.x = convertedPoint.x();
+    convertedParams.y = convertedPoint.y();
+  }
+
   context_menu_.reset(new content::ContextMenuControllerEfl(evas_object(), type));
-  if(!context_menu_->PopulateAndShowContextMenu(params))
+  if(!context_menu_->PopulateAndShowContextMenu(convertedParams))
     context_menu_.reset();
 }
 
