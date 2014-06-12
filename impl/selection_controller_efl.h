@@ -75,6 +75,7 @@ class SelectionControllerEfl {
   EWebView* GetParentView() { return parent_view_; }
   void HideHandle();
   void HideHandleAndContextMenu();
+  bool IsAnyHandleVisible() const;
 
   void SetScrollStatus(const bool enable);
   bool GetScrollStatus();

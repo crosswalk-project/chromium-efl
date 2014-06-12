@@ -82,6 +82,10 @@ inline Ewk_View_Smart_Data* ToSmartData(const Evas_Object* evas_object) {
   return static_cast<Ewk_View_Smart_Data*>(evas_object_smart_data_get(evas_object));
 }
 
+static inline bool isHardwareBackKey(const Evas_Event_Key_Down *event) {
+  return (strcmp(event->key, "XF86Stop") == 0);
+}
+
 void SmartDataChanged(Ewk_View_Smart_Data* d) {
   DCHECK(d);
   if (d->changed.any)
@@ -723,7 +727,22 @@ Eina_Bool EWebView::handleMouseMove(Ewk_View_Smart_Data* d, const Evas_Event_Mou
 }
 
 Eina_Bool EWebView::handleKeyDown(Ewk_View_Smart_Data* d, const Evas_Event_Key_Down* event) {
-  ToEWebView(d)->rwhv()->HandleEvasEvent(event);
+  bool handled = false;
+  EWebView *webview = ToEWebView(d);
+  if (isHardwareBackKey(event)) {
+    if (webview->context_menu_) {
+      DVLOG(1) << "Hiding context menu due to back key press";
+      webview->context_menu_.reset();
+      handled = true;
+    }
+    if (webview->selection_controller_->IsAnyHandleVisible()){
+      DVLOG(1) << "Clearing text selection due to back key press";
+      webview->ClearSelection();
+      handled = true;
+    }
+  }
+  if (!handled)
+    webview->rwhv()->HandleEvasEvent(event);
   return true;
 }
 

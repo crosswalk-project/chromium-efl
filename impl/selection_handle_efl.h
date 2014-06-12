@@ -51,6 +51,7 @@ class SelectionHandleEfl {
   ~SelectionHandleEfl();
   void Show();
   void Hide();
+  bool IsVisible() const;
   void Move(const gfx::Point& point);
   void SetBasePosition(const gfx::Point& point) { base_point_ = point; }
   gfx::Point GetBasePosition() const { return base_point_; }

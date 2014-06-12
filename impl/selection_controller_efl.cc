@@ -171,6 +171,12 @@ void SelectionControllerEfl::HideHandleAndContextMenu() {
   HideHandle();
 }
 
+bool SelectionControllerEfl::IsAnyHandleVisible() const {
+  return (start_handle_->IsVisible() ||
+          end_handle_->IsVisible() ||
+          input_handle_->IsVisible());
+}
+
 void SelectionControllerEfl::Clear() {
   start_handle_->Hide();
   end_handle_->Hide();

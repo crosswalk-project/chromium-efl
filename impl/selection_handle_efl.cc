@@ -91,6 +91,10 @@ void SelectionHandleEfl::Hide() {
   evas_object_hide(handle_);
 }
 
+bool SelectionHandleEfl::IsVisible() const {
+  return evas_object_visible_get(handle_);
+}
+
 void SelectionHandleEfl::Move(const gfx::Point& point) {
   Evas_Coord x, y, deviceWidth, deviceHeight;
   gfx::Point movePoint = point;
