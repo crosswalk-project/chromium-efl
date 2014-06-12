@@ -198,6 +198,8 @@
       'file_chooser_controller_efl.h',
       'memory_purger.cc',
       'memory_purger.h',
+      'memory_sampler.cc',
+      'memory_sampler.h',
       'message_pump_for_ui_efl.cc',
       'message_pump_for_ui_efl.h',
       'navigation_policy_params.h',
