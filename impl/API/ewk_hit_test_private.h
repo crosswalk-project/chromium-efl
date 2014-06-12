@@ -27,8 +27,6 @@
 #include <Eina.h>
 
 #include "third_party/skia/include/core/SkBitmap.h"
-
-#include "public/ewk_hit_test.h"
 #include "tizen_webview/public/tw_hit_test.h"
 
 typedef std::map<std::string, std::string> NodeAttributesMap;
@@ -37,6 +35,10 @@ typedef std::map<std::string, std::string> NodeAttributesMap;
 struct _Ewk_Hit_Test {
   _Ewk_Hit_Test();
   _Ewk_Hit_Test(const _Ewk_Hit_Test& other);
+  // TODO: check whether bitwise assignment is acceptable (e.g, attributeHash)
+  // If not, proper implementation for below should be added:
+  // _Ewk_Hit_Test& operator=(const _Ewk_Hit_Test&);
+  // Note: Currently the operation is used in EwebView::UpdateHitTestData().
 
   tizen_webview::Hit_Test_Result_Context context;
   std::string linkURI;

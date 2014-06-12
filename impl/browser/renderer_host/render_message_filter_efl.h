@@ -48,8 +48,9 @@ class RenderMessageFilterEfl : public content::BrowserMessageFilter {
       content::BrowserThread::ID*) OVERRIDE;
 
  private:
-  void OnDecideNavigationPolicy(NavigationPolicyParams, bool*);
-  void OnReceivedHitTestData(int, const Ewk_Hit_Test&, const NodeAttributesMap&);
+  void OnDecideNavigationPolicy(NavigationPolicyParams, bool* handled);
+  void OnReceivedHitTestData(int view, const _Ewk_Hit_Test& hit_test_data,
+      const NodeAttributesMap& node_attributes);
 
   int render_process_id_;
 };

@@ -67,9 +67,12 @@ void RenderMessageFilterEfl::OnDecideNavigationPolicy(NavigationPolicyParams par
 }
 
 void RenderMessageFilterEfl::OnReceivedHitTestData(int render_view,
-  const Ewk_Hit_Test& hit_test_data,
+  const _Ewk_Hit_Test& hit_test_data,
   const NodeAttributesMap& node_attributes) {
-  if (content::WebContents* web_contents = WebContentsFromViewID(render_process_id_, render_view)) {
+  content::WebContents* web_contents = WebContentsFromViewID(
+      render_process_id_, render_view);
+
+  if (web_contents) {
     content::WebContentsDelegateEfl* delegate =
     static_cast<content::WebContentsDelegateEfl*>(web_contents->GetDelegate());
     delegate->web_view()->UpdateHitTestData(hit_test_data, node_attributes);

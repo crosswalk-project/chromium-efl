@@ -46,7 +46,6 @@
 #include "API/ewk_settings_private.h"
 #include "API/ewk_web_application_icon_data_private.h"
 #include "eweb_view_callbacks.h"
-#include "public/ewk_hit_test.h"
 #include "public/ewk_policy_decision.h"
 #include "public/ewk_view.h"
 #include "selection_controller_efl.h"
@@ -72,10 +71,9 @@
 #include "browser/selectpicker/popup_picker.h"
 #endif
 
-#include "tizen_webview/public/tw_hit_test.h"
-#include "tizen_webview/public/tw_touch_event.h"
 #include "tizen_webview/public/tw_input_type.h"
 #include "tizen_webview/public/tw_find_options.h"
+#include "tizen_webview/public/tw_touch_event.h"
 
 namespace content {
 class RenderViewHost;
@@ -95,6 +93,7 @@ class TouchEvent;
 
 namespace tizen_webview {
 class WebContext;
+class Hit_Test;
 }
 
 class EwkViewPlainTextGetCallback {
@@ -300,8 +299,8 @@ class EWebView
       NavigationPolicyParams params, bool* handled);
   void UseSettingsFont();
 
-  Ewk_Hit_Test* RequestHitTestDataAt(int x, int y, tizen_webview::Hit_Test_Mode mode);
-  void UpdateHitTestData(const Ewk_Hit_Test& hit_test_data, const NodeAttributesMap& node_attributes);
+  tizen_webview::Hit_Test* RequestHitTestDataAt(int x, int y, tizen_webview::Hit_Test_Mode mode);
+  void UpdateHitTestData(const _Ewk_Hit_Test& hit_test_data, const NodeAttributesMap& node_attributes);
 
   int current_find_request_id() const { return current_find_request_id_; }
   bool PlainTextGet(Ewk_View_Plain_Text_Get_Callback callback, void* user_data);
@@ -481,7 +480,7 @@ class EWebView
   gfx::Size contents_area_;
   double progress_;
   mutable std::string title_;
-  Ewk_Hit_Test hit_test_data_;
+  _Ewk_Hit_Test hit_test_data_;
   base::WaitableEvent hit_test_completion_;
   IDMap<MHTMLCallbackDetails, IDMapOwnPointer> mhtml_callback_map_;
   double page_scale_factor_;

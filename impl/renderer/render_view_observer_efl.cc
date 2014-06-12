@@ -58,7 +58,7 @@ bool GetGRBAValuesFromString(const std::string& input, int* r, int* g, int* b, i
   return parsing_status;
 }
 
-void PopulateEwkHitTestData(const blink::WebHitTestResult& web_hit_test, Ewk_Hit_Test* ewk_hit_test)
+void PopulateEwkHitTestData(const blink::WebHitTestResult& web_hit_test, _Ewk_Hit_Test* ewk_hit_test)
 {
   DCHECK(ewk_hit_test);
   ewk_hit_test->imageURI = web_hit_test.absoluteImageURL().string().utf8();

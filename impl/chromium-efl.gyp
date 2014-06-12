@@ -238,6 +238,8 @@
       #TODO: making separate gyp for tizen_webview
       '<(chrome_src_dir)/tizen_webview/public/tw_custom_handlers.h',
       '<(chrome_src_dir)/tizen_webview/public/tw_custom_handlers.cc',
+      '<(chrome_src_dir)/tizen_webview/public/tw_hit_test.h',
+      '<(chrome_src_dir)/tizen_webview/public/tw_hit_test.cc',
       '<(chrome_src_dir)/tizen_webview/public/tw_notification.cc',
       '<(chrome_src_dir)/tizen_webview/public/tw_notification.h',
       '<(chrome_src_dir)/tizen_webview/public/tw_security_origin.cc',

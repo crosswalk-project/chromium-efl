@@ -83,17 +83,17 @@ IPC_STRUCT_TRAITS_END()
 IPC_ENUM_TRAITS(tizen_webview::Hit_Test_Mode)
 IPC_ENUM_TRAITS(tizen_webview::Hit_Test_Result_Context)
 
-IPC_STRUCT_TRAITS_BEGIN(Ewk_Hit_Test::Hit_Test_Node_Data)
+IPC_STRUCT_TRAITS_BEGIN(_Ewk_Hit_Test::Hit_Test_Node_Data)
   IPC_STRUCT_TRAITS_MEMBER(tagName)
   IPC_STRUCT_TRAITS_MEMBER(nodeValue)
 IPC_STRUCT_TRAITS_END()
 
-IPC_STRUCT_TRAITS_BEGIN(Ewk_Hit_Test::Hit_Test_Image_Buffer)
+IPC_STRUCT_TRAITS_BEGIN(_Ewk_Hit_Test::Hit_Test_Image_Buffer)
   IPC_STRUCT_TRAITS_MEMBER(fileNameExtension)
   IPC_STRUCT_TRAITS_MEMBER(imageBitmap)
 IPC_STRUCT_TRAITS_END()
 
-IPC_STRUCT_TRAITS_BEGIN(Ewk_Hit_Test)
+IPC_STRUCT_TRAITS_BEGIN(_Ewk_Hit_Test)
   IPC_STRUCT_TRAITS_MEMBER(context)
   IPC_STRUCT_TRAITS_MEMBER(linkURI)
   IPC_STRUCT_TRAITS_MEMBER(linkLabel)
@@ -212,7 +212,7 @@ IPC_MESSAGE_ROUTED2(EwkHostMsg_DidChangeMaxScrollOffset,
 
 IPC_MESSAGE_CONTROL3(EwkViewHostMsg_HitTestReply,
                     int, /* render_view_id */
-                    Ewk_Hit_Test, /* Ewk Hit test data without node map */
+                    _Ewk_Hit_Test, /* Ewk Hit test data without node map */
                     NodeAttributesMap /* node attributes */)
 
 IPC_MESSAGE_ROUTED1(EwkViewMsg_GetMHTMLData,

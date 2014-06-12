@@ -56,6 +56,8 @@
 #include "grit/webkit_strings.h"
 #include "ui/base/l10n/l10n_util.h"
 #include "devtools_delegate_efl.h"
+
+#include "tizen_webview/public/tw_hit_test.h"
 #include "tizen_webview/public/tw_touch_point.h"
 #include "tizen_webview/public/tw_web_context.h"
 #ifdef OS_TIZEN
@@ -921,7 +923,8 @@ void EWebView::DispatchPostponedGestureEvent(ui::GestureEvent* event) {
       ClearSelection();
 
     if (settings && settings->textSelectionEnabled()) {
-      _Ewk_Hit_Test* hit_test_data = RequestHitTestDataAt(event->x(), event->y(), TW_HIT_TEST_MODE_DEFAULT);
+      tizen_webview::Hit_Test* hit_test = RequestHitTestDataAt(event->x(), event->y(), TW_HIT_TEST_MODE_DEFAULT);
+      _Ewk_Hit_Test* hit_test_data = hit_test->impl;
       if (hit_test_data && hit_test_data->context & TW_HIT_TEST_RESULT_CONTEXT_EDITABLE) {
         selection_controller_->SetSelectionStatus(true);
         selection_controller_->SetCaretSelectionStatus(true);
@@ -945,11 +948,12 @@ void EWebView::DispatchPostponedGestureEvent(ui::GestureEvent* event) {
       } else {
         LOG(INFO) << __PRETTY_FUNCTION__ << ":: hit_test = " << hit_test_data->context;
       }
-      delete hit_test_data;
+      delete hit_test;
       rwhv()->HandleGesture(event);
     }
   } else if ((event->details().type() == ui::ET_GESTURE_TAP) || (event->details().type() == ui::ET_GESTURE_SHOW_PRESS))  {
-    _Ewk_Hit_Test* hit_test_data = RequestHitTestDataAt(event->x(), event->y(), TW_HIT_TEST_MODE_DEFAULT);
+    tizen_webview::Hit_Test* hit_test = RequestHitTestDataAt(event->x(), event->y(), TW_HIT_TEST_MODE_DEFAULT);
+   _Ewk_Hit_Test* hit_test_data = hit_test->impl;
     LOG(INFO) << __PRETTY_FUNCTION__ << " hit_test = " << hit_test_data;
     if (hit_test_data && hit_test_data->context & TW_HIT_TEST_RESULT_CONTEXT_EDITABLE) {
       LOG(INFO) << "DispatchPostponedGestureEvent :: TW_HIT_TEST_RESULT_CONTEXT_EDITABLE";
@@ -968,7 +972,7 @@ void EWebView::DispatchPostponedGestureEvent(ui::GestureEvent* event) {
       selection_controller_->SetSelectionEditable(false);
       //ClearSelection();
     }
-    delete hit_test_data;
+    delete hit_test;
     rwhv()->HandleGesture(event);
   } else {
     ClearSelection();
@@ -1470,7 +1474,7 @@ bool EWebView::ClearSelection() {
     return retval;
 }
 
-Ewk_Hit_Test* EWebView::RequestHitTestDataAt(int x, int y, tizen_webview::Hit_Test_Mode mode) {
+tizen_webview::Hit_Test* EWebView::RequestHitTestDataAt(int x, int y, tizen_webview::Hit_Test_Mode mode) {
   RenderViewHost* render_view_host = web_contents_delegate()->web_contents()->GetRenderViewHost();
   DCHECK(render_view_host);
 
@@ -1481,10 +1485,10 @@ Ewk_Hit_Test* EWebView::RequestHitTestDataAt(int x, int y, tizen_webview::Hit_Te
     base::ThreadRestrictions::ScopedAllowWait allow_wait;
     hit_test_completion_.Wait();
   }
-  return new Ewk_Hit_Test(hit_test_data_);
+  return new tizen_webview::Hit_Test(hit_test_data_);
 }
 
-void EWebView::UpdateHitTestData(const Ewk_Hit_Test& hit_test_data, const NodeAttributesMap& node_attributes) {
+void EWebView::UpdateHitTestData(const _Ewk_Hit_Test& hit_test_data, const NodeAttributesMap& node_attributes) {
   DCHECK(content::BrowserThread::CurrentlyOn(content::BrowserThread::IO));
   hit_test_data_ = hit_test_data;
   hit_test_data_.nodeData.PopulateNodeAtributes(node_attributes);

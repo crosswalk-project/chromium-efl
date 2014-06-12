@@ -5,6 +5,12 @@
 #ifndef TIZEN_WEBVIEW_PUBLIC_TW_HIT_TEST_MODE_H_
 #define TIZEN_WEBVIEW_PUBLIC_TW_HIT_TEST_MODE_H_
 
+#include <eina_hash.h>
+#include <cstddef>   // Provides size_t
+
+struct _Ewk_Hit_Test;
+class EWebView;
+
 namespace tizen_webview {
 
 /**
@@ -43,6 +49,46 @@ enum Hit_Test_Result_Context {
   TW_HIT_TEST_RESULT_CONTEXT_SELECTION = 1 << 5,
   TW_HIT_TEST_RESULT_CONTEXT_EDITABLE = 1 << 6,
   TW_HIT_TEST_RESULT_CONTEXT_TEXT = 1 << 7
+};
+
+
+class Hit_Test {
+ public:
+  Hit_Test();
+  Hit_Test(const Hit_Test& other);
+  ~Hit_Test();
+  Hit_Test& operator=(const Hit_Test& other);
+
+  Hit_Test_Result_Context GetResultContext() const;
+
+  const char* GetLinkUri() const;
+  const char* GetLinkTitle() const;
+  const char* GetLinkLabel() const;
+
+  const char* GetImageUri() const;
+  const char* GetImageFilenameExtension() const;
+  int         GetImageWidth() const;
+  int         GetImageHeight() const;
+  void*       GetImageBuffer() const;
+  size_t      GetImageBufferLength() const;
+
+  const char* GetMediaUri() const;
+
+  const char* GetNodeTagName() const;
+  const char* GetNodeValue() const;
+  Eina_Hash*  GetNodeAttributeHash() const;
+
+ private:
+  typedef _Ewk_Hit_Test Hit_Test_Impl;
+  Hit_Test_Impl* impl;
+
+  // construct directly from the impl class;
+  explicit Hit_Test(const Hit_Test_Impl& impl_);
+
+  // utility function
+  void Swap(Hit_Test& other);
+
+  friend class ::EWebView;
 };
 
 } // namespace tizen_webview
