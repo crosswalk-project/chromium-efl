@@ -56,6 +56,9 @@
 #define EFL_MAX_WIDTH 10000
 #define EFL_MAX_HEIGHT 10000  // borrowed from GTK+ port
 
+#define MAX_SURFACE_WIDTH_EGL 4096 //max supported Framebuffer width
+#define MAX_SURFACE_HEIGHT_EGL 4096 //max supported Framebuffer height
+
 namespace content {
 
 void RenderWidgetHostViewBase::GetDefaultScreenInfo(blink::WebScreenInfo* results) {
@@ -253,6 +256,12 @@ void RenderWidgetHostViewEfl::Init_EvasGL(int width, int height) {
   } else {
     LOG(INFO) << "set_eweb_view -- Create evas gl context Success";
   }
+
+  if(width > MAX_SURFACE_WIDTH_EGL)
+    width = MAX_SURFACE_WIDTH_EGL;
+
+  if(height > MAX_SURFACE_HEIGHT_EGL)
+    height = MAX_SURFACE_HEIGHT_EGL;
 
   evas_gl_surface_ = evas_gl_surface_create(evas_gl_, evas_gl_config_, width, height);
   if (!evas_gl_surface_) {
