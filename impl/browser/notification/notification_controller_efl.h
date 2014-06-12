@@ -66,17 +66,8 @@ class NotificationControllerEfl {
   // Notify engine when user clicked on the notification
   void NotifyNotificationClicked(uint64_t notification_id);
 
-  // sets the permision for all the pending notifications
-  void SetPermissionForAllNotifications(Eina_List* ewk_notification_permissions) { ewk_notification_permissions_ = ewk_notification_permissions; }
-
   // sets the permission for a particular pending notification
   void SetPermissionForNotification(Ewk_Notification_Permission_Request* notification, bool isAllowed);
-
-  // returns if the permisssion is already there
-  bool IsDefaultAllowed(const std::string& origin);
-
-  // Removes the entry that was added by SetPermissionForAllNotifications API list
-  void RemoveStoredOrigins(Eina_List* origins);
 
   // Removes all the shown notifications
   bool RemoveClosedNotifications(Evas_Object* ewkView, Eina_List* notification_list);
@@ -87,7 +78,6 @@ class NotificationControllerEfl {
 
  private:
   IDMap<NotificationData, IDMapOwnPointer> notification_map; // This stores the notifications displayed to the user
-  Eina_List* ewk_notification_permissions_; // This stores the list of cached permissions that user has set
 
   DISALLOW_COPY_AND_ASSIGN(NotificationControllerEfl);
 };

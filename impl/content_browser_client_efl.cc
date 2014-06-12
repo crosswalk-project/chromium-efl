@@ -136,16 +136,9 @@ void ContentBrowserClientEfl::RequestDesktopNotificationPermission(
        new Ewk_Notification_Permission_Request(
          delegate->web_view()->evas_object(), callback_context, source_origin);
 
-  if (browser_context->GetNotificationController()->
-        IsDefaultAllowed(notification_permission->origin->GetHost())) {
-    browser_context->GetNotificationController()->
-        SetPermissionForNotification(notification_permission, true);
-    delete notification_permission;
-  } else {
-    delegate->web_view()->
+  delegate->web_view()->
       SmartCallback<EWebViewCallbacks::NotificationPermissionRequest>()
         .call(notification_permission);
-  }
 #else
   NOTIMPLEMENTED();
 #endif

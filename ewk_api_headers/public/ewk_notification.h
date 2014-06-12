@@ -27,13 +27,7 @@
 extern "C" {
 #endif
 
-struct _Ewk_Notification_Permission {
-    Eina_Stringshare* origin;
-    Eina_Bool allowed;
-};
-
 typedef struct _Ewk_Notification Ewk_Notification;
-typedef struct _Ewk_Notification_Permission Ewk_Notification_Permission;
 typedef struct _Ewk_Notification_Permission_Request Ewk_Notification_Permission_Request;
 
 

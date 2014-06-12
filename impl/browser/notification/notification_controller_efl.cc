@@ -40,16 +40,10 @@ using tizen_webview::GetURL;
 
 namespace content {
 
-NotificationControllerEfl::NotificationControllerEfl()
-     : ewk_notification_permissions_(NULL) {
+NotificationControllerEfl::NotificationControllerEfl() {
 }
 
 NotificationControllerEfl::~NotificationControllerEfl() {
-  void* data = NULL;
-  EINA_LIST_FREE(ewk_notification_permissions_, data) {
-    Ewk_Notification_Permission* notificationPermission = static_cast<Ewk_Notification_Permission*>(data);
-    delete notificationPermission;
-  }
   notification_map.Clear();
 }
 
@@ -81,42 +75,12 @@ void NotificationControllerEfl::NotifyNotificationClicked(uint64_t notification_
     render_view_host->DesktopNotificationPostClick(notification_id);
 }
 
-bool NotificationControllerEfl::IsDefaultAllowed(const std::string& origin) {
-  Eina_List* list_iterator = NULL;
-  void* data = NULL;
-
-  EINA_LIST_FOREACH(ewk_notification_permissions_, list_iterator, data) {
-    Ewk_Notification_Permission* notificationPermission = static_cast<Ewk_Notification_Permission*>(data);
-    if (!origin.compare(notificationPermission->origin))
-      return true;
-  }
-  return false;
-}
-
 void NotificationControllerEfl::SetPermissionForNotification(Ewk_Notification_Permission_Request* notification, bool isAllowed) {
   RenderViewHost* render_view_host = ToEWebView(notification->ewkView)->web_contents_delegate()->web_contents()->GetRenderViewHost();
   if (render_view_host) {
     render_view_host->DesktopNotificationPermissionRequestDone(notification->callback_context);
     if (isAllowed)
       render_view_host->DesktopNotificationPostDisplay(notification->callback_context);
-  }
-}
-
-void NotificationControllerEfl::RemoveStoredOrigins(Eina_List* origins) {
-  Eina_List* origin_iterator = NULL;
-  void* origin_data = NULL;
-  EINA_LIST_FOREACH(origins, origin_iterator, origin_data) {
-    Security_Origin* origin = static_cast<Security_Origin*>(origin_data);
-    Eina_List* permission_list_iterator = NULL;
-    Eina_List* permission_list_iterator_next = NULL;
-    void* permission_data = NULL;
-    EINA_LIST_FOREACH_SAFE(ewk_notification_permissions_, permission_list_iterator, permission_list_iterator_next, permission_data) {
-      Ewk_Notification_Permission* notification_permission = static_cast<Ewk_Notification_Permission*>(permission_data);
-      if (!strcmp(notification_permission->origin, origin->GetHost())) {
-        delete notification_permission;
-        ewk_notification_permissions_ = eina_list_remove_list(ewk_notification_permissions_, permission_list_iterator);
-      }
-    }
   }
 }
 
