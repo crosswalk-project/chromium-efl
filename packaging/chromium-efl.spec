@@ -1,3 +1,8 @@
+%if 0%{?nodebug}
+%global __debug_install_post %{nil}
+%global debug_package %{nil}
+%endif
+
 Name: org.tizen.chromium-efl
 Summary: Chromium EFL
 # Set by by scripts/update-chromium-version.sh
