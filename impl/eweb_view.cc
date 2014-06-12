@@ -945,7 +945,6 @@ void EWebView::DispatchPostponedGestureEvent(ui::GestureEvent* event) {
           && hit_test_data->context & EWK_HIT_TEST_RESULT_CONTEXT_TEXT) {
         selection_controller_->SetSelectionStatus(true);
         selection_controller_->HandleLongPressEvent(rwhv()->ConvertPointInViewPix(gfx::Point(event->x(), event->y())));
-        delete hit_test_data;
         LOG(INFO) << __PRETTY_FUNCTION__ << ":: link, !image, !media, text";
       } else if (hit_test_data && hit_test_data->context & EWK_HIT_TEST_RESULT_CONTEXT_DOCUMENT) {
         LOG(INFO) << __PRETTY_FUNCTION__ << ":: EWK_HIT_TEST_RESULT_CONTEXT_DOCUMENT";
@@ -957,6 +956,7 @@ void EWebView::DispatchPostponedGestureEvent(ui::GestureEvent* event) {
       } else {
         LOG(INFO) << __PRETTY_FUNCTION__ << ":: hit_test = " << hit_test_data->context;
       }
+      delete hit_test_data;
       rwhv()->HandleGesture(event);
     }
   } else if ((event->details().type() == ui::ET_GESTURE_TAP) || (event->details().type() == ui::ET_GESTURE_SHOW_PRESS))  {
@@ -970,7 +970,6 @@ void EWebView::DispatchPostponedGestureEvent(ui::GestureEvent* event) {
         selection_controller_->SetCaretSelectionStatus(true);
       } else
         selection_controller_->SetSelectionEditable(true);
-      delete hit_test_data;
     } else {
       if (hit_test_data && hit_test_data->context & EWK_HIT_TEST_RESULT_CONTEXT_DOCUMENT)
         LOG(INFO) << __PRETTY_FUNCTION__ << " DOCUMENT";
@@ -980,6 +979,7 @@ void EWebView::DispatchPostponedGestureEvent(ui::GestureEvent* event) {
       selection_controller_->SetSelectionEditable(false);
       //ClearSelection();
     }
+    delete hit_test_data;
     rwhv()->HandleGesture(event);
   } else {
     ClearSelection();
