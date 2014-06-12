@@ -384,6 +384,8 @@ class EWebView
   std::string GetErrorPage(const std::string& invalidUrl);
   static std::string GetPlatformLocale();
   void UpdateMagnifierScreen(const SkBitmap& bitmap);
+  bool GetLinkMagnifierEnabled() const;
+  void SetLinkMagnifierEnabled(bool enabled);
 
   void SetOverrideEncoding(const std::string& encoding);
 

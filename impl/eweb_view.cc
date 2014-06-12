@@ -1532,6 +1532,20 @@ void EWebView::SetOverrideEncoding(const std::string& encoding) {
   web_contents_delegate_->web_contents()->SetOverrideEncoding(encoding);
 }
 
+bool EWebView::GetLinkMagnifierEnabled() const {
+  WebContents* webContents = web_contents_delegate()->web_contents();
+  return webContents->GetMutableRendererPrefs()->tap_multiple_targets_strategy == TAP_MULTIPLE_TARGETS_STRATEGY_POPUP;
+}
+
+void EWebView::SetLinkMagnifierEnabled(bool enabled) {
+  WebContents* webContents = web_contents_delegate()->web_contents();
+
+  webContents->GetMutableRendererPrefs()->tap_multiple_targets_strategy =
+      enabled ? TAP_MULTIPLE_TARGETS_STRATEGY_POPUP
+              : TAP_MULTIPLE_TARGETS_STRATEGY_NONE;
+  webContents->GetRenderViewHost()->SyncRendererPrefs();
+}
+
 void EWebView::GetSnapShotForRect(gfx::Rect& rect) {
 #ifdef OS_TIZEN
   rwhv()->GetSnapshotForRect(rect);
