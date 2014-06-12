@@ -25,30 +25,14 @@
 #include "third_party/WebKit/public/web/WebInputEvent.h"
 #include "ui/events/event.h"
 
-typedef struct _Ecore_Event_Mouse_Button Ecore_Event_Mouse_Button;
-typedef struct _Ecore_Event_Mouse_Wheel  Ecore_Event_Mouse_Wheel;
-typedef struct _Ecore_Event_Mouse_Move   Ecore_Event_Mouse_Move;
-typedef struct _Ecore_Event_Key          Ecore_Event_Key;
-typedef struct _Evas Evas;
-typedef struct _Evas_Event_Mouse_Down    Evas_Event_Mouse_Down;
-typedef struct _Evas_Event_Mouse_Up      Evas_Event_Mouse_Up;
-typedef struct _Evas_Event_Mouse_Move    Evas_Event_Mouse_Move;
-typedef struct _Evas_Event_Mouse_Wheel   Evas_Event_Mouse_Wheel;
-typedef struct _Evas_Event_Key_Down      Evas_Event_Key_Down;
-typedef struct _Evas_Event_Key_Up        Evas_Event_Key_Up;
+#include <Evas.h>
+
 typedef struct _Ewk_Touch_Point          Ewk_Touch_Point;
-typedef struct _Evas_Object Evas_Object;
 
 namespace content {
 
 class WebEventFactoryEfl {
  public:
-  static blink::WebMouseEvent toWebMouseEvent(const Ecore_Event_Mouse_Button*, bool pressed);
-  static blink::WebMouseWheelEvent toWebMouseEvent(const Ecore_Event_Mouse_Wheel*);
-  static blink::WebMouseEvent toWebMouseEvent(const Ecore_Event_Mouse_Move*);
-
-  static content::NativeWebKeyboardEvent toWebKeyboardEvent(const Ecore_Event_Key*, bool pressed);
-
   static blink::WebMouseEvent toWebMouseEvent(Evas*, Evas_Object*, const Evas_Event_Mouse_Down*, float scale_factor);
   static blink::WebMouseEvent toWebMouseEvent(Evas*, Evas_Object*,  const Evas_Event_Mouse_Up*, float scale_factor);
   static blink::WebMouseEvent toWebMouseEvent(Evas*,  Evas_Object*, const Evas_Event_Mouse_Move*, float scale_factor);

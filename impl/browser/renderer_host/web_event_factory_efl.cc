@@ -26,11 +26,8 @@
 #include "ui/events/keycodes/keyboard_codes.h"
 #include "ui/events/keycodes/keyboard_code_conversion_x.h"
 
-#include <Eina.h>
 #include <Ecore.h>
-#include <Ecore_Input.h>
 #include <Ecore_X.h>
-#include <Evas.h>
 
 // TODO: Figure out how to avoid this includes.
 #include <X11/Xutil.h>
@@ -40,7 +37,7 @@ using namespace blink;
 
 namespace {
 
-inline void TranslateEvasCoordToWebKitCoord(Evas_Object *web_view, int& x, int& y) {
+static void TranslateEvasCoordToWebKitCoord(Evas_Object *web_view, int& x, int& y) {
   Evas_Coord tmpX, tmpY;
   evas_object_geometry_get(web_view, &tmpX, &tmpY, 0, 0);
   x -= tmpX;
@@ -48,104 +45,16 @@ inline void TranslateEvasCoordToWebKitCoord(Evas_Object *web_view, int& x, int& 
 }
 
 }
+
 namespace content {
-
-static WebMouseEvent::Button EflToWebMouseButton(unsigned int eflButton) {
-  switch(eflButton) {
-    case 1:
-      return WebMouseEvent::ButtonLeft;
-    case 2:
-      return WebMouseEvent::ButtonMiddle;
-    case 3:
-      return WebMouseEvent::ButtonRight;
-  }
-
-  return WebMouseEvent::ButtonNone;
-}
-
-static int EflToWebModifiers(unsigned int eflmodifiers, unsigned int eflbuttons) {
-  int flags = 0;
-  if (eflmodifiers & ECORE_EVENT_MODIFIER_CTRL)
-    flags |= WebInputEvent::ControlKey;
-
-  if (eflmodifiers & ECORE_EVENT_MODIFIER_SHIFT)
-    flags |= WebInputEvent::ShiftKey;
-
-  if (eflmodifiers & ECORE_EVENT_MODIFIER_ALT)
-    flags |= WebInputEvent::AltKey;
-
-  if (eflbuttons == 1)
-    flags |= WebInputEvent::LeftButtonDown;
-
-  if (eflbuttons == 2)
-    flags |= WebInputEvent::MiddleButtonDown;
-
-  if (eflbuttons == 3)
-    flags |= WebInputEvent::RightButtonDown;
-
-  return flags;
-}
-
-WebMouseEvent WebEventFactoryEfl::toWebMouseEvent(const Ecore_Event_Mouse_Button* ev, bool pressed) {
-  WebMouseEvent webKitEvent;
-  webKitEvent.timeStampSeconds = (double)ev->timestamp / 1000;
-  webKitEvent.button = EflToWebMouseButton(ev->buttons);
-  webKitEvent.modifiers = EflToWebModifiers(ev->modifiers, pressed ? ev->buttons : 0);
-
-  webKitEvent.x = webKitEvent.windowX = ev->x;
-  webKitEvent.y = webKitEvent.windowY = ev->y;
-  webKitEvent.globalX = ev->root.x;
-  webKitEvent.globalY = ev->root.y;
-  webKitEvent.type = pressed ? WebInputEvent::MouseDown : WebInputEvent::MouseUp;
-
-  webKitEvent.clickCount = 1;
-
-  return webKitEvent;
-}
 
 static const float cDefaultScrollStep = 20;
 
-WebMouseWheelEvent WebEventFactoryEfl::toWebMouseEvent(const Ecore_Event_Mouse_Wheel* ev) {
-  WebMouseWheelEvent webKitEvent;
-  webKitEvent.timeStampSeconds = (double)ev->timestamp / 1000;
-  webKitEvent.modifiers = EflToWebModifiers(ev->modifiers, 0);
-
-  webKitEvent.x = webKitEvent.windowX = ev->x;
-  webKitEvent.y = webKitEvent.windowY = ev->y;
-  webKitEvent.globalX = ev->root.x;
-  webKitEvent.globalY = ev->root.y;
-  webKitEvent.type = WebInputEvent::MouseWheel;
-
-  if (ev->direction) {
-    webKitEvent.wheelTicksX = ev->z;
-    webKitEvent.deltaX = ev->z * cDefaultScrollStep;
-  } else {
-    webKitEvent.wheelTicksY = -(ev->z);
-    webKitEvent.deltaY = -(ev->z * cDefaultScrollStep);
-  }
-
-  return webKitEvent;
-}
-
-WebMouseEvent WebEventFactoryEfl::toWebMouseEvent(const Ecore_Event_Mouse_Move* ev) {
-  WebMouseEvent webKitEvent;
-  webKitEvent.timeStampSeconds = (double)ev->timestamp / 1000;
-  webKitEvent.modifiers = EflToWebModifiers(ev->modifiers, 0);
-
-  webKitEvent.x = webKitEvent.windowX = ev->x;
-  webKitEvent.y = webKitEvent.windowY = ev->y;
-  webKitEvent.globalX = ev->root.x;
-  webKitEvent.globalY = ev->root.y;
-  webKitEvent.type = WebInputEvent::MouseMove;
-
-  return webKitEvent;
-}
-
-ui::KeyboardCode KeyboardCodeFromEflKey(const char* key) {
+static ui::KeyboardCode KeyboardCodeFromEflKey(const char* key) {
   return ui::KeyboardCodeFromXKeysym(XStringToKeysym(key));
 }
 
-int WindowsKeyCodeFromEflKey(const char* key) {
+static int WindowsKeyCodeFromEflKey(const char* key) {
   int windows_key_code = KeyboardCodeFromEflKey(key);
   if (windows_key_code == ui::VKEY_SHIFT ||
       windows_key_code == ui::VKEY_CONTROL ||
@@ -173,12 +82,12 @@ int WindowsKeyCodeFromEflKey(const char* key) {
   return windows_key_code;
 }
 
-int NativeKeyCodeFromEflKey(const char* key) {
+static int NativeKeyCodeFromEflKey(const char* key) {
   //return ecore_x_keysym_keycode_get(ev->key);
   return XKeysymToKeycode((Display*)ecore_x_display_get(), XStringToKeysym(key));
 }
 
-int CharacterFromEflString(const char* string) {
+static int CharacterFromEflString(const char* string) {
   if (string) {
     base::string16 result;
     base::UTF8ToUTF16(string, strlen(string), &result);
@@ -234,34 +143,6 @@ static blink::WebUChar GetControlCharacter(int windows_key_code, bool shift) {
   return 0;
 }
 
-content::NativeWebKeyboardEvent WebEventFactoryEfl::toWebKeyboardEvent(const Ecore_Event_Key* ev, bool pressed) {
-  content::NativeWebKeyboardEvent webKitEvent;
-  webKitEvent.timeStampSeconds =  (double)ev->timestamp / 1000;
-  webKitEvent.modifiers = EflToWebModifiers(ev->modifiers, 0);
-  webKitEvent.type = pressed ? WebInputEvent::KeyDown : WebInputEvent::KeyUp;
-
-  webKitEvent.nativeKeyCode = NativeKeyCodeFromEflKey(ev->key);
-  webKitEvent.windowsKeyCode = WindowsKeyCodeFromEflKey(ev->key);
-
-  if (webKitEvent.windowsKeyCode == ui::VKEY_RETURN)
-      webKitEvent.unmodifiedText[0] = '\r';
-  else
-    webKitEvent.unmodifiedText[0] = CharacterFromEflString(ev->string);
-
-  if (webKitEvent.modifiers & blink::WebInputEvent::ControlKey) {
-    webKitEvent.text[0] =
-        GetControlCharacter(
-            webKitEvent.windowsKeyCode,
-            webKitEvent.modifiers & blink::WebInputEvent::ShiftKey);
-  } else {
-    webKitEvent.text[0] = webKitEvent.unmodifiedText[0];
-  }
-
-  webKitEvent.setKeyIdentifierFromWindowsKeyCode();
-
-  return webKitEvent;
-}
-
 enum {
   LeftButton = 1,
   MiddleButton = 2,
@@ -279,7 +160,7 @@ static  WebMouseEvent::Button EvasToWebMouseButton(int button) {
   return WebMouseEvent::ButtonNone;
 }
 
-static inline WebInputEvent::Modifiers EvasToWebModifiers(const Evas_Modifier* modifiers) {
+static WebInputEvent::Modifiers EvasToWebModifiers(const Evas_Modifier* modifiers) {
   unsigned result = 0;
 
   if (evas_key_modifier_is_set(modifiers, "Shift"))

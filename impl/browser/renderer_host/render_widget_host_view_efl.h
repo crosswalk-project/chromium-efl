@@ -322,8 +322,8 @@ class RenderWidgetHostViewEfl
   GLuint position_attrib_;
   GLuint texcoord_attrib_;
   void* egl_image_;
-  unsigned int current_pixmap_id_;
-  unsigned int next_pixmap_id_;
+  unsigned long current_pixmap_id_;
+  unsigned long next_pixmap_id_;
   GLuint texture_id_;
 
   DISALLOW_COPY_AND_ASSIGN(RenderWidgetHostViewEfl);

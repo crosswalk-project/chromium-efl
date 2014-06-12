@@ -27,13 +27,10 @@
 
 namespace content {
 
-const int menuHeight = 140;// The Height fo the context menu.
-const int menuPadding = 60;// This is padding for deciding when to modify context menu position.
-//const int spacePadding = 24;// This is for making context menu closer to the handles.
-const int spacePadding = 0;// This is for making context menu closer to the handles.
-const int textSelectionScrollSize = 50;// Scroll step when selection handler is moving out of viewport.
-static int s_magnifierMaxYOffsetDelta = 50;// Magnifier should not show the image below the viewport
-static int s_textSelectionMargin = 5;
+static const int menuHeight = 140;// The Height fo the context menu.
+static const int menuPadding = 60;// This is padding for deciding when to modify context menu position.
+static const int spacePadding = 0; // 24;// This is for making context menu closer to the handles.
+static const int textSelectionScrollSize = 50;// Scroll step when selection handler is moving out of viewport.
 
 static bool IsRectEmpty(const gfx::Rect& rect) {
   if (rect.x() == 0 && rect.y() == 0 && rect.height() == 0 && rect.width() == 0) {
@@ -46,8 +43,8 @@ static bool IsRectEmpty(const gfx::Rect& rect) {
 SelectionControllerEfl::SelectionControllerEfl(EWebView* parent_view)
     :  parent_view_(parent_view),
        mouse_press_(false),
-       long_mouse_press_(false),
        scrolling_(false),
+       long_mouse_press_(false),
        selection_data_(new SelectionBoxEfl(parent_view)),
        start_handle_(new SelectionHandleEfl(this, SelectionHandleEfl::HANDLE_TYPE_LEFT, parent_view->evas_object())),
        end_handle_(new SelectionHandleEfl(this, SelectionHandleEfl::HANDLE_TYPE_RIGHT, parent_view->evas_object())),

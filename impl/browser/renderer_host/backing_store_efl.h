@@ -9,7 +9,7 @@
 #include "content/browser/renderer_host/backing_store.h"
 #include "third_party/skia/include/core/SkBitmap.h"
 
-typedef struct _Evas_Object Evas_Object;
+#include <Evas.h>
 
 namespace gfx {
 class Point;

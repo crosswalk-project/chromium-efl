@@ -314,7 +314,7 @@ void ContextMenuControllerEfl::MenuItemSelected(ContextMenuItemEfl *menu_item) {
       if (params_.is_editable) {
         HideSelectionHandle();
         Eina_Rectangle left_rect, right_rect;
-        Eina_Bool result = view->GetSelectionRange(&left_rect, &right_rect);
+        view->GetSelectionRange(&left_rect, &right_rect);
         Evas_Coord x, y;
         evas_object_geometry_get(view->evas_object(), &x, &y, 0, 0);
         right_rect.x += x;
