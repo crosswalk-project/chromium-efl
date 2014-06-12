@@ -765,15 +765,19 @@ Eina_Bool EWebView::handleKeyDown(Ewk_View_Smart_Data* d, const Evas_Event_Key_D
       webview->context_menu_.reset();
       handled = true;
     }
-    if (webview->selection_controller_->IsAnyHandleVisible()){
+    if (webview->selection_controller_->IsAnyHandleVisible()) {
       DVLOG(1) << "Clearing text selection due to back key press";
       webview->ClearSelection();
       handled = true;
     }
+#ifndef OS_TIZEN_TV
+    if (!handled)
+      webview->GoBack();
+#endif
+    return EINA_TRUE;
   }
-  if (!handled)
-    webview->rwhv()->HandleEvasEvent(event);
-  return true;
+  webview->rwhv()->HandleEvasEvent(event);
+  return EINA_TRUE;
 }
 
 Eina_Bool EWebView::handleKeyUp(Ewk_View_Smart_Data* d, const Evas_Event_Key_Up* event) {
