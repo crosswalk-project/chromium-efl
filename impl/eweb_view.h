@@ -385,6 +385,8 @@ class EWebView
   static std::string GetPlatformLocale();
   void UpdateMagnifierScreen(const SkBitmap& bitmap);
 
+  void SetOverrideEncoding(const std::string& encoding);
+
  private:
   EWebView(tizen_webview::WebContext*, Evas_Object* smart_object);
   ~EWebView();

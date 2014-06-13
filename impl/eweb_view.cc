@@ -1528,6 +1528,10 @@ void EWebView::UpdateMagnifierScreen(const SkBitmap& bitmap) {
   selection_controller_->UpdateMagnifierScreen(bitmap);
 }
 
+void EWebView::SetOverrideEncoding(const std::string& encoding) {
+  web_contents_delegate_->web_contents()->SetOverrideEncoding(encoding);
+}
+
 void EWebView::GetSnapShotForRect(gfx::Rect& rect) {
 #ifdef OS_TIZEN
   rwhv()->GetSnapshotForRect(rect);
