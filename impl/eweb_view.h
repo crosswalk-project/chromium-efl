@@ -260,6 +260,8 @@ class EWebView
   bool IsIMEShow();
   gfx::Rect GetIMERect();
 
+  std::string GetErrorPage(const std::string& invalidUrl);
+
  private:
   EWebView(EWebContext*, Evas_Object* smart_object);
   ~EWebView();

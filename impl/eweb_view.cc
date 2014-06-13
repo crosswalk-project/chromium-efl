@@ -31,6 +31,7 @@
 #include "API/ewk_view_private.h"
 #include "public/ewk_private.h"
 #include "web_contents_delegate_efl.h"
+#include "public/platform/WebString.h"
 
 #include "base/files/file_path.h"
 #include "base/logging.h"
@@ -50,6 +51,8 @@
 #include "third_party/WebKit/public/web/WebFindOptions.h"
 #include "ui/events/gestures/gesture_recognizer.h"
 #include "browser/motion/wkext_motion.h"
+#include "grit/webkit_strings.h"
+#include "ui/base/l10n/l10n_util.h"
 
 #ifdef OS_TIZEN
 #include <vconf.h>
@@ -1623,4 +1626,55 @@ bool EWebView::IsIMEShow() {
 
 gfx::Rect EWebView::GetIMERect() {
   return rwhv()->im_context()->GetIMERect();
+}
+
+std::string EWebView::GetErrorPage(const std::string& invalidUrl) {
+  base::string16 url16;
+  url16.assign(invalidUrl.begin(), invalidUrl.end());
+
+  std::string errorHead = l10n_util::GetStringUTF8(IDS_ERRORPAGES_HEADING_NOT_AVAILABLE);
+  std::string errorMessage = l10n_util::GetStringFUTF8(IDS_ERRORPAGES_SUMMARY_NAME_NOT_RESOLVED, url16);
+
+  std::string html =
+    "<html>"
+      "<head>"
+        "<meta name='viewport' content='width=device-width, initial-scale=1.0, user-scalable=no'>"
+        "<meta http-equiv='Content-Type' content='text/html; charset=UTF-8'>"
+        "<title>";
+  html += invalidUrl;
+  html +=
+        "</title>"
+        "<style type=text/css>"
+        "#body"
+        "{"
+        " background-color: #fff;"
+        " margin: 0;"
+        " padding: 0;"
+        "}"
+        "#Box"
+        "{"
+        " background: #fff;"
+        " width: 80%%;"
+        " min-width: 150px;"
+        " max-width: 750px;"
+        " margin: auto;"
+        " padding: 5px;"
+        " border: 1px solid #BFA3A3;"
+        " border-radius: 1px;"
+        " word-wrap:break-word"
+        "}"
+        "</style>"
+      "</head>"
+      "<body bgcolor=\"#CFCFCF\">"
+      "<div id=Box>"
+      "<h2 align=\"center\">";
+    html += errorHead;
+    html += "</h2></br>";
+    html += errorMessage;
+    html +=
+      "</div>"
+      "</body>"
+    "</html>"
+    ;
+   return html;
 }

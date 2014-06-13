@@ -38,7 +38,7 @@ ContentRendererClient* WebProcessContentMainDelegateEfl::CreateContentRendererCl
 void WebProcessContentMainDelegateEfl::PreSandboxStartup() {
   base::FilePath pak_dir;
   base::FilePath pak_file;
-  PathService::Get(base::DIR_MODULE, &pak_dir);
+  PathService::Get(base::DIR_EXE, &pak_dir);
   pak_file = pak_dir.Append(FILE_PATH_LITERAL("content_shell.pak"));
   ui::ResourceBundle::InitSharedInstanceWithPakPath(pak_file);
 }
