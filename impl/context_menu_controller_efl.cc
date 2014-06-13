@@ -87,8 +87,8 @@ void ContextMenuControllerEfl::GetProposedContextMenu() {
   if (!params_.link_url.is_empty()) {
     AddItemToPropsedList(MENU_ITEM_TYPE_ACTION,
                          MENU_ITEM_OPEN_LINK_IN_NEW_WINDOW,
-                         std::string(dgettext("WebKit","IDS_WEBVIEW_OPT_OPEN_LINK_IN_NEW_TAB_ABB")),
-                         std::string(),
+                         std::string(dgettext("WebKit", "IDS_WEBVIEW_OPT_OPEN_LINK_IN_NEW_TAB_ABB")),
+                         params_.link_url.spec(),
                          params_.link_url.spec(),
                          std::string());
     AddItemToPropsedList(MENU_ITEM_TYPE_ACTION,
@@ -139,30 +139,16 @@ void ContextMenuControllerEfl::GetProposedContextMenu() {
                          std::string(),
                          std::string());
   }
-  if (params_.has_image_contents && !params_.link_url.is_empty())
+  if (params_.has_image_contents) {
     AddItemToPropsedList(MENU_ITEM_TYPE_ACTION,
                          MENU_ITEM_OPEN_IMAGE_IN_NEW_WINDOW,
-                         std::string(dgettext("WebKit","IDS_WEBVIEW_OPT_OPEN_IMAGE_IN_NEW_TAB_ABB")),
-                         params_.link_url.spec(),
-                         params_.link_url.spec(),
+                         std::string(dgettext("WebKit", "IDS_WEBVIEW_OPT_OPEN_IMAGE_IN_NEW_TAB_ABB")),
+                         params_.src_url.spec(),
+                         params_.src_url.spec(),
                          std::string());
-  if (!params_.has_image_contents && !params_.link_url.is_empty())
-    AddItemToPropsedList(MENU_ITEM_TYPE_ACTION,
-                         MENU_ITEM_TEXT_SELECTION_MODE,
-                         std::string(dgettext("WebKit","IDS_WEBVIEW_OPT_SELECTION_MODE_ABB")),
-                         params_.link_url.spec(),
-                         params_.link_url.spec(),
-                         std::string());
-  if (params_.has_image_contents && params_.link_url.is_empty()) {
     AddItemToPropsedList(MENU_ITEM_TYPE_ACTION,
                          MENU_ITEM_DOWNLOAD_IMAGE_TO_DISK,
-                         std::string("Save Image"),
-                         params_.src_url.spec(),
-                         params_.src_url.spec(),
-                         std::string());
-    AddItemToPropsedList(MENU_ITEM_TYPE_ACTION,
-                         MENU_ITEM_OPEN_IMAGE_IN_NEW_WINDOW,
-                         std::string("View Image"),
+                         std::string(dgettext("WebKit", "IDS_WEBVIEW_OPT_SAVE_IMAGE_ABB")),
                          params_.src_url.spec(),
                          params_.src_url.spec(),
                          std::string());
@@ -171,6 +157,14 @@ void ContextMenuControllerEfl::GetProposedContextMenu() {
                          std::string("Copy Image"),
                          params_.src_url.spec(),
                          params_.src_url.spec(),
+                         std::string());
+  }
+  if (!params_.has_image_contents && !params_.link_url.is_empty()) {
+    AddItemToPropsedList(MENU_ITEM_TYPE_ACTION,
+                         MENU_ITEM_TEXT_SELECTION_MODE,
+                         std::string(dgettext("WebKit", "IDS_WEBVIEW_OPT_SELECTION_MODE_ABB")),
+                         params_.link_url.spec(),
+                         params_.link_url.spec(),
                          std::string());
   }
   AddItemToPropsedList(MENU_ITEM_TYPE_ACTION,
@@ -355,6 +349,15 @@ base::FilePath ContextMenuControllerEfl::DownloadFile(const GURL url, const base
   return fullPath;
 }
 
+void ContextMenuControllerEfl::OpenInNewTab(const GURL url) {
+  WindowOpenDisposition disposition = NEW_FOREGROUND_TAB;
+  if (!url.is_valid())
+    return;
+  NavigationController::LoadURLParams params(url);
+  WebContents* web_contents = wcd_->web_contents();
+  web_contents->GetController().LoadURLWithParams(params);
+}
+
 void ContextMenuControllerEfl::MenuItemSelected(ContextMenuItemEfl *menu_item) {
   EWebView* view = ToEWebView(evas_object_);
   if (!view)
@@ -364,10 +367,7 @@ void ContextMenuControllerEfl::MenuItemSelected(ContextMenuItemEfl *menu_item) {
   switch(menu_item->GetContextMenuOption())
   {
     case MENU_ITEM_OPEN_LINK_IN_NEW_WINDOW: {
-      _Ewk_Context_Menu_Item *item = new _Ewk_Context_Menu_Item();
-      item->menu_item_ = menu_item;
-      view->SmartCallback<EWebViewCallbacks::ContextMenuItemSelected>().call(item);
-      delete item;
+      OpenInNewTab(GURL(menu_item->LinkURL()));
       break;
     }
     case MENU_ITEM_GO_BACK: {
@@ -430,13 +430,7 @@ void ContextMenuControllerEfl::MenuItemSelected(ContextMenuItemEfl *menu_item) {
       break;
     }
     case MENU_ITEM_OPEN_IMAGE_IN_NEW_WINDOW: {
-      WindowOpenDisposition disposition = CURRENT_TAB;
-      GURL url(menu_item->ImageURL());
-      if (!url.is_valid())
-        return;
-      NavigationController::LoadURLParams params(url);
-      WebContents* web_contents = wcd_->web_contents();
-      web_contents->GetController().LoadURLWithParams(params);
+      OpenInNewTab(GURL(menu_item->ImageURL()));
       break;
     }
     case MENU_ITEM_SELECT_WORD: {
