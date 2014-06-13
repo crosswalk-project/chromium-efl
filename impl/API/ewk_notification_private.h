@@ -1,3 +1,6 @@
+// Copyright (c) 2014 The Chromium Authors. All rights reserved.
+// Use of this source code is governed by a BSD-style license that can be
+// found in the LICENSE file.
 /*
  * Copyright (C) 2013 Samsung Electronics
  *
@@ -18,8 +21,8 @@
  *
  */
 
-#ifndef ewk_notification_private_h
-#define ewk_notification_private_h
+#ifndef TIZEN_WEBVIEW_PRIVATE_TW_NOTIFICATION_IMPL_H_
+#define TIZEN_WEBVIEW_PRIVATE_TW_NOTIFICATION_IMPL_H_
 
 #include <Eina.h>
 #include <Evas.h>
@@ -30,21 +33,25 @@
 #include "eweb_view.h"
 #include "eweb_context.h"
 
-
 namespace tizen_webview {
-  class Security_Origin;
+class Security_Origin;
+class URL;
 }
 
 struct _Ewk_Notification {
-  Eina_Stringshare* body;
-  Eina_Stringshare* iconURL;
-  Eina_Stringshare* replaceID;
-  Eina_Stringshare* title;
-  uint64_t notificationID;
-  tizen_webview::Security_Origin* securityOrigin;
+  std::string body_;
+  std::string iconURL_;
+  std::string replaceID_;
+  std::string title_;
+  uint64_t notificationID_;
+  tizen_webview::Security_Origin* securityOrigin_;
 
-  explicit _Ewk_Notification(const content::ShowDesktopNotificationHostMsgParams& params);
-
+  _Ewk_Notification(const std::string& body,
+                    const std::string& iconURL,
+                    const std::string& replaceID,
+                    const std::string& title,
+                    uint64_t notificationID,
+                    const tizen_webview::URL& securityOrigin);
   ~_Ewk_Notification();
 };
 
@@ -60,4 +67,4 @@ struct _Ewk_Notification_Permission_Request {
   ~_Ewk_Notification_Permission_Request();
 };
 
-#endif // ewk_notification_private_h
+#endif // TIZEN_WEBVIEW_PRIVATE_TW_NOTIFICATION_IMPL_H_

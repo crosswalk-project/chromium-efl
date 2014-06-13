@@ -1,29 +1,33 @@
 #include "ewk_notification_private.h"
+#include "tizen_webview/public/tw_url.h"
 #include "tizen_webview/public/tw_security_origin.h"
 
+using namespace tizen_webview;
+
 _Ewk_Notification::_Ewk_Notification(
-    const content::ShowDesktopNotificationHostMsgParams& params)
-  : body(eina_stringshare_add((base::UTF16ToUTF8(params.body)).c_str()))
-  , iconURL(eina_stringshare_add((params.icon_url).spec().c_str()))
-  , replaceID(eina_stringshare_add((base::UTF16ToUTF8(params.replace_id)).c_str()))
-  , title(eina_stringshare_add((base::UTF16ToUTF8(params.title)).c_str()))
+    const std::string& body,
+    const std::string& iconURL,
+    const std::string& replaceID,
+    const std::string& title,
+    uint64_t notificationID,
+    const tizen_webview::URL& origin)
+    : body_(body),
+      iconURL_(iconURL),
+      replaceID_(replaceID),
+      title_(title),
 #if 0
-  , notificationID(params.notification_id)
+      notificationID_(notificationID),
 #else
 #warning "[M37] params.notification_id does not exist"
-  , notificationID(0)
+      notificationID_(0),
 #endif
-  , securityOrigin(new tizen_webview::Security_Origin(
-      params.origin.host().c_str(), params.origin.scheme().c_str(),
-      atoi(params.origin.port().c_str()))) {
+      securityOrigin_(new tizen_webview::Security_Origin(origin.getHost(),
+                                                         origin.getProtocol(),
+                                                         origin.getPort())) {
 }
 
 _Ewk_Notification::~_Ewk_Notification() {
-  eina_stringshare_del(body);
-  eina_stringshare_del(iconURL);
-  eina_stringshare_del(replaceID);
-  eina_stringshare_del(title);
-  delete securityOrigin;
+  delete securityOrigin_;
 }
 
 _Ewk_Notification_Permission_Request::_Ewk_Notification_Permission_Request(

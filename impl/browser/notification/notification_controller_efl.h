@@ -69,9 +69,6 @@ class NotificationControllerEfl {
   // sets the permission for a particular pending notification
   void SetPermissionForNotification(Ewk_Notification_Permission_Request* notification, bool isAllowed);
 
-  // Removes all the shown notifications
-  bool RemoveClosedNotifications(Evas_Object* ewkView, Eina_List* notification_list);
-
   // Checks if the notification is already present.
   // If present returns the notification id of the notification else false
   bool IsNotificationPresent(const base::string16& replaceid, uint64_t& notification_id);

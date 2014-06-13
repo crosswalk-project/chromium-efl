@@ -37,10 +37,14 @@
 #include "browser/geolocation/location_provider_efl.h"
 #endif
 
+#include "tizen_webview/public/tw_notification.h"
 #include "tizen_webview/public/tw_security_origin.h"
+#include "tizen_webview/public/tw_url.h"
 
 using web_contents_utils::WebContentsFromFrameID;
 using web_contents_utils::WebContentsFromViewID;
+using tizen_webview::URL;
+using tizen_webview::Security_Origin;
 
 namespace content {
 
@@ -168,9 +172,22 @@ void ContentBrowserClientEfl::ShowDesktopNotification(
   browser_context->GetNotificationController()->
       AddNotification(params.notification_id, render_process_id,
                       render_view_id, params.replace_id);
-  Ewk_Notification* notification = new Ewk_Notification(params);
+  tizen_webview::Notification* notification =
+      new tizen_webview::Notification(base::UTF16ToUTF8(params.body),
+                                      params.icon_url.spec(),
+                                      base::UTF16ToUTF8(params.replace_id),
+                                      base::UTF16ToUTF8(params.title),
+                                      params.notification_id,
+                                      URL(params.origin.host(),
+                                          params.origin.scheme(),
+                                          atoi(params.origin.port().c_str())));
+
   delegate->web_view()->
       SmartCallback<EWebViewCallbacks::NotificationShow>().call(notification);
+  // A smart callback cannot have ownership for data because the callback may
+  // not ever exist. Therefore new resource should be deleted in the call site.
+  // [sns.park] TODO: uncomment below if no side effect.
+  //delete notification;
 #else
   NOTIMPLEMENTED();
 #endif

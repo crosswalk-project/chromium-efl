@@ -27,7 +27,6 @@
 extern "C" {
 #endif
 
-typedef struct _Ewk_Notification Ewk_Notification;
 typedef struct _Ewk_Notification_Permission_Request Ewk_Notification_Permission_Request;
 
 

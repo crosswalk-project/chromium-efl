@@ -43,6 +43,10 @@ typedef struct EwkObject Ewk_File_Chooser_Request;
 typedef struct EwkObject Ewk_Form_Submission_Request;
 typedef struct EwkObject Ewk_Navigation_Policy_Decision;
 
+namespace tizen_webview {
+class Notification;
+}
+
 namespace EWebViewCallbacks {
 
 enum CallbackType {
@@ -245,7 +249,7 @@ DECLARE_EWK_VIEW_CALLBACK(LoadCommitted, "load,committed", void);
 DECLARE_EWK_VIEW_CALLBACK(GeoLocationPermissionRequest, "geolocation,permission,request", _Ewk_Geolocation_Permission_Request*);
 DECLARE_EWK_VIEW_CALLBACK(RequestCertificateConfirm, "request,certificate,confirm", _Ewk_Certificate_Policy_Decision*);
 DECLARE_EWK_VIEW_CALLBACK(AuthChallenge, "authentication,challenge", _Ewk_Auth_Challenge*);
-DECLARE_EWK_VIEW_CALLBACK(NotificationShow, "notification,show", Ewk_Notification*);
+DECLARE_EWK_VIEW_CALLBACK(NotificationShow, "notification,show", tizen_webview::Notification*);
 DECLARE_EWK_VIEW_CALLBACK(NotificationCancel, "notification,cancel", uint64_t*);
 DECLARE_EWK_VIEW_CALLBACK(NotificationPermissionRequest, "notification,permission,request", Ewk_Notification_Permission_Request*);
 DECLARE_EWK_VIEW_CALLBACK(PolicyResponseDecide, "policy,response,decide", Ewk_Policy_Decision*);

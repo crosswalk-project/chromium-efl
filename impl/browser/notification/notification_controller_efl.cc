@@ -84,20 +84,6 @@ void NotificationControllerEfl::SetPermissionForNotification(Ewk_Notification_Pe
   }
 }
 
-bool NotificationControllerEfl::RemoveClosedNotifications(Evas_Object* ewkView, Eina_List* notification_list) {
-  if (!eina_list_count(notification_list))
-    return false;
-
-  Eina_List* notification_iterator = NULL;
-  void* notification_data = NULL;
-  EINA_LIST_FOREACH(notification_list, notification_iterator, notification_data) {
-    Ewk_Notification* notification = static_cast<Ewk_Notification*>(notification_data);
-    DeleteNotification(notification->notificationID, true);
-    delete notification;
-  }
-  return true;
-}
-
 bool NotificationControllerEfl::IsNotificationPresent(const base::string16& replaceid, uint64_t& notification_id) {
   std::string in_replaceid(base::UTF16ToUTF8(replaceid).c_str());
   IDMap<NotificationData, IDMapOwnPointer>::const_iterator it(&notification_map);
