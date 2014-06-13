@@ -29,7 +29,6 @@
 #include "API/ewk_geolocation_private.h"
 #include "API/ewk_certificate_private.h"
 #include "API/ewk_user_media_private.h"
-#include "public/ewk_notification.h"
 #include "tizen_webview/public/tw_custom_handlers.h"
 #include "tizen_webview/public/tw_policy_decision.h"
 
@@ -44,6 +43,7 @@ typedef struct EwkObject Ewk_Navigation_Policy_Decision;
 
 namespace tizen_webview {
 class Notification;
+class NotificationPermissionRequest;
 class WrtIpcMessageData;
 }
 
@@ -251,7 +251,7 @@ DECLARE_EWK_VIEW_CALLBACK(RequestCertificateConfirm, "request,certificate,confir
 DECLARE_EWK_VIEW_CALLBACK(AuthChallenge, "authentication,challenge", _Ewk_Auth_Challenge*);
 DECLARE_EWK_VIEW_CALLBACK(NotificationShow, "notification,show", tizen_webview::Notification*);
 DECLARE_EWK_VIEW_CALLBACK(NotificationCancel, "notification,cancel", uint64_t*);
-DECLARE_EWK_VIEW_CALLBACK(NotificationPermissionRequest, "notification,permission,request", Ewk_Notification_Permission_Request*);
+DECLARE_EWK_VIEW_CALLBACK(NotificationPermissionRequest, "notification,permission,request", tizen_webview::NotificationPermissionRequest*);
 DECLARE_EWK_VIEW_CALLBACK(PolicyResponseDecide, "policy,response,decide", tizen_webview::PolicyDecision*);
 DECLARE_EWK_VIEW_CALLBACK(ContextMenuCustomize, "contextmenu,customize", _Ewk_Context_Menu*);
 DECLARE_EWK_VIEW_CALLBACK(ContextMenuItemSelected, "contextmenu,selected", _Ewk_Context_Menu_Item*);

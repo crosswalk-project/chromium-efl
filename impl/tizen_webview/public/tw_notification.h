@@ -10,6 +10,11 @@
 #include "tizen_webview/public/tw_macro.h"
 
 struct _Ewk_Notification;
+struct _Ewk_Notification_Permission_Request;
+
+namespace content {
+class NotificationControllerEfl;
+}
 
 namespace tizen_webview {
 
@@ -37,6 +42,31 @@ class Notification {
   typedef ::_Ewk_Notification Impl;
   Impl *impl;
   DISALLOW_COPY_AND_ASSIGN(Notification);
+};
+
+class NotificationPermissionRequest {
+ public:
+  NotificationPermissionRequest(Evas_Object* webview,
+                                int callback_context,
+                                const tizen_webview::URL& source_origin);
+  ~NotificationPermissionRequest();
+
+  Evas_Object* GetWebviewEvasObject() const;
+  const Security_Origin* GetSecurityOrigin() const;
+  bool IsDecided() const;
+  bool IsSuspended() const;
+  void SetSuspend(bool suspend) const;
+
+ private:
+  // get chromium internal callback context
+  int GetInternalCallbackContext() const;
+  friend class content::NotificationControllerEfl;
+
+  typedef ::_Ewk_Notification_Permission_Request Impl;
+  Impl *impl;
+
+
+  DISALLOW_COPY_AND_ASSIGN(NotificationPermissionRequest);
 };
 
 } // namespace tizen_webview

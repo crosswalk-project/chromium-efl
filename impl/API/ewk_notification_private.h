@@ -56,14 +56,14 @@ struct _Ewk_Notification {
 };
 
 struct _Ewk_Notification_Permission_Request {
-  Evas_Object* ewkView;
-  tizen_webview::Security_Origin* origin;
-  bool isDecided;
-  bool isSuspended;
-  int callback_context; // required by content API
+  Evas_Object* webview_;
+  tizen_webview::Security_Origin* origin_;
+  bool decided_;
+  bool suspended_;
+  int callback_context_; // required by content API
 
-  _Ewk_Notification_Permission_Request(Evas_Object* ewkView, int callback, const GURL& source_origin);
-
+  _Ewk_Notification_Permission_Request(Evas_Object* webview,
+      int callback_context, const tizen_webview::URL& source_origin);
   ~_Ewk_Notification_Permission_Request();
 };
 

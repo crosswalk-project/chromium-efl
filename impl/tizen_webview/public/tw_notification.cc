@@ -8,6 +8,7 @@
 
 namespace tizen_webview {
 
+// tizen_webview::Notification ------------------------------------------------
 Notification::Notification(
     const std::string& body,
     const std::string& iconURL,
@@ -44,6 +45,42 @@ int Notification::GetID() const {
 
 const Security_Origin* Notification::GetSecurityOrigin() const {
   return impl->securityOrigin_;
+}
+
+// tizen_webview::NotificationPermissionRequest -------------------------------
+
+NotificationPermissionRequest::NotificationPermissionRequest(
+    Evas_Object* webview, int callback_context, const URL& source_origin)
+    : impl(new _Ewk_Notification_Permission_Request(
+          webview, callback_context,source_origin)) {
+}
+
+NotificationPermissionRequest::~NotificationPermissionRequest() {
+  delete impl;
+}
+
+Evas_Object* NotificationPermissionRequest::GetWebviewEvasObject() const {
+  return impl->webview_;
+}
+
+const Security_Origin* NotificationPermissionRequest::GetSecurityOrigin() const {
+  return impl->origin_;
+}
+
+bool NotificationPermissionRequest::IsDecided() const {
+  return impl->decided_;
+}
+
+bool NotificationPermissionRequest::IsSuspended() const {
+  return impl->suspended_;
+}
+
+void NotificationPermissionRequest::SetSuspend(bool suspend) const {
+  impl->suspended_ = suspend;
+}
+
+int NotificationPermissionRequest::GetInternalCallbackContext() const {
+  return impl->callback_context_;
 }
 
 } // namespace tizen_webview

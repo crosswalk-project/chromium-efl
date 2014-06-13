@@ -28,11 +28,14 @@
 
 #include <Eina.h>
 #include <Evas.h>
-#include "public/ewk_notification.h"
 #include "base/strings/utf_string_conversions.h"
 #include "base/id_map.h"
 
 class EWebView;
+
+namespace tizen_webview {
+class NotificationPermissionRequest;
+}
 
 namespace content {
 
@@ -67,7 +70,9 @@ class NotificationControllerEfl {
   void NotifyNotificationClicked(uint64_t notification_id);
 
   // sets the permission for a particular pending notification
-  void SetPermissionForNotification(Ewk_Notification_Permission_Request* notification, bool isAllowed);
+  void SetPermissionForNotification(
+      tizen_webview::NotificationPermissionRequest* notification,
+      bool isAllowed);
 
   // Checks if the notification is already present.
   // If present returns the notification id of the notification else false

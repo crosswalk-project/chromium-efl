@@ -40,9 +40,11 @@
 #include "tizen_webview/public/tw_notification.h"
 #include "tizen_webview/public/tw_security_origin.h"
 #include "tizen_webview/public/tw_url.h"
+#include "tizen_webview/tw_misc_utility.h"
 
 using web_contents_utils::WebContentsFromFrameID;
 using web_contents_utils::WebContentsFromViewID;
+using tizen_webview::NotificationPermissionRequest;
 using tizen_webview::URL;
 using tizen_webview::Security_Origin;
 
@@ -136,13 +138,18 @@ void ContentBrowserClientEfl::RequestDesktopNotificationPermission(
 
   BrowserContextEfl* browser_context =
       static_cast<BrowserContextEfl*>(web_contents->GetBrowserContext());
-  Ewk_Notification_Permission_Request* notification_permission =
-       new Ewk_Notification_Permission_Request(
-         delegate->web_view()->evas_object(), callback_context, source_origin);
+  NotificationPermissionRequest* notification_permission
+      = new NotificationPermissionRequest(delegate->web_view()->evas_object(),
+                                          callback_context,
+                                          tizen_webview::GetURL(source_origin));
 
   delegate->web_view()->
       SmartCallback<EWebViewCallbacks::NotificationPermissionRequest>()
         .call(notification_permission);
+  // A smart callback cannot have ownership for data because the callback may
+  // not ever exist. Therefore new resource should be deleted in the call site.
+  // [sns.park] TODO: uncomment below if no side effect.
+  //delete notification_permission;
 #else
   NOTIMPLEMENTED();
 #endif

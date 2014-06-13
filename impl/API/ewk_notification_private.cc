@@ -2,8 +2,7 @@
 #include "tizen_webview/public/tw_url.h"
 #include "tizen_webview/public/tw_security_origin.h"
 
-using namespace tizen_webview;
-
+// _Ewk_Notification ----------------------------------------------------------
 _Ewk_Notification::_Ewk_Notification(
     const std::string& body,
     const std::string& iconURL,
@@ -30,16 +29,17 @@ _Ewk_Notification::~_Ewk_Notification() {
   delete securityOrigin_;
 }
 
+// _Ewk_Notification_Permission_Request ---------------------------------------
 _Ewk_Notification_Permission_Request::_Ewk_Notification_Permission_Request(
-    Evas_Object* ewkView, int callback, const GURL& source_origin)
-  : ewkView(ewkView)
-  , origin(new tizen_webview::Security_Origin(source_origin.host().c_str(),
-       source_origin.scheme().c_str(), atoi(source_origin.port().c_str())))
-  , isDecided(false)
-  , isSuspended(false)
-  , callback_context(callback) {
+    Evas_Object* webview, int callback_context,
+    const tizen_webview::URL& source_origin)
+  : webview_(webview),
+    origin_(new tizen_webview::Security_Origin(source_origin)),
+    decided_(false),
+    suspended_(false),
+    callback_context_(callback_context) {
 }
 
 _Ewk_Notification_Permission_Request::~_Ewk_Notification_Permission_Request() {
-  delete origin;
+  delete origin_;
 }

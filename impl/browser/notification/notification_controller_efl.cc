@@ -31,12 +31,11 @@
 #include "API/ewk_notification_private.h"
 #include "eweb_view.h"
 
+#include "tizen_webview/public/tw_notification.h"
 #include "tizen_webview/public/tw_security_origin.h"
-#include "tizen_webview/tw_misc_utility.h"
 
+using tizen_webview::NotificationPermissionRequest;
 using tizen_webview::Security_Origin;
-using tizen_webview::GetGURL;
-using tizen_webview::GetURL;
 
 namespace content {
 
@@ -75,12 +74,17 @@ void NotificationControllerEfl::NotifyNotificationClicked(uint64_t notification_
     render_view_host->DesktopNotificationPostClick(notification_id);
 }
 
-void NotificationControllerEfl::SetPermissionForNotification(Ewk_Notification_Permission_Request* notification, bool isAllowed) {
-  RenderViewHost* render_view_host = ToEWebView(notification->ewkView)->web_contents_delegate()->web_contents()->GetRenderViewHost();
+void NotificationControllerEfl::SetPermissionForNotification(
+    NotificationPermissionRequest* notification, bool isAllowed) {
+  RenderViewHost* render_view_host =
+    ToEWebView(notification->GetWebviewEvasObject())->web_contents_delegate()
+        ->web_contents()->GetRenderViewHost();
   if (render_view_host) {
-    render_view_host->DesktopNotificationPermissionRequestDone(notification->callback_context);
+    render_view_host->DesktopNotificationPermissionRequestDone(
+                          notification->GetInternalCallbackContext());
     if (isAllowed)
-      render_view_host->DesktopNotificationPostDisplay(notification->callback_context);
+      render_view_host->DesktopNotificationPostDisplay(
+                            notification->GetInternalCallbackContext());
   }
 }
 
