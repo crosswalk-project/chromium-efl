@@ -119,25 +119,26 @@ void ContextMenuControllerEfl::GetProposedContextMenu() {
                          std::string(),
                          std::string());
     AddItemToPropsedList(MENU_ITEM_TYPE_ACTION,
-                         MENU_ITEM_SELECT_ALL,
-                         std::string(dgettext("WebKit","IDS_WEBVIEW_OPT_SELECT_ALL_ABB")),
-                         std::string(),
-                         std::string(),
-                         std::string());
-    AddItemToPropsedList(MENU_ITEM_TYPE_ACTION,
                          MENU_ITEM_PASTE,
                          std::string(dgettext("WebKit","IDS_WEBVIEW_OPT_PASTE")),
                          std::string(),
                          std::string(),
                          std::string());
   }
-  if (!params_.selection_text.empty())
+  if (!params_.selection_text.empty()) {
     AddItemToPropsedList(MENU_ITEM_TYPE_ACTION,
                          MENU_ITEM_COPY,
                          std::string(dgettext("WebKit","IDS_WEBVIEW_OPT_COPY")),
                          std::string(),
                          std::string(),
                          std::string());
+    AddItemToPropsedList(MENU_ITEM_TYPE_ACTION,
+                         MENU_ITEM_SELECT_ALL,
+                         std::string(dgettext("WebKit", "IDS_WEBVIEW_OPT_SELECT_ALL_ABB")),
+                         std::string(),
+                         std::string(),
+                         std::string());
+  }
   if (params_.has_image_contents && !params_.link_url.is_empty())
     AddItemToPropsedList(MENU_ITEM_TYPE_ACTION,
                          MENU_ITEM_OPEN_IMAGE_IN_NEW_WINDOW,
