@@ -288,6 +288,7 @@ void IMContextEfl::UpdateCaretBounds(const gfx::Rect& caret_bounds) {
 }
 
 void IMContextEfl::OnFocusIn() {
+  CancelComposition();
 
   ClearQueues();
   view_->ClearQueues();
