@@ -44,6 +44,7 @@
 #include "ui/views/widget/desktop_aura/desktop_screen.h"
 #include "ui/events/event_utils.h"
 #include "browser/motion/wkext_motion.h"
+#include "content/common/input_messages.h"
 
 #include <assert.h>
 #include <Ecore.h>
@@ -304,6 +305,9 @@ bool RenderWidgetHostViewEfl::OnMessageReceived(const IPC::Message& message) {
     IPC_MESSAGE_HANDLER(EwkHostMsg_DidChangePageScaleFactor, OnDidChangePageScaleFactor)
     IPC_MESSAGE_HANDLER(EwkHostMsg_DidChangePageScaleRange, OnDidChangePageScaleRange)
     IPC_MESSAGE_HANDLER(ViewHostMsg_TextInputInFormStateChanged, OnTextInputInFormStateChanged)
+#if defined(OS_TIZEN)
+    IPC_MESSAGE_HANDLER(InputHostMsg_DidInputEventHandled, OnDidInputEventHandled)
+#endif
     IPC_MESSAGE_UNHANDLED(handled = false)
   IPC_END_MESSAGE_MAP()
   return handled;
@@ -1009,8 +1013,6 @@ void RenderWidgetHostViewEfl::HandleEvasEvent(const Evas_Event_Mouse_Wheel* even
 void RenderWidgetHostViewEfl::HandleEvasEvent(const Evas_Event_Key_Down* event) {
   LOG(INFO) << __PRETTY_FUNCTION__ << " : " << event->key;
   bool wasFiltered = false;
-  if (im_context_)
-    im_context_->HandleKeyDownEvent(event, &wasFiltered);
 
   if (!strcmp(event->key, "BackSpace")) {
     SelectionControllerEfl* controller = web_view_->GetSelectionController();
@@ -1018,7 +1020,35 @@ void RenderWidgetHostViewEfl::HandleEvasEvent(const Evas_Event_Key_Down* event) 
       controller->HideHandleAndContextMenu();
   }
 
-  if(!wasFiltered)
+  if (im_context_) {
+    im_context_->HandleKeyDownEvent(event, &wasFiltered);
+    NativeWebKeyboardEvent n_event = WebEventFactoryEfl::toWebKeyboardEvent(evas_, event);
+
+    if (wasFiltered)
+      n_event.isSystemKey = true;
+
+    // Do not forward keyevent now if there is fake key event
+    // handling at the moment to preserve orders of events as in Webkit
+    if (im_context_->GetPreeditQueue().empty() ||
+        keyupev_queue_.empty()) {
+      host_->ForwardKeyboardEvent(n_event);
+    } else {
+      NativeWebKeyboardEvent *n_event_ptr = new NativeWebKeyboardEvent();
+
+      n_event_ptr->timeStampSeconds = n_event.timeStampSeconds;
+      n_event_ptr->modifiers = n_event.modifiers;
+      n_event_ptr->type = n_event.type;
+      n_event_ptr->nativeKeyCode = n_event.nativeKeyCode;
+      n_event_ptr->windowsKeyCode = n_event.windowsKeyCode;
+      n_event_ptr->isSystemKey = n_event.isSystemKey;
+      n_event_ptr->unmodifiedText[0] = n_event.unmodifiedText[0];
+      n_event_ptr->text[0] = n_event.text[0];
+
+      keydownev_queue_.push(n_event_ptr);
+    }
+
+    keyupev_queue_.push(n_event.windowsKeyCode);
+  } else
     host_->ForwardKeyboardEvent(WebEventFactoryEfl::toWebKeyboardEvent(evas_, event));
 }
 
@@ -1027,8 +1057,8 @@ void RenderWidgetHostViewEfl::HandleEvasEvent(const Evas_Event_Key_Up* event) {
   if (im_context_)
     im_context_->HandleKeyUpEvent(event, &wasFiltered);
 
-  if(!wasFiltered)
-    host_->ForwardKeyboardEvent(WebEventFactoryEfl::toWebKeyboardEvent(evas_, event));
+  if (!im_context_)
+      host_->ForwardKeyboardEvent(WebEventFactoryEfl::toWebKeyboardEvent(evas_, event));
 }
 
 #ifdef OS_TIZEN
@@ -1049,6 +1079,22 @@ void RenderWidgetHostViewEfl::makePinchZoom(void* eventInfo) {
       motionEvent->position.x, motionEvent->position.y, 0, ui::EventTimeForNow(),
       ui::GestureEventDetails(ui::ET_GESTURE_PINCH_UPDATE, motionEvent->scale, 0), 1);
   HandleGesture(&event);
+}
+
+void RenderWidgetHostViewEfl::OnDidInputEventHandled(const blink::WebInputEvent* input_event, bool processed) {
+  if (!im_context_)
+    return;
+
+  if (blink::WebInputEvent::isKeyboardEventType(input_event->type)) {
+    if (input_event->type == blink::WebInputEvent::KeyDown) {
+
+      HandleCommitQueue(processed);
+      HandlePreeditQueue(processed);
+
+      HandleKeyUpQueue();
+      HandleKeyDownQueue();
+    }
+  }
 }
 #endif
 
@@ -1129,15 +1175,15 @@ void RenderWidgetHostViewEfl::HandleTouchEvent(ui::TouchEvent* event) {
   // Update the touch event first.
   blink::WebTouchPoint* point =
     content::UpdateWebTouchEventFromUIEvent(*event, &touch_event_);
-
   // Forward the touch event only if a touch point was updated, and there's a
   // touch-event handler in the page, and no other touch-event is in the queue.
   // It is important to always consume the event if there is a touch-event
   // handler in the page, or some touch-event is already in the queue, even if
   // no point has been updated, to make sure that this event does not get
   // processed by the gesture recognizer before the events in the queue.
-  if (host_->ShouldForwardTouchEvent())
+  if (host_->ShouldForwardTouchEvent()) {
     event->StopPropagation();
+  }
 
   if (point) {
     if (host_->ShouldForwardTouchEvent()) {
@@ -1210,6 +1256,89 @@ void RenderWidgetHostViewEfl::OnDidChangePageScaleRange(double min_scale, double
 
 SelectionControllerEfl* RenderWidgetHostViewEfl::GetSelectionController() {
   return web_view_->GetSelectionController();
+}
+
+void RenderWidgetHostViewEfl::ClearQueues() {
+  while (!keyupev_queue_.empty()) {
+    keyupev_queue_.pop();
+  }
+
+  while (!keydownev_queue_.empty()) {
+    delete keydownev_queue_.front();
+    keydownev_queue_.pop();
+  }
+}
+
+void RenderWidgetHostViewEfl::HandleCommitQueue(bool processed) {
+  if (!im_context_)
+    return;
+
+  if (!processed) {
+    if (!im_context_->GetCommitQueue().empty()) {
+      base::string16 text16 = im_context_->GetCommitQueue().front();
+      host_->ImeConfirmComposition(text16, gfx::Range::InvalidRange(), false);
+      im_context_->CommitQueuePop();
+    }
+  } else {
+    if (!im_context_->GetCommitQueue().empty())
+      im_context_->CommitQueuePop();
+  }
+}
+
+void RenderWidgetHostViewEfl::HandlePreeditQueue(bool processed) {
+  if (!im_context_)
+    return;
+
+  if (!processed) {
+    if (!im_context_->GetPreeditQueue().empty()) {
+      ui::CompositionText composition_ = im_context_->GetPreeditQueue().front();
+
+      const std::vector<blink::WebCompositionUnderline>& underlines =
+      reinterpret_cast<const std::vector<blink::WebCompositionUnderline>&>(
+      composition_.underlines);
+
+      host_->ImeSetComposition(
+      composition_.text, underlines, composition_.selection.start(),
+      composition_.selection.end());
+      im_context_->PreeditQueuePop();
+    }
+  } else {
+    if (!im_context_->GetPreeditQueue().empty())
+      im_context_->PreeditQueuePop();
+  }
+}
+
+void RenderWidgetHostViewEfl::HandleKeyUpQueue() {
+  if (!im_context_)
+    return;
+
+  if (keyupev_queue_.empty())
+    return;
+
+  int keyCode = keyupev_queue_.front();
+  SendCompositionKeyUpEvent(keyCode);
+  keyupev_queue_.pop();
+}
+
+void RenderWidgetHostViewEfl::HandleKeyDownQueue() {
+  if (!im_context_)
+    return;
+
+  if (keydownev_queue_.empty())
+    return;
+
+  NativeWebKeyboardEvent *n_event = keydownev_queue_.front();
+  host_->ForwardKeyboardEvent(*n_event);
+  keydownev_queue_.pop();
+  delete n_event;
+}
+
+void RenderWidgetHostViewEfl::SendCompositionKeyUpEvent(char c) {
+  NativeWebKeyboardEvent event;
+  event.windowsKeyCode = c;
+  event.skip_in_browser = false;
+  event.type = blink::WebInputEvent::KeyUp;
+  host_->ForwardKeyboardEvent(event);
 }
 
 }  // namespace content

@@ -27,6 +27,8 @@
 
 #include <Ecore_Evas.h>
 #include <Ecore_IMF_Evas.h>
+#include "wtf/unicode/icu/UnicodeIcu.h"
+#include "third_party/icu/source/common/unicode/uchar.h"
 
 #ifdef IM_CTX_DEBUG
 #define IM_CTX_LOG_CHANNEL LOG(ERROR)
@@ -81,7 +83,8 @@ IMContextEfl::IMContextEfl(RenderWidgetHostViewEfl* view, Ecore_IMF_Context* con
       focused_(false),
       enabled_(false),
       panel_was_ever_shown_(false),
-      is_in_form_tag_(false) {
+      is_in_form_tag_(false),
+      is_handling_keydown_(false) {
   IM_CTX_LOG;
   InitializeIMFContext(context_);
 }
@@ -115,13 +118,17 @@ IMContextEfl::~IMContextEfl() {
 
 void IMContextEfl::Reset() {
   ecore_imf_context_reset(context_);
+  ClearQueues();
+  view_->ClearQueues();
 }
 
 void IMContextEfl::HandleKeyDownEvent(const Evas_Event_Key_Down* event, bool* wasFiltered) {
 #if USE_IM_COMPOSITING
   Ecore_IMF_Event im_event;
+  is_handling_keydown_ = true;
   ecore_imf_evas_event_key_down_wrap(const_cast<Evas_Event_Key_Down*>(event), &im_event.key_down);
   *wasFiltered = ecore_imf_context_filter_event(context_, ECORE_IMF_EVENT_KEY_DOWN, &im_event);
+  is_handling_keydown_ = false;
 #endif
 }
 
@@ -143,6 +150,9 @@ void IMContextEfl::UpdateInputMethodState(ui::TextInputType input_type,
 
   enabled_ = enabled;
   ecore_imf_context_reset(context_);
+
+  ClearQueues();
+  view_->ClearQueues();
 
   // This can only be called when having focus since we disable IME messages in OnFocusOut.
   DCHECK(focused_);
@@ -278,6 +288,10 @@ void IMContextEfl::UpdateCaretBounds(const gfx::Rect& caret_bounds) {
 }
 
 void IMContextEfl::OnFocusIn() {
+
+  ClearQueues();
+  view_->ClearQueues();
+
   if (focused_)
     return;
 
@@ -312,6 +326,9 @@ void IMContextEfl::OnFocusOut() {
   // Disable RenderWidget's IME related events to save bandwidth.
   if (view_->GetRenderWidgetHost())
     RenderWidgetHostImpl::From(view_->GetRenderWidgetHost())->SetInputMethodActive(false);
+
+  ClearQueues();
+  view_->ClearQueues();
 }
 
 void IMContextEfl::CancelComposition() {
@@ -349,15 +366,55 @@ void IMContextEfl::OnCommit(void* event_info) {
 #if USE_IM_COMPOSITING
   IM_CTX_LOG;
   composition_.Clear();
-  if (view_->GetRenderWidgetHost()) {
-    char* text = static_cast<char*>(event_info);
-    base::string16 text16;
-    base::UTF8ToUTF16(text, strlen(text), &text16);
 
-    // XXX Consider doing the SendFakeCompositionKeyEvent workaround what Gtk does.
-    RenderWidgetHostImpl::From(view_->GetRenderWidgetHost())->ImeConfirmComposition(text16, gfx::Range::InvalidRange(), false);
-  }
+  char* text = static_cast<char*>(event_info);
+  base::string16 text16;
+  base::UTF8ToUTF16(text, strlen(text), &text16);
+
+  // Only add commit to queue, till we dont know if key event
+  // should be handled. It can be default prevented for exactly.
+  commit_queue_.push(text16);
+
+  // sending fake key event if hardware key is not handled as it is
+  // in Webkit.
+  SendFakeCompositionKeyEvent(text);
 #endif
+}
+
+void IMContextEfl::SendFakeCompositionKeyEvent(char * buf) {
+  if (is_handling_keydown_)
+    return;
+
+  if (!buf)
+    return;
+
+  UChar32 ch = 0;
+  if (strlen(buf)) {
+    ch = buf[strlen(buf) - 1];
+  }
+
+  std::string str;
+
+  if (u_isspace(ch))
+    str = "space";
+  else
+    str.append(1, ch);
+
+  Evas_Event_Key_Down downEvent;
+  memset(&downEvent, 0, sizeof(Evas_Event_Key_Down));
+  downEvent.key = str.c_str();
+  downEvent.string = str.c_str();
+
+  NativeWebKeyboardEvent n_event = WebEventFactoryEfl::toWebKeyboardEvent(view_->evas(), &downEvent);
+  n_event.type = blink::WebInputEvent::KeyDown;
+
+  n_event.isSystemKey = true;
+
+  if (!view_->GetRenderWidgetHost())
+    return;
+
+  view_->KeyUpEventQueuePush(n_event.windowsKeyCode);
+  view_->GetRenderWidgetHost()->ForwardKeyboardEvent(n_event);
 }
 
 void IMContextEfl::OnPreeditChanged(void* data, Ecore_IMF_Context* context, void* event_info) {
@@ -370,23 +427,19 @@ void IMContextEfl::OnPreeditChanged(void* data, Ecore_IMF_Context* context, void
   if (!buffer)
       return;
 
+  SendFakeCompositionKeyEvent(buffer);
   composition_.Clear();
   composition_.text = base::UTF8ToUTF16(buffer);
-  free(buffer);
-
-  if (!view_->GetRenderWidgetHost())
-    return;
 
   composition_.underlines.push_back(ui::CompositionUnderline(0, composition_.text.length(), SK_ColorBLACK, false));
   composition_.selection = gfx::Range(composition_.text.length());
 
-  const std::vector<blink::WebCompositionUnderline>& underlines =
-      reinterpret_cast<const std::vector<blink::WebCompositionUnderline>&>(
-          composition_.underlines);
-  RenderWidgetHostImpl::From(
-      view_->GetRenderWidgetHost())->ImeSetComposition(
-          composition_.text, underlines, composition_.selection.start(),
-          composition_.selection.end());
+  // Only add preedit to queue, till we dont know if key event
+  // should be handled. It can be default prevented for exactly.
+  preedit_queue_.push(composition_);
+
+  free(buffer);
+
 #endif
 }
 
@@ -435,6 +488,16 @@ void IMContextEfl::OnCandidateInputPanelLanguageChanged(Ecore_IMF_Context* /*con
 
 bool IMContextEfl::IsShow() {
   return (context_ && focused_ && ecore_imf_context_input_panel_state_get(context_) != ECORE_IMF_INPUT_PANEL_STATE_HIDE);
+}
+
+void IMContextEfl::ClearQueues() {
+  while (!commit_queue_.empty()) {
+    commit_queue_.pop();
+  }
+
+  while (!preedit_queue_.empty()) {
+    preedit_queue_.pop();
+  }
 }
 
 } // namespace content

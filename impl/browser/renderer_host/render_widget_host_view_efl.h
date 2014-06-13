@@ -23,9 +23,13 @@
 #include "ui/base/ime/text_input_client.h"
 #include "eweb_view.h"
 #include "browser/renderer_host/im_context_efl.h"
+#include "third_party/WebKit/public/web/WebInputEvent.h"
+
+#include <deque>
 #include <Evas.h>
 #include <Ecore_Evas.h>
 #include <Evas_GL.h>
+#include <Ecore_IMF_Evas.h>
 
 #ifndef OS_TIZEN
 // On desktops using mesa as GLES2 implementation GLchar is not defined
@@ -195,6 +199,7 @@ class RenderWidgetHostViewEfl
 #ifdef OS_TIZEN
   void FilterInputMotion(const blink::WebGestureEvent& gesture_event);
   void makePinchZoom(void* eventInfo);
+  void OnDidInputEventHandled(const blink::WebInputEvent* input_event, bool processed);
 #endif
 
   Evas* evas() const {
@@ -237,6 +242,8 @@ class RenderWidgetHostViewEfl
   gfx::Point ConvertPointInViewPix(gfx::Point point);
 
   void OnTextInputInFormStateChanged(bool is_in_form_tag);
+  void KeyUpEventQueuePush(int key) { keyupev_queue_.push(key); }
+  void ClearQueues();
 
  protected:
   friend class RenderWidgetHostView;
@@ -273,6 +280,12 @@ class RenderWidgetHostViewEfl
   gfx::Rect GetViewBoundsInPix() const;
 
   Ecore_X_Window GetEcoreXWindow() const;
+
+  void HandleCommitQueue(bool processed);
+  void HandlePreeditQueue(bool processed);
+  void HandleKeyUpQueue();
+  void HandleKeyDownQueue();
+  void SendCompositionKeyUpEvent(char c);
 
   RenderWidgetHostImpl* host_;
   EWebView* web_view_;
@@ -325,6 +338,12 @@ class RenderWidgetHostViewEfl
   unsigned long current_pixmap_id_;
   unsigned long next_pixmap_id_;
   GLuint texture_id_;
+
+  typedef std::queue<int> KeyUpEventQueue;
+  KeyUpEventQueue keyupev_queue_;
+
+  typedef std::queue<NativeWebKeyboardEvent*> KeyDownEventQueue;
+  KeyDownEventQueue keydownev_queue_;
 
   DISALLOW_COPY_AND_ASSIGN(RenderWidgetHostViewEfl);
 };
