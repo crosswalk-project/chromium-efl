@@ -44,6 +44,7 @@ class BrowserContextEfl
     public visitedlink::VisitedLinkDelegate {
  public:
   BrowserContextEfl(EWebContext*);
+  ~BrowserContextEfl();
 
   virtual bool IsOffTheRecord() const OVERRIDE { return false; }
   virtual net::URLRequestContextGetter* GetRequestContext() OVERRIDE;
@@ -114,7 +115,7 @@ class BrowserContextEfl
   static void ReadCertificateAndAdd(base::FilePath* file_path);
 
   scoped_ptr<visitedlink::VisitedLinkMaster> visitedlink_master_;
-  scoped_ptr<ResourceContextEfl> resource_context_;
+  ResourceContextEfl* resource_context_;
   scoped_refptr<URLRequestContextGetterEfl> request_context_getter_;
   EWebContext* web_context_;
 #if defined(ENABLE_NOTIFICATIONS)

@@ -20,22 +20,15 @@
 #ifndef EWEB_CONTEXT_H
 #define EWEB_CONTEXT_H
 
-#include "base/command_line.h"
-#include "base/memory/scoped_ptr.h"
-#include "base/run_loop.h"
-#include "content/public/app/content_main_runner.h"
-#include "content/public/browser/browser_main_runner.h"
-#include "content/public/browser/browser_context.h"
-#include "browser/renderer_host/web_cache_manager_efl.h"
 #include "eweb_object.h"
 #include "API/ewk_cookie_manager_private.h"
+#include "browser/renderer_host/web_cache_manager_efl.h"
 #include "public/ewk_context.h"
-#include "public/ewk_ipc_message.h"
-#include "ui/gfx/rect.h"
-
-#include <Evas.h>
 
 typedef std::map<std::string, std::string> HTTPCustomHeadersEflMap;
+
+class CookieManager;
+struct Ewk_IPC_Wrt_Message_Data;
 
 namespace content {
 class BrowserContextEfl;
@@ -111,14 +104,9 @@ class EWebContext : public EWebObject {
   int Pixmap() const { return m_pixmap; }
 
  private:
-  struct GlobalData;
-
   virtual ~EWebContext();
 
-  static void EnsureGlobalData();
-
   static EWebContext* default_context_;
-  static GlobalData* global_data_;
   scoped_ptr<WebCacheManagerEfl> web_cache_manager_;
   scoped_ptr<content::BrowserContextEfl> browser_context_;
   HTTPCustomHeadersEflMap http_custom_headers_;
@@ -126,9 +114,6 @@ class EWebContext : public EWebObject {
   std::string proxy_uri_;
   scoped_ptr<EwkDidStartDownloadCallback> start_download_callback_;
   int m_pixmap;
-
-  static int argc_;
-  static const char** argv_;
 };
 
 EWebContext* ToEWebContext(Ewk_Context* context);

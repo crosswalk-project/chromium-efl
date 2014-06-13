@@ -19,63 +19,37 @@
 
 #include "eweb_context.h"
 
-#include "base/command_line.h"
-#include "base/files/file_path.h"
-#include "base/path_service.h"
-#include "base/logging.h"
-#include "base/threading/thread_restrictions.h"
+#include "base/synchronization/waitable_event.h"
 #include "content/common/plugin_list.h"
-#include "content/public/app/content_main_runner.h"
-#include "content/public/common/main_function_params.h"
 #include "content/public/browser/appcache_service.h"
-#include "content/public/browser/browser_main_runner.h"
+#include "content/public/browser/browser_context.h"
+#include "content/public/browser/browser_thread.h"
+#include "content/public/browser/storage_partition.h"
 #include "content/public/browser/render_process_host.h"
-#include "content/public/common/content_client.h"
-#include "content/common/plugin_list.h"
-#include "content/public/app/content_main_runner.h"
-#include "content/public/common/main_function_params.h"
-#include "content/public/browser/browser_main_runner.h"
-#include "content/public/browser/utility_process_host.h"
-#include "content/utility/in_process_utility_thread.h"
-#include "content/renderer/in_process_renderer_thread.h"
-#include "content/gpu/in_process_gpu_thread.h"
-#include "content/browser/gpu/gpu_process_host.h"
-#include "content/public/common/content_switches.h"
-#include "common/render_messages_efl.h"
-#include "browser/renderer_host/browsing_data_remover_efl.h"
-#include "browser/vibration/vibration_provider_client.h"
-#include "content_main_delegate_efl.h"
-#include "message_pump_for_ui_efl.h"
-#include "API/ewk_security_origin_private.h"
-#include "web_contents_delegate_efl.h"
-#include "screen_efl.h"
-#include "memory_purger.h"
-#include "cookie_manager.h"
-#include "command_line_efl.h"
 #include "net/http/http_cache.h"
-#include "net/proxy/proxy_config.h"
 #include "net/proxy/proxy_config_service_fixed.h"
 #include "net/proxy/proxy_service.h"
-#include "net/url_request/url_request_context_getter.h"
-#include "ui/base/resource/resource_bundle.h"
 #include "webkit/browser/database/database_quota_client.h"
 #include "webkit/browser/fileapi/file_system_quota_client.h"
 #include "webkit/browser/quota/quota_manager.h"
-#include "webkit/common/quota/quota_types.h"
 
-#include <Ecore.h>
+#include "browser_context_efl.h"
+#include "ewk_global_data.h"
+#include "memory_purger.h"
+#include "API/ewk_security_origin_private.h"
+#include "browser/renderer_host/browsing_data_remover_efl.h"
+#include "browser/vibration/vibration_provider_client.h"
+#include "common/render_messages_efl.h"
 
-using namespace base;
-using namespace content;
+using content::BrowserThread;
+using content::BrowserContext;
+using content::BrowserContextEfl;
+
 using std::string;
 using std::pair;
 using std::map;
 
 namespace {
-
-MessagePump* MessagePumpFactory() {
-  return new MessagePumpForUIEfl;
-}
 
 void SetProxyConfigCallbackOnIOThread(base::WaitableEvent* done,
                             net::URLRequestContextGetter* url_request_context_getter,
@@ -189,18 +163,7 @@ void EwkDidStartDownloadCallback::TriggerCallback(const string& url) {
     (*callback_)(url.c_str(),user_data_);
 }
 
-struct EWebContext::GlobalData {
-  GlobalData()
-    : content_main_runner_(ContentMainRunner::Create())
-    , browser_main_runner_(BrowserMainRunner::Create()) {
-  }
-
-  ContentMainRunner* content_main_runner_;
-  BrowserMainRunner* browser_main_runner_;
-};
-
 EWebContext* EWebContext::default_context_ = NULL;
-EWebContext::GlobalData* EWebContext::global_data_ = NULL;
 
 EWebContext* ToEWebContext(Ewk_Context* context) {
   EWebContext* web_context = ewk_object_cast<EWebContext*>(context);
@@ -248,7 +211,7 @@ void EWebContext::Delete(EWebContext*const context) {
 
 EWebContext::EWebContext()
   : m_pixmap(0) {
-  EnsureGlobalData();
+  EwkGlobalData::Ensure();
 
   browser_context_.reset(new BrowserContextEfl(this));
   // Notification Service gets init in BrowserMainRunner init,
@@ -260,47 +223,6 @@ EWebContext::~EWebContext() {
   VibrationProviderClient::DeleteInstance();
   if (this == default_context_)
     default_context_= NULL;
-}
-
-// static
-void EWebContext::EnsureGlobalData() {
-  if (global_data_)
-    return;
-
-  global_data_ = new GlobalData;
-
-  bool message_pump_overridden = base::MessageLoop::InitMessagePumpForUIFactory(&MessagePumpFactory);
-  DCHECK(message_pump_overridden);
-
-  InstallScreenInstance();
-
-  global_data_->content_main_runner_->Initialize(CommandLineEfl::GetArgc(),
-      CommandLineEfl::GetArgv(), new ContentMainDelegateEfl());
-  global_data_->browser_main_runner_->Initialize(CommandLineEfl::GetDefaultPortParams());
-
-  base::ThreadRestrictions::SetIOAllowed(true);
-
-  base::FilePath pak_dir;
-  base::FilePath pak_file;
-  PathService::Get(base::DIR_MODULE, &pak_dir);
-  pak_file = pak_dir.Append(FILE_PATH_LITERAL("content_shell.pak"));
-  ui::ResourceBundle::InitSharedInstanceWithPakPath(pak_file);
-
-  if (CommandLine::ForCurrentProcess()->HasSwitch(switches::kSingleProcess)) {
-    UtilityProcessHost::RegisterUtilityMainThreadFactory(
-        CreateInProcessUtilityThread);
-    RenderProcessHost::RegisterRendererMainThreadFactory(
-        CreateInProcessRendererThread);
-    GpuProcessHost::RegisterGpuMainThreadFactory(
-        CreateInProcessGpuThread);
-  }
-
-#ifndef NDEBUG
-  logging::LoggingSettings settings;
-  settings.logging_dest = logging::LOG_TO_SYSTEM_DEBUG_LOG;
-  logging::InitLogging(settings);
-  logging::SetLogItems(true, true, true, true);
-#endif
 }
 
 void EWebContext::ClearNetworkCache() {

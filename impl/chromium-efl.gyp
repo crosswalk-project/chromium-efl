@@ -165,6 +165,8 @@
       'eweb_view.cc',
       'eweb_view.h',
       'eweb_view_callbacks.h',
+      'ewk_global_data.h',
+      'ewk_global_data.cc',
       'file_chooser_controller_efl.cc',
       'file_chooser_controller_efl.h',
       'memory_purger.cc',

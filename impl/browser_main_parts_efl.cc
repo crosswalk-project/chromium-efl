@@ -10,7 +10,8 @@
 
 namespace content {
 
-BrowserMainPartsEfl::BrowserMainPartsEfl() {
+BrowserMainPartsEfl::BrowserMainPartsEfl()
+  : devtools_delegate_(NULL) {
 }
 
 BrowserMainPartsEfl::~BrowserMainPartsEfl() {

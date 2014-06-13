@@ -42,9 +42,6 @@ MessagePumpForUIEfl::MessagePumpForUIEfl()
 }
 
 MessagePumpForUIEfl::~MessagePumpForUIEfl() {
-  DCHECK(run_loop_->running());
-  run_loop_->AfterRun();
-  delete run_loop_;
 }
 
 // FIXME: need to be implemented for tests.
@@ -54,7 +51,13 @@ void MessagePumpForUIEfl::Run(base::MessagePump::Delegate* delegate) {
 
 // FIXME: need to be implemented for tests.
 void MessagePumpForUIEfl::Quit() {
-  NOTREACHED();
+  // RunLoop must be destroyed before chromium cleanup
+  ecore_pipe_del(pipe_);
+  DCHECK(run_loop_->running());
+  run_loop_->AfterRun();
+  delete run_loop_;
+  run_loop_ = NULL;
+  pipe_ = NULL;
 }
 
 void MessagePumpForUIEfl::ScheduleWork() {

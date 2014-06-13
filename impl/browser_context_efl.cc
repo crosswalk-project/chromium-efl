@@ -19,6 +19,7 @@
 
 #include "browser_context_efl.h"
 
+#include "base/bind.h"
 #include "base/file_util.h"
 #include "base/path_service.h"
 #include "components/visitedlink/browser/visitedlink_master.h"
@@ -32,6 +33,13 @@ namespace content {
 BrowserContextEfl::ResourceContextEfl::ResourceContextEfl(BrowserContextEfl *ctx)
     : getter_(NULL),
       browser_context_(ctx) {
+}
+
+BrowserContextEfl::~BrowserContextEfl() {
+  if (resource_context_) {
+    DCHECK(BrowserThread::DeleteSoon(BrowserThread::IO, FROM_HERE, resource_context_));
+    resource_context_ = NULL;
+  }
 }
 
 BrowserContextEfl::ResourceContextEfl::~ResourceContextEfl() {
@@ -61,7 +69,8 @@ void BrowserContextEfl::ResourceContextEfl::set_url_request_context_getter(
 }
 
 BrowserContextEfl::BrowserContextEfl(EWebContext* web_context)
-  : web_context_(web_context),
+  : resource_context_(NULL),
+    web_context_(web_context),
 #if defined(ENABLE_NOTIFICATIONS)
     notification_controllerefl_(new NotificationControllerEfl()),
 #endif
@@ -75,9 +84,9 @@ net::URLRequestContextGetter* BrowserContextEfl::GetRequestContext() {
 
 ResourceContext* BrowserContextEfl::GetResourceContext() {
   if (!resource_context_)
-    resource_context_.reset(new ResourceContextEfl(this));
+    resource_context_ = new ResourceContextEfl(this);
 
-  return resource_context_.get();
+  return resource_context_;
 }
 
 base::FilePath BrowserContextEfl::GetPath() const {
