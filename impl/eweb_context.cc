@@ -44,6 +44,7 @@
 #include "common/render_messages_efl.h"
 
 #include "tizen_webview/public/tw_security_origin.h"
+#include "tizen_webview/public/tw_wrt.h"
 #include "tizen_webview/tw_misc_utility.h"
 
 using content::BrowserThread;
@@ -217,7 +218,7 @@ void EWebContext::SendWidgetInfo(int widget_id, double scale, const string &them
   }
 }
 
-void EWebContext::SendWrtMessage(const Ewk_IPC_Wrt_Message_Data& data) {
+void EWebContext::SendWrtMessage(const tizen_webview::WrtIpcMessageData& data) {
   content::RenderProcessHost::iterator i(content::RenderProcessHost::AllHostsIterator());
   for (; !i.IsAtEnd(); i.Advance()) {
     i.GetCurrentValue()->Send(new EwkViewMsg_SendWrtMessage(data));

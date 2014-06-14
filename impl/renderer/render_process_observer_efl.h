@@ -6,7 +6,6 @@
 #include "content/public/renderer/render_process_observer.h"
 #include "common/render_messages_efl.h"
 #include "cache_params_efl.h"
-#include "public/ewk_ipc_message.h"
 
 namespace IPC {
 class Message;
@@ -30,7 +29,7 @@ private:
                     const std::string &theme,
                     const std::string &encoded_bundle);
   void OnSetCache(const CacheParamsEfl& params);
-  void OnWrtMessage(const Ewk_IPC_Wrt_Message_Data& data);
+  void OnWrtMessage(const tizen_webview::WrtIpcMessageData& data);
   ContentRendererClientEfl* content_client_;
   bool webkit_initialized_;
   CacheParamsEfl pending_cache_params_;

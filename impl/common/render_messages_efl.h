@@ -8,17 +8,16 @@
 #include "ui/gfx/ipc/gfx_param_traits.h"
 #include "API/ewk_hit_test_private.h"
 #include "API/ewk_text_style_private.h"
-#include "API/ewk_ipc_message_private.h"
 #include "cache_params_efl.h"
 #include "public/ewk_view.h"
 #include "navigation_policy_params.h"
-#include "public/ewk_ipc_message.h"
 #include "renderer/print_pages_params.h"
 #include "third_party/WebKit/public/web/WebNavigationPolicy.h"
 #include "third_party/WebKit/public/web/WebNavigationType.h"
 #include "url/gurl.h"
 
 #include "tizen_webview/public/tw_hit_test.h"
+#include "tizen_webview/public/tw_wrt.h"
 
 #include <string>
 #include <map>
@@ -113,7 +112,7 @@ IPC_STRUCT_TRAITS_BEGIN(DidPrintPagesParams)
   IPC_STRUCT_TRAITS_MEMBER(filename)
 IPC_STRUCT_TRAITS_END()
 
-IPC_STRUCT_TRAITS_BEGIN(Ewk_IPC_Wrt_Message_Data)
+IPC_STRUCT_TRAITS_BEGIN(tizen_webview::WrtIpcMessageData)
   IPC_STRUCT_TRAITS_MEMBER(type)
   IPC_STRUCT_TRAITS_MEMBER(value)
   IPC_STRUCT_TRAITS_MEMBER(id)
@@ -141,7 +140,7 @@ IPC_MESSAGE_CONTROL4(EwkViewMsg_SetWidgetInfo,
                      std::string)    // result: encodedBundle
 
 IPC_MESSAGE_CONTROL1(EwkViewMsg_SendWrtMessage,
-                     Ewk_IPC_Wrt_Message_Data /* data */);
+                     tizen_webview::WrtIpcMessageData /* data */);
 
 IPC_MESSAGE_ROUTED0(EwkViewMsg_GetSelectionStyle)
 
@@ -177,7 +176,7 @@ IPC_SYNC_MESSAGE_ROUTED0_2(EwkHostMsg_GetContentSecurityPolicy,
                            Ewk_CSP_Header_Type /* header type */)
 
 IPC_SYNC_MESSAGE_ROUTED1_1(EwkHostMsg_WrtSyncMessage,
-                           Ewk_IPC_Wrt_Message_Data /* data */,
+                           tizen_webview::WrtIpcMessageData /* data */,
                            std::string /*result*/);
 
 IPC_MESSAGE_ROUTED3(EwkViewMsg_Scale,
@@ -193,7 +192,7 @@ IPC_MESSAGE_ROUTED2(EwkHostMsg_PlainTextGetContents,
                     int /* callback id */)
 
 IPC_MESSAGE_ROUTED1(EwkHostMsg_WrtMessage,
-                    Ewk_IPC_Wrt_Message_Data /* data */);
+                    tizen_webview::WrtIpcMessageData /* data */);
 
 IPC_MESSAGE_ROUTED2(EwkHostMsg_DidChangeContentsSize,
                     int, /* width */

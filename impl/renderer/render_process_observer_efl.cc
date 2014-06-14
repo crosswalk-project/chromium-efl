@@ -38,7 +38,7 @@ void RenderProcessObserverEfl::OnWidgetInfo(int widget_id,
   content_client_->SetWidgetInfo(widget_id, scale, encoded_bundle, theme);
 }
 
-void RenderProcessObserverEfl::OnWrtMessage(const Ewk_IPC_Wrt_Message_Data& data)
+void RenderProcessObserverEfl::OnWrtMessage(const tizen_webview::WrtIpcMessageData& data)
 {
   content_client_->WrtMessageReceived(data);
 }

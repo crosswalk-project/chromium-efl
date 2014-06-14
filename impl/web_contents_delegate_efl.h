@@ -9,7 +9,6 @@
 #include "browser/javascript_dialog_manager_efl.h"
 #include "browser_context_efl.h"
 #include "eweb_view.h"
-#include "public/ewk_ipc_message.h"
 #include "content/public/browser/web_contents.h"
 #include "content/public/browser/web_contents_delegate.h"
 #include "content/public/common/frame_navigate_params.h"
@@ -22,6 +21,10 @@
 #include "ui/base/ime/text_input_type.h"
 
 class DidPrintPagesParams;
+
+namespace tizen_webview {
+class WrtIpcMessageData;
+}
 
 namespace content {
 struct DateTimeSuggestion;
@@ -165,8 +168,8 @@ class WebContentsDelegateEfl
 
  private:
   void OnGetContentSecurityPolicy(IPC::Message* reply_msg);
-  void OnWrtPluginMessage(const Ewk_IPC_Wrt_Message_Data& data);
-  void OnWrtPluginSyncMessage(const Ewk_IPC_Wrt_Message_Data& data,
+  void OnWrtPluginMessage(const tizen_webview::WrtIpcMessageData& data);
+  void OnWrtPluginSyncMessage(const tizen_webview::WrtIpcMessageData& data,
                               IPC::Message* reply);
 
   EWebView* web_view_;

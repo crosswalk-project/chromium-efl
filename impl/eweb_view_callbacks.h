@@ -31,7 +31,6 @@
 #include "API/ewk_user_media_private.h"
 #include "public/ewk_notification.h"
 #include "public/ewk_policy_decision.h"
-#include "public/ewk_ipc_message.h"
 #include "tizen_webview/public/tw_custom_handlers.h"
 
 #include <Evas.h>
@@ -45,6 +44,7 @@ typedef struct EwkObject Ewk_Navigation_Policy_Decision;
 
 namespace tizen_webview {
 class Notification;
+class WrtIpcMessageData;
 }
 
 namespace EWebViewCallbacks {
@@ -279,7 +279,7 @@ DECLARE_EWK_VIEW_CALLBACK(ClipboardOpened, "clipboard,opened", void*);
 DECLARE_EWK_VIEW_CALLBACK(BackForwardListChange, "back,forward,list,changed", void);
 DECLARE_EWK_VIEW_CALLBACK(WebProcessCrashed, "webprocess,crashed", bool*);
 DECLARE_EWK_VIEW_CALLBACK(ConsoleMessage, "console,message", _Ewk_Console_Message*);
-DECLARE_EWK_VIEW_CALLBACK(WrtPluginsMessage, "wrt,message", Ewk_IPC_Wrt_Message_Data*);
+DECLARE_EWK_VIEW_CALLBACK(WrtPluginsMessage, "wrt,message", tizen_webview::WrtIpcMessageData*);
 DECLARE_EWK_VIEW_CALLBACK(IconReceived, "icon,received", void);
 }
 

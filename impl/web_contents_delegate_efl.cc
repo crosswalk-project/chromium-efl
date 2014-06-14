@@ -28,6 +28,8 @@
 #include "printing/pdf_metafile_skia.h"
 #include "url/gurl.h"
 #include "browser/favicon/favicon_service.h"
+
+#include "tizen_webview/public/tw_web_context.h"
 #include "tizen_webview/public/tw_input_type.h"
 
 #ifdef TIZEN_AUTOFILL_SUPPORT
@@ -429,8 +431,8 @@ void WebContentsDelegateEfl::OnFormSubmit(const GURL&url) {
   web_view_->SmartCallback<EWebViewCallbacks::FormSubmit>().call(url.GetContent().c_str());
 }
 
-void WebContentsDelegateEfl::OnWrtPluginMessage(const Ewk_IPC_Wrt_Message_Data& data) {
-  scoped_ptr<Ewk_IPC_Wrt_Message_Data> p(new Ewk_IPC_Wrt_Message_Data);
+void WebContentsDelegateEfl::OnWrtPluginMessage(const tizen_webview::WrtIpcMessageData& data) {
+  scoped_ptr<tizen_webview::WrtIpcMessageData> p(new tizen_webview::WrtIpcMessageData);
   p->type = data.type;
   p->value = data.value;
   p->id = data.id;
@@ -439,9 +441,9 @@ void WebContentsDelegateEfl::OnWrtPluginMessage(const Ewk_IPC_Wrt_Message_Data& 
   web_view_->SmartCallback<EWebViewCallbacks::WrtPluginsMessage>().call(p.get());
 }
 
-void WebContentsDelegateEfl::OnWrtPluginSyncMessage(const Ewk_IPC_Wrt_Message_Data& data,
+void WebContentsDelegateEfl::OnWrtPluginSyncMessage(const tizen_webview::WrtIpcMessageData& data,
                                                     IPC::Message* reply) {
-  scoped_ptr<Ewk_IPC_Wrt_Message_Data> tmp(new Ewk_IPC_Wrt_Message_Data);
+  scoped_ptr<tizen_webview::WrtIpcMessageData> tmp(new tizen_webview::WrtIpcMessageData);
   tmp->type = data.type;
   web_view_->SmartCallback<EWebViewCallbacks::WrtPluginsMessage>().call(tmp.get());
   EwkHostMsg_WrtSyncMessage::WriteReplyParams(reply, tmp->value);

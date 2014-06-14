@@ -23,7 +23,10 @@
 #include <string>
 #include "url/gurl.h"
 #include "v8/include/v8.h"
-#include "public/ewk_ipc_message.h"
+
+namespace tizen_webview {
+class WrtIpcMessageData;
+}
 
 class WrtWidget {
  public:
@@ -34,7 +37,7 @@ class WrtWidget {
                      const std::string& encodedBundle,
                      const std::string& theme);
 
-  void messageReceived(const Ewk_IPC_Wrt_Message_Data& data);
+  void messageReceived(const tizen_webview::WrtIpcMessageData& data);
 
   void ParseUrl(const GURL& url, GURL& new_url);
 

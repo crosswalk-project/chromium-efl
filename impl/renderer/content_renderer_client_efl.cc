@@ -116,7 +116,7 @@ void ContentRendererClientEfl::SetWidgetInfo(int widgetHandle,
   wrt_widget_->SetWidgetInfo(widgetHandle, scaleFactor, encodedBundle, theme);
 }
 
-void ContentRendererClientEfl::WrtMessageReceived(const Ewk_IPC_Wrt_Message_Data& data) {
+void ContentRendererClientEfl::WrtMessageReceived(const tizen_webview::WrtIpcMessageData& data) {
   wrt_widget_->messageReceived(data);
 }
 

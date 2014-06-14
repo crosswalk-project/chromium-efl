@@ -64,8 +64,7 @@ void WrtWidget::StopSession(v8::Handle<v8::Context> context) {
   //TODO: stop session
 }
 
-void WrtWidget::messageReceived(const Ewk_IPC_Wrt_Message_Data& data) {
-    if (widgetHandle_ != -1) {
-        DynamicPlugin::instance().messageReceived(data);
-    }
+void WrtWidget::messageReceived(const tizen_webview::WrtIpcMessageData& data) {
+  if (widgetHandle_ != -1)
+    DynamicPlugin::instance().messageReceived(data);
 }

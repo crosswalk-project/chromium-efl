@@ -4,12 +4,15 @@
 #include "content/public/renderer/content_renderer_client.h"
 #include "v8/include/v8.h"
 #include "renderer/render_process_observer_efl.h"
-#include "public/ewk_ipc_message.h"
 
 namespace content {
 class RenderView;
 class RenderFrame;
 class DocumentState;
+}
+
+namespace tizen_webview {
+class WrtIpcMessageData;
 }
 
 namespace visitedlink {
@@ -33,7 +36,7 @@ class ContentRendererClientEfl : public content::ContentRendererClient
                      const std::string &encodedBundle,
                      const std::string &theme);
 
-  void WrtMessageReceived(const Ewk_IPC_Wrt_Message_Data& data);
+  void WrtMessageReceived(const tizen_webview::WrtIpcMessageData& data);
 
   virtual void DidCreateScriptContext(blink::WebFrame* frame,
                                       v8::Handle<v8::Context> context,

@@ -89,8 +89,8 @@ DynamicPlugin& DynamicPlugin::instance() {
   return dynamicPlugin;
 }
 
-void DynamicPlugin::messageReceived(const Ewk_IPC_Wrt_Message_Data& data) {
-  if(!m_onIPCMessage)
+void DynamicPlugin::messageReceived(const tizen_webview::WrtIpcMessageData& data) {
+  if (!m_onIPCMessage)
     return;
 
   m_onIPCMessage(data);

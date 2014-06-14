@@ -22,7 +22,11 @@
 
 #include <string>
 #include "v8/include/v8.h"
-#include "public/ewk_ipc_message.h"
+
+
+namespace tizen_webview {
+class WrtIpcMessageData;
+}
 
 typedef void (*startSessionFun)(int,
                                 v8::Handle<v8::Context>,
@@ -31,7 +35,7 @@ typedef void (*startSessionFun)(int,
                                 const char*,
                                 const char*);
 
-typedef void (*onIPCMessageFun)(const Ewk_IPC_Wrt_Message_Data&);
+typedef void (*onIPCMessageFun)(const tizen_webview::WrtIpcMessageData&);
 
 typedef void (*parseUrlFun)(std::string*, std::string*, int);
 typedef void (*databaseAttachFun)(int);
@@ -47,7 +51,7 @@ class DynamicPlugin {
 
   void parseURL(std::string* old_url, std::string* new_url, int widget_id);
 
-  void messageReceived(const Ewk_IPC_Wrt_Message_Data& data);
+  void messageReceived(const tizen_webview::WrtIpcMessageData& data);
 
   ~DynamicPlugin();
 

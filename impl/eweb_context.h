@@ -28,12 +28,12 @@
 namespace tizen_webview {
 class URL;
 class WebContext;
+class WrtIpcMessageData;
 }
 
 typedef std::map<std::string, std::string> HTTPCustomHeadersEflMap;
 
 class CookieManager;
-struct Ewk_IPC_Wrt_Message_Data;
 
 namespace content {
 class BrowserContextEfl;
@@ -100,7 +100,7 @@ class EWebContext {
   Evas_Object *AddFaviconObject(const char* uri, Evas* canvas) const;
 
   void SendWidgetInfo(int widget_id, double scale, const std::string &theme, const std::string &encoded_bundle);
-  void SendWrtMessage(const Ewk_IPC_Wrt_Message_Data& message);
+  void SendWrtMessage(const tizen_webview::WrtIpcMessageData& message);
 
   void SetPixmap(int pixmap) { m_pixmap = pixmap; }
   int Pixmap() const { return m_pixmap; }
