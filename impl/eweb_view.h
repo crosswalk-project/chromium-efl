@@ -73,6 +73,7 @@
 
 #include "tizen_webview/public/tw_hit_test.h"
 #include "tizen_webview/public/tw_touch_event.h"
+#include "tizen_webview/public/tw_callbacks.h"
 #include "tizen_webview/public/tw_content_security_policy.h"
 #include "tizen_webview/public/tw_input_type.h"
 #include "tizen_webview/public/tw_find_options.h"
@@ -101,44 +102,44 @@ class Hit_Test;
 
 class EwkViewPlainTextGetCallback {
  public:
-  EwkViewPlainTextGetCallback(Ewk_View_Plain_Text_Get_Callback callback,
+  EwkViewPlainTextGetCallback(tizen_webview::View_Plain_Text_Get_Callback callback,
                               void* user_data)
     : callback_(callback), user_data_(user_data)
     { }
   void TriggerCallback(Evas_Object* obj, const std::string& content_text);
 
  private:
-  Ewk_View_Plain_Text_Get_Callback callback_;
+  tizen_webview::View_Plain_Text_Get_Callback callback_;
   void* user_data_;
 };
 
 class OrientationLockCallback {
  public:
-  OrientationLockCallback(Ewk_Orientation_Lock_Cb lock,
+  OrientationLockCallback(tizen_webview::Orientation_Lock_Cb lock,
                           void* user_data)
     : lock_(lock),
       user_data_(user_data)
     {}
   private:
-    Ewk_Orientation_Lock_Cb lock_;
+    tizen_webview::Orientation_Lock_Cb lock_;
     void* user_data_;
 };
 
 class MHTMLCallbackDetails {
  public:
-  MHTMLCallbackDetails(Ewk_View_MHTML_Data_Get_Callback callback_func, void *user_data)
+  MHTMLCallbackDetails(tizen_webview::View_MHTML_Data_Get_Callback callback_func, void *user_data)
     : callback_func_(callback_func),
       user_data_(user_data)
   {}
   void Run(Evas_Object* obj, const std::string& mhtml_content);
 
-  Ewk_View_MHTML_Data_Get_Callback callback_func_;
+  tizen_webview::View_MHTML_Data_Get_Callback callback_func_;
   void *user_data_;
 };
 
 class WebApplicationIconUrlGetCallback {
  public:
-  WebApplicationIconUrlGetCallback(Ewk_Web_App_Icon_URL_Get_Callback func, void *user_data)
+  WebApplicationIconUrlGetCallback(tizen_webview::Web_App_Icon_URL_Get_Callback func, void *user_data)
     : func_(func), user_data_(user_data)
   {}
   void Run(const std::string &url) {
@@ -148,13 +149,13 @@ class WebApplicationIconUrlGetCallback {
   }
 
  private:
-  Ewk_Web_App_Icon_URL_Get_Callback func_;
+  tizen_webview::Web_App_Icon_URL_Get_Callback func_;
   void *user_data_;
 };
 
 class WebApplicationIconUrlsGetCallback {
  public:
-  WebApplicationIconUrlsGetCallback(Ewk_Web_App_Icon_URLs_Get_Callback func, void *user_data)
+  WebApplicationIconUrlsGetCallback(tizen_webview::Web_App_Icon_URLs_Get_Callback func, void *user_data)
     : func_(func), user_data_(user_data)
   {}
   void Run(const std::map<std::string, std::string> &urls) {
@@ -169,13 +170,13 @@ class WebApplicationIconUrlsGetCallback {
   }
 
  private:
-  Ewk_Web_App_Icon_URLs_Get_Callback func_;
+  tizen_webview::Web_App_Icon_URLs_Get_Callback func_;
   void *user_data_;
 };
 
 class WebApplicationCapableGetCallback {
  public:
-  WebApplicationCapableGetCallback(Ewk_Web_App_Capable_Get_Callback func, void *user_data)
+  WebApplicationCapableGetCallback(tizen_webview::Web_App_Capable_Get_Callback func, void *user_data)
     : func_(func), user_data_(user_data)
   {}
   void Run(bool capable) {
@@ -185,7 +186,7 @@ class WebApplicationCapableGetCallback {
   }
 
  private:
-  Ewk_Web_App_Capable_Get_Callback func_;
+  tizen_webview::Web_App_Capable_Get_Callback func_;
   void *user_data_;
 };
 
@@ -238,7 +239,7 @@ class EWebView
   void SetTextZoomFactor(double text_zoom_factor);
   void ExecuteEditCommand(const char* command, const char* value);
   void SendOrientationChangeEventIfNeeded(int orientation);
-  void SetOrientationLockCallback(Ewk_Orientation_Lock_Cb func, void* data);
+  void SetOrientationLockCallback(tizen_webview::Orientation_Lock_Cb func, void* data);
   bool TouchEventsEnabled() const;
   void SetTouchEventsEnabled(bool enabled);
   bool MouseEventsEnabled() const;
@@ -246,7 +247,7 @@ class EWebView
   void HandleTouchEvents(tizen_webview::Touch_Event_Type type, const Eina_List *points, const Evas_Modifier *modifiers);
   void Show();
   void Hide();
-  bool ExecuteJavaScript(const char* script, Ewk_View_Script_Execute_Callback callback, void* userdata);
+  bool ExecuteJavaScript(const char* script, tizen_webview::View_Script_Execute_Callback callback, void* userdata);
   bool SetUserAgent(const char* userAgent);
   bool SetUserAgentAppName(const char* application_name);
   const char* GetUserAgent() const;
@@ -306,9 +307,9 @@ class EWebView
   void UpdateHitTestData(const _Ewk_Hit_Test& hit_test_data, const NodeAttributesMap& node_attributes);
 
   int current_find_request_id() const { return current_find_request_id_; }
-  bool PlainTextGet(Ewk_View_Plain_Text_Get_Callback callback, void* user_data);
+  bool PlainTextGet(tizen_webview::View_Plain_Text_Get_Callback callback, void* user_data);
   void InvokePlainTextGetCallback(const std::string& content_text, int plain_text_get_callback_id);
-  int SetEwkViewPlainTextGetCallback(Ewk_View_Plain_Text_Get_Callback callback, void* user_data);
+  int SetEwkViewPlainTextGetCallback(tizen_webview::View_Plain_Text_Get_Callback callback, void* user_data);
   void DidChangeContentsSize(int width, int height);
   const Eina_Rectangle GetContentsSize() const;
   void GetScrollSize(int* w, int* h);
@@ -319,24 +320,24 @@ class EWebView
   bool SaveAsPdf(int width, int height, const std::string& file_name);
   void BackForwardListClear();
   void InvokeBackForwardListChangedCallback();
-  bool WebAppCapableGet(Ewk_Web_App_Capable_Get_Callback callback, void *userData);
-  bool WebAppIconUrlGet(Ewk_Web_App_Icon_URL_Get_Callback callback, void *userData);
-  bool WebAppIconUrlsGet(Ewk_Web_App_Icon_URLs_Get_Callback callback, void *userData);
+  bool WebAppCapableGet(tizen_webview::Web_App_Capable_Get_Callback callback, void *userData);
+  bool WebAppIconUrlGet(tizen_webview::Web_App_Icon_URL_Get_Callback callback, void *userData);
+  bool WebAppIconUrlsGet(tizen_webview::Web_App_Icon_URLs_Get_Callback callback, void *userData);
   void InvokeWebAppCapableGetCallback(bool capable, int callbackId);
   void InvokeWebAppIconUrlGetCallback(const std::string &iconUrl, int callbackId);
   void InvokeWebAppIconUrlsGetCallback(const std::map<std::string, std::string> &iconUrls, int callbackId);
 
-  bool GetMHTMLData(Ewk_View_MHTML_Data_Get_Callback callback, void* user_data);
+  bool GetMHTMLData(tizen_webview::View_MHTML_Data_Get_Callback callback, void* user_data);
   void OnMHTMLContentGet(const std::string& mhtml_content, int callback_id);
   bool IsFullscreen();
   void ExitFullscreen();
   double GetScale();
   void DidChangePageScaleFactor(double scale_factor);
-  void SetJavaScriptAlertCallback(Ewk_View_JavaScript_Alert_Callback callback, void* user_data);
+  void SetJavaScriptAlertCallback(tizen_webview::View_JavaScript_Alert_Callback callback, void* user_data);
   void JavaScriptAlertReply();
-  void SetJavaScriptConfirmCallback(Ewk_View_JavaScript_Confirm_Callback callback, void* user_data);
+  void SetJavaScriptConfirmCallback(tizen_webview::View_JavaScript_Confirm_Callback callback, void* user_data);
   void JavaScriptConfirmReply(bool result);
-  void SetJavaScriptPromptCallback(Ewk_View_JavaScript_Prompt_Callback callback, void* user_data);
+  void SetJavaScriptPromptCallback(tizen_webview::View_JavaScript_Prompt_Callback callback, void* user_data);
   void JavaScriptPromptReply(const char* result);
   void set_renderer_crashed();
   void GetPageScaleRange(double *min_scale, double *max_scale);

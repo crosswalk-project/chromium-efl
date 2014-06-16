@@ -161,32 +161,6 @@ struct Ewk_View_Smart_Class {
     Eina_Bool (*window_geometry_get)(Ewk_View_Smart_Data *sd, Evas_Coord *x, Evas_Coord *y, Evas_Coord *width, Evas_Coord *height)  __attribute__((deprecated));
 };
 
-// #if PLATFORM(TIZEN)
-/**
- * Callback for ewk_view_web_app_capable_get
- *
- * @param capable web application capable
- * @param user_data user_data will be passsed when ewk_view_web_app_capable_get is called
- */
-typedef void (*Ewk_Web_App_Capable_Get_Callback)(Eina_Bool capable, void* user_data);
-
-/**
- * Callback for ewk_view_web_app_icon_get
- *
- * @param icon_url web application icon
- * @param user_data user_data will be passsed when ewk_view_web_app_icon_get is called
- */
-typedef void (*Ewk_Web_App_Icon_URL_Get_Callback)(const char* icon_url, void* user_data);
-
-/**
- * Callback for ewk_view_web_app_icon_urls_get.
- *
- * @param icon_urls list of Ewk_Web_App_Icon_Data for web app
- * @param user_data user_data will be passsed when ewk_view_web_app_icon_urls_get is called
- */
-typedef void (*Ewk_Web_App_Icon_URLs_Get_Callback)(Eina_List *icon_urls, void *user_data);
-// #endif
-
 /**
  * The version you have to put into the version field
  * in the @a Ewk_View_Smart_Class structure.
@@ -257,68 +231,6 @@ struct Ewk_View_Smart_Data {
         Eina_Bool position:1;
     } changed;
 };
-
-/**
- * Callback for ewk_view_script_execute
- *
- * @param o the view object
- * @param result_value value returned by script
- * @param user_data user data
- */
-typedef void (*Ewk_View_Script_Execute_Callback)(Evas_Object* o, const char* result_value, void* user_data);
-
-/**
- * Callback for ewk_view_plain_text_get
- *
- * @param o the view object
- * @param plain_text the contents of the given frame converted to plain text
- * @param user_data user data
- */
-typedef void (*Ewk_View_Plain_Text_Get_Callback)(Evas_Object* o, const char* plain_text, void* user_data);
-
-/**
- * Creates a type name for the callback function used to get the page contents.
- *
- * @param o view object
- * @param data mhtml data of the page contents
- * @param user_data user data will be passed when ewk_view_mhtml_data_get is called
- */
-typedef void (*Ewk_View_MHTML_Data_Get_Callback)(Evas_Object *o, const char *data, void *user_data);
-
-
-
-typedef Eina_Bool (*Ewk_View_Password_Confirm_Popup_Callback)(Evas_Object* o, const char* message, void* user_data);
-
-typedef Eina_Bool (*Ewk_View_JavaScript_Alert_Callback)(Evas_Object* o, const char* alert_text, void* user_data);
-
-
-typedef Eina_Bool (*Ewk_View_JavaScript_Confirm_Callback)(Evas_Object* o, const char* message, void* user_data);
-/**
- * Callback for ewk_view_javascript_prompt_callback_set
- *
- * @param o the view object
- * @param message the text to be displayed on the prompt popup
- * @param default_value default text to be entered in the prompt dialog
- * @param user_data user data
- */
-typedef Eina_Bool (*Ewk_View_JavaScript_Prompt_Callback)(Evas_Object* o, const char* message, const char* default_value, void* user_data);
-
-
-//#if ENABLE(TIZEN_SUPPORT_BEFORE_UNLOAD_CONFIRM_PANEL)
-typedef Eina_Bool (*Ewk_View_Before_Unload_Confirm_Panel_Callback)(Evas_Object* o, const char* message, void* user_data);
-
-//#if ENABLE(TIZEN_APPLICATION_CACHE)
-typedef Eina_Bool (*Ewk_View_Applicacion_Cache_Permission_Callback)(Evas_Object* o, Ewk_Security_Origin* origin,  void* user_data);
-
-typedef Eina_Bool (*Ewk_View_Exceeded_Indexed_Database_Quota_Callback)(Evas_Object* o, Ewk_Security_Origin* origin, long long currentQuota, void* user_data);
-
-
-typedef Eina_Bool (*Ewk_View_Exceeded_Database_Quota_Callback)(Evas_Object* o, Ewk_Security_Origin* origin, const char* database_name, unsigned long long expectedQuota, void* user_data);
-
-typedef Eina_Bool (*Ewk_View_Exceeded_Local_File_System_Quota_Callback)(Evas_Object* o, Ewk_Security_Origin* origin, long long currentQuota, void* user_data);
-
-
-typedef Eina_Bool (*Ewk_Orientation_Lock_Cb)(Evas_Object* o, Eina_Bool need_lock, int orientation, void* user_data);
 
 #ifdef __cplusplus
 }

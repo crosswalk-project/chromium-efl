@@ -567,7 +567,7 @@ void EWebView::SendOrientationChangeEventIfNeeded(int orientation) {
 #endif
 }
 
-void EWebView::SetOrientationLockCallback(Ewk_Orientation_Lock_Cb func, void* data) {
+void EWebView::SetOrientationLockCallback(tizen_webview::Orientation_Lock_Cb func, void* data) {
   orientation_lock_callback_.reset(new OrientationLockCallback(func, data));
 }
 
@@ -1034,12 +1034,12 @@ namespace {
 
 class JavaScriptCallbackDetails {
  public:
-  JavaScriptCallbackDetails(Ewk_View_Script_Execute_Callback callback_func, void *user_data, Evas_Object* view)
+  JavaScriptCallbackDetails(tizen_webview::View_Script_Execute_Callback callback_func, void *user_data, Evas_Object* view)
     : callback_func_(callback_func)
     , user_data_(user_data)
     , view_(view) {}
 
-  Ewk_View_Script_Execute_Callback callback_func_;
+  tizen_webview::View_Script_Execute_Callback callback_func_;
   void *user_data_;
   Evas_Object* view_;
 };
@@ -1055,7 +1055,7 @@ void JavaScriptComplete(JavaScriptCallbackDetails* script_callback_data, const b
 
 } //namespace
 
-bool EWebView::ExecuteJavaScript(const char* script, Ewk_View_Script_Execute_Callback callback, void* userdata) {
+bool EWebView::ExecuteJavaScript(const char* script, tizen_webview::View_Script_Execute_Callback callback, void* userdata) {
   if (!script)
     return false;
 
@@ -1561,7 +1561,7 @@ void EWebView::InvokeBackForwardListChangedCallback() {
   SmartCallback<EWebViewCallbacks::BackForwardListChange>().call();
 }
 
-bool EWebView::WebAppCapableGet(Ewk_Web_App_Capable_Get_Callback callback, void *userData) {
+bool EWebView::WebAppCapableGet(tizen_webview::Web_App_Capable_Get_Callback callback, void *userData) {
   RenderViewHost *renderViewHost = web_contents_delegate()->web_contents()->GetRenderViewHost();
   if (!renderViewHost) {
     return false;
@@ -1571,7 +1571,7 @@ bool EWebView::WebAppCapableGet(Ewk_Web_App_Capable_Get_Callback callback, void 
   return renderViewHost->Send(new EwkViewMsg_WebAppCapableGet(renderViewHost->GetRoutingID(), callbackId));
 }
 
-bool EWebView::WebAppIconUrlGet(Ewk_Web_App_Icon_URL_Get_Callback callback, void* userData) {
+bool EWebView::WebAppIconUrlGet(tizen_webview::Web_App_Icon_URL_Get_Callback callback, void *userData) {
   RenderViewHost* renderViewHost = web_contents_delegate()->web_contents()->GetRenderViewHost();
   if (!renderViewHost) {
     return false;
@@ -1581,7 +1581,7 @@ bool EWebView::WebAppIconUrlGet(Ewk_Web_App_Icon_URL_Get_Callback callback, void
   return renderViewHost->Send(new EwkViewMsg_WebAppIconUrlGet(renderViewHost->GetRoutingID(), callbackId));
 }
 
-bool EWebView::WebAppIconUrlsGet(Ewk_Web_App_Icon_URLs_Get_Callback callback, void *userData) {
+bool EWebView::WebAppIconUrlsGet(tizen_webview::Web_App_Icon_URLs_Get_Callback callback, void *userData) {
   RenderViewHost* renderViewHost = web_contents_delegate()->web_contents()->GetRenderViewHost();
   if (!renderViewHost) {
     return false;
@@ -1653,12 +1653,12 @@ void EwkViewPlainTextGetCallback::TriggerCallback(Evas_Object* obj, const std::s
     (callback_)(obj, content_text.c_str(), user_data_);
 }
 
-int EWebView::SetEwkViewPlainTextGetCallback(Ewk_View_Plain_Text_Get_Callback callback, void* user_data) {
+int EWebView::SetEwkViewPlainTextGetCallback(tizen_webview::View_Plain_Text_Get_Callback callback, void* user_data) {
   EwkViewPlainTextGetCallback* view_plain_text_callback_ptr = new EwkViewPlainTextGetCallback(callback, user_data);
   return plain_text_get_callback_map_.Add(view_plain_text_callback_ptr);
 }
 
-bool EWebView::PlainTextGet(Ewk_View_Plain_Text_Get_Callback callback, void* user_data) {
+bool EWebView::PlainTextGet(tizen_webview::View_Plain_Text_Get_Callback callback, void* user_data) {
   RenderViewHost* render_view_host = web_contents_delegate()->web_contents()->GetRenderViewHost();
   if (!render_view_host)
     return false;
@@ -1698,7 +1698,7 @@ bool EWebView::SaveAsPdf(int width, int height, const std::string& filename) {
       width, height, base::FilePath(filename)));
 }
 
-bool EWebView::GetMHTMLData(Ewk_View_MHTML_Data_Get_Callback callback, void* user_data) {
+bool EWebView::GetMHTMLData(tizen_webview::View_MHTML_Data_Get_Callback callback, void* user_data) {
   RenderViewHost* render_view_host = web_contents_delegate()->web_contents()->GetRenderViewHost();
   if (!render_view_host)
     return false;
@@ -1744,7 +1744,7 @@ inline JavaScriptDialogManagerEfl* EWebView::GetJavaScriptDialogManagerEfl() {
   return static_cast<JavaScriptDialogManagerEfl*>(web_contents_delegate()->GetJavaScriptDialogManager());
 }
 
-void EWebView::SetJavaScriptAlertCallback(Ewk_View_JavaScript_Alert_Callback callback, void* user_data) {
+void EWebView::SetJavaScriptAlertCallback(tizen_webview::View_JavaScript_Alert_Callback callback, void* user_data) {
   GetJavaScriptDialogManagerEfl()->SetAlertCallback(callback, user_data);
 }
 
@@ -1759,7 +1759,7 @@ void EWebView::JavaScriptAlertReply() {
   SmartCallback<EWebViewCallbacks::PopupReplyWaitFinish>().call(0);
 }
 
-void EWebView::SetJavaScriptConfirmCallback(Ewk_View_JavaScript_Confirm_Callback callback, void* user_data) {
+void EWebView::SetJavaScriptConfirmCallback(tizen_webview::View_JavaScript_Confirm_Callback callback, void* user_data) {
   GetJavaScriptDialogManagerEfl()->SetConfirmCallback(callback, user_data);
 }
 
@@ -1768,7 +1768,7 @@ void EWebView::JavaScriptConfirmReply(bool result) {
   SmartCallback<EWebViewCallbacks::PopupReplyWaitFinish>().call(0);
 }
 
-void EWebView::SetJavaScriptPromptCallback(Ewk_View_JavaScript_Prompt_Callback callback, void* user_data) {
+void EWebView::SetJavaScriptPromptCallback(tizen_webview::View_JavaScript_Prompt_Callback callback, void* user_data) {
   GetJavaScriptDialogManagerEfl()->SetPromptCallback(callback, user_data);
 }
 

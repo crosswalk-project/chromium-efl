@@ -36,7 +36,7 @@ bool JavaScriptModalCallbacksData::Run(Evas_Object* obj, const char* message_tex
 }
 
 JavaScriptModalCallbacksData* JavaScriptModalCallbacksData::CreateWithAlertDialogData(
-    Ewk_View_JavaScript_Alert_Callback callback,
+    tizen_webview::View_JavaScript_Alert_Callback callback,
     void* user_data)
 {
   JavaScriptModalCallbacksData* callback_data = new JavaScriptModalCallbacksData(
@@ -46,7 +46,7 @@ JavaScriptModalCallbacksData* JavaScriptModalCallbacksData::CreateWithAlertDialo
 }
 
 JavaScriptModalCallbacksData* JavaScriptModalCallbacksData::CreateWithConfirmDialogData(
-    Ewk_View_JavaScript_Confirm_Callback callback,
+    tizen_webview::View_JavaScript_Confirm_Callback callback,
     void* user_data)
 {
   JavaScriptModalCallbacksData* callback_data = new JavaScriptModalCallbacksData(
@@ -56,7 +56,7 @@ JavaScriptModalCallbacksData* JavaScriptModalCallbacksData::CreateWithConfirmDia
 }
 
 JavaScriptModalCallbacksData* JavaScriptModalCallbacksData::CreateWithPromptDialogData(
-    Ewk_View_JavaScript_Prompt_Callback callback,
+    tizen_webview::View_JavaScript_Prompt_Callback callback,
     void* user_data)
 {
   JavaScriptModalCallbacksData* callback_data = new JavaScriptModalCallbacksData(
@@ -115,17 +115,17 @@ void JavaScriptDialogManagerEfl::RunJavaScriptDialog(content::WebContents* web_c
   dialog_ = JavaScriptModalDialogEfl::CreateDialog(web_contents, origin_url, accept_lang, javascript_message_type, message_text, default_prompt_text, callback);
 }
 
-void JavaScriptDialogManagerEfl::SetAlertCallback(Ewk_View_JavaScript_Alert_Callback callback, void* user_data)
+void JavaScriptDialogManagerEfl::SetAlertCallback(tizen_webview::View_JavaScript_Alert_Callback callback, void* user_data)
 {
   alert_callback_data_.reset(JavaScriptModalCallbacksData::CreateWithAlertDialogData(callback, user_data));
 }
 
-void JavaScriptDialogManagerEfl::SetConfirmCallback(Ewk_View_JavaScript_Confirm_Callback callback, void* user_data)
+void JavaScriptDialogManagerEfl::SetConfirmCallback(tizen_webview::View_JavaScript_Confirm_Callback callback, void* user_data)
 {
   confirm_callback_data_.reset(JavaScriptModalCallbacksData::CreateWithConfirmDialogData(callback, user_data));
 }
 
-void JavaScriptDialogManagerEfl::SetPromptCallback(Ewk_View_JavaScript_Prompt_Callback callback, void* user_data)
+void JavaScriptDialogManagerEfl::SetPromptCallback(tizen_webview::View_JavaScript_Prompt_Callback callback, void* user_data)
 {
   prompt_callback_data_.reset(JavaScriptModalCallbacksData::CreateWithPromptDialogData(callback, user_data));
 }

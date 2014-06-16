@@ -9,6 +9,8 @@
 #include "public/ewk_view.h"
 #include "url/gurl.h"
 
+#include "tizen_webview/public/tw_content_security_policy.h"
+
 namespace content{
 class WebContents;
 }
@@ -17,20 +19,20 @@ class JavaScriptModalDialogEfl;
 class JavaScriptModalCallbacksData {
  public:
   bool Run(Evas_Object* obj, const char* content_text, const char* default_text);
-  static JavaScriptModalCallbacksData* CreateWithAlertDialogData(Ewk_View_JavaScript_Alert_Callback callback,
+  static JavaScriptModalCallbacksData* CreateWithAlertDialogData(tizen_webview::View_JavaScript_Alert_Callback callback,
                                                           void* user_data);
-  static JavaScriptModalCallbacksData* CreateWithConfirmDialogData(Ewk_View_JavaScript_Confirm_Callback callback,
+  static JavaScriptModalCallbacksData* CreateWithConfirmDialogData(tizen_webview::View_JavaScript_Confirm_Callback callback,
                                                             void* user_data);
-  static JavaScriptModalCallbacksData* CreateWithPromptDialogData(Ewk_View_JavaScript_Prompt_Callback callback,
+  static JavaScriptModalCallbacksData* CreateWithPromptDialogData(tizen_webview::View_JavaScript_Prompt_Callback callback,
                                                            void* user_data);
   ~JavaScriptModalCallbacksData() { }
 
  private:
   JavaScriptModalCallbacksData(content::JavaScriptMessageType javascript_message_type, void* user_data);
   union {
-    Ewk_View_JavaScript_Alert_Callback alert_callback_;
-    Ewk_View_JavaScript_Confirm_Callback confirm_callback_;
-    Ewk_View_JavaScript_Prompt_Callback prompt_callback_;
+    tizen_webview::View_JavaScript_Alert_Callback alert_callback_;
+    tizen_webview::View_JavaScript_Confirm_Callback confirm_callback_;
+    tizen_webview::View_JavaScript_Prompt_Callback prompt_callback_;
   };
   void* user_data_;
   content::JavaScriptMessageType javascript_message_type_;
@@ -74,9 +76,9 @@ class JavaScriptDialogManagerEfl: public content::JavaScriptDialogManager {
     NOTIMPLEMENTED();
   }
 
-  void SetAlertCallback(Ewk_View_JavaScript_Alert_Callback callback, void* user_data);
-  void SetConfirmCallback(Ewk_View_JavaScript_Confirm_Callback callback, void* user_data);
-  void SetPromptCallback(Ewk_View_JavaScript_Prompt_Callback callback, void* user_data);
+  void SetAlertCallback(tizen_webview::View_JavaScript_Alert_Callback callback, void* user_data);
+  void SetConfirmCallback(tizen_webview::View_JavaScript_Confirm_Callback callback, void* user_data);
+  void SetPromptCallback(tizen_webview::View_JavaScript_Prompt_Callback callback, void* user_data);
   void ExecuteDialogClosedCallBack(bool result, const std::string prompt_data);
 
  private:
