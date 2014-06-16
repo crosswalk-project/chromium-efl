@@ -23,6 +23,8 @@
 
 #include <Eina.h>
 
+#include <string>
+
 #include <base/memory/scoped_ptr.h>
 #include <base/memory/ref_counted.h>
 #include <url/gurl.h>
@@ -74,13 +76,13 @@ class _Ewk_Policy_Decision {
   bool isDecided() const { return isDecided_; }
   bool isSuspended() const { return isSuspended_; }
   tizen_webview::Policy_Navigation_Type GetNavigationType() const { return navigationType_; }
-  Eina_Stringshare* GetCookie() const { return cookie_; }
-  Eina_Stringshare* GetAuthUser() const { return AuthUser_; }
-  Eina_Stringshare* GetAuthPassword() const { return AuthPassword_; }
-  Eina_Stringshare* GetUrl() const { return url_; }
-  Eina_Stringshare* GetScheme() const { return scheme_; }
-  Eina_Stringshare* GetHost() const { return host_; }
-  Eina_Stringshare* GetResponseMime() const { return responseMime_; }
+  const char* GetCookie() const;
+  const char* GetAuthUser() const;
+  const char* GetAuthPassword() const;
+  const char* GetUrl() const;
+  const char* GetScheme() const;
+  const char* GetHost() const;
+  const char* GetResponseMime() const;
   tizen_webview::Policy_Decision_Type GetDecisionType() const { return decisionType_; }
   Eina_Hash* GetResponseHeaders() const { return responseHeaders_; }
   int GetResponseStatusCode() const { return responseStatusCode_; }
@@ -116,19 +118,19 @@ class _Ewk_Policy_Decision {
   scoped_refptr<PolicyResponseDelegateEfl> policy_response_delegate_;
   scoped_ptr<NavigationPolicyHandlerEfl> navigation_policy_handler_;
   scoped_ptr<Ewk_Frame> frame_;
-  const char* cookie_;
-  const char* url_;
-  const char* host_;
-  const char* scheme_;
-  const char* responseMime_;
+  std::string cookie_;
+  std::string url_;
+  std::string host_;
+  std::string scheme_;
+  std::string responseMime_;
   Eina_Hash* responseHeaders_;
   tizen_webview::Policy_Decision_Type decisionType_;
   tizen_webview::Policy_Navigation_Type navigationType_;
   bool isDecided_;
   bool isSuspended_;
   int responseStatusCode_;
-  const char* AuthUser_;
-  const char* AuthPassword_;
+  std::string AuthUser_;
+  std::string AuthPassword_;
   PolicyType type_;
 };
 

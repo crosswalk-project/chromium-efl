@@ -42,7 +42,7 @@ namespace {
   // Let's set the policy decision type as "USE."
   tizen_webview::Policy_Decision_Type GetSanitizedDecisionTypeForWebFontIfNeeded(
     const GURL &request_url,
-    std::string mime_type,
+    const std::string& mime_type,
     tizen_webview::Policy_Decision_Type default_value) {
 
     const char* kWoff = ".woff";
@@ -73,19 +73,12 @@ namespace {
 _Ewk_Policy_Decision::_Ewk_Policy_Decision(const GURL &request_url, const net::HttpResponseHeaders* response_headers, PolicyResponseDelegateEfl* delegate)
   : new_window_policy_delegate_(NULL)
   , policy_response_delegate_(delegate)
-  , cookie_(NULL)
-  , url_(NULL)
-  , host_(NULL)
-  , scheme_(NULL)
-  , responseMime_(NULL)
   , responseHeaders_(NULL)
   , decisionType_(TW_POLICY_DECISION_USE)
   , navigationType_(TW_POLICY_NAVIGATION_TYPE_OTHER)
   , isDecided_(false)
   , isSuspended_(false)
   , responseStatusCode_(0)
-  , AuthUser_(NULL)
-  , AuthPassword_(NULL)
   , type_(POLICY_RESPONSE) {
   DCHECK(response_headers);
   DCHECK(delegate);
@@ -98,7 +91,7 @@ _Ewk_Policy_Decision::_Ewk_Policy_Decision(const GURL &request_url, const net::H
     std::string mime_type;
 
     if (response_headers->GetMimeType(&mime_type)) {
-      responseMime_ = eina_stringshare_add(mime_type.c_str());
+      responseMime_ = mime_type;
 
       if (!net::IsSupportedMimeType(mime_type))
         decisionType_ = TW_POLICY_DECISION_DOWNLOAD;
@@ -114,7 +107,7 @@ _Ewk_Policy_Decision::_Ewk_Policy_Decision(const GURL &request_url, const net::H
     std::string set_cookie_;
 
     if (response_headers->EnumerateHeader(NULL, "Set-Cookie", &set_cookie_))
-      cookie_ = eina_stringshare_add(set_cookie_.c_str());
+      cookie_ = set_cookie_;
 
     void* iter = NULL;
     std::string name;
@@ -129,19 +122,12 @@ _Ewk_Policy_Decision::_Ewk_Policy_Decision(const NavigationPolicyParams &params,
   : new_window_policy_delegate_(NULL)
   , navigation_policy_handler_(new NavigationPolicyHandlerEfl(rvh, params))
   , frame_(new Ewk_Frame(params))
-  , cookie_(NULL)
-  , url_(NULL)
-  , host_(NULL)
-  , scheme_(NULL)
-  , responseMime_(NULL)
   , responseHeaders_(NULL)
   , decisionType_(TW_POLICY_DECISION_USE)
   , navigationType_(static_cast<tizen_webview::Policy_Navigation_Type>(params.type))
   , isDecided_(false)
   , isSuspended_(false)
   , responseStatusCode_(0)
-  , AuthUser_(NULL)
-  , AuthPassword_(NULL)
   , type_(POLICY_NAVIGATION) {
   ParseUrl(params.url);
   if (!params.auth.isEmpty())
@@ -152,19 +138,12 @@ _Ewk_Policy_Decision::_Ewk_Policy_Decision(const NavigationPolicyParams &params,
 
 _Ewk_Policy_Decision::_Ewk_Policy_Decision(content::WebContentsDelegateEfl* view, const GURL& url)
   : new_window_policy_delegate_(view)
-  , cookie_(NULL)
-  , url_(NULL)
-  , host_(NULL)
-  , scheme_(NULL)
-  , responseMime_(NULL)
   , responseHeaders_(NULL)
   , decisionType_(TW_POLICY_DECISION_USE)
   , navigationType_(TW_POLICY_NAVIGATION_TYPE_OTHER)
   , isDecided_(false)
   , isSuspended_(false)
   , responseStatusCode_(0)
-  , AuthUser_(NULL)
-  , AuthPassword_(NULL)
   , type_(POLICY_NEWWINDOW) {
   DCHECK(BrowserThread::CurrentlyOn(BrowserThread::UI));
   DCHECK(view);
@@ -183,14 +162,7 @@ _Ewk_Policy_Decision::_Ewk_Policy_Decision(content::WebContentsDelegateEfl* view
 }
 
 _Ewk_Policy_Decision::~_Ewk_Policy_Decision() {
-  eina_stringshare_del(cookie_);
-  eina_stringshare_del(url_);
-  eina_stringshare_del(host_);
-  eina_stringshare_del(scheme_);
-  eina_stringshare_del(responseMime_);
   eina_hash_free(responseHeaders_);
-  eina_stringshare_del(AuthUser_);
-  eina_stringshare_del(AuthPassword_);
 }
 
 void _Ewk_Policy_Decision::Use() {
@@ -286,16 +258,16 @@ Ewk_Frame* _Ewk_Policy_Decision::GetFrameRef() const {
 }
 
 void _Ewk_Policy_Decision::ParseUrl(const GURL& url) {
-  url_ = eina_stringshare_add(url.spec().c_str());
-  scheme_ = eina_stringshare_add(url.scheme().c_str());
-  host_ = eina_stringshare_add(url.host().c_str());
+  url_ = url.spec();
+  scheme_ = url.scheme();
+  host_ = url.host();
 }
 
 void _Ewk_Policy_Decision::SetAuthorizationIfNecessary(const GURL& request_url) {
   // There is no need to check if username or password is empty.
   // It was checked befor in constructor
-  AuthPassword_ = eina_stringshare_add(request_url.password().c_str());
-  AuthUser_ = eina_stringshare_add(request_url.username().c_str());
+  AuthPassword_ = request_url.password();
+  AuthUser_ = request_url.username();
 }
 
 void _Ewk_Policy_Decision::SetAuthorizationIfNecessary(const std::string request) {
@@ -303,8 +275,8 @@ void _Ewk_Policy_Decision::SetAuthorizationIfNecessary(const std::string request
   std::transform(type.begin(), type.end(), type.begin(), ::toupper);
 
   if (type.compare(BASIC_AUTHORIZATION)) {
-    AuthUser_ = eina_stringshare_add("");
-    AuthPassword_ = eina_stringshare_add("");
+    AuthUser_.clear();
+    AuthPassword_.clear();
     return;
   }
 
@@ -315,14 +287,34 @@ void _Ewk_Policy_Decision::SetAuthorizationIfNecessary(const std::string request
   if (space == std::string::npos || colon == std::string::npos || colon == request.length())
     return;
 
-  std::string user = request.substr(space + 1, request.length() - colon - 1);
-  std::string pass = request.substr(colon + 1);
+  AuthUser_ = request.substr(space + 1, request.length() - colon - 1);
+  AuthPassword_ = request.substr(colon + 1);
+}
 
-  if (user.empty() || pass.empty()) {
-    AuthUser_ = eina_stringshare_add("");
-    AuthPassword_ = eina_stringshare_add("");
-  } else {
-    AuthUser_ = eina_stringshare_add(user.c_str());
-    AuthPassword_  = eina_stringshare_add(pass.c_str());
-  }
+const char* _Ewk_Policy_Decision::GetCookie() const {
+  return cookie_.empty() ? NULL : cookie_.c_str();
+}
+
+const char* _Ewk_Policy_Decision::GetAuthUser() const {
+  return AuthUser_.empty() ? NULL : AuthUser_.c_str();
+}
+
+const char* _Ewk_Policy_Decision::GetAuthPassword() const {
+  return AuthPassword_.empty() ? NULL : AuthPassword_.c_str();
+}
+
+const char* _Ewk_Policy_Decision::GetUrl() const {
+  return url_.empty() ? NULL : url_.c_str();
+}
+
+const char* _Ewk_Policy_Decision::GetScheme() const {
+  return scheme_.empty() ? NULL : scheme_.c_str();
+}
+
+const char* _Ewk_Policy_Decision::GetHost() const {
+  return host_.empty() ? NULL : host_.c_str();
+}
+
+const char* _Ewk_Policy_Decision::GetResponseMime() const {
+  return responseMime_.empty() ? NULL : responseMime_.c_str();
 }
