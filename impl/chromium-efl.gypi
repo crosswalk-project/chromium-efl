@@ -124,6 +124,8 @@
           ['exclude', 'browser/geolocation/location_provider_efl\\.(cc|h)$'],
           ['exclude', 'browser/motion/MotionUI\\.(h|cc)$'],
           ['exclude', 'browser/motion/wkext_motion\\.(h|cc)$'],
+#          ['exclude', 'browser/media/tizen/webaudio_decoder_browser_tizen\\.(h|cc)$'],
+  #        ['exclude', 'renderer/media/tizen/audio_decoder_tizen\\.(h|cc)$'],
         ],
       }],
       ['building_for_tizen_mobile==1', {
