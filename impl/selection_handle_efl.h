@@ -74,8 +74,8 @@ class SelectionHandleEfl {
   static void UpdateMouseMove(void* data);
 
   void ChangeObjectDirection(HandleType, int);
-  HandleType GetHandleType(const gfx::Point&);
-  gfx::Rect GetSelectionRect(HandleType);
+  HandleType GetHandleType() const;
+  gfx::Rect GetSelectionRect();
   void MoveObject(gfx::Point&);
   void SetIsMouseDowned(bool enable) { is_mouse_downed_ = enable; };
 
@@ -104,6 +104,9 @@ class SelectionHandleEfl {
 
   // Direction of handle
   bool is_top_;
+
+  // Handle type
+  HandleType handle_type_;
 };
 
 } // namespace

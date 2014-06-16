@@ -46,13 +46,15 @@ void SelectionBoxEfl::UpdateSelectStringData(const base::string16& text) {
 }
 
 void SelectionBoxEfl::ClearRectData() {
-  LOG(INFO) << __PRETTY_FUNCTION__;
+  TRACE_EVENT0("selection,efl", __PRETTY_FUNCTION__);
   left_rect_ = right_rect_ = gfx::Rect(0, 0, 0, 0);
   context_params_->x = context_params_->y = 0;
 }
 
 void SelectionBoxEfl::UpdateRectData(const gfx::Rect& left_rect, const gfx::Rect& right_rect, bool is_anchor_first) {
-  LOG(INFO) << __PRETTY_FUNCTION__ << " l_x = " << left_rect.x() << " l_y = " << left_rect.y() << " r_x = " << right_rect.x() << " r_y = " << right_rect.y();
+  TRACE_EVENT2("selection,efl", __PRETTY_FUNCTION__,
+               "left_rect", left_rect.ToString(),
+               "right_rect", right_rect.ToString());
   is_anchor_first_ = is_anchor_first;
   left_rect_ = left_rect;
   right_rect_ = right_rect;
@@ -63,15 +65,12 @@ void SelectionBoxEfl::UpdateRectData(const gfx::Rect& left_rect, const gfx::Rect
   //context params suppose to be global - related to evas not the web view
   context_params_->x = left_rect_.x() + x;
   context_params_->y = left_rect_.y() + y;
+
+  UpdateHandleData();
 }
 
 bool SelectionBoxEfl::IsInEditField() const {
-  if (editable_ && !(left_rect_.width() && !(left_rect_.height()))) {
-    LOG(INFO) << "SelectionBoxEfl::IsInEditField : true";
-    return true;
-  }
-  LOG(INFO) << "SelectionBoxEfl::IsInEditField : false";
-  return false;
+  return (editable_ && !(left_rect_.width() && !(left_rect_.height())));
 }
 
 }

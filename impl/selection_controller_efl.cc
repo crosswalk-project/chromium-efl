@@ -19,7 +19,6 @@
 
 #include "eweb_view.h"
 #include "selection_controller_efl.h"
-#include "selection_handle_efl.h"
 #include "selection_box_efl.h"
 #include "selection_magnifier_efl.h"
 
@@ -33,11 +32,7 @@ static const int spacePadding = 0; // 24;// This is for making context menu clos
 static const int textSelectionScrollSize = 50;// Scroll step when selection handler is moving out of viewport.
 
 static bool IsRectEmpty(const gfx::Rect& rect) {
-  if (rect.x() == 0 && rect.y() == 0 && rect.height() == 0 && rect.width() == 0) {
-    LOG(INFO) << "SelectionControllerEfl:IsRectEmpty : true";
-    return true;
-  }
-  return false;
+  return (rect.x() == 0 && rect.y() == 0 && rect.height() == 0 && rect.width() == 0);
 }
 
 SelectionControllerEfl::SelectionControllerEfl(EWebView* parent_view)
@@ -54,37 +49,40 @@ SelectionControllerEfl::SelectionControllerEfl(EWebView* parent_view)
 }
 
 void SelectionControllerEfl::SetSelectionStatus(bool enable) {
-  LOG(INFO) << "SelectionControllerEfl::SetSelectionStatus " << enable;
+  TRACE_EVENT1("selection,efl", __PRETTY_FUNCTION__, "enable", enable);
   selection_data_->SetStatus(enable);
 }
 
 bool SelectionControllerEfl::GetSelectionStatus() const {
-  LOG(INFO) << "SelectionControllerEfl::GetSelectionStatus " << selection_data_->GetStatus();
+  TRACE_EVENT1("selection,efl", __PRETTY_FUNCTION__,
+               "status", selection_data_->GetStatus());
   return selection_data_->GetStatus();
 }
 
 void SelectionControllerEfl::SetSelectionEditable(bool enable) {
-  LOG(INFO) << "SelectionControllerEfl::SetSelectionEditable" << enable;
+  TRACE_EVENT1("selection,efl", __PRETTY_FUNCTION__, "enable", enable);
   selection_data_->SetEditable(enable);
 }
 
 bool SelectionControllerEfl::GetSelectionEditable() const {
-  LOG(INFO) << "SelectionControllerEfl::GetSelectionEditable " << selection_data_->GetEditable();
+  TRACE_EVENT1("selection,efl", __PRETTY_FUNCTION__,
+               "editable", selection_data_->GetEditable());
   return selection_data_->GetEditable();
 }
 
 void SelectionControllerEfl::SetCaretSelectionStatus(const bool enable) {
-  LOG(INFO) << "SelectionControllerEfl::SetCaretSelectionStatus : " << enable;
+  TRACE_EVENT1("selection,efl", __PRETTY_FUNCTION__, "caret selection", enable);
   selection_data_->SetCaretSelectionStatus(enable);
 }
 
 bool SelectionControllerEfl::GetCaretSelectionStatus() const {
-  LOG(INFO) << "SelectionControllerEfl::GetCaretSelectionStatus : " << selection_data_->GetCaretSelectionStatus();
+  TRACE_EVENT1("selection,efl", __PRETTY_FUNCTION__,
+               "caret selection", selection_data_->GetCaretSelectionStatus());
   return selection_data_->GetCaretSelectionStatus();
 }
 
 void SelectionControllerEfl::SetScrollStatus(const bool enable) {
-  LOG(INFO) << __PRETTY_FUNCTION__ << " enable : " << enable;
+  TRACE_EVENT1("selection,efl", __PRETTY_FUNCTION__, "scroll status", enable);
   scrolling_ = enable;
   if (enable)
     Clear();
@@ -93,7 +91,7 @@ void SelectionControllerEfl::SetScrollStatus(const bool enable) {
 }
 
 bool SelectionControllerEfl::GetScrollStatus() {
-  LOG(INFO) << __PRETTY_FUNCTION__ << " " << scrolling_;
+  TRACE_EVENT1("selection,efl", __PRETTY_FUNCTION__, "scroll status", scrolling_);
   return scrolling_;
 }
 
@@ -106,7 +104,7 @@ void SelectionControllerEfl::UpdateMagnifierScreen(Evas_Object* img) {
 }
 
 void SelectionControllerEfl::UpdateSelectionDataAndShow(const gfx::Rect& left_rect, const gfx::Rect& right_rect, bool is_anchor_first) {
-  LOG(INFO) << __PRETTY_FUNCTION__;
+  TRACE_EVENT0("selection,efl", __PRETTY_FUNCTION__);
   selection_data_->UpdateRectData(left_rect, right_rect, is_anchor_first);
 
   if (!IsSelectionValid(left_rect, right_rect)) {
@@ -127,7 +125,7 @@ void SelectionControllerEfl::UpdateSelectionDataAndShow(const gfx::Rect& left_re
 }
 
 void SelectionControllerEfl::ShowHandleAndContextMenuIfRequired() {
-  LOG(INFO) << __PRETTY_FUNCTION__;
+  TRACE_EVENT0("selection,efl", __PRETTY_FUNCTION__);
   if (!selection_data_->GetStatus())
     return;
 
@@ -204,14 +202,23 @@ void SelectionControllerEfl::OnMouseDown(const gfx::Point& touch_point) {
   ShowHandleAndContextMenuIfRequired();
 }
 
-void SelectionControllerEfl::OnMouseMove(const gfx::Point& touch_point, bool on_curson_handle) {
+void SelectionControllerEfl::OnMouseMove(const gfx::Point& touch_point, SelectionHandleEfl::HandleType handle) {
   // FIXME : Check the text Direction later
   magnifier_->UpdateLocation(touch_point);
   magnifier_->Move(touch_point);
-  if (!on_curson_handle)
-    parent_view_->SelectRange(start_handle_->GetBasePosition(), end_handle_->GetBasePosition());
-  else
-    parent_view_->MoveCaret(input_handle_->GetBasePosition());
+  switch (handle) {
+    case SelectionHandleEfl::HANDLE_TYPE_INPUT:
+      parent_view_->MoveCaret(input_handle_->GetBasePosition());
+      return;
+    case SelectionHandleEfl::HANDLE_TYPE_LEFT:
+      parent_view_->SelectRange(end_handle_->GetBasePosition(),
+                                start_handle_->GetBasePosition());
+      return;
+    case SelectionHandleEfl::HANDLE_TYPE_RIGHT:
+      parent_view_->SelectRange(start_handle_->GetBasePosition(),
+                                end_handle_->GetBasePosition());
+      return;
+  }
 }
 
 void SelectionControllerEfl::OnMouseUp(const gfx::Point& touch_point) {
@@ -255,7 +262,9 @@ void SelectionControllerEfl::HandleLongPressEndEvent() {
 }
 
 bool SelectionControllerEfl::IsSelectionValid(const gfx::Rect& left_rect, const gfx::Rect& right_rect) {
-  LOG(INFO) << __PRETTY_FUNCTION__ << " l_x = " << left_rect.x() << " l_y = " << left_rect.y() << " r_x = " << right_rect.x() << " r_y = " << right_rect.y();
+  TRACE_EVENT2("selection,efl", __PRETTY_FUNCTION__,
+               "left_rect", left_rect.ToString(),
+               "right_rect", right_rect.ToString());
   // For all normal cases the widht will be 0 and we want to check empty which Implies
   // x, y, h w all to be 0
   if ((IsRectEmpty(left_rect) || IsRectEmpty(right_rect))) {
@@ -275,7 +284,6 @@ bool SelectionControllerEfl::IsSelectionValid(const gfx::Rect& left_rect, const 
     return false;
   }
 
-  LOG(INFO) << "SelectionControllerEfl::IsSelectionValid true";
   if (!GetSelectionStatus())
     SetSelectionStatus(true);
 
@@ -285,12 +293,11 @@ bool SelectionControllerEfl::IsSelectionValid(const gfx::Rect& left_rect, const 
       SetCaretSelectionStatus(false);
   }
 
-  LOG(INFO) << "SelectionControllerEfl::IsSelectionValid true";
   return true;
 }
 
 void SelectionControllerEfl::ClearSelection() {
-  LOG(INFO) << __PRETTY_FUNCTION__;
+  TRACE_EVENT0("selection,efl", __PRETTY_FUNCTION__);
   Clear();
   selection_data_->SetStatus(false);
   SetSelectionEditable(false);
@@ -298,7 +305,7 @@ void SelectionControllerEfl::ClearSelection() {
 }
 
 void SelectionControllerEfl::OnParentParentViewMove() {
-  LOG(INFO) << __PRETTY_FUNCTION__;
+  TRACE_EVENT0("selection,efl", __PRETTY_FUNCTION__);
   parent_view_->CancelContextMenu(0);
   start_handle_->Move(start_handle_->GetBasePosition());
   end_handle_->Move(end_handle_->GetBasePosition());

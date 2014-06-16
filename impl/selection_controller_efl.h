@@ -25,8 +25,8 @@
 #include "ui/gfx/range/range.h"
 #include "ui/gfx/image/image_skia.h"
 #include "ui/gfx/rect.h"
-#include "selection_handle_efl.h"
 #include "selection_box_efl.h"
+#include "selection_handle_efl.h"
 #include "selection_magnifier_efl.h"
 
 class EWebView;
@@ -73,7 +73,7 @@ class SelectionControllerEfl {
   void GetSelectionBounds(gfx::Rect* left, gfx::Rect* right);
   // Handles the mouse press,move and relase events on selection handles
   void OnMouseDown(const gfx::Point& touch_point);
-  void OnMouseMove(const gfx::Point& touch_point, bool on_curson_handle);
+  void OnMouseMove(const gfx::Point& touch_point, SelectionHandleEfl::HandleType);
   void OnMouseUp(const gfx::Point& touch_point);
 
   void SetCaretSelectionStatus(const bool enable);
