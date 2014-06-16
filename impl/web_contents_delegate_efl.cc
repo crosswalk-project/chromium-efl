@@ -369,7 +369,7 @@ void WebContentsDelegateEfl::RequestCertificateConfirm(WebContents* /*web_conten
     callback.Run(true);
 }
 
-void WebContentsDelegateEfl::SetContentSecurityPolicy(const std::string& policy, Ewk_CSP_Header_Type header_type) {
+void WebContentsDelegateEfl::SetContentSecurityPolicy(const std::string& policy, tizen_webview::ContentSecurityPolicyType header_type) {
   if (document_created_) {
     RenderViewHost* rvh = web_contents_->GetRenderViewHost();
     rvh->Send(new EwkViewMsg_SetCSP(rvh->GetRoutingID(), policy, header_type));
@@ -457,7 +457,7 @@ void WebContentsDelegateEfl::DidFirstVisuallyNonEmptyPaint(int32 page_id) {
 void WebContentsDelegateEfl::OnGetContentSecurityPolicy(IPC::Message* reply_msg) {
   document_created_ = true;
   if (!pending_content_security_policy_.get()) {
-    EwkHostMsg_GetContentSecurityPolicy::WriteReplyParams(reply_msg, std::string(), EWK_DEFAULT_POLICY);
+    EwkHostMsg_GetContentSecurityPolicy::WriteReplyParams(reply_msg, std::string(), TW_CSP_DEFAULT_POLICY);
   } else {
     EwkHostMsg_GetContentSecurityPolicy::WriteReplyParams(reply_msg,
         pending_content_security_policy_->policy, pending_content_security_policy_->header_type);

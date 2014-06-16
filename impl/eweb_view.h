@@ -71,6 +71,9 @@
 #include "browser/selectpicker/popup_picker.h"
 #endif
 
+#include "tizen_webview/public/tw_hit_test.h"
+#include "tizen_webview/public/tw_touch_event.h"
+#include "tizen_webview/public/tw_content_security_policy.h"
 #include "tizen_webview/public/tw_input_type.h"
 #include "tizen_webview/public/tw_find_options.h"
 #include "tizen_webview/public/tw_touch_event.h"
@@ -259,7 +262,7 @@ class EWebView
   void InvokeAuthCallbackOnUI(_Ewk_Auth_Challenge* auth_challenge);
   void set_auth_challenge(_Ewk_Auth_Challenge* ac) { auth_challenge_.reset(ac); }
   _Ewk_Auth_Challenge* get_auth_challenge() const { return auth_challenge_.get(); }
-  void SetContentSecurityPolicy(const char* policy, Ewk_CSP_Header_Type type);
+  void SetContentSecurityPolicy(const char* policy, tizen_webview::ContentSecurityPolicyType type);
   void ShowPopupMenu(const gfx::Rect& rect, WebCore::TextDirection textDirection, double pageScaleFactor, const std::vector<content::MenuItem>& items, int data, int selectedIndex);
   Eina_Bool HidePopupMenu();
   bool FormIsNavigating() const { return formIsNavigating_; }

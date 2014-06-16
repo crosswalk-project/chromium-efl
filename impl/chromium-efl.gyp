@@ -234,6 +234,7 @@
       'selection_magnifier_efl.h',
       # tizen_webview
       #TODO: making separate gyp for tizen_webview
+      '<(chrome_src_dir)/tizen_webview/public/tw_content_security_policy.h',
       '<(chrome_src_dir)/tizen_webview/public/tw_custom_handlers.h',
       '<(chrome_src_dir)/tizen_webview/public/tw_custom_handlers.cc',
       '<(chrome_src_dir)/tizen_webview/public/tw_hit_test.h',

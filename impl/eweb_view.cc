@@ -1149,7 +1149,7 @@ void EWebView::UpdateWebKitPreferences() {
   render_view_host->UpdateWebkitPreferences(settings_->getPreferences());
 }
 
-void EWebView::SetContentSecurityPolicy(const char* policy, Ewk_CSP_Header_Type type) {
+void EWebView::SetContentSecurityPolicy(const char* policy, tizen_webview::ContentSecurityPolicyType type) {
   web_contents_delegate_->SetContentSecurityPolicy((policy ? policy : std::string()), type);
 }
 

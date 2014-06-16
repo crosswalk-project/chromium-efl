@@ -8,6 +8,7 @@
 #include "content/public/renderer/render_view_observer.h"
 #include "API/ewk_hit_test_private.h"
 #include "third_party/WebKit/public/platform/WebSize.h"
+#include "tizen_webview/public/tw_content_security_policy.h"
 #include "tizen_webview/public/tw_hit_test.h"
 
 namespace base {
@@ -41,7 +42,7 @@ class RenderViewObserverEfl: public content::RenderViewObserver {
   virtual void DidUpdateLayout() OVERRIDE;
 
  private:
-  void OnSetContentSecurityPolicy(const std::string& policy, Ewk_CSP_Header_Type header_type);
+  void OnSetContentSecurityPolicy(const std::string& policy, tizen_webview::ContentSecurityPolicyType header_type);
   void OnScale(double scale_factor, int x, int y);
   void OnSetScroll(int x, int y);
   void OnUseSettingsFont();

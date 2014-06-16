@@ -20,6 +20,8 @@
 #include "third_party/WebKit/Source/platform/text/TextDirection.h"
 #include "ui/base/ime/text_input_type.h"
 
+#include "tizen_webview/public/tw_content_security_policy.h"
+
 class DidPrintPagesParams;
 
 namespace tizen_webview {
@@ -136,7 +138,7 @@ class WebContentsDelegateEfl
   virtual void DidDownloadFavicon(bool success, const GURL& icon_url, const SkBitmap& bitmap);
 
   void OnFormSubmit(const GURL&);
-  void SetContentSecurityPolicy(const std::string& policy, Ewk_CSP_Header_Type header_type);
+  void SetContentSecurityPolicy(const std::string& policy, tizen_webview::ContentSecurityPolicyType header_type);
   void ShowPopupMenu(const gfx::Rect& rect, WebCore::TextDirection textDirection, double pageScaleFactor, const std::vector<MenuItem>& items, int data, int selectedIndex);
   void HidePopupMenu();
   virtual void ShowContextMenu(RenderFrameHost* render_frame_host, const ContextMenuParams& params) OVERRIDE;
@@ -177,12 +179,12 @@ class WebContentsDelegateEfl
   scoped_ptr<WebContents> web_contents_;
 
   struct ContentSecurityPolicy {
-    ContentSecurityPolicy(const std::string& p, Ewk_CSP_Header_Type type)
+    ContentSecurityPolicy(const std::string& p, tizen_webview::ContentSecurityPolicyType type)
         : policy(p),
           header_type(type) {
     }
     std::string policy;
-    Ewk_CSP_Header_Type header_type;
+    tizen_webview::ContentSecurityPolicyType header_type;
   };
 
   // Structure to hold media request and its callback.

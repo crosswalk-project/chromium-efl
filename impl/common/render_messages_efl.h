@@ -16,6 +16,7 @@
 #include "third_party/WebKit/public/web/WebNavigationType.h"
 #include "url/gurl.h"
 
+#include "tizen_webview/public/tw_content_security_policy.h"
 #include "tizen_webview/public/tw_hit_test.h"
 #include "tizen_webview/public/tw_wrt.h"
 
@@ -40,7 +41,7 @@ IPC_STRUCT_TRAITS_BEGIN(CacheParamsEfl)
   IPC_STRUCT_TRAITS_MEMBER(cache_max_dead_capacity)
 IPC_STRUCT_TRAITS_END()
 
-IPC_ENUM_TRAITS(Ewk_CSP_Header_Type)
+IPC_ENUM_TRAITS(tizen_webview::ContentSecurityPolicyType)
 
 IPC_ENUM_TRAITS(blink::WebNavigationPolicy)
 IPC_ENUM_TRAITS(blink::WebNavigationType)
@@ -146,7 +147,7 @@ IPC_MESSAGE_ROUTED0(EwkViewMsg_GetSelectionStyle)
 
 IPC_MESSAGE_ROUTED2(EwkViewMsg_SetCSP,
                     std::string, /* policy */
-                    Ewk_CSP_Header_Type /* header type */)
+                    tizen_webview::ContentSecurityPolicyType /* header type */)
 
 IPC_MESSAGE_ROUTED2(EwkViewMsg_SetScroll,
                     int, /* horizontal position */
@@ -173,7 +174,7 @@ IPC_SYNC_MESSAGE_CONTROL1_1(EwkHostMsg_DecideNavigationPolicy,
 
 IPC_SYNC_MESSAGE_ROUTED0_2(EwkHostMsg_GetContentSecurityPolicy,
                            std::string, /* policy */
-                           Ewk_CSP_Header_Type /* header type */)
+                           tizen_webview::ContentSecurityPolicyType /* header type */)
 
 IPC_SYNC_MESSAGE_ROUTED1_1(EwkHostMsg_WrtSyncMessage,
                            tizen_webview::WrtIpcMessageData /* data */,

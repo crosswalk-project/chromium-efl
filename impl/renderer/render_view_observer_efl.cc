@@ -151,15 +151,15 @@ bool RenderViewObserverEfl::OnMessageReceived(const IPC::Message& message)
 void RenderViewObserverEfl::DidCreateDocumentElement(blink::WebFrame* frame)
 {
   std::string policy;
-  Ewk_CSP_Header_Type type = EWK_DEFAULT_POLICY;
+  tizen_webview::ContentSecurityPolicyType type = TW_CSP_DEFAULT_POLICY;
   Send(new EwkHostMsg_GetContentSecurityPolicy(render_view()->GetRoutingID(), &policy, &type));
   // Since, Webkit supports some more types and we cast ewk type to Webkit type.
   // We allow only ewk types.
-  if (type == EWK_REPORT_ONLY || type == EWK_ENFORCE_POLICY)
+  if (type == TW_CSP_REPORT_ONLY || type == TW_CSP_ENFORCE_POLICY)
     frame->document().setContentSecurityPolicyUsingHeader(blink::WebString::fromUTF8(policy), type);
 }
 
-void RenderViewObserverEfl::OnSetContentSecurityPolicy(const std::string& policy, Ewk_CSP_Header_Type header_type)
+void RenderViewObserverEfl::OnSetContentSecurityPolicy(const std::string& policy, tizen_webview::ContentSecurityPolicyType header_type)
 {
   blink::WebView* view = render_view()->GetWebView();
   DCHECK(view);

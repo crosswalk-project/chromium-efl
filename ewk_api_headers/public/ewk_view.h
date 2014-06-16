@@ -258,13 +258,6 @@ struct Ewk_View_Smart_Data {
     } changed;
 };
 
-enum _Ewk_CSP_Header_Type {
-  EWK_REPORT_ONLY,
-  EWK_ENFORCE_POLICY,
-  EWK_DEFAULT_POLICY
-};
-typedef enum _Ewk_CSP_Header_Type Ewk_CSP_Header_Type;
-
 /**
  * Callback for ewk_view_script_execute
  *
