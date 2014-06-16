@@ -56,6 +56,8 @@ class WebContentsDelegateEfl
 
   virtual void ToggleFullscreenModeForTab(WebContents* web_contents,
                                           bool enter_fullscreen) OVERRIDE;
+  virtual bool IsFullscreenForTabOrPending(
+      const WebContents* web_contents) const OVERRIDE;
   virtual void RequestMediaAccessPermission(
       WebContents* web_contents,
       const MediaStreamRequest& request,
@@ -153,6 +155,7 @@ class WebContentsDelegateEfl
                               IPC::Message* reply);
 
   EWebView* web_view_;
+  bool is_fullscreen_;
   scoped_ptr<WebContents> web_contents_;
 
   struct ContentSecurityPolicy {

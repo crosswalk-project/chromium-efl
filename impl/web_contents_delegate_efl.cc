@@ -117,11 +117,18 @@ void WebContentsDelegateEfl::CloseContents(WebContents* source) {
 
 void WebContentsDelegateEfl::ToggleFullscreenModeForTab(WebContents* web_contents,
       bool enter_fullscreen) {
+  is_fullscreen_ = enter_fullscreen;
   if(enter_fullscreen)
     web_view_->SmartCallback<EWebViewCallbacks::EnterFullscreen>().call();
   else
     web_view_->SmartCallback<EWebViewCallbacks::ExitFullscreen>().call();
 }
+
+bool WebContentsDelegateEfl::IsFullscreenForTabOrPending(
+      const WebContents* web_contents) const {
+  return is_fullscreen_;
+}
+
 void WebContentsDelegateEfl::RegisterProtocolHandler(WebContents* web_contents,
         const std::string& protocol, const GURL& url, const string16& title, bool user_gesture) {
   scoped_ptr<Ewk_Custom_Handlers_Data> protocol_data(new Ewk_Custom_Handlers_Data(protocol.c_str(), url.host().c_str(),

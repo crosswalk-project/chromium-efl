@@ -1496,6 +1496,11 @@ void MHTMLCallbackDetails::Run(Evas_Object* obj, const std::string& mhtml_conten
     callback_func_(obj, mhtml_content.c_str(), user_data_);
 }
 
+bool EWebView::IsFullscreen() {
+  WebContents* web_contents = web_contents_delegate_->web_contents();
+  return web_contents_delegate_->IsFullscreenForTabOrPending(web_contents);
+}
+
 void EWebView::ExitFullscreen() {
   RenderViewHost* rvh = web_contents_delegate_->web_contents()->GetRenderViewHost();
   if (!rvh)

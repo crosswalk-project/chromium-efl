@@ -1099,6 +1099,14 @@ void RenderWidgetHostViewEfl::OnDidInputEventHandled(const blink::WebInputEvent*
 #endif
 
 void RenderWidgetHostViewEfl::HandleGesture(ui::GestureEvent* event) {
+  if ((event->type() == ui::ET_GESTURE_PINCH_BEGIN ||
+       event->type() == ui::ET_GESTURE_PINCH_UPDATE ||
+       event->type() == ui::ET_GESTURE_PINCH_END) &&
+      (!pinch_zoom_enabled_ || eweb_view()->IsFullscreen())) {
+    event->SetHandled();
+    return;
+  }
+
   blink::WebGestureEvent gesture = content::MakeWebGestureEventFromUIEvent(*event);
 
   gesture.x = event->x();

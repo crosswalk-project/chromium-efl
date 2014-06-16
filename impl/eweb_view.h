@@ -231,6 +231,7 @@ class EWebView
 
   bool GetMHTMLData(Ewk_View_MHTML_Data_Get_Callback callback, void* user_data);
   void OnMHTMLContentGet(const std::string& mhtml_content, int callback_id);
+  bool IsFullscreen();
   void ExitFullscreen();
   double GetScale();
   void DidChangePageScaleFactor(double scale_factor);
