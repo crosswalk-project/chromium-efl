@@ -26,6 +26,8 @@
 #include "content/public/browser/browser_thread.h"
 #include "content/public/browser/storage_partition.h"
 #include "content/public/browser/render_process_host.h"
+#include "content/public/browser/local_storage_usage_info.h"
+#include "content/public/browser/dom_storage_context.h"
 #include "net/http/http_cache.h"
 #include "net/proxy/proxy_config_service_fixed.h"
 #include "net/proxy/proxy_service.h"
@@ -50,6 +52,38 @@ using std::pair;
 using std::map;
 
 namespace {
+
+/**
+ * @brief Helper class for obtaining WebStorage origins
+ */
+class WebStorageGetAllOriginsDispatcher: public base::RefCountedThreadSafe<WebStorageGetAllOriginsDispatcher> {
+public:
+  WebStorageGetAllOriginsDispatcher(Ewk_Web_Storage_Origins_Get_Callback callback, void* user_data)
+    : callback_(callback)
+    , user_data_(user_data) {
+    DCHECK(callback_);
+    DCHECK(user_data_);
+  }
+
+  void Dispatch(const std::vector<content::LocalStorageUsageInfo> &local_storage) {
+    DCHECK(BrowserThread::CurrentlyOn(BrowserThread::UI));
+
+    Eina_List* lorigins = NULL;
+
+    std::vector<content::LocalStorageUsageInfo>::const_iterator it;
+
+    for (it = local_storage.begin(); it != local_storage.end(); it++) {
+      _Ewk_Security_Origin* origin = new _Ewk_Security_Origin(it->origin);
+      lorigins = eina_list_append(lorigins, origin);
+    }
+
+    callback_(lorigins, user_data_);
+  }
+
+private:
+  Ewk_Web_Storage_Origins_Get_Callback callback_;
+  void* user_data_;
+};
 
 void SetProxyConfigCallbackOnIOThread(base::WaitableEvent* done,
                             net::URLRequestContextGetter* url_request_context_getter,
@@ -377,6 +411,23 @@ void EWebContext::GetApplicationCacheUsage(
 void EWebContext::WebStorageDelete() {
   BrowsingDataRemoverEfl* remover = BrowsingDataRemoverEfl::CreateForUnboundedRange(browser_context_.get());
   remover->RemoveImpl(BrowsingDataRemoverEfl::REMOVE_LOCAL_STORAGE, GURL());
+}
+
+void EWebContext::WebStorageDelete(const GURL& origin) {
+  content::StoragePartition* partition =
+      BrowserContext::GetStoragePartition(browser_context_.get(), NULL);
+
+  partition->GetDOMStorageContext()->DeleteLocalStorage(origin);
+}
+
+void EWebContext::WebStorageOriginsAllGet(Ewk_Web_Storage_Origins_Get_Callback callback,
+                                                    void* user_data) {
+  content::StoragePartition* partition =
+      BrowserContext::GetStoragePartition(browser_context_.get(), NULL);
+
+  WebStorageGetAllOriginsDispatcher* dispatcher = new WebStorageGetAllOriginsDispatcher(callback, user_data);
+
+  partition->GetDOMStorageContext()->GetLocalStorageUsage(base::Bind(&WebStorageGetAllOriginsDispatcher::Dispatch, dispatcher));
 }
 
 void EWebContext::IndexedDBDelete() {

@@ -94,6 +94,8 @@ class EWebContext : public EWebObject {
   void WebDBDelete(const GURL& host);
   void IndexedDBDelete();
   void WebStorageDelete();
+  void WebStorageDelete(const GURL& origin);
+  void WebStorageOriginsAllGet(Ewk_Web_Storage_Origins_Get_Callback callback, void* user_data);
   void FileSystemDelete(const GURL& host);
   void GetAllOriginsWithFileSystem(Ewk_Local_File_System_Origins_Get_Callback callback, void* user_data) const;
 
