@@ -374,11 +374,16 @@ bool WebContentsDelegateEfl::OnMessageReceived(const IPC::Message& message) {
     IPC_MESSAGE_HANDLER_DELAY_REPLY(EwkHostMsg_GetContentSecurityPolicy, OnGetContentSecurityPolicy)
     IPC_MESSAGE_HANDLER(EwkHostMsg_DidPrintPagesToPdf, OnPrintedMetafileReceived)
     IPC_MESSAGE_HANDLER(EwkHostMsg_WrtMessage, OnWrtPluginMessage)
+    IPC_MESSAGE_HANDLER(EwkHostMsg_FormSubmit, OnFormSubmit)
     IPC_MESSAGE_HANDLER_DELAY_REPLY(EwkHostMsg_WrtSyncMessage, OnWrtPluginSyncMessage)
     IPC_MESSAGE_UNHANDLED(handled = false)
   IPC_END_MESSAGE_MAP()
 
   return handled;
+}
+
+void WebContentsDelegateEfl::OnFormSubmit(const GURL&url) {
+  web_view_->SmartCallback<EWebViewCallbacks::FormSubmit>().call(url.GetContent().c_str());
 }
 
 void WebContentsDelegateEfl::OnWrtPluginMessage(const Ewk_IPC_Wrt_Message_Data& data) {

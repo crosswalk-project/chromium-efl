@@ -129,6 +129,7 @@ class WebContentsDelegateEfl
                                    const std::vector<FaviconURL>& candidates) OVERRIDE;
   virtual void DidDownloadFavicon(bool success, const GURL& icon_url, const SkBitmap& bitmap);
 
+  void OnFormSubmit(const GURL&);
   void SetContentSecurityPolicy(const std::string& policy, Ewk_CSP_Header_Type header_type);
   void OnHeadersReceived(PolicyResponseDelegateEfl* delegate,
                          const GURL& request,

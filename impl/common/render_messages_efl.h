@@ -230,6 +230,9 @@ IPC_MESSAGE_ROUTED1(EwkViewMsg_SetDrawsTransparentBackground,
 IPC_MESSAGE_ROUTED1(EwkHostMsg_OrientationChangeEvent,
                     int /* orientation */)
 
+// Notifies the browser to form submit
+IPC_MESSAGE_ROUTED1(EwkHostMsg_FormSubmit, GURL)
+
 IPC_MESSAGE_ROUTED1(EwkViewMsg_WebAppIconUrlGet,
                     int /* callback id */)
 

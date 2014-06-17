@@ -53,6 +53,7 @@ class RenderViewObserverEfl: public content::RenderViewObserver {
   void OnGetMHTMLData(int callback_id);
   void OnSetDrawsTransparentBackground(bool enabled);
   void OnWebAppIconUrlGet(int callback_id);
+  void WillSubmitForm(blink::WebFrame* frame, const blink::WebFormElement& form);
 
   blink::WebSize max_scroll_offset_;
   float cached_min_page_scale_factor_;

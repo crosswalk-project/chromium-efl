@@ -15,7 +15,7 @@
 #include "third_party/WebKit/public/platform/WebSize.h"
 #include "third_party/WebKit/public/platform/WebString.h"
 #include "third_party/WebKit/public/web/WebDocument.h"
-#include "third_party/WebKit/public/web/WebElement.h"
+#include "third_party/WebKit/public/web/WebFormElement.h"
 #include "third_party/WebKit/public/web/WebFrame.h"
 #include "third_party/WebKit/public/web/WebFrame.h"
 #include "third_party/WebKit/public/web/WebHitTestResult.h"
@@ -386,4 +386,9 @@ void RenderViewObserverEfl::OnWebAppIconUrlGet(int callback_id)
 void RenderViewObserverEfl::OrientationChangeEvent(int orientation)
 {
   Send(new EwkHostMsg_OrientationChangeEvent(render_view()->GetRoutingID(), orientation));
+}
+
+void RenderViewObserverEfl::WillSubmitForm(blink::WebFrame* frame, const blink::WebFormElement& form) {
+  GURL url(form.action());
+  Send(new EwkHostMsg_FormSubmit(routing_id(),url));
 }

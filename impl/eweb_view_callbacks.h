@@ -120,7 +120,8 @@ enum CallbackType {
   ClipboardOpened,
   ConsoleMessage,
   WrtPluginsMessage,
-  IconReceived
+  IconReceived,
+  FormSubmit
 };
 
 template <CallbackType>
@@ -215,6 +216,7 @@ DECLARE_EWK_VIEW_CALLBACK(WindowResizable, "window,resizable", bool*);
 // Note: type 'void' means that no arguments are expected.
 
 DECLARE_EWK_VIEW_CALLBACK(FileChooserRequest, "file,chooser,request", Ewk_File_Chooser_Request*);
+DECLARE_EWK_VIEW_CALLBACK(FormSubmit, "form,submit", const char*);
 DECLARE_EWK_VIEW_CALLBACK(LoadFinished, "load,finished", void);
 DECLARE_EWK_VIEW_CALLBACK(LoadStarted, "load,started", void);
 DECLARE_EWK_VIEW_CALLBACK(LoadError, "load,error", _Ewk_Error*);
