@@ -881,8 +881,8 @@ void RenderWidgetHostViewEfl::AcceleratedSurfaceBuffersSwapped(
   int gpu_host_id) {
 #ifdef OS_TIZEN
   next_pixmap_id_ = params.pixmap_id;
-#endif
   evas_object_image_pixels_dirty_set(content_image_, true);
+#endif
 
   AcceleratedSurfaceMsg_BufferPresented_Params ack_params;
   ack_params.sync_point = 0;
@@ -934,12 +934,8 @@ gfx::Rect RenderWidgetHostViewEfl::GetBoundsInRootWindow() {
 }
 
 gfx::GLSurfaceHandle RenderWidgetHostViewEfl::GetCompositingSurface() {
-#ifdef OS_TIZEN
   gfx::NativeViewId window_id = GetNativeViewId();
   return gfx::GLSurfaceHandle(static_cast<gfx::PluginWindowHandle>(window_id), gfx::NATIVE_TRANSPORT);
-#else
-  return gfx::GLSurfaceHandle();
-#endif
 }
 
 void RenderWidgetHostViewEfl::ResizeCompositingSurface(const gfx::Size& size) {

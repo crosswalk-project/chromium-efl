@@ -50,6 +50,7 @@ content::MainFunctionParams CommandLineEfl::GetDefaultPortParams() {
   p_command_line->AppendSwitch(switches::kEnableSpatialNavigation);
 #else
   p_command_line->AppendSwitchASCII(switches::kUseGL, gfx::kGLImplementationDesktopName);
+  p_command_line->AppendSwitch(switches::kDisableDelegatedRenderer);
 #endif
 
   p_command_line->AppendSwitch(switches::kDisableDelegatedRenderer);
