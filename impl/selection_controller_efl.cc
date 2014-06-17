@@ -24,6 +24,9 @@
 
 #include <Edje.h>
 
+// FIXME: To use BLINK_TEXT_DIR, following line needs to be modified later.
+#define WEBKIT_TEXT_DIR "/usr/share/ewebkit2-0/locale/po"
+
 namespace content {
 
 static const int menuHeight = 140;// The Height fo the context menu.
@@ -46,6 +49,12 @@ SelectionControllerEfl::SelectionControllerEfl(EWebView* parent_view)
        input_handle_(new SelectionHandleEfl(this, SelectionHandleEfl::HANDLE_TYPE_INPUT, parent_view->evas_object())),
        magnifier_(new SelectionMagnifierEfl(this)) {
   evas_object_event_callback_add(parent_view_->evas_object(), EVAS_CALLBACK_MOVE, &EvasParentViewMoveCallback, this);
+
+#if defined(OS_TIZEN)
+  setlocale(LC_ALL, vconf_get_str(VCONFKEY_LANGSET));
+  bindtextdomain("WebKit", WEBKIT_TEXT_DIR);
+  vconf_notify_key_changed(VCONFKEY_LANGSET, PlatformLanguageChanged, this);
+#endif
 }
 
 void SelectionControllerEfl::SetSelectionStatus(bool enable) {
@@ -58,6 +67,21 @@ bool SelectionControllerEfl::GetSelectionStatus() const {
                "status", selection_data_->GetStatus());
   return selection_data_->GetStatus();
 }
+
+#if defined(OS_TIZEN)
+void SelectionControllerEfl::PlatformLanguageChanged(keynode_t* keynode, void* data) {
+  setlocale(LC_ALL, vconf_get_str(VCONFKEY_LANGSET));
+  bindtextdomain("WebKit", WEBKIT_TEXT_DIR);
+
+  SelectionControllerEfl* selection_controller = static_cast<SelectionControllerEfl*>(data);
+  if (!selection_controller)
+    return;
+
+  if (selection_controller->GetSelectionStatus())
+    selection_controller->ClearSelectionViaEWebView();
+  selection_controller->HideHandleAndContextMenu();
+}
+#endif
 
 void SelectionControllerEfl::SetSelectionEditable(bool enable) {
   TRACE_EVENT1("selection,efl", __PRETTY_FUNCTION__, "enable", enable);
@@ -101,6 +125,10 @@ void SelectionControllerEfl::UpdateSelectionData(const base::string16& text) {
 
 void SelectionControllerEfl::UpdateMagnifierScreen(Evas_Object* img) {
   magnifier_->UpdateScreen(img);
+}
+
+void SelectionControllerEfl::ClearSelectionViaEWebView() {
+  parent_view_->ClearSelection();
 }
 
 void SelectionControllerEfl::UpdateSelectionDataAndShow(const gfx::Rect& left_rect, const gfx::Rect& right_rect, bool is_anchor_first) {

@@ -29,6 +29,12 @@
 #include "selection_handle_efl.h"
 #include "selection_magnifier_efl.h"
 
+#if defined(OS_TIZEN)
+#include "vconf/vconf.h"
+#endif
+
+#include <libintl.h>
+
 class EWebView;
 
 namespace content {
@@ -81,6 +87,7 @@ class SelectionControllerEfl {
 
   // Clears the selection and hides context menu and handles
   void ClearSelection();
+  void ClearSelectionViaEWebView();
   EWebView* GetParentView() { return parent_view_; }
   void HideHandle();
   void HideHandleAndContextMenu();
@@ -101,6 +108,10 @@ class SelectionControllerEfl {
 
   static void EvasParentViewMoveCallback(void *data, Evas *e, Evas_Object *obj, void *event_info)
   { reinterpret_cast<SelectionControllerEfl*>(data)->OnParentParentViewMove(); }
+
+#if defined(OS_TIZEN)
+  static void PlatformLanguageChanged(keynode_t* keynode, void* data);
+#endif
 
   void OnParentParentViewMove();
 

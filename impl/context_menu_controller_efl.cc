@@ -78,33 +78,33 @@ void ContextMenuControllerEfl::GetProposedContextMenu() {
   if (!params_.link_url.is_empty())
     AddItemToPropsedList(MENU_ITEM_TYPE_ACTION,
                          MENU_ITEM_OPEN_LINK_IN_NEW_WINDOW,
-                         std::string("Open in new window"),
+                         std::string(dgettext("WebKit","IDS_WEBVIEW_OPT_OPEN_LINK_IN_NEW_TAB_ABB")),
                          std::string(),
                          params_.link_url.spec(),
                          std::string());
   if (!params_.selection_text.empty())
     AddItemToPropsedList(MENU_ITEM_TYPE_ACTION,
                          MENU_ITEM_CUT,
-                         std::string("Cut"),
+                         std::string(dgettext("WebKit","IDS_WEBVIEW_OPT_CUT_ABB")),
                          std::string(),
                          std::string(),
                          std::string());
   if (params_.is_editable) {
     AddItemToPropsedList(MENU_ITEM_TYPE_ACTION,
                          MENU_ITEM_SELECT_WORD,
-                         std::string("Select"),
+                         std::string(dgettext("WebKit","IDS_WEBVIEW_OPT_SELECT_ABB")),
                          std::string(),
                          std::string(),
                          std::string());
     AddItemToPropsedList(MENU_ITEM_TYPE_ACTION,
                          MENU_ITEM_SELECT_ALL,
-                         std::string("Select All"),
+                         std::string(dgettext("WebKit","IDS_WEBVIEW_OPT_SELECT_ALL_ABB")),
                          std::string(),
                          std::string(),
                          std::string());
     AddItemToPropsedList(MENU_ITEM_TYPE_ACTION,
                          MENU_ITEM_PASTE,
-                         std::string("Paste"),
+                         std::string(dgettext("WebKit","IDS_WEBVIEW_OPT_PASTE")),
                          std::string(),
                          std::string(),
                          std::string());
@@ -112,27 +112,27 @@ void ContextMenuControllerEfl::GetProposedContextMenu() {
   if (!params_.selection_text.empty())
     AddItemToPropsedList(MENU_ITEM_TYPE_ACTION,
                          MENU_ITEM_COPY,
-                         std::string("Copy"),
+                         std::string(dgettext("WebKit","IDS_WEBVIEW_OPT_COPY")),
                          std::string(),
                          std::string(),
                          std::string());
   if (params_.has_image_contents && !params_.link_url.is_empty())
     AddItemToPropsedList(MENU_ITEM_TYPE_ACTION,
                          MENU_ITEM_OPEN_IMAGE_IN_NEW_WINDOW,
-                         std::string("Open Image"),
+                         std::string(dgettext("WebKit","IDS_WEBVIEW_OPT_OPEN_IMAGE_IN_NEW_TAB_ABB")),
                          params_.link_url.spec(),
                          params_.link_url.spec(),
                          std::string());
   if (!params_.has_image_contents && !params_.link_url.is_empty())
     AddItemToPropsedList(MENU_ITEM_TYPE_ACTION,
                          MENU_ITEM_TEXT_SELECTION_MODE,
-                         std::string("Select Mode"),
+                         std::string(dgettext("WebKit","IDS_WEBVIEW_OPT_SELECTION_MODE_ABB")),
                          params_.link_url.spec(),
                          params_.link_url.spec(),
                          std::string());
   AddItemToPropsedList(MENU_ITEM_TYPE_ACTION,
                        MENU_ITEM_CLIPBOARD,
-                       std::string("Clipboard"),
+                       std::string(dgettext("WebKit","IDS_WEBVIEW_OPT_CLIPBOARD")),
                        std::string(),
                        std::string(),
                        std::string());
