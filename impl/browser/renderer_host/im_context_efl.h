@@ -139,6 +139,7 @@ class IMContextEfl {
   PreeditQueue preedit_queue_;
 
   bool is_handling_keydown_;
+  ui::TextInputType input_type_;
 };
 
 } // namespace content

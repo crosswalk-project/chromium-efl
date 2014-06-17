@@ -84,7 +84,8 @@ IMContextEfl::IMContextEfl(RenderWidgetHostViewEfl* view, Ecore_IMF_Context* con
       enabled_(false),
       panel_was_ever_shown_(false),
       is_in_form_tag_(false),
-      is_handling_keydown_(false) {
+      is_handling_keydown_(false),
+      input_type_(ui::TEXT_INPUT_TYPE_NONE) {
   IM_CTX_LOG;
   InitializeIMFContext(context_);
 }
@@ -146,6 +147,7 @@ void IMContextEfl::UpdateInputMethodState(ui::TextInputType input_type,
                                           bool is_user_action) {
   IM_CTX_LOG << "textinputtype=" << input_type;
 
+  input_type_ = input_type;
   bool enabled = input_type != ui::TEXT_INPUT_TYPE_NONE;
 
   enabled_ = enabled;
@@ -175,6 +177,7 @@ void IMContextEfl::UpdateInputMethodState(ui::TextInputType input_type,
 void IMContextEfl::UpdateInputMethodState(ui::TextInputType input_type) {
   IM_CTX_LOG << "textinputtype=" << input_type;
 
+  input_type_ = input_type;
   bool enabled = input_type != ui::TEXT_INPUT_TYPE_NONE;
   enabled_ = enabled;
 
@@ -204,6 +207,8 @@ void IMContextEfl::ShowPanel(ui::TextInputType input_type, ui::TextInputMode inp
   switch (input_type) {
     case ui::TEXT_INPUT_TYPE_TEXT:
       layout = ECORE_IMF_INPUT_PANEL_LAYOUT_NORMAL;
+      if (!is_in_form_tag_)
+        return_key_type = ECORE_IMF_INPUT_PANEL_RETURN_KEY_TYPE_DONE;
       break;
     case ui::TEXT_INPUT_TYPE_PASSWORD:
       layout = ECORE_IMF_INPUT_PANEL_LAYOUT_PASSWORD;
@@ -218,6 +223,8 @@ void IMContextEfl::ShowPanel(ui::TextInputType input_type, ui::TextInputMode inp
       break;
     case ui::TEXT_INPUT_TYPE_NUMBER:
       layout = ECORE_IMF_INPUT_PANEL_LAYOUT_NUMBER;
+      if (!is_in_form_tag_)
+        return_key_type = ECORE_IMF_INPUT_PANEL_RETURN_KEY_TYPE_DONE;
       break;
     case ui::TEXT_INPUT_TYPE_TELEPHONE:
       layout = ECORE_IMF_INPUT_PANEL_LAYOUT_PHONENUMBER;
@@ -358,9 +365,15 @@ void IMContextEfl::SetIsInFormTag(bool is_in_form_tag) {
   if (is_in_form_tag_)
     ecore_imf_context_input_panel_return_key_type_set(context_,
       ECORE_IMF_INPUT_PANEL_RETURN_KEY_TYPE_GO);
-  else
-    ecore_imf_context_input_panel_return_key_type_set(context_,
+  else {
+    if (input_type_ == ui::TEXT_INPUT_TYPE_TEXT ||
+        input_type_ == ui::TEXT_INPUT_TYPE_NUMBER)
+      ecore_imf_context_input_panel_return_key_type_set(context_,
+      ECORE_IMF_INPUT_PANEL_RETURN_KEY_TYPE_DONE);
+    else
+      ecore_imf_context_input_panel_return_key_type_set(context_,
       ECORE_IMF_INPUT_PANEL_RETURN_KEY_TYPE_DEFAULT);
+  }
 }
 
 void IMContextEfl::OnCommit(void* event_info) {
