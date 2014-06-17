@@ -29,6 +29,18 @@
 #include "url/gurl.h"
 #include "browser/favicon/favicon_service.h"
 
+#ifdef TIZEN_AUTOFILL_SUPPORT
+#include "browser/autofill/autofill_manager_delegate_efl.h"
+#include "browser/password_manager/password_manager_client_efl.h"
+#include "components/autofill/content/browser/autofill_driver_impl.h"
+#include "components/autofill/core/browser/autofill_manager.h"
+#include "components/web_modal/web_contents_modal_dialog_manager.h"
+
+using autofill::AutofillDriverImpl;
+using autofill::AutofillManager;
+using autofill::AutofillManagerDelegateEfl;
+#endif
+
 using base::string16;
 
 namespace content {
@@ -50,6 +62,14 @@ WebContentsDelegateEfl::WebContentsDelegateEfl(EWebView* view)
   web_contents_.reset(WebContents::Create(WebContents::CreateParams(browser_context)));
   web_contents_->SetDelegate(this);
   Observe(web_contents_.get());
+
+#ifdef TIZEN_AUTOFILL_SUPPORT
+  AutofillManagerDelegateEfl::CreateForWebContents(web_contents_.get());
+  AutofillDriverImpl::CreateForWebContentsAndDelegate(web_contents_.get(),
+      AutofillManagerDelegateEfl::FromWebContents(web_contents_.get()),
+      "en-US", AutofillManager::DISABLE_AUTOFILL_DOWNLOAD_MANAGER);
+  PasswordManagerClientEfl::CreateForWebContents(web_contents_.get());
+#endif
 }
 
 WebContentsDelegateEfl::WebContentsDelegateEfl(EWebView* view, WebContents* contents)

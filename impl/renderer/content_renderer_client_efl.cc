@@ -15,9 +15,23 @@
 
 #include "components/editing/content/renderer/editorclient_agent.h"
 #include "components/visitedlink/renderer/visitedlink_slave.h"
+
+#ifdef TIZEN_AUTOFILL_SUPPORT
+#include "components/autofill/content/renderer/autofill_agent.h"
+#include "components/autofill/content/renderer/password_autofill_agent.h"
+#include "components/autofill/content/renderer/password_generation_agent.h"
+#include "components/autofill/core/common/password_generation_util.h"
+#endif
+
 #include "renderer/content_renderer_client_efl.h"
 #include "navigation_policy_params.h"
 #include "wrt/wrtwidget.h"
+
+#ifdef TIZEN_AUTOFILL_SUPPORT
+using autofill::AutofillAgent;
+using autofill::PasswordAutofillAgent;
+using autofill::PasswordGenerationAgent;
+#endif
 
 ContentRendererClientEfl::ContentRendererClientEfl() {
   wrt_widget_.reset(new WrtWidget);
@@ -39,6 +53,16 @@ void ContentRendererClientEfl::RenderViewCreated(content::RenderView* render_vie
   // Deletes itself when render_view is destroyed.
   new RenderViewObserverEfl(render_view);
   new editing::EditorClientAgent(render_view);
+
+#ifdef TIZEN_AUTOFILL_SUPPORT
+  PasswordGenerationAgent* password_generation_agent =
+      new PasswordGenerationAgent(render_view);
+  PasswordAutofillAgent* password_autofill_agent =
+      new PasswordAutofillAgent(render_view);
+  new AutofillAgent(render_view,
+                    password_autofill_agent,
+                    password_generation_agent);
+#endif
 }
 
 bool ContentRendererClientEfl::HandleNavigation(content::RenderFrame* render_frame,
