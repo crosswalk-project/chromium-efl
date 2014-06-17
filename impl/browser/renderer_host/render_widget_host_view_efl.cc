@@ -534,6 +534,7 @@ void RenderWidgetHostViewEfl::TextInputStateChanged(
 
   if (im_context_) {
     im_context_->UpdateInputMethodState(params.type);
+    web_view_->QuerySelectionStyle();
   }
 
   if (GetSelectionController()) {
