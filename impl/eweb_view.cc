@@ -32,7 +32,7 @@
 #include "public/ewk_private.h"
 #include "web_contents_delegate_efl.h"
 #include "public/platform/WebString.h"
-
+#include "base/command_line.h"
 #include "base/files/file_path.h"
 #include "base/logging.h"
 #include "base/strings/utf_string_conversions.h"
@@ -49,6 +49,7 @@
 #include "content/public/browser/host_zoom_map.h"
 #include "skia/ext/platform_canvas.h"
 #include "third_party/WebKit/public/web/WebFindOptions.h"
+#include "ui/events/event_switches.h"
 #include "ui/events/gestures/gesture_recognizer.h"
 #include "browser/motion/wkext_motion.h"
 #include "grit/webkit_strings.h"
@@ -88,7 +89,11 @@ inline Ewk_View_Smart_Data* ToSmartData(const Evas_Object* evas_object) {
 }
 
 static inline bool isHardwareBackKey(const Evas_Event_Key_Down *event) {
+#ifdef OS_TIZEN
   return (strcmp(event->key, "XF86Stop") == 0);
+#else
+  return (strcmp(event->key, "Escape") == 0);
+#endif
 }
 
 void SmartDataChanged(Ewk_View_Smart_Data* d) {
@@ -300,11 +305,13 @@ EWebView::EWebView(EWebContext* context, Evas_Object* object)
     UnsubscribeMotionEvents();
   }
   evas_object_smart_callback_call(evas_object(), "motion,enable", (void*)&enable);
-
-  SetTouchEventsEnabled(true);
-#else
-  SetMouseEventsEnabled(true);
 #endif
+
+  CommandLine *cmdline = CommandLine::ForCurrentProcess();
+  if (cmdline->HasSwitch(switches::kTouchEvents))
+    SetTouchEventsEnabled(true);
+  else
+    SetMouseEventsEnabled(true);
 
   //allow this object and its children to get a focus
   elm_object_tree_focus_allow_set (object, EINA_TRUE);
@@ -1325,21 +1332,11 @@ void EWebView::UpdateHitTestData(const Ewk_Hit_Test& hit_test_data, const NodeAt
   hit_test_completion_.Signal();
 }
 
-void EWebView::OnCopyFromBackingStore(bool success, const SkBitmap& bitmap) {
-#warning "[M37] Need proper implementation for OnCopyFromBackingStore"
-  // if (selection_controller_->GetSelectionStatus() || selection_controller_->GetCaretSelectionStatus())
-  //   selection_controller_->UpdateMagnifierScreen(bitmap);
-}
-
 void EWebView::GetSnapShotForRect(const gfx::Rect& display) {
-#warning "[M37] Need proper implementation for GetSnapShotForRect"
-  // RenderViewHost* render_view_host = web_contents_delegate_->web_contents()->GetRenderViewHost();
-  // render_view_host->GetSnapshotFromRenderer(display,
-  //                                           base::Bind(&EWebView::OnCopyFromBackingStore,
-  //                                           base::Unretained(this)));
   Evas_Object *magnifImg = NULL;
   rwhv()->SaveImage(&magnifImg, display);
-  selection_controller_->UpdateMagnifierScreen(magnifImg);
+  if (magnifImg)
+    selection_controller_->UpdateMagnifierScreen(magnifImg);
 }
 
 bool EWebView::GetSnapshot(Eina_Rectangle rect, Evas_Object *image) {
@@ -1663,11 +1660,17 @@ bool EWebView::SetColorPickerColor(int r, int g, int b, int a) {
 }
 
 bool EWebView::IsIMEShow() {
-  return rwhv()->im_context()->IsShow();
+  if (rwhv()->im_context())
+    return rwhv()->im_context()->IsShow();
+
+  return false;
 }
 
 gfx::Rect EWebView::GetIMERect() {
-  return rwhv()->im_context()->GetIMERect();
+  if (rwhv()->im_context())
+    return rwhv()->im_context()->GetIMERect();
+
+  return gfx::Rect();
 }
 
 std::string EWebView::GetErrorPage(const std::string& invalidUrl) {

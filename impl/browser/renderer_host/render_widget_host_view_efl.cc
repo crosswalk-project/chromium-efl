@@ -605,6 +605,7 @@ void RenderWidgetHostViewEfl::DidStopFlinging() {
 }
 
 void RenderWidgetHostViewEfl::SaveImage(Evas_Object **img, const gfx::Rect &bounds) {
+#ifdef OS_TIZEN
   int width = bounds.width();
   int height = bounds.height();
   int x = bounds.x();
@@ -634,6 +635,10 @@ void RenderWidgetHostViewEfl::SaveImage(Evas_Object **img, const gfx::Rect &boun
 
   delete(bits);
   delete(tmp);
+#else
+  NOTIMPLEMENTED();
+  *img = NULL;
+#endif
 }
 
 void RenderWidgetHostViewEfl::CopyFromCompositingSurface(
