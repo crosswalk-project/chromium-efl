@@ -1,6 +1,8 @@
 #ifndef WEB_CONTENTS_DELEGATE_EFL
 #define WEB_CONTENTS_DELEGATE_EFL
 
+#include <deque>
+
 #include "base/memory/scoped_ptr.h"
 #include "base/memory/weak_ptr.h"
 #include "content/public/browser/browser_context.h"
@@ -153,6 +155,7 @@ class WebContentsDelegateEfl
                                    const base::string16& source_id) OVERRIDE;
   void RunFileChooser(WebContents* web_contents, const FileChooserParams& params);
   ColorChooser* OpenColorChooser(WebContents* web_contents, SkColor color, const std::vector<ColorSuggestion>& suggestions);
+  void OnAccessRequestResponse(Eina_Bool allowed);
 
  private:
   void OnGetContentSecurityPolicy(IPC::Message* reply_msg);
@@ -173,6 +176,17 @@ class WebContentsDelegateEfl
     Ewk_CSP_Header_Type header_type;
   };
 
+  // Structure to hold media request and its callback.
+  struct PendingAccessRequest {
+    PendingAccessRequest(const content::MediaStreamRequest& request,
+                         const content::MediaResponseCallback& callback);
+    ~PendingAccessRequest();
+    content::MediaStreamRequest request;
+    content::MediaResponseCallback callback;
+  };
+
+  //Queue to hold all pending request for requesting user permissions.
+  std::deque<PendingAccessRequest> requests_Queue_;
   scoped_ptr<ContentSecurityPolicy> pending_content_security_policy_;
   bool document_created_;
   bool should_open_new_window_;

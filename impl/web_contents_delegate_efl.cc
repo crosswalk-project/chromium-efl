@@ -142,45 +142,62 @@ void WebContentsDelegateEfl::RegisterProtocolHandler(WebContents* web_contents,
   web_view_->SmartCallback<EWebViewCallbacks::RegisterProtocolHandler>().call(protocol_data.get());
 }
 
+WebContentsDelegateEfl::PendingAccessRequest::PendingAccessRequest(
+  const content::MediaStreamRequest& request,
+  const content::MediaResponseCallback& callback)
+  : request(request)
+  , callback(callback) {
+}
+
+WebContentsDelegateEfl::PendingAccessRequest::~PendingAccessRequest() {
+}
+
+void WebContentsDelegateEfl::OnAccessRequestResponse(Eina_Bool allowed) {
+#warning "[M37] Fix media permissions"
+#if 0
+  MediaStreamDevices devices;
+  DVLOG(1) << __FUNCTION__ << " Queue Size: " << requests_Queue_.size();
+  if (requests_Queue_.empty()) {
+    DVLOG(1) << __FUNCTION__ << " Empty Queue ";
+    return;
+  }
+  PendingAccessRequest pending_request = requests_Queue_.front();
+  if (pending_request.callback.is_null()) {
+    requests_Queue_.pop_front();
+    DVLOG(1) << __FUNCTION__ << " Invalid Callback ";
+    return;
+  }
+  if (allowed) {
+    if (pending_request.request.audio_type == content::MEDIA_DEVICE_AUDIO_CAPTURE) {
+      DVLOG(1) << __FUNCTION__ << "Added Audio Device";
+      devices.push_back(MediaStreamDevice(pending_request.request.audio_type,
+                                          "default", "Default"));
+    }
+    if (pending_request.request.video_type == content::MEDIA_DEVICE_VIDEO_CAPTURE) {
+      DVLOG(1) << __FUNCTION__ << " Added Video Device";
+      devices.push_back(MediaStreamDevice(pending_request.request.video_type,
+                                          "1", "1"));
+    }
+    pending_request.callback.Run(devices, scoped_ptr<MediaStreamUI>());
+  } else {
+    DVLOG(1) << __FUNCTION__ << " Decline request with empty list";
+    pending_request.callback.Run(MediaStreamDevices(),
+                                 scoped_ptr<MediaStreamUI>());
+  }
+  requests_Queue_.pop_front();
+#endif
+}
+
 void WebContentsDelegateEfl::RequestMediaAccessPermission(
         WebContents* web_contents,
         const MediaStreamRequest& request,
         const MediaResponseCallback& callback) {
-#if 0
+  //send callback to application to request for user permission.
   _Ewk_User_Media_Permission_Request* media_permission_request =
-      new _Ewk_User_Media_Permission_Request(web_view_, request);
-
-  web_view_->SmartCallback<EWebViewCallbacks::UserMediaPermission>().call(media_permission_request);
-  MediaStreamDevices devices;
-  if (media_permission_request->isDecided) {
-    // TODO: we have to re-look at this when we actually connect to camera and mic (user media)
-    // and how it is used in engine side. sending dummy data for now.
-    // How do we construct a MediaStreamDevice?
-    MediaStreamDevice audio_device(request.audio_type,
-        request.requested_audio_device_id /*id*/,
-        request.requested_audio_device_id/*name*/);
-    MediaStreamDevice video_device(request.video_type,
-            request.requested_video_device_id /*id*/,
-            request.requested_video_device_id/*name*/);
-    devices.push_back(audio_device);
-    devices.push_back(video_device);
-    //FIXME: This crashes somewhere inside, so we return an empty list for now.
-    callback.Run(MediaStreamDevices(), scoped_ptr<MediaStreamUI>());
-  }
-  else {
-    // Nothing was approved by user, so send an empty list.
-    callback.Run(MediaStreamDevices(), scoped_ptr<MediaStreamUI>());
-  }
-#else
-  // FIXME This should be changed to the devices to which the user has granted
-  //       access.
-  MediaStreamDevices devices;
-  if (request.audio_type == content::MEDIA_DEVICE_AUDIO_CAPTURE)
-    devices.push_back(MediaStreamDevice(request.audio_type, "default", "Default"));
-  if (request.video_type == content::MEDIA_DEVICE_VIDEO_CAPTURE)
-    devices.push_back(MediaStreamDevice(request.video_type, "1", "1"));
-  callback.Run(devices, scoped_ptr<MediaStreamUI>());
-#endif
+    new _Ewk_User_Media_Permission_Request(web_view_, request,this);
+  requests_Queue_.push_back(PendingAccessRequest(request, callback));
+  web_view_->SmartCallback<EWebViewCallbacks::UserMediaPermission>().call(
+    media_permission_request);
 }
 
 void WebContentsDelegateEfl::OnAuthRequired(net::URLRequest* request,
