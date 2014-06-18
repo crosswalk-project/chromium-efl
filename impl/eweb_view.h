@@ -276,6 +276,8 @@ class EWebView
   void GetPageScaleRange(double *min_scale, double *max_scale);
   void DidChangePageScaleRange(double min_scale, double max_scale);
   void SetDrawsTransparentBackground(bool enabled);
+  void GetSessionData(const char **data, unsigned *length) const;
+  bool RestoreFromSessionData(const char *data, unsigned length);
   void ProcessAckedTouchEvent(const content::TouchEventWithLatencyInfo& touch,
                               content::InputEventAckState ack_result);
   void ShowFileChooser(const content::FileChooserParams&);

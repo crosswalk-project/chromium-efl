@@ -35,6 +35,7 @@
       '<(chrome_src_dir)/components/components.gyp:visitedlink_browser',
       '<(chrome_src_dir)/components/components.gyp:visitedlink_renderer',
       '<(chrome_src_dir)/third_party/icu/icu.gyp:icuuc',
+      '<(chrome_src_dir)/components/components.gyp:sessions',
     ],
     'defines': [
       'CHROMIUMCORE_IMPLEMENTATION=1',

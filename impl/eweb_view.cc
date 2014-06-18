@@ -19,12 +19,14 @@
 
 #include "eweb_view.h"
 
+#include "base/pickle.h"
 #include "base/threading/thread_restrictions.h"
 #include "browser/navigation_policy_handler_efl.h"
 #include "browser/renderer_host/render_widget_host_view_efl.h"
 #include "browser/renderer_host/web_event_factory_efl.h"
 #include "common/render_messages_efl.h"
 #include "common/version_info.h"
+#include "components/sessions/serialized_navigation_entry.h"
 #include "API/ewk_policy_decision_private.h"
 #include "API/ewk_settings_private.h"
 #include "API/ewk_text_style_private.h"
@@ -1588,6 +1590,67 @@ void EWebView::SetDrawsTransparentBackground(bool enabled) {
     return;
 
   render_view_host->Send(new EwkViewMsg_SetDrawsTransparentBackground(render_view_host->GetRoutingID(), enabled));
+}
+
+void EWebView::GetSessionData(const char **data, unsigned *length) const {
+  static const int MAX_SESSION_ENTRY_SIZE = std::numeric_limits<int>::max();
+
+  WebContents* contents = web_contents_delegate_->web_contents();
+  NavigationController &navigationController = contents->GetController();
+  Pickle sessionPickle;
+  const int itemCount = navigationController.GetEntryCount();
+
+  sessionPickle.WriteInt(itemCount);
+  sessionPickle.WriteInt(navigationController.GetCurrentEntryIndex());
+
+  for (int i = 0; i < itemCount; i++) {
+    NavigationEntry *navigationEntry = navigationController.GetEntryAtIndex(i);
+    sessions::SerializedNavigationEntry serializedEntry =
+      sessions::SerializedNavigationEntry::FromNavigationEntry(i, *navigationEntry);
+    serializedEntry.WriteToPickle(MAX_SESSION_ENTRY_SIZE, &sessionPickle);
+  }
+
+  *data = static_cast<char *>(malloc(sizeof(char) * sessionPickle.size()));
+  memcpy(const_cast<char *>(*data), sessionPickle.data(), sessionPickle.size());
+  *length = sessionPickle.size();
+}
+
+bool EWebView::RestoreFromSessionData(const char *data, unsigned length) {
+  Pickle sessionPickle(data, length);
+  PickleIterator pickleIterator(sessionPickle);
+  int entryCount;
+  int currentEntry;
+
+  if (!pickleIterator.ReadInt(&entryCount))
+    return false;
+  if (!pickleIterator.ReadInt(&currentEntry))
+    return false;
+
+  std::vector<sessions::SerializedNavigationEntry> serializedEntries;
+  serializedEntries.resize(entryCount);
+  for (int i = 0; i < entryCount; ++i) {
+    if (!serializedEntries.at(i).ReadFromPickle(&pickleIterator))
+      return false;
+  }
+
+  if (!entryCount)
+    return true;
+
+  std::vector<NavigationEntry *> navigationEntries =
+    sessions::SerializedNavigationEntry::ToNavigationEntries(serializedEntries, context()->browser_context());
+  WebContents* contents = web_contents_delegate_->web_contents();
+  NavigationController &navigationController = contents->GetController();
+
+  if (currentEntry < 0)
+    currentEntry = 0;
+
+  if (currentEntry >= navigationEntries.size())
+    currentEntry = navigationEntries.size() - 1;
+
+  navigationController.Restore(currentEntry,
+                               NavigationController::RESTORE_LAST_SESSION_EXITED_CLEANLY,
+                               &navigationEntries);
+  return true;
 }
 
 #ifdef OS_TIZEN
