@@ -66,7 +66,7 @@ JavaScriptModalCallbacksData* JavaScriptModalCallbacksData::CreateWithPromptDial
 }
 
 JavaScriptDialogManagerEfl::JavaScriptDialogManagerEfl()
-{
+    : dialog_(NULL) {
 }
 
 JavaScriptDialogManagerEfl::~JavaScriptDialogManagerEfl()
@@ -80,15 +80,39 @@ void JavaScriptDialogManagerEfl::RunJavaScriptDialog(content::WebContents* web_c
                                                      const base::string16& message_text,
                                                      const base::string16& default_prompt_text,
                                                      const DialogClosedCallback& callback,
-                                                     bool* did_suppress_message)
-{
+                                                     bool* did_suppress_message) {
   DCHECK(web_contents);
   dialog_closed_callback_ = callback;
   content::WebContentsDelegateEfl* web_contents_delegate =
       static_cast<content::WebContentsDelegateEfl*>(web_contents->GetDelegate());
   web_contents_delegate->web_view()->SmartCallback<EWebViewCallbacks::PopupReplyWaitStart>().call(0);
 
-  JavaScriptModalDialogEfl::CreateDialog(web_contents, origin_url, accept_lang, javascript_message_type, message_text, default_prompt_text, callback);
+  if (javascript_message_type == content::JAVASCRIPT_MESSAGE_TYPE_ALERT) {
+    if (alert_callback_data_) {
+      if (!(alert_callback_data_->Run(web_contents_delegate->web_view()->evas_object(),
+                                      UTF16ToUTF8(message_text).c_str(),
+                                      NULL)))
+        ExecuteDialogClosedCallBack(false, std::string());
+    }
+  }
+  if (javascript_message_type == content::JAVASCRIPT_MESSAGE_TYPE_CONFIRM) {
+    if (confirm_callback_data_) {
+      if (!(confirm_callback_data_->Run(web_contents_delegate->web_view()->evas_object(),
+                                        UTF16ToUTF8(message_text).c_str(),
+                                        NULL)))
+        ExecuteDialogClosedCallBack(false, std::string());
+    }
+  }
+  if (javascript_message_type == content::JAVASCRIPT_MESSAGE_TYPE_PROMPT) {
+    if (prompt_callback_data_) {
+      if (!(prompt_callback_data_->Run(web_contents_delegate->web_view()->evas_object(),
+                                       UTF16ToUTF8(message_text).c_str(),
+                                       UTF16ToUTF8(default_prompt_text).c_str())))
+        ExecuteDialogClosedCallBack(false, std::string());
+    }
+  }
+
+  dialog_ = JavaScriptModalDialogEfl::CreateDialog(web_contents, origin_url, accept_lang, javascript_message_type, message_text, default_prompt_text, callback);
 }
 
 void JavaScriptDialogManagerEfl::SetAlertCallback(Ewk_View_JavaScript_Alert_Callback callback, void* user_data)
@@ -109,6 +133,10 @@ void JavaScriptDialogManagerEfl::SetPromptCallback(Ewk_View_JavaScript_Prompt_Ca
 void JavaScriptDialogManagerEfl::ExecuteDialogClosedCallBack(bool result, const std::string prompt_data)
 {
   dialog_closed_callback_.Run(result, base::UTF8ToUTF16(prompt_data));
+  if(dialog_) {
+    dialog_->close();
+    delete dialog_;
+  }
 }
 
 void JavaScriptDialogManagerEfl::RunBeforeUnloadDialog(content::WebContents* web_contents,

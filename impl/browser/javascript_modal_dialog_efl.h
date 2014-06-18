@@ -26,12 +26,14 @@ class JavaScriptModalDialogEfl {
                            const base::string16& default_prompt_text,
                            const content::JavaScriptDialogManager::DialogClosedCallback& callback);
   virtual ~JavaScriptModalDialogEfl();
-  static void OkButtonHandlerForDialog(void *data, Evas_Object *obj, void *event_info);
-  static void CancelButtonHandlerForDialog(void *data, Evas_Object *obj, void *event_info);
+  static void OkButtonHandlerForAlert(void *data, Evas_Object *obj, void *event_info);
+  static void CancelButtonHandlerForAlert(void *data, Evas_Object *obj, void *event_info);
+  static void OkButtonHandlerForConfirm(void *data, Evas_Object *obj, void *event_info);
+  static void CancelButtonHandlerForConfirm(void *data, Evas_Object *obj, void *event_info);
   static void OkButtonHandlerForPrompt(void *data, Evas_Object *obj, void *event_info);
   static void CancelButtonHandlerForPrompt(void *data, Evas_Object *obj, void *event_info);
   static void javascriptPopupResizeCallback(void *data, Evas *e, Evas_Object *obj, void *event_info);
-  static void CreateDialog(content::WebContents* web_contents,
+  static JavaScriptModalDialogEfl* CreateDialog(content::WebContents* web_contents,
                            const GURL& origin_url,
                            const std::string& accept_lang,
                            content::JavaScriptMessageType javascript_message_type,

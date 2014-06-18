@@ -5,8 +5,14 @@
 #include "base/files/file_path.h"
 #include "paths_efl.h"
 
+#ifdef OS_TIZEN_MOBILE
+#include <dlfcn.h>
+#include <efl_assist.h>
+extern void* EflAssistHandle;
+#endif
+
 //static
-void JavaScriptModalDialogEfl::CreateDialog(content::WebContents* web_contents,
+JavaScriptModalDialogEfl* JavaScriptModalDialogEfl::CreateDialog(content::WebContents* web_contents,
                            const GURL& origin_url,
                            const std::string& accept_lang,
                            content::JavaScriptMessageType javascript_message_type,
@@ -113,7 +119,6 @@ bool JavaScriptModalDialogEfl::ShowJavaScriptDialog() {
     elm_object_style_set(cancel_button_, "popup");
     elm_object_text_set(cancel_button_, "Leave");
     elm_object_part_content_set(popup_, "button1", cancel_button_);
-    evas_object_focus_set(cancel_button_, true);
     evas_object_smart_callback_add(cancel_button_, "clicked", OkButtonHandlerForPrompt, this);
 
     ok_button_ = elm_button_add(popup_);
@@ -128,11 +133,10 @@ bool JavaScriptModalDialogEfl::ShowJavaScriptDialog() {
 
     ok_button_ = elm_button_add(popup_);
     elm_object_style_set(ok_button_, "popup");
-  elm_object_text_set(ok_button_, "OK");
+    elm_object_text_set(ok_button_, "OK");
     elm_object_part_content_set(popup_, "button1", ok_button_);
 
-    evas_object_focus_set(ok_button_, true);
-    evas_object_smart_callback_add(ok_button_, "clicked", OkButtonHandlerForDialog, this);
+    evas_object_smart_callback_add(ok_button_, "clicked", OkButtonHandlerForAlert, this);
   } else if(javascript_message_type_ == content::JAVASCRIPT_MESSAGE_TYPE_CONFIRM) {
     LOG(INFO) << "JAVASCRIPT_MESSAGE_TYPE_CONFIRM() ";
     if (!setLabelText(UTF16ToUTF8(message_text_).c_str()))
@@ -142,17 +146,29 @@ bool JavaScriptModalDialogEfl::ShowJavaScriptDialog() {
     elm_object_style_set(cancel_button_, "popup");
     elm_object_text_set(cancel_button_, "Cancel");
     elm_object_part_content_set(popup_, "button1", cancel_button_);
-    evas_object_smart_callback_add(cancel_button_, "clicked", CancelButtonHandlerForDialog, this);
+    evas_object_smart_callback_add(cancel_button_, "clicked", CancelButtonHandlerForConfirm, this);
 
     ok_button_ = elm_button_add(popup_);
     elm_object_style_set(ok_button_, "popup");
     elm_object_text_set(ok_button_, "OK");
     elm_object_part_content_set(popup_, "button2", ok_button_);
-    evas_object_smart_callback_add(ok_button_, "clicked", OkButtonHandlerForDialog, this);
-    evas_object_focus_set(ok_button_, true);
+    evas_object_smart_callback_add(ok_button_, "clicked", OkButtonHandlerForConfirm, this);
   }
 
+#ifdef OS_TIZEN_MOBILE
+  if (EflAssistHandle) {
+    void (*webkit_ea_object_event_callback_add)(Evas_Object *, Ea_Callback_Type , Ea_Event_Cb func, void *);
+    webkit_ea_object_event_callback_add = (void (*)(Evas_Object *, Ea_Callback_Type , Ea_Event_Cb func, void *))dlsym(EflAssistHandle, "ea_object_event_callback_add");
+    if(javascript_message_type_ == content::JAVASCRIPT_MESSAGE_TYPE_PROMPT || javascript_message_type_ == content::JAVASCRIPT_MESSAGE_TYPE_NAVIGATION_PROMPT)
+      (*webkit_ea_object_event_callback_add)(popup_, EA_CALLBACK_BACK, CancelButtonHandlerForPrompt, this);
+    else if(javascript_message_type_ == content::JAVASCRIPT_MESSAGE_TYPE_ALERT)
+      (*webkit_ea_object_event_callback_add)(popup_, EA_CALLBACK_BACK, CancelButtonHandlerForAlert, this);
+    else
+      (*webkit_ea_object_event_callback_add)(popup_, EA_CALLBACK_BACK, CancelButtonHandlerForConfirm, this);
+  }
+#endif
   evas_object_show(popup_);
+  evas_object_focus_set(popup_, true);
 
   return true;
 }
@@ -217,7 +233,11 @@ void JavaScriptModalDialogEfl::javascriptPopupResizeCallback(void *data, Evas *e
 
 
 Evas_Object* JavaScriptModalDialogEfl::popupAdd() {
-  widgetWin_ = elm_win_add(webview_, "WebKit JavaScript Popup", ELM_WIN_UTILITY);
+  Evas_Object* parent = elm_object_top_widget_get(elm_object_parent_widget_get(webview_));
+  if (!parent)
+    return 0;
+
+  widgetWin_ = elm_win_add(parent, "Blink JavaScript Popup", ELM_WIN_UTILITY);
   if (!widgetWin_)
     return 0;
 
@@ -258,7 +278,7 @@ Evas_Object* JavaScriptModalDialogEfl::popupAdd() {
   return elm_popup_add(layout);
 }
 
-void JavaScriptModalDialogEfl::OkButtonHandlerForDialog(void *data, Evas_Object *obj, void *event_info) {
+void JavaScriptModalDialogEfl::OkButtonHandlerForAlert(void *data, Evas_Object *obj, void *event_info) {
   JavaScriptModalDialogEfl* dialog = (JavaScriptModalDialogEfl*)data;
 
   dialog->callback_.Run(true, base::string16());
@@ -268,7 +288,27 @@ void JavaScriptModalDialogEfl::OkButtonHandlerForDialog(void *data, Evas_Object 
   dialog->web_contents_delegate_->web_view()->SmartCallback<EWebViewCallbacks::PopupReplyWaitFinish>().call(0);
 }
 
-void JavaScriptModalDialogEfl::CancelButtonHandlerForDialog(void *data, Evas_Object *obj, void *event_info) {
+void JavaScriptModalDialogEfl::CancelButtonHandlerForAlert(void *data, Evas_Object *obj, void *event_info) {
+  JavaScriptModalDialogEfl* dialog = (JavaScriptModalDialogEfl*)data;
+
+  dialog->callback_.Run(false, base::string16());
+  evas_object_del(elm_object_top_widget_get(obj));
+  dialog->close();
+
+  dialog->web_contents_delegate_->web_view()->SmartCallback<EWebViewCallbacks::PopupReplyWaitFinish>().call(0);
+}
+
+void JavaScriptModalDialogEfl::OkButtonHandlerForConfirm(void *data, Evas_Object *obj, void *event_info) {
+  JavaScriptModalDialogEfl* dialog = (JavaScriptModalDialogEfl*)data;
+
+  dialog->callback_.Run(true, base::string16());
+  evas_object_del(elm_object_top_widget_get(obj));
+  dialog->close();
+
+  dialog->web_contents_delegate_->web_view()->SmartCallback<EWebViewCallbacks::PopupReplyWaitFinish>().call(0);
+}
+
+void JavaScriptModalDialogEfl::CancelButtonHandlerForConfirm(void *data, Evas_Object *obj, void *event_info) {
   JavaScriptModalDialogEfl* dialog = (JavaScriptModalDialogEfl*)data;
 
   dialog->callback_.Run(false, base::string16());
