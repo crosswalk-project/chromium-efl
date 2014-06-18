@@ -591,12 +591,12 @@ void RenderWidgetHostViewEfl::SelectionBoundsChanged(
 }
 
 void RenderWidgetHostViewEfl::ScrollOffsetChanged() {
-  LOG(INFO) << __PRETTY_FUNCTION__;
   NOTIMPLEMENTED();
 }
 
 void RenderWidgetHostViewEfl::SelectionRootBoundsChanged(const gfx::Rect& rect) {
-  NOTIMPLEMENTED();
+  if (GetSelectionController())
+    GetSelectionController()->SetVisibilityBounds(rect);
 }
 
 void RenderWidgetHostViewEfl::DidStopFlinging() {

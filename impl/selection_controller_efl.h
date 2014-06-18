@@ -99,6 +99,8 @@ class SelectionControllerEfl {
   gfx::Rect GetLeftRect();
   gfx::Rect GetRightRect();
 
+  void SetVisibilityBounds(const gfx::Rect& rect) { visibility_rect_ = rect; }
+
   void ChangeContextMenuPosition(gfx::Point& position, int& drawDirection);
 
  private:
@@ -141,6 +143,9 @@ class SelectionControllerEfl {
 
   // Points to show the contents magnified
   scoped_ptr<SelectionMagnifierEfl> magnifier_;
+
+  // Visibility rectangle
+  gfx::Rect visibility_rect_;
 };
 
 }
