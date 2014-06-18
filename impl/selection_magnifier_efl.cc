@@ -113,16 +113,15 @@ void SelectionMagnifierEfl::OnAnimatorUp() {
 }
 
 void SelectionMagnifierEfl::UpdateLocation(const gfx::Point& location) {
-  gfx::Rect content_rect(location.x() - width_/2,
-                         location.y() - height_/2 + kHeightOffset,
-                         width_,
-                         height_);
   int device_x, device_y, device_width, device_height;
   evas_object_geometry_get(controller_->GetParentView()->evas_object(),
                            &device_x,
                            &device_y,
                            &device_width,
                            &device_height);
+
+  // substract device_x and device_y to correct offset if it exists.
+  gfx::Rect content_rect(location.x() - device_x - width_/2, location.y() - device_y - height_/2 + kHeightOffset,  width_, height_);
 
   // Adjustments for boundry conditions
   if (content_rect.x() < 0)
@@ -170,10 +169,10 @@ void SelectionMagnifierEfl::Move(const gfx::Point& location) {
   if (magnifier_location.y() < 0) // Do not let location to be negative
     magnifier_location.set_y(0);
 
-  if ((magnifier_location.x() - (width_/2)) <= device_x)
-    magnifier_location.set_x(width_/2);
-  else if ((magnifier_location.x() + width_/2) > device_width)
-    magnifier_location.set_x(device_width - width_/2);
+  if (width_/2+kHeightOffset >= magnifier_location.x())
+    magnifier_location.set_x(width_/2+kHeightOffset);
+  else if ((magnifier_location.x() + width_/2 + kHeightOffset) > device_width)
+    magnifier_location.set_x(device_width - width_/2 - kHeightOffset);
 
   // Only top condition is considered as for the bottom part the magnifer
   // will always be on top of the touch point so no need to consider
