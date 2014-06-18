@@ -8,26 +8,27 @@
 namespace content {
 
 class PopupControllerEfl {
-
+ public:
   enum Content_Type {
     EMAIL,
     PHONE,
     UNKNOWN
   };
 
- public:
   PopupControllerEfl(EWebView*);
   void openPopup(const char*);
   void closePopup();
   Evas_Object* popup() { return popup_; }
   Content_Type popupContentType() { return content_type_; }
   const std::string& content() { return content_; }
+  const std::string& fullContent() { return full_content_; }
 
  private:
   EWebView* web_view_;
   Evas_Object* popup_;
   Content_Type content_type_;
   std::string content_;
+  std::string full_content_;
 };
 
 } // namespace

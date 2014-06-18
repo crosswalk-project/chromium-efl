@@ -91,6 +91,7 @@
             '<!@(<(pkg-config) --cflags libtbm)',
             '<!@(<(pkg-config) --cflags libdri2)',
             '<!@(<(pkg-config) --cflags gles20)',
+            '<!@(<(pkg-config) --libs-only-l ui-gadget-1)',
          ],
          'link_settings': {
            'ldflags': [

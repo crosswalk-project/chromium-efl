@@ -1,5 +1,6 @@
 #include "base/logging.h"
 #include "popup_controller_efl.h"
+#include "components/clipboard/clipboard_helper_efl.h"
 #include <Eina.h>
 #include <Elementary.h>
 #include <Ecore_X.h>
@@ -9,13 +10,67 @@
 namespace content {
 
 static void item_selected_cb(void *data, Evas_Object *obj, void *event_info) {
+  PopupControllerEfl* controller = static_cast<PopupControllerEfl*>(data);
+  std::string info = elm_object_item_text_get(static_cast<Elm_Object_Item*>(event_info));
+
+  LOG(INFO) << __PRETTY_FUNCTION__ << " : " << info << " content: " << controller->fullContent().c_str()
+    << " type: " << controller->popupContentType();
+
+  controller->closePopup();
+
+  service_h svcHandle = 0;
+  if (service_create(&svcHandle) < 0 || !svcHandle) {
+    LOG(ERROR) << __PRETTY_FUNCTION__ << " : " << "could not create service.";
+    return;
+  }
+
+  if (controller->popupContentType() == PopupControllerEfl::PHONE) {
+    if (info == "Call") {
+      service_set_operation(svcHandle, SERVICE_OPERATION_DIAL);
+      service_set_uri(svcHandle, controller->fullContent().c_str());
+    } else if (info == "Send message") {
+      service_set_operation(svcHandle, SERVICE_OPERATION_COMPOSE);
+      service_add_extra_data(svcHandle, "http://tizen.org/appcontrol/data/messagetype", "sms");
+      service_add_extra_data(svcHandle, SERVICE_DATA_TO, controller->content().c_str());
+      service_add_extra_data(svcHandle, "http://tizen.org/appcontrol/data/return_result", "false");
+      service_set_app_id(svcHandle, "msg-composer-efl");
+    } else if (info == "Add to contacts") {
+      service_set_operation(svcHandle, "http://tizen.org/appcontrol/operation/social/add");
+      service_add_extra_data(svcHandle, "http://tizen.org/appcontrol/data/social/item_type", "contact");
+      service_add_extra_data(svcHandle, "http://tizen.org/appcontrol/data/social/phone", controller->content().c_str());
+      service_set_app_id(svcHandle, "contacts-details-efl");
+    }
+  } else if (controller->popupContentType() == PopupControllerEfl::EMAIL) {
+    if (info == "Send email") {
+      service_set_operation(svcHandle, SERVICE_OPERATION_COMPOSE);
+      service_add_extra_data(svcHandle, SERVICE_DATA_TO, controller->content().c_str());
+      service_set_app_id(svcHandle, "email-composer-efl");
+    } else if (info == "Add to contacts") {
+      service_set_operation(svcHandle, "http://tizen.org/appcontrol/operation/social/add");
+      service_add_extra_data(svcHandle, "http://tizen.org/appcontrol/data/social/item_type", "contact");
+      service_add_extra_data(svcHandle, "http://tizen.org/appcontrol/data/social/email", controller->content().c_str());
+      service_set_app_id(svcHandle, "contacts-details-efl");
+    }
+  }
+
+  int ret = service_send_launch_request(svcHandle, 0, 0);
+  if (ret != SERVICE_ERROR_NONE) {
+    LOG(ERROR) << __PRETTY_FUNCTION__ << " : " << "could not launch application.";
+    service_destroy(svcHandle);
+    return;
+  }
+  service_destroy(svcHandle);
+}
+
+static void copy_cb(void *data, Evas_Object *obj, void *event_info) {
+  PopupControllerEfl* controller = static_cast<PopupControllerEfl*>(data);
+
   LOG(INFO) << __PRETTY_FUNCTION__ << " : " << elm_object_item_text_get(static_cast<Elm_Object_Item*>(event_info))
-    << " content: " << static_cast<PopupControllerEfl*>(data)->content().c_str()
-    << " type: " << static_cast<PopupControllerEfl*>(data)->popupContentType();
+    << " content: " << controller->fullContent().c_str() << " type: " << controller->popupContentType();
 
-  // NOT IMPLEMENTED
+  ClipboardHelperEfl::GetInstance()->SetData(controller->content(), ClipboardHelperEfl::CLIPBOARD_DATA_TYPE_PLAIN_TEXT);
 
-  static_cast<PopupControllerEfl*>(data)->closePopup();
+  controller->closePopup();
 }
 
 static void block_clicked_cb(void *data, Evas_Object *obj, void *event_info) {
@@ -36,7 +91,7 @@ void PopupControllerEfl::openPopup(const char* message) {
   if (!popup_)
     return;
 
-  content_ = std::string(message);
+  full_content_ = std::string(message);
 
   if (content_.find("mailto:") != std::string::npos) {
     content_.erase(0, 7);
@@ -63,12 +118,12 @@ void PopupControllerEfl::openPopup(const char* message) {
   if (content_type_ == EMAIL) {
     elm_popup_item_append(popup_, "Send email", NULL, item_selected_cb, this);
     elm_popup_item_append(popup_, "Add to contacts", NULL, item_selected_cb, this);
-    elm_popup_item_append(popup_, "Copy", NULL, item_selected_cb, this);
+    elm_popup_item_append(popup_, "Copy", NULL, copy_cb, this);
   } else if (content_type_ == PHONE) {
     elm_popup_item_append(popup_, "Call", NULL, item_selected_cb, this);
     elm_popup_item_append(popup_, "Send message", NULL, item_selected_cb, this);
     elm_popup_item_append(popup_, "Add to contacts", NULL, item_selected_cb, this);
-    elm_popup_item_append(popup_, "Copy", NULL, item_selected_cb, this);
+    elm_popup_item_append(popup_, "Copy", NULL, copy_cb, this);
   }
 
   // Close popup after tapping on Block Event area
