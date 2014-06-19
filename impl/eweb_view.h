@@ -258,8 +258,11 @@ class EWebView
   void SelectLinkText(const gfx::Point& touch_point);
   bool GetSelectionRange(Eina_Rectangle* left_rect, Eina_Rectangle* right_rect);
   bool ClearSelection();
+  void GetSnapShotForRect(gfx::Rect& rect);
+
   // Callback OnCopyFromBackingStore will be called once we get the snapshot from render
-  void GetSnapShotForRect(const gfx::Rect& rect);
+  void OnCopyFromBackingStore(bool success, const SkBitmap& bitmap);
+
   // scale factor needs to be accommodated once HW acceleration is enabled.
   bool GetSnapshot(Eina_Rectangle rect, Evas_Object *image);
   void set_policy_decision(Ewk_Policy_Decision* pr) { policy_decision_.reset(pr); }
@@ -333,6 +336,7 @@ class EWebView
   int StartInspectorServer();
 
   std::string GetErrorPage(const std::string& invalidUrl);
+  void UpdateMagnifierScreen(const SkBitmap& bitmap);
 
  private:
   EWebView(EWebContext*, Evas_Object* smart_object);

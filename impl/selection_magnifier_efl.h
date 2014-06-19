@@ -38,7 +38,7 @@ class SelectionMagnifierEfl {
 
   void HandleLongPress(const gfx::Point& touch_point);
   void UpdateLocation(const gfx::Point& location);
-  void UpdateScreen(Evas_Object* img);
+  void UpdateScreen(const SkBitmap& display_image);
   void Move(const gfx::Point& location);
   void Show();
   void Hide();

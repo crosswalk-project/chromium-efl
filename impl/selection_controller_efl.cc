@@ -125,8 +125,8 @@ void SelectionControllerEfl::UpdateSelectionData(const base::string16& text) {
   selection_data_->UpdateSelectStringData(text);
 }
 
-void SelectionControllerEfl::UpdateMagnifierScreen(Evas_Object* img) {
-  magnifier_->UpdateScreen(img);
+void SelectionControllerEfl::UpdateMagnifierScreen(const SkBitmap& display_image) {
+  magnifier_->UpdateScreen(display_image);
 }
 
 void SelectionControllerEfl::ClearSelectionViaEWebView() {

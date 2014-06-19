@@ -32,6 +32,7 @@ namespace content {
 const int kWidthOffset = 32;
 const int kHeightOffset = 60;
 const float kZoomScale = 0.66;
+const int kMagnifierYOffset = 220;
 
 SelectionMagnifierEfl::SelectionMagnifierEfl(content::SelectionControllerEfl* controller)
   : controller_(controller),
@@ -112,7 +113,10 @@ void SelectionMagnifierEfl::OnAnimatorUp() {
 }
 
 void SelectionMagnifierEfl::UpdateLocation(const gfx::Point& location) {
-  gfx::Rect content_rect(location.x() - width_/2, location.y() - height_/2, width_, height_);
+  gfx::Rect content_rect(location.x() - width_/2,
+                         location.y() - height_/2 + kHeightOffset,
+                         width_,
+                         height_);
   int device_x, device_y, device_width, device_height;
   evas_object_geometry_get(controller_->GetParentView()->evas_object(),
                            &device_x,
@@ -126,31 +130,24 @@ void SelectionMagnifierEfl::UpdateLocation(const gfx::Point& location) {
   else if ((content_rect.x() + width_) > device_width)
     content_rect.set_x(device_width - width_);
 
-  if (content_rect.y() < 0)
-    content_rect.set_y(0);
+  if (content_rect.y() < height_) // Do not let location to be less then magnifier y value
+    content_rect.set_y(height_);
   else if ((content_rect.y() + height_) > device_height)
     content_rect.set_y(device_height - height_);
 
   controller_->GetParentView()->GetSnapShotForRect(content_rect);
 }
 
-void SelectionMagnifierEfl::UpdateScreen(Evas_Object* img) {
+void SelectionMagnifierEfl::UpdateScreen(const SkBitmap& display_image) {
   if (content_image_) {
     evas_object_del(content_image_);
     content_image_ = 0;
   }
 
-  //Evas* evas = evas_object_evas_get(controller_->GetParentView()->evas_object());
-  content_image_ = img; //evas_object_image_filled_add(evas);
-
-  //evas_object_image_colorspace_set(content_image_, EVAS_COLORSPACE_ARGB8888);
-  // evas_object_image_size_set(content_image_, width_, height_);
-  // evas_object_image_alpha_set(content_image_, EINA_TRUE);
-
-  // evas_object_image_data_copy_set(content_image_, display_image.getPixels());
-  evas_object_size_hint_min_set(content_image_, width_, height_);
-  // evas_object_resize(content_image_, width_, height_);
-  // evas_object_image_filled_set(content_image_, true);
+  Evas* evas = evas_object_evas_get(controller_->GetParentView()->evas_object());
+  content_image_ = evas_object_image_filled_add(evas);
+  evas_object_image_size_set(content_image_, width_, height_);
+  evas_object_image_data_copy_set(content_image_, display_image.getPixels());
   evas_object_show(content_image_);
 
   elm_object_part_content_set(container_, "swallow", content_image_);
@@ -161,9 +158,6 @@ void SelectionMagnifierEfl::UpdateScreen(Evas_Object* img) {
   evas_object_layer_set(content_image_, EVAS_LAYER_MAX);
 }
 
-// Inherited from WK2 w.r.t tizen style
-const int kMagnifierYOffset = 220;
-
 void SelectionMagnifierEfl::Move(const gfx::Point& location) {
   gfx::Point magnifier_location(location.x(), location.y() - kMagnifierYOffset);
   int device_x, device_y, device_width;
@@ -172,6 +166,9 @@ void SelectionMagnifierEfl::Move(const gfx::Point& location) {
                            &device_y,
                            &device_width,
                            0);
+
+  if (magnifier_location.y() < 0) // Do not let location to be negative
+    magnifier_location.set_y(0);
 
   if ((magnifier_location.x() - (width_/2)) <= device_x)
     magnifier_location.set_x(width_/2);

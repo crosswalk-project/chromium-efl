@@ -93,8 +93,6 @@ class RenderWidgetHostViewEfl
   virtual void TextInputStateChanged(
       const ViewHostMsg_TextInputState_Params& params) OVERRIDE;
 
-  void SaveImage(Evas_Object** img, const gfx::Rect& bounds);
-
   virtual void ImeCancelComposition() OVERRIDE;
   virtual void ImeCompositionRangeChanged(const gfx::Range&, const std::vector<gfx::Rect>&) OVERRIDE;
   virtual void DidUpdateBackingStore(const gfx::Rect&,
@@ -170,6 +168,8 @@ class RenderWidgetHostViewEfl
   void FilterInputMotion(const blink::WebGestureEvent& gesture_event);
   void makePinchZoom(void* eventInfo);
   void OnDidInputEventHandled(const blink::WebInputEvent* input_event, bool processed);
+  void GetSnapshotForRect(gfx::Rect& rect);
+  void SetRectSnapshot(const SkBitmap& bitmap);
 #endif
 
   Evas* evas() const {
@@ -307,6 +307,7 @@ class RenderWidgetHostViewEfl
   unsigned long current_pixmap_id_;
   unsigned long next_pixmap_id_;
   GLuint texture_id_;
+  int surface_id_;
 
   typedef std::queue<int> KeyUpEventQueue;
   KeyUpEventQueue keyupev_queue_;

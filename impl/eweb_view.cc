@@ -1502,11 +1502,20 @@ void EWebView::UpdateHitTestData(const Ewk_Hit_Test& hit_test_data, const NodeAt
   hit_test_completion_.Signal();
 }
 
-void EWebView::GetSnapShotForRect(const gfx::Rect& display) {
-  Evas_Object *magnifImg = NULL;
-  rwhv()->SaveImage(&magnifImg, display);
-  if (magnifImg)
-    selection_controller_->UpdateMagnifierScreen(magnifImg);
+void EWebView::OnCopyFromBackingStore(bool success, const SkBitmap& bitmap) {
+  if (selection_controller_->GetSelectionStatus() ||
+      selection_controller_->GetCaretSelectionStatus())
+    selection_controller_->UpdateMagnifierScreen(bitmap);
+}
+
+void EWebView::UpdateMagnifierScreen(const SkBitmap& bitmap) {
+  selection_controller_->UpdateMagnifierScreen(bitmap);
+}
+
+void EWebView::GetSnapShotForRect(gfx::Rect& rect) {
+#ifdef OS_TIZEN
+  rwhv()->GetSnapshotForRect(rect);
+#endif
 }
 
 bool EWebView::GetSnapshot(Eina_Rectangle rect, Evas_Object *image) {

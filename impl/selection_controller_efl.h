@@ -73,7 +73,7 @@ class SelectionControllerEfl {
   // To update the selection string
   void UpdateSelectionData(const base::string16& text);
   // To update the bitmap Image to show the magnifier
-  void UpdateMagnifierScreen(Evas_Object* img);
+  void UpdateMagnifierScreen(const SkBitmap& display_image);
   // To update the selection bounds
   void UpdateSelectionDataAndShow(const gfx::Rect& left_rect, const gfx::Rect& right_rect, bool is_anchor_first);
   void GetSelectionBounds(gfx::Rect* left, gfx::Rect* right);

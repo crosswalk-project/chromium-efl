@@ -23,6 +23,7 @@
 #include "content/browser/renderer_host/event_with_latency_info.h"
 #include "content/public/browser/browser_thread.h"
 #include "content/browser/renderer_host/dip_util.h"
+#include "content/browser/gpu/gpu_process_host.h"
 #include "content/common/cursors/webcursor_efl.h"
 #include "content/common/gpu/client/gl_helper.h"
 #include "content/public/browser/render_widget_host_view_frame_subscriber.h"
@@ -84,7 +85,8 @@ RenderWidgetHostViewEfl::RenderWidgetHostViewEfl(RenderWidgetHost* widget)
     m_magnifier(false),
     egl_image_(0),
     current_pixmap_id_(0),
-    next_pixmap_id_(0) {
+    next_pixmap_id_(0),
+    surface_id_(0) {
   host_->SetView(this);
 
   static bool scale_factor_initialized = false;
@@ -601,42 +603,18 @@ void RenderWidgetHostViewEfl::DidStopFlinging() {
     GetSelectionController()->SetScrollStatus(false);
 }
 
-void RenderWidgetHostViewEfl::SaveImage(Evas_Object **img, const gfx::Rect &bounds) {
 #ifdef OS_TIZEN
-  int width = bounds.width();
-  int height = bounds.height();
-  int x = bounds.x();
-  int y = GetViewBoundsInPix().height() - bounds.y() + height; // correction of Y axis to take proper snapshot from GL
-
-  Evas_GL_API* gl_api = evasGlApi();
-  DCHECK(gl_api);
-
-  int size = width * height;
-  GLubyte* tmp  = new GLubyte[size * 4];
-  GLubyte* bits = new GLubyte[size * 4];
-  gl_api->glFinish(); // Finish all commands of OpenGL
-  gl_api->glReadPixels(x, y, width, height, GL_RGBA, GL_UNSIGNED_BYTE, bits);
-  // Flip data after reading
-  for (int i = 0; i < height; i++) {
-      memcpy(&tmp[i * width * 4],
-             &bits[(height - i - 1) * width * 4],
-             width * 4 * sizeof(unsigned char));
-  }
-
-  *img = evas_object_image_filled_add(evas_);
-
-  evas_object_image_size_set(*img, width, height);
-  evas_object_image_alpha_set(*img, EINA_TRUE);
-  evas_object_image_data_copy_set(*img, tmp);
-  evas_object_resize(*img, width, height);
-
-  delete(bits);
-  delete(tmp);
-#else
-  NOTIMPLEMENTED();
-  *img = NULL;
-#endif
+void RenderWidgetHostViewEfl::SetRectSnapshot(const SkBitmap& bitmap) {
+  web_view_->UpdateMagnifierScreen(bitmap);
 }
+
+void RenderWidgetHostViewEfl::GetSnapshotForRect(gfx::Rect& rect) {
+  GpuProcessHost::SendOnIO(
+    GpuProcessHost::GPU_PROCESS_KIND_SANDBOXED,
+    CAUSE_FOR_GPU_LAUNCH_NO_LAUNCH,
+    new GpuMsg_GetPixelRegion(surface_id_, rect));
+}
+#endif
 
 void RenderWidgetHostViewEfl::CopyFromCompositingSurface(
   const gfx::Rect& src_subrect,
@@ -879,6 +857,7 @@ void RenderWidgetHostViewEfl::AcceleratedSurfaceBuffersSwapped(
 #ifdef OS_TIZEN
   next_pixmap_id_ = params.pixmap_id;
   evas_object_image_pixels_dirty_set(content_image_, true);
+  surface_id_ = params.surface_id;
 #endif
 
   AcceleratedSurfaceMsg_BufferPresented_Params ack_params;
