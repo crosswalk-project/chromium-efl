@@ -137,6 +137,7 @@ bool RenderViewObserverEfl::OnMessageReceived(const IPC::Message& message)
     IPC_MESSAGE_HANDLER(EwkViewMsg_PrintToPdf, OnPrintToPdf)
     IPC_MESSAGE_HANDLER(EwkViewMsg_GetMHTMLData, OnGetMHTMLData);
     IPC_MESSAGE_HANDLER(EwkViewMsg_WebAppIconUrlGet, OnWebAppIconUrlGet);
+    IPC_MESSAGE_HANDLER(EwkViewMsg_WebAppCapableGet, OnWebAppCapableGet);
     IPC_MESSAGE_HANDLER(EwkViewMsg_SetDrawsTransparentBackground, OnSetDrawsTransparentBackground);
     IPC_MESSAGE_HANDLER(EwkViewMsg_SetBrowserFont, OnSetBrowserFont);
     IPC_MESSAGE_UNHANDLED(handled = false)
@@ -382,6 +383,40 @@ void RenderViewObserverEfl::OnWebAppIconUrlGet(int callback_id)
     }
   }
   Send(new EwkHostMsg_WebAppIconUrlGet(render_view()->GetRoutingID(), appleIconUrl.empty() ? iconUrl : appleIconUrl, callback_id));
+}
+
+void RenderViewObserverEfl::OnWebAppCapableGet(int callback_id) {
+  blink::WebFrame *frame = render_view()->GetWebView()->mainFrame();
+  if (!frame)
+    return;
+
+  blink::WebDocument document = frame->document();
+  blink::WebElement head = document.head();
+  if (head.isNull())
+    return;
+
+  bool capable = false;
+  blink::WebNodeList nodes = head.childNodes();
+  for (int i = 0; i < nodes.length(); ++i) {
+    blink::WebNode node = nodes.item(i);
+    if (!node.isElementNode())
+      continue;
+
+    blink::WebElement elem = node.to<blink::WebElement>();
+    if (!elem.hasHTMLTagName("meta"))
+      continue;
+
+    std::string name = elem.getAttribute("name").utf8();
+    if (LowerCaseEqualsASCII(name, "apple-mobile-web-app-capable") ||   // Apple's way
+        LowerCaseEqualsASCII(name, "mobile-web-app-capable")) {         // Google's way
+      std::string content = elem.getAttribute("content").utf8();
+      if (LowerCaseEqualsASCII(content, "yes")) {
+        capable = true;
+      }
+      break;
+    }
+  }
+  Send(new EwkHostMsg_WebAppCapableGet(render_view()->GetRoutingID(), capable, callback_id));
 }
 
 void RenderViewObserverEfl::OrientationChangeEvent(int orientation)

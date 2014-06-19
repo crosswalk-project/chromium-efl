@@ -53,6 +53,7 @@ class RenderViewObserverEfl: public content::RenderViewObserver {
   void OnGetMHTMLData(int callback_id);
   void OnSetDrawsTransparentBackground(bool enabled);
   void OnWebAppIconUrlGet(int callback_id);
+  void OnWebAppCapableGet(int callback_id);
   void WillSubmitForm(blink::WebFrame* frame, const blink::WebFormElement& form);
   void OnSetBrowserFont();
 

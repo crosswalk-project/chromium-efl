@@ -204,6 +204,7 @@ class RenderWidgetHostViewEfl
   void HandleGesture(ui::GestureEvent*);
   void HandleTouchEvent(ui::TouchEvent*);
   void OnPlainTextGetContents(const std::string&, int);
+  void OnWebAppCapableGet(bool capable, int callback_id);
   void OnWebAppIconUrlGet(const std::string &icon_url, int callback_id);
   void SelectRange(const gfx::Point&, const gfx::Point&);
   void MoveCaret(const gfx::Point&);

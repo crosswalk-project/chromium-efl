@@ -1415,6 +1415,16 @@ void EWebView::InvokeBackForwardListChangedCallback() {
   SmartCallback<EWebViewCallbacks::BackForwardListChange>().call();
 }
 
+bool EWebView::WebAppCapableGet(Ewk_Web_App_Capable_Get_Callback callback, void *userData) {
+  RenderViewHost *renderViewHost = web_contents_delegate()->web_contents()->GetRenderViewHost();
+  if (!renderViewHost) {
+    return false;
+  }
+  WebApplicationCapableGetCallback *cb = new WebApplicationCapableGetCallback(callback, userData);
+  int callbackId = web_app_capable_get_callback_map_.Add(cb);
+  return renderViewHost->Send(new EwkViewMsg_WebAppCapableGet(renderViewHost->GetRoutingID(), callbackId));
+}
+
 bool EWebView::WebAppIconUrlGet(Ewk_Web_App_Icon_URL_Get_Callback callback, void* userData) {
   RenderViewHost* renderViewHost = web_contents_delegate()->web_contents()->GetRenderViewHost();
   if (!renderViewHost) {
@@ -1423,6 +1433,13 @@ bool EWebView::WebAppIconUrlGet(Ewk_Web_App_Icon_URL_Get_Callback callback, void
   WebApplicationIconUrlGetCallback *cb = new WebApplicationIconUrlGetCallback(callback, userData);
   int callbackId = web_app_icon_url_get_callback_map_.Add(cb);
   return renderViewHost->Send(new EwkViewMsg_WebAppIconUrlGet(renderViewHost->GetRoutingID(), callbackId));
+}
+
+void EWebView::InvokeWebAppCapableGetCallback(bool capable, int callbackId) {
+  WebApplicationCapableGetCallback *callback = web_app_capable_get_callback_map_.Lookup(callbackId);
+  if (!callback)
+    return;
+  callback->Run(capable);
 }
 
 void EWebView::InvokeWebAppIconUrlGetCallback(const std::string& iconUrl, int callbackId) {
