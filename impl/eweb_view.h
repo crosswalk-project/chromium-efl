@@ -41,12 +41,10 @@
 #include "eweb_context.h"
 #include "API/ewk_hit_test_private.h"
 #include "API/ewk_auth_challenge_private.h"
-#include "API/ewk_policy_decision_private.h"
 #include "API/ewk_view_private.h"
 #include "API/ewk_settings_private.h"
 #include "API/ewk_web_application_icon_data_private.h"
 #include "eweb_view_callbacks.h"
-#include "public/ewk_policy_decision.h"
 #include "public/ewk_view.h"
 #include "selection_controller_efl.h"
 #include "web_contents_delegate_efl.h"
@@ -98,6 +96,7 @@ class TouchEvent;
 namespace tizen_webview {
 class WebContext;
 class Hit_Test;
+class PolicyDecision;
 }
 
 class EwkViewPlainTextGetCallback {
@@ -296,9 +295,9 @@ class EWebView
 
   // scale factor needs to be accommodated once HW acceleration is enabled.
   bool GetSnapshot(Eina_Rectangle rect, Evas_Object *image);
-  void set_policy_decision(Ewk_Policy_Decision* pr) { policy_decision_.reset(pr); }
-  Ewk_Policy_Decision* get_policy_decision() const { return policy_decision_.get(); }
-  void InvokePolicyResponseCallback(Ewk_Policy_Decision* policy_decision);
+  void set_policy_decision(tizen_webview::PolicyDecision* pr) { policy_decision_.reset(pr); }
+  tizen_webview::PolicyDecision* get_policy_decision() const { return policy_decision_.get(); }
+  void InvokePolicyResponseCallback(tizen_webview::PolicyDecision* policy_decision);
   void InvokePolicyNavigationCallback(content::RenderViewHost* rvh,
       NavigationPolicyParams params, bool* handled);
   void UseSettingsFont();
@@ -449,7 +448,7 @@ class EWebView
   scoped_ptr<content::WebContentsDelegateEfl> web_contents_delegate_;
   std::string pending_url_request_;
   scoped_ptr<Ewk_Settings> settings_;
-  scoped_ptr<Ewk_Policy_Decision> window_policy_;
+  scoped_ptr<tizen_webview::PolicyDecision> window_policy_;
   Evas_Object* evas_object_;
   bool touch_events_enabled_;
   bool mouse_events_enabled_;
@@ -458,7 +457,7 @@ class EWebView
   std::string overridden_user_agent_;
   mutable std::string selected_text_;
   scoped_ptr<_Ewk_Auth_Challenge> auth_challenge_;
-  scoped_ptr<Ewk_Policy_Decision> policy_decision_;
+  scoped_ptr<tizen_webview::PolicyDecision> policy_decision_;
 #if defined(OS_TIZEN)
   Eina_List* popupMenuItems_;
   Popup_Picker* popupPicker_;

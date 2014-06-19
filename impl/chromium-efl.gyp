@@ -241,6 +241,8 @@
       '<(chrome_src_dir)/tizen_webview/public/tw_hit_test.cc',
       '<(chrome_src_dir)/tizen_webview/public/tw_notification.cc',
       '<(chrome_src_dir)/tizen_webview/public/tw_notification.h',
+      '<(chrome_src_dir)/tizen_webview/public/tw_policy_decision.h',
+      '<(chrome_src_dir)/tizen_webview/public/tw_policy_decision.cc',
       '<(chrome_src_dir)/tizen_webview/public/tw_security_origin.cc',
       '<(chrome_src_dir)/tizen_webview/public/tw_security_origin.h',
       '<(chrome_src_dir)/tizen_webview/public/tw_touch_point.h',

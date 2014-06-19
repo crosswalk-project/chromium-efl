@@ -593,7 +593,7 @@ void EWebView::InvokeAuthCallback(LoginDelegateEfl* login_delegate,
   }
 }
 
-void EWebView::InvokePolicyResponseCallback(Ewk_Policy_Decision* policy_decision) {
+void EWebView::InvokePolicyResponseCallback(tizen_webview::PolicyDecision* policy_decision) {
   set_policy_decision(policy_decision);
   SmartCallback<EWebViewCallbacks::PolicyResponseDecide>().call(policy_decision_.get());
 
@@ -605,7 +605,7 @@ void EWebView::InvokePolicyResponseCallback(Ewk_Policy_Decision* policy_decision
 void EWebView::InvokePolicyNavigationCallback(RenderViewHost* rvh,
     const NavigationPolicyParams params, bool* handled) {
   DCHECK(BrowserThread::CurrentlyOn(BrowserThread::UI));
-  policy_decision_.reset(new Ewk_Policy_Decision(params, rvh));
+  policy_decision_.reset(new tizen_webview::PolicyDecision(params, rvh));
 
   SmartCallback<EWebViewCallbacks::NavigationPolicyDecision>().call(policy_decision_.get());
 

@@ -5,11 +5,13 @@
 #include "net/base/completion_callback.h"
 #include "url/gurl.h"
 
-struct _Ewk_Policy_Decision;
-
 namespace net {
 class URLRequest;
 class HttpResponseHeaders;
+}
+
+namespace tizen_webview {
+class PolicyDecision;
 }
 
 class PolicyResponseDelegateEfl: public base::RefCountedThreadSafe<PolicyResponseDelegateEfl> {
@@ -32,7 +34,7 @@ class PolicyResponseDelegateEfl: public base::RefCountedThreadSafe<PolicyRespons
   void UseResponseOnIOThread();
   void IgnoreResponseOnIOThread();
 
-  scoped_ptr<_Ewk_Policy_Decision> policy_decision_;
+  scoped_ptr<tizen_webview::PolicyDecision> policy_decision_;
   net::CompletionCallback callback_;
   int render_process_id_;
   int render_frame_id_;

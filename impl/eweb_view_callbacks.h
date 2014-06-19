@@ -30,8 +30,8 @@
 #include "API/ewk_certificate_private.h"
 #include "API/ewk_user_media_private.h"
 #include "public/ewk_notification.h"
-#include "public/ewk_policy_decision.h"
 #include "tizen_webview/public/tw_custom_handlers.h"
+#include "tizen_webview/public/tw_policy_decision.h"
 
 #include <Evas.h>
 #include <Eina.h>
@@ -252,12 +252,12 @@ DECLARE_EWK_VIEW_CALLBACK(AuthChallenge, "authentication,challenge", _Ewk_Auth_C
 DECLARE_EWK_VIEW_CALLBACK(NotificationShow, "notification,show", tizen_webview::Notification*);
 DECLARE_EWK_VIEW_CALLBACK(NotificationCancel, "notification,cancel", uint64_t*);
 DECLARE_EWK_VIEW_CALLBACK(NotificationPermissionRequest, "notification,permission,request", Ewk_Notification_Permission_Request*);
-DECLARE_EWK_VIEW_CALLBACK(PolicyResponseDecide, "policy,response,decide", Ewk_Policy_Decision*);
+DECLARE_EWK_VIEW_CALLBACK(PolicyResponseDecide, "policy,response,decide", tizen_webview::PolicyDecision*);
 DECLARE_EWK_VIEW_CALLBACK(ContextMenuCustomize, "contextmenu,customize", _Ewk_Context_Menu*);
 DECLARE_EWK_VIEW_CALLBACK(ContextMenuItemSelected, "contextmenu,selected", _Ewk_Context_Menu_Item*);
-DECLARE_EWK_VIEW_CALLBACK(NavigationPolicyDecision, "policy,navigation,decide", Ewk_Policy_Decision*);
+DECLARE_EWK_VIEW_CALLBACK(NavigationPolicyDecision, "policy,navigation,decide", tizen_webview::PolicyDecision*);
 DECLARE_EWK_VIEW_CALLBACK(TextFound, "text,found", unsigned int*);
-DECLARE_EWK_VIEW_CALLBACK(NewWindowPolicyDecision, "policy,newwindow,decide", Ewk_Policy_Decision*);
+DECLARE_EWK_VIEW_CALLBACK(NewWindowPolicyDecision, "policy,newwindow,decide", tizen_webview::PolicyDecision*);
 DECLARE_EWK_VIEW_CALLBACK(LoadNonEmptyLayoutFinished, "load,nonemptylayout,finished", void);
 DECLARE_EWK_VIEW_CALLBACK(PopupReplyWaitStart, "popup,reply,wait,start", void*);
 DECLARE_EWK_VIEW_CALLBACK(PopupReplyWaitFinish, "popup,reply,wait,finish", void*);

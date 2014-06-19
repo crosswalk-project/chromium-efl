@@ -13,7 +13,6 @@
 #include "eweb_view.h"
 #include "eweb_view_callbacks.h"
 #include "public/ewk_view.h"
-#include "public/ewk_policy_decision.h"
 
 #include "base/strings/utf_string_conversions.h"
 #include "content/common/view_messages.h"
@@ -118,7 +117,7 @@ bool WebContentsDelegateEfl::ShouldCreateWebContents(
     const std::string& partition_id,
     SessionStorageNamespace* session_storage_namespace) {
   // this method is called ONLY when creating new window - no matter what type
-  web_view_->set_policy_decision(new _Ewk_Policy_Decision(this, target_url));
+  web_view_->set_policy_decision(new tizen_webview::PolicyDecision(this, target_url));
   web_view_->SmartCallback<EWebViewCallbacks::NewWindowPolicyDecision>().call(web_view_->get_policy_decision());
   // Chromium has sync API. We cannot block this calls on UI thread.
   CHECK(!web_view_->get_policy_decision()->isSuspended());

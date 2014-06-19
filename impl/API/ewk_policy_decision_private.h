@@ -30,7 +30,6 @@
 #include <browser/navigation_policy_handler_efl.h>
 #include <browser/policy_response_delegate_efl.h>
 
-#include <public/ewk_policy_decision.h>
 #include "ewk_frame_private.h"
 
 struct NavigationPolicyParams;

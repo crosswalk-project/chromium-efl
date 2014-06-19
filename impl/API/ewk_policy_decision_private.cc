@@ -167,13 +167,13 @@ void _Ewk_Policy_Decision::Use() {
 void _Ewk_Policy_Decision::Ignore() {
   isDecided_ = true;
   switch (type_) {
-    case Ewk_Policy_Decision::POLICY_RESPONSE:
+    case _Ewk_Policy_Decision::POLICY_RESPONSE:
       policy_response_delegate_->IgnoreResponse();
       break;
-    case Ewk_Policy_Decision::POLICY_NAVIGATION:
+    case _Ewk_Policy_Decision::POLICY_NAVIGATION:
       navigation_policy_handler_->SetDecision(NavigationPolicyHandlerEfl::Handled);
       break;
-    case Ewk_Policy_Decision::POLICY_NEWWINDOW:
+    case _Ewk_Policy_Decision::POLICY_NEWWINDOW:
       new_window_policy_delegate_->set_new_window_policy(false);
       break;
     default:
@@ -185,13 +185,13 @@ void _Ewk_Policy_Decision::Ignore() {
 void _Ewk_Policy_Decision::Download() {
   isDecided_ = true;
   switch (type_) {
-    case Ewk_Policy_Decision::POLICY_RESPONSE:
+    case _Ewk_Policy_Decision::POLICY_RESPONSE:
       policy_response_delegate_->UseResponse();
       break;
-    case Ewk_Policy_Decision::POLICY_NAVIGATION:
+    case _Ewk_Policy_Decision::POLICY_NAVIGATION:
       navigation_policy_handler_->DownloadNavigation();
       break;
-    case Ewk_Policy_Decision::POLICY_NEWWINDOW:
+    case _Ewk_Policy_Decision::POLICY_NEWWINDOW:
       new_window_policy_delegate_->set_new_window_policy(false);
       break;
     default:
@@ -205,7 +205,7 @@ void _Ewk_Policy_Decision::Suspend() {
 }
 
 void _Ewk_Policy_Decision::InitializeOnUIThread() {
-  DCHECK(type_ == Ewk_Policy_Decision::POLICY_RESPONSE);
+  DCHECK(type_ == _Ewk_Policy_Decision::POLICY_RESPONSE);
   DCHECK(policy_response_delegate_);
 
   if (policy_response_delegate_) {

@@ -35,7 +35,7 @@ static content::WebContentsDelegateEfl* WebContentsDelegateFromFrameId(int rende
 PolicyResponseDelegateEfl::PolicyResponseDelegateEfl(net::URLRequest* request,
     const net::CompletionCallback& callback,
     const net::HttpResponseHeaders* original_response_headers)
-    : policy_decision_(new _Ewk_Policy_Decision(request->url(), original_response_headers, this)),
+    : policy_decision_(new tizen_webview::PolicyDecision(request->url(), original_response_headers, this)),
       callback_(callback),
       render_process_id_(0),
       render_frame_id_(0),
@@ -67,7 +67,7 @@ void PolicyResponseDelegateEfl::HandlePolicyResponseOnUIThread() {
   DCHECK(BrowserThread::CurrentlyOn(BrowserThread::UI));
   DCHECK(policy_decision_.get());
 
-  policy_decision_->InitializeOnUIThread();
+  policy_decision_->GetImpl()->InitializeOnUIThread();
   // Delegate may be retrieved ONLY on UI thread
   content::WebContentsDelegateEfl *delegate = WebContentsDelegateFromFrameId(render_process_id_, render_frame_id_);
   if (!delegate) {
