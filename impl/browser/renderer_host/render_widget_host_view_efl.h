@@ -57,7 +57,6 @@ class ReadbackYUVInterface;
 // RenderWidgetHostView class hierarchy described in render_widget_host_view.h.
 class RenderWidgetHostViewEfl
   : public RenderWidgetHostViewBase,
-    public ui::TextInputClient,
     public base::SupportsWeakPtr<RenderWidgetHostViewEfl>,
     public IPC::Sender {
  public:
@@ -158,43 +157,10 @@ class RenderWidgetHostViewEfl
   virtual void RenderProcessGone(base::TerminationStatus, int) OVERRIDE;
   virtual bool OnMessageReceived(const IPC::Message&) OVERRIDE;
   virtual void ProcessAckedTouchEvent(const TouchEventWithLatencyInfo&, InputEventAckState) OVERRIDE;
+  virtual void DidStopFlinging() OVERRIDE;
 
-  virtual bool IsEditingCommandEnabled(int) OVERRIDE { return false; }
-  virtual void ExecuteEditingCommand(int) OVERRIDE {}
   // IPC::Sender implementation:
   virtual bool Send(IPC::Message*) OVERRIDE;
-
-  // Overridden from ui::TextInputClient implementation:
-  virtual void SetCompositionText(
-      const ui::CompositionText& composition) OVERRIDE {}
-  virtual void ConfirmCompositionText() OVERRIDE {}
-  virtual void ClearCompositionText() OVERRIDE {}
-  virtual void InsertText(const base::string16& text) OVERRIDE {}
-  virtual void InsertChar(base::char16 ch, int flags) OVERRIDE {}
-  virtual gfx::NativeWindow GetAttachedWindow() const OVERRIDE { return gfx::NativeWindow(); }
-  virtual ui::TextInputType GetTextInputType() const OVERRIDE { return ui::TextInputType(); }
-  virtual ui::TextInputMode GetTextInputMode() const OVERRIDE { return ui::TextInputMode(); }
-  virtual bool CanComposeInline() const OVERRIDE { return false; }
-  virtual gfx::Rect GetCaretBounds() const OVERRIDE { return gfx::Rect(); }
-  virtual bool GetCompositionCharacterBounds(uint32 index,
-                                             gfx::Rect* rect) const OVERRIDE;
-  virtual bool HasCompositionText() const OVERRIDE { return false; }
-  virtual bool GetTextRange(gfx::Range* range) const OVERRIDE { return false; }
-  virtual bool GetCompositionTextRange(gfx::Range* range) const OVERRIDE { return false; }
-  virtual bool GetSelectionRange(gfx::Range* range) const OVERRIDE { return false; }
-  virtual bool SetSelectionRange(const gfx::Range& range) OVERRIDE { return false; }
-  virtual bool DeleteRange(const gfx::Range& range) OVERRIDE { return false; }
-  virtual bool GetTextFromRange(const gfx::Range& range,
-                                base::string16* text) const OVERRIDE { return false; }
-  virtual void OnInputMethodChanged() OVERRIDE {}
-  virtual bool ChangeTextDirectionAndLayoutAlignment(
-      base::i18n::TextDirection direction) OVERRIDE { return false; }
-  virtual void ExtendSelectionAndDelete(size_t before, size_t after) OVERRIDE {}
-  virtual void EnsureCaretInRect(const gfx::Rect& rect) OVERRIDE {}
-  virtual void OnCandidateWindowShown() OVERRIDE {}
-  virtual void OnCandidateWindowUpdated() OVERRIDE {}
-  virtual void OnCandidateWindowHidden() OVERRIDE {}
-  virtual void DidStopFlinging() OVERRIDE;
 
   void OnDidFirstVisuallyNonEmptyLayout();
   void OnSelectionTextStyleState(const SelectionStylePrams& params);
@@ -304,9 +270,6 @@ class RenderWidgetHostViewEfl
 
   typedef std::map<gfx::PluginWindowHandle, Ecore_X_Window> PluginWindowToWidgetMap;
   PluginWindowToWidgetMap plugin_window_to_widget_map_;
-
-  // The current composition character bounds.
-  std::vector<gfx::Rect> composition_character_bounds_;
 
   bool m_magnifier;
 

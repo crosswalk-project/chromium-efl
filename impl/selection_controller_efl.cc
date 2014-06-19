@@ -42,11 +42,13 @@ SelectionControllerEfl::SelectionControllerEfl(EWebView* parent_view)
     :  parent_view_(parent_view),
        mouse_press_(false),
        scrolling_(false),
+       expecting_update_(false),
        long_mouse_press_(false),
        selection_data_(new SelectionBoxEfl(parent_view)),
-       start_handle_(new SelectionHandleEfl(this, SelectionHandleEfl::HANDLE_TYPE_LEFT, parent_view->evas_object())),
-       end_handle_(new SelectionHandleEfl(this, SelectionHandleEfl::HANDLE_TYPE_RIGHT, parent_view->evas_object())),
-       input_handle_(new SelectionHandleEfl(this, SelectionHandleEfl::HANDLE_TYPE_INPUT, parent_view->evas_object())),
+       start_handle_(new SelectionHandleEfl(*this, SelectionHandleEfl::HANDLE_TYPE_LEFT, parent_view->evas_object())),
+       end_handle_(new SelectionHandleEfl(*this, SelectionHandleEfl::HANDLE_TYPE_RIGHT, parent_view->evas_object())),
+       input_handle_(new SelectionHandleEfl(*this, SelectionHandleEfl::HANDLE_TYPE_INPUT, parent_view->evas_object())),
+
        magnifier_(new SelectionMagnifierEfl(this)) {
   evas_object_event_callback_add(parent_view_->evas_object(), EVAS_CALLBACK_MOVE, &EvasParentViewMoveCallback, this);
 
@@ -131,51 +133,55 @@ void SelectionControllerEfl::ClearSelectionViaEWebView() {
   parent_view_->ClearSelection();
 }
 
-void SelectionControllerEfl::UpdateSelectionDataAndShow(const gfx::Rect& left_rect, const gfx::Rect& right_rect, bool is_anchor_first) {
+void SelectionControllerEfl::UpdateSelectionDataAndShow(const gfx::Rect& left_rect, const gfx::Rect& right_rect, bool) {
   TRACE_EVENT0("selection,efl", __PRETTY_FUNCTION__);
-  selection_data_->UpdateRectData(left_rect, right_rect, is_anchor_first);
-  parent_view_->QuerySelectionStyle();
+  selection_data_->UpdateRectData(left_rect, right_rect);
 
   if (!IsSelectionValid(left_rect, right_rect)) {
     selection_data_->ClearRectData();
     Clear();
-    return;
+  } else {
+    if (selection_data_->GetEditable()) {
+      // In case we're selecting text in editable text field we've already sent swapped
+      // coordinates from OnMouseMove. No need to do it for the second time.
+      ShowHandleAndContextMenuIfRequired();
+    } else {
+      ShowHandleAndContextMenuIfRequired(left_rect < right_rect);
+    }
   }
-
-  // Do not show the context menu and handlers untill long mouse press is released
-  if (long_mouse_press_)
-    return;
-
-  // Do not show the context menu and handlers while page is scrolling
-  if (scrolling_)
-    return;
-
-  ShowHandleAndContextMenuIfRequired();
+  expecting_update_ = false;
 }
 
-void SelectionControllerEfl::ShowHandleAndContextMenuIfRequired() {
+void SelectionControllerEfl::ShowHandleAndContextMenuIfRequired(bool anchor_first) {
   TRACE_EVENT0("selection,efl", __PRETTY_FUNCTION__);
   if (!selection_data_->GetStatus())
     return;
 
-  Clear();
+  gfx::Rect left, right;
+  if (anchor_first) {
+    left = selection_data_->GetLeftRect();
+    right = selection_data_->GetRightRect();
+  } else {
+    right = selection_data_->GetLeftRect();
+    left = selection_data_->GetRightRect();
+  }
 
   // Is in edit field and no text is selected. show only single handle
-  if (selection_data_->IsInEditField() && GetCaretSelectionStatus()) {
+  if (selection_data_->IsInEditField() && left == right) {
     gfx::Rect left = selection_data_->GetLeftRect();
     input_handle_->SetBasePosition(gfx::Point(left.x(), left.y()));
-    input_handle_->SetCursorHandlerStatus(true);
-    input_handle_->Move(gfx::Point(left.x(), left.y() + left.height()));
+    input_handle_->Move(left.bottom_right());
     input_handle_->Show();
+    start_handle_->Hide();
+    end_handle_->Hide();
 
     if (!mouse_press_)
       parent_view_->ShowContextMenu(*(selection_data_->GetContextMenuParams()), MENU_TYPE_SELECTION);
     parent_view_->QuerySelectionStyle();
     return;
+  } else {
+    input_handle_->Hide();
   }
-
-  gfx::Rect left = selection_data_->GetLeftRect();
-  gfx::Rect right = selection_data_->GetRightRect();
 
   if (left.x() == 0 && left.y() == 0 && right.x() == 0 && right.y() == 0) {
     selection_data_->ClearRectData();
@@ -183,18 +189,18 @@ void SelectionControllerEfl::ShowHandleAndContextMenuIfRequired() {
   }
   // The base position of start_handle should be set to the middle of the left rectangle.
   // Otherwise the start_handle may be shifted up when the right_handle is moving
-  start_handle_->SetBasePosition(gfx::Point(left.x(), left.y() + (left.height() / 2)));
-  start_handle_->Move(gfx::Point(left.x(), left.y() + left.height()));
-  if (left.x() >= visibility_rect_.x() && left.x() <= (visibility_rect_.x() + visibility_rect_.width()))
+  start_handle_->SetBasePosition(left.CenterPoint());
+  start_handle_->Move(left.bottom_left());
+  if (left.x() >= visibility_rect_.x() && left.x() <= visibility_rect_.right())
     start_handle_->Show();
   else
     start_handle_->Hide();
 
   // The base position of end_handle should be set to the middle of the right rectangle.
   // Otherwise the end_handle may be shifted up when the left_handle is moving
-  end_handle_->SetBasePosition(gfx::Point(right.x(), right.y() + (right.height() / 2)));
-  end_handle_->Move(gfx::Point(right.x() + right.width(), right.y() + right.height()));
-  if (right.x() >= visibility_rect_.x() && right.x() <= (visibility_rect_.x() + visibility_rect_.width()))
+  end_handle_->SetBasePosition(right.CenterPoint());
+  end_handle_->Move(right.bottom_right());
+  if (right.x() >= visibility_rect_.x() && right.x() <= visibility_rect_.right())
     end_handle_->Show();
   else
     end_handle_->Hide();
@@ -227,6 +233,12 @@ void SelectionControllerEfl::Clear() {
   input_handle_->Hide();
 }
 
+bool SelectionControllerEfl::IsShowingMagnifier() {
+  if(magnifier_->IsShowing())
+    return true;
+  return false;
+}
+
 void SelectionControllerEfl::OnMouseDown(const gfx::Point& touch_point) {
   // Hide context menu on mouse down
   parent_view_->CancelContextMenu(0);
@@ -240,14 +252,20 @@ void SelectionControllerEfl::OnMouseMove(const gfx::Point& touch_point, Selectio
   // FIXME : Check the text Direction later
   magnifier_->UpdateLocation(touch_point);
   magnifier_->Move(touch_point);
+  expecting_update_ = true;
   switch (handle) {
     case SelectionHandleEfl::HANDLE_TYPE_INPUT:
       parent_view_->MoveCaret(input_handle_->GetBasePosition());
       return;
     case SelectionHandleEfl::HANDLE_TYPE_LEFT:
-      parent_view_->SelectRange(end_handle_->GetBasePosition(),
-                                start_handle_->GetBasePosition());
-      return;
+      if (GetSelectionEditable()) {
+        // Form elements only support scrolling of extent/end caret. To
+        // move the start element we need to swap the coordinates provided
+        // to SelectRange function.
+        parent_view_->SelectRange(end_handle_->GetBasePosition(),
+                                  start_handle_->GetBasePosition());
+        return;
+      }
     case SelectionHandleEfl::HANDLE_TYPE_RIGHT:
       parent_view_->SelectRange(start_handle_->GetBasePosition(),
                                 end_handle_->GetBasePosition());
@@ -256,10 +274,11 @@ void SelectionControllerEfl::OnMouseMove(const gfx::Point& touch_point, Selectio
 }
 
 void SelectionControllerEfl::OnMouseUp(const gfx::Point& touch_point) {
-  selection_data_->UpdateHandleData();
   mouse_press_ = false;
   magnifier_->Hide();
-  parent_view_->ShowContextMenu(*(selection_data_->GetContextMenuParams()), MENU_TYPE_SELECTION);
+  start_handle_->SetBasePosition(selection_data_->GetLeftRect().bottom_left());
+  end_handle_->SetBasePosition(selection_data_->GetRightRect().bottom_right());
+  ShowHandleAndContextMenuIfRequired();
 }
 
 void SelectionControllerEfl::GetSelectionBounds(gfx::Rect* left, gfx::Rect* right) {
@@ -271,6 +290,7 @@ void SelectionControllerEfl::GetSelectionBounds(gfx::Rect* left, gfx::Rect* righ
 
 void SelectionControllerEfl::HandleLongPressEvent(const gfx::Point& touch_point) {
   long_mouse_press_ = true;
+  Clear();
   magnifier_->HandleLongPress(touch_point);
 }
 
@@ -312,8 +332,8 @@ bool SelectionControllerEfl::IsSelectionValid(const gfx::Rect& left_rect, const 
   // Thus the width is not sufficient for checking selection condition.
   // Further invesitigation showed left_rect and right_rect always have the same x,y values
   // for such cases. So, the equality for x and y rather than width should be tested.
-  if (left_rect.x()==right_rect.x() && left_rect.y()==right_rect.y() &&
-      !selection_data_->IsInEditField() && !mouse_press_) {
+  if (left_rect.x() == right_rect.x() && left_rect.y() == right_rect.y() &&
+      !selection_data_->IsInEditField()  && !mouse_press_ && !expecting_update_) {
     SetSelectionStatus(false);
     return false;
   }

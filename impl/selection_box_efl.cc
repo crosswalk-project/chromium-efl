@@ -25,20 +25,9 @@ namespace content {
 SelectionBoxEfl::SelectionBoxEfl(EWebView* parent_view)
   : status_(false),
     editable_(false),
-    is_anchor_first_(true),
     is_caret_selection_(false),
     context_params_(new ContextMenuParams()),
     parent_view_(parent_view) {
-}
-
-void SelectionBoxEfl::UpdateHandleData() {
-  // Swap the handlers when these handles cross over
-  if (!is_anchor_first_) {
-    gfx::Rect swap_rect_;
-    swap_rect_ = left_rect_;
-    left_rect_ = right_rect_;
-    right_rect_ = swap_rect_;
-  }
 }
 
 void SelectionBoxEfl::UpdateSelectStringData(const base::string16& text) {
@@ -51,13 +40,17 @@ void SelectionBoxEfl::ClearRectData() {
   context_params_->x = context_params_->y = 0;
 }
 
-void SelectionBoxEfl::UpdateRectData(const gfx::Rect& left_rect, const gfx::Rect& right_rect, bool is_anchor_first) {
+void SelectionBoxEfl::UpdateRectData(const gfx::Rect& left_rect, const gfx::Rect& right_rect) {
   TRACE_EVENT2("selection,efl", __PRETTY_FUNCTION__,
                "left_rect", left_rect.ToString(),
                "right_rect", right_rect.ToString());
-  is_anchor_first_ = is_anchor_first;
-  left_rect_ = left_rect;
-  right_rect_ = right_rect;
+  if (left_rect < right_rect) {
+    left_rect_ = left_rect;
+    right_rect_ = right_rect;
+  } else {
+    right_rect_ = left_rect;
+    left_rect_ = right_rect;
+  }
 
   // Display point of context Menu
   Evas_Coord x, y;
@@ -65,8 +58,6 @@ void SelectionBoxEfl::UpdateRectData(const gfx::Rect& left_rect, const gfx::Rect
   //context params suppose to be global - related to evas not the web view
   context_params_->x = left_rect_.x() + x;
   context_params_->y = left_rect_.y() + y;
-
-  UpdateHandleData();
 }
 
 bool SelectionBoxEfl::IsInEditField() const {

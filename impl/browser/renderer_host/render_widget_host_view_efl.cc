@@ -503,6 +503,14 @@ void RenderWidgetHostViewEfl::TextInputTypeChanged(ui::TextInputType type, ui::T
     // Finally, the empty rect is not used.
     host_->ScrollFocusedEditableNodeIntoRect(gfx::Rect(0, 0, 0, 0));
   }
+
+  if (GetSelectionController()) {
+    GetSelectionController()->SetSelectionEditable(
+      type == ui::TEXT_INPUT_TYPE_TEXT ||
+      type == ui::TEXT_INPUT_TYPE_PASSWORD ||
+      type == ui::TEXT_INPUT_TYPE_TEXT_AREA ||
+      type == ui::TEXT_INPUT_TYPE_CONTENT_EDITABLE);
+  }
 }
 
 void RenderWidgetHostViewEfl::TextInputStateChanged(
@@ -513,33 +521,18 @@ void RenderWidgetHostViewEfl::TextInputStateChanged(
 }
 
 void RenderWidgetHostViewEfl::ImeCancelComposition() {
-  LOG(INFO) << __PRETTY_FUNCTION__;
   if (im_context_)
     im_context_->CancelComposition();
 }
 
-void RenderWidgetHostViewEfl::OnTextInputInFormStateChanged(bool is_in_form_tag)
-{
+void RenderWidgetHostViewEfl::OnTextInputInFormStateChanged(bool is_in_form_tag) {
   if (im_context_)
     im_context_->SetIsInFormTag(is_in_form_tag);
 }
 
-bool RenderWidgetHostViewEfl::GetCompositionCharacterBounds(uint32 index, gfx::Rect* rect) const
-{
-  LOG(INFO) << __PRETTY_FUNCTION__;
-  DCHECK(rect);
-  if (index >= composition_character_bounds_.size())
-    return false;
-
-  *rect = composition_character_bounds_[index];
-  return true;
-}
-
 void RenderWidgetHostViewEfl::ImeCompositionRangeChanged(
-    const gfx::Range& range,
-    const std::vector<gfx::Rect>& character_bounds) {
-  LOG(INFO) << __PRETTY_FUNCTION__;
-  composition_character_bounds_ = character_bounds;
+  const gfx::Range& range,
+  const std::vector<gfx::Rect>& character_bounds) {
   SelectionControllerEfl* controller = web_view_->GetSelectionController();
   if (controller) {
     controller->SetCaretSelectionStatus(false);
@@ -569,7 +562,6 @@ void RenderWidgetHostViewEfl::SetTooltipText(const base::string16& text) {
 void RenderWidgetHostViewEfl::SelectionChanged(const base::string16& text,
   size_t offset,
   const gfx::Range& range) {
-  LOG(INFO) << __PRETTY_FUNCTION__;
   SelectionControllerEfl* controller = web_view_->GetSelectionController();
   if (controller)
     controller->UpdateSelectionData(text);
@@ -577,7 +569,6 @@ void RenderWidgetHostViewEfl::SelectionChanged(const base::string16& text,
 
 void RenderWidgetHostViewEfl::SelectionBoundsChanged(
   const ViewHostMsg_SelectionBounds_Params& params) {
-  LOG(INFO) << __PRETTY_FUNCTION__;
   ViewHostMsg_SelectionBounds_Params guest_params(params);
   guest_params.anchor_rect = ConvertRectToPixel(device_scale_factor_, params.anchor_rect);
   guest_params.focus_rect = ConvertRectToPixel(device_scale_factor_, params.focus_rect);
@@ -596,7 +587,8 @@ void RenderWidgetHostViewEfl::ScrollOffsetChanged() {
 
 void RenderWidgetHostViewEfl::SelectionRootBoundsChanged(const gfx::Rect& rect) {
   if (GetSelectionController())
-    GetSelectionController()->SetVisibilityBounds(rect);
+    GetSelectionController()->SetVisibilityBounds(
+      ConvertRectToPixel(device_scale_factor_, rect));
 }
 
 void RenderWidgetHostViewEfl::DidStopFlinging() {
@@ -1136,8 +1128,6 @@ void RenderWidgetHostViewEfl::HandleGesture(ui::GestureEvent* event) {
   const gfx::Point root_point = event->root_location();
   gesture.globalX = root_point.x();
   gesture.globalY = root_point.y();
-
-  LOG(INFO) << "RenderWidgetHostViewEfl::HandleGesture : type = " << event->type();
 
   if (event->type() == ui::ET_GESTURE_TAP_DOWN) {
     // Webkit does not stop a fling-scroll on tap-down. So explicitly send an

@@ -77,6 +77,7 @@ class SelectionControllerEfl {
   // To update the selection bounds
   void UpdateSelectionDataAndShow(const gfx::Rect& left_rect, const gfx::Rect& right_rect, bool is_anchor_first);
   void GetSelectionBounds(gfx::Rect* left, gfx::Rect* right);
+
   // Handles the mouse press,move and relase events on selection handles
   void OnMouseDown(const gfx::Point& touch_point);
   void OnMouseMove(const gfx::Point& touch_point, SelectionHandleEfl::HandleType);
@@ -103,8 +104,12 @@ class SelectionControllerEfl {
 
   void ChangeContextMenuPosition(gfx::Point& position, int& drawDirection);
 
+  bool GetLongPressed() { return long_mouse_press_; }
+
+  bool IsShowingMagnifier();
+
  private:
-  void ShowHandleAndContextMenuIfRequired();
+  void ShowHandleAndContextMenuIfRequired(bool anchor_first = true);
   void Clear();
   bool IsSelectionValid(const gfx::Rect& left_rect, const gfx::Rect& right_rect);
 
@@ -126,6 +131,10 @@ class SelectionControllerEfl {
   // Saves state so that context menu is not displayed during page scrolling
   bool scrolling_;
 
+  // True when new caret/selection position was sent to chromium,
+  // but no reply was received, yet
+  bool expecting_update_;
+
   // Saves state so that handlers and context menu is not shown when seletion change event occurs.
   bool long_mouse_press_;
 
@@ -144,7 +153,7 @@ class SelectionControllerEfl {
   // Points to show the contents magnified
   scoped_ptr<SelectionMagnifierEfl> magnifier_;
 
-  // Visibility rectangle
+  // Rectangle inside of which selection handles should be visible.
   gfx::Rect visibility_rect_;
 };
 

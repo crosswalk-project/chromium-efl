@@ -36,7 +36,8 @@ const float kZoomScale = 0.66;
 SelectionMagnifierEfl::SelectionMagnifierEfl(content::SelectionControllerEfl* controller)
   : controller_(controller),
     content_image_(0),
-    animator_(0) {
+    animator_(0),
+    shown_(false) {
   Evas_Object* top_widget = elm_object_top_widget_get(
       elm_object_parent_widget_get(controller->GetParentView()->evas_object()));
   if (!top_widget)
@@ -177,12 +178,14 @@ void SelectionMagnifierEfl::Move(const gfx::Point& location) {
 }
 
 void SelectionMagnifierEfl::Show() {
+  shown_ = true;
   evas_object_show(container_);
   controller_->GetParentView()->SmartCallback<EWebViewCallbacks::MagnifierShow>().call();
   controller_->GetParentView()->set_magnifier(true);
 }
 
 void SelectionMagnifierEfl::Hide() {
+  shown_ = false;
   evas_object_hide(content_image_);
   evas_object_hide(container_);
   controller_->GetParentView()->SmartCallback<EWebViewCallbacks::MagnifierHide>().call();

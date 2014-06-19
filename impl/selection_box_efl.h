@@ -41,9 +41,8 @@ class SelectionBoxEfl {
   bool GetStatus() const { return status_; }
   void SetEditable(bool enable) { GetContextMenuParams()->is_editable = editable_ = enable; }
   bool GetEditable() const { return editable_; }
-  void UpdateHandleData();
   void UpdateSelectStringData(const base::string16& text);
-  void UpdateRectData(const gfx::Rect& left_rect, const gfx::Rect& right_rect, bool is_anchor_first);
+  void UpdateRectData(const gfx::Rect& left_rect, const gfx::Rect& right_rect);
   void ClearRectData();
   bool IsInEditField() const;
   void SetCaretSelectionStatus(const bool enable) { is_caret_selection_ = enable; }
@@ -51,7 +50,6 @@ class SelectionBoxEfl {
   gfx::Rect GetLeftRect() const { return left_rect_; }
   gfx::Rect GetRightRect() const { return right_rect_; }
   ContextMenuParams* GetContextMenuParams() const { return context_params_.get(); }
-  bool IsAnchorFirst() { return is_anchor_first_; }
 
  private:
   // Save the state of selection, if active or not
@@ -59,9 +57,6 @@ class SelectionBoxEfl {
 
   // Save if the selection is in one of the editable fields
   bool editable_;
-
-  // Is set if handlers crossover rects are interchanged
-  bool is_anchor_first_;
 
   // Caret is in a input field
   bool is_caret_selection_;

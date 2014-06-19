@@ -42,6 +42,7 @@ class SelectionMagnifierEfl {
   void Move(const gfx::Point& location);
   void Show();
   void Hide();
+  bool IsShowing() { return shown_; }
 
  private:
   static Eina_Bool MoveAnimatorCallback(void* data);
@@ -64,6 +65,9 @@ class SelectionMagnifierEfl {
 
   // Handle longmove
   Ecore_Animator* animator_;
+
+  // Is magnifier showing
+  bool shown_;
 };
 
 }

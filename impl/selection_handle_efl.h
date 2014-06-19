@@ -55,7 +55,7 @@ class SelectionHandleEfl {
     DirectionNone,
   };
 
-  SelectionHandleEfl(SelectionControllerEfl* controller, HandleType type, Evas_Object* parent);
+  SelectionHandleEfl(SelectionControllerEfl& controller, HandleType type, Evas_Object* parent);
   ~SelectionHandleEfl();
   void Show();
   void Hide();
@@ -63,7 +63,6 @@ class SelectionHandleEfl {
   void Move(const gfx::Point& point);
   void SetBasePosition(const gfx::Point& point) { base_point_ = point; }
   gfx::Point GetBasePosition() const { return base_point_; }
-  void SetCursorHandlerStatus(bool enable) { is_cursor_handle_ = enable; }
   bool IsTop() { return is_top_; }
   Evas_Object* evas_object() const { return handle_; }
 
@@ -73,11 +72,10 @@ class SelectionHandleEfl {
   static void OnMouseUp(void* data, Evas*, Evas_Object*, void* event_info);
   static void UpdateMouseMove(void* data);
 
-  void ChangeObjectDirection(HandleType, int);
-  HandleType GetHandleType() const;
-  gfx::Rect GetSelectionRect();
-  void MoveObject(gfx::Point&);
-  void SetIsMouseDowned(bool enable) { is_mouse_downed_ = enable; };
+  HandleDirection CalculateDirection(const gfx::Point&) const;
+  void ChangeObjectDirection(HandleDirection direction);
+  gfx::Rect GetSelectionRect() const;
+  void MoveObject(const gfx::Point& point);
 
   // This point is one which will be used during extending selection
   // it is in web view coordinates
@@ -91,16 +89,13 @@ class SelectionHandleEfl {
   gfx::Point diff_point_;
 
   // Parent to send back mouse events
-  content::SelectionControllerEfl* controller_;
+  SelectionControllerEfl& controller_;
 
   // Handler object
   Evas_Object* handle_;
 
-  // Is set if the handle is of type input
-  bool is_cursor_handle_;
-
-  // Is mouse down
-  bool is_mouse_downed_;
+  // Is pressed
+  bool pressed_;
 
   // Direction of handle
   bool is_top_;
