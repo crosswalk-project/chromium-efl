@@ -89,6 +89,7 @@ void WebContentsDelegateEfl::NavigationStateChanged(const WebContents* source, u
   if (changed_flags & content::INVALIDATE_TYPE_URL) {
     const char* url = source->GetVisibleURL().spec().c_str();
     web_view_->SmartCallback<EWebViewCallbacks::URLChanged>().call(url);
+    web_view_->SmartCallback<EWebViewCallbacks::URIChanged>().call(url);
   }
 }
 

@@ -121,7 +121,8 @@ enum CallbackType {
   ConsoleMessage,
   WrtPluginsMessage,
   IconReceived,
-  FormSubmit
+  FormSubmit,
+  URIChanged
 };
 
 template <CallbackType>
@@ -222,6 +223,7 @@ DECLARE_EWK_VIEW_CALLBACK(LoadStarted, "load,started", void);
 DECLARE_EWK_VIEW_CALLBACK(LoadError, "load,error", _Ewk_Error*);
 DECLARE_EWK_VIEW_CALLBACK(TitleChange, "title,changed", const char*);
 DECLARE_EWK_VIEW_CALLBACK(URLChanged, "url,changed", const char*);
+DECLARE_EWK_VIEW_CALLBACK(URIChanged, "uri,changed", const char*);
 DECLARE_EWK_VIEW_CALLBACK(LoadProgress, "load,progress", double*);
 DECLARE_EWK_VIEW_CALLBACK(LoadProgressStarted, "load,progress,started", void);
 DECLARE_EWK_VIEW_CALLBACK(LoadProgressFinished, "load,progress,finished", void);
