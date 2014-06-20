@@ -92,6 +92,15 @@ RenderWidgetHostViewEfl::RenderWidgetHostViewEfl(RenderWidgetHost* widget)
     surface_id_(0) {
   host_->SetView(this);
 
+#if defined(OS_TIZEN)
+  const CommandLine& command_line = *CommandLine::ForCurrentProcess();
+
+  if (command_line.HasSwitch(switches::kUseSWRenderingPath))
+      is_hw_accelerated_ = false;
+  else
+#endif
+      is_hw_accelerated_ = true;
+
   static bool scale_factor_initialized = false;
   if (!scale_factor_initialized) {
     std::vector<ui::ScaleFactor> supported_scale_factors;
@@ -292,11 +301,14 @@ void RenderWidgetHostViewEfl::set_eweb_view(EWebView* view) {
   DCHECK(content_image_);
 
 #ifdef OS_TIZEN
-  gfx::Rect bounds = GetViewBoundsInPix();
-  if (bounds.width() == 0 && bounds.height() == 0) {
-    LOG(ERROR) << "set_eweb_view -- view width and height set to '0' --> skip to configure evasgl";
-  } else {
-    Init_EvasGL(bounds.width(), bounds.height());
+
+  if (is_hw_accelerated_) {
+    gfx::Rect bounds = GetViewBoundsInPix();
+    if (bounds.width() == 0 && bounds.height() == 0) {
+      LOG(ERROR)<<"set_eweb_view -- view width and height set to '0' --> skip to configure evasgl";
+    } else {
+      Init_EvasGL(bounds.width(), bounds.height());
+    }
   }
 #endif
 
@@ -338,6 +350,16 @@ void RenderWidgetHostViewEfl::OnDidFirstVisuallyNonEmptyLayout() {
 void RenderWidgetHostViewEfl::OnSelectionTextStyleState(const SelectionStylePrams& params) {
   web_view_->OnQuerySelectionStyleReply(params);
 }
+
+#if 0
+// [M37] Not support Backing store
+BackingStore* RenderWidgetHostViewEfl::AllocBackingStore(const gfx::Size& size) {
+  if (is_hw_accelerated_)
+    return NULL;
+  else
+    return new BackingStoreEfl(host_, content_image_, size);
+}
+#endif
 
 void RenderWidgetHostViewEfl::InitAsChild(gfx::NativeView parent_view) {
   NOTIMPLEMENTED();
@@ -394,7 +416,13 @@ gfx::NativeView RenderWidgetHostViewEfl::GetNativeView() const {
 
 gfx::NativeViewId RenderWidgetHostViewEfl::GetNativeViewId() const {
 #ifdef OS_TIZEN
-  return reinterpret_cast<gfx::NativeViewId>(content_image_);
+  if (is_hw_accelerated_) {
+    return reinterpret_cast<gfx::NativeViewId>(content_image_);
+  } else {
+    Ecore_Evas* ee = ecore_evas_ecore_evas_get(evas_);
+    return ecore_evas_window_get(ee);
+  }
+
 #else
   Ecore_Evas* ee = ecore_evas_ecore_evas_get(evas_);
   return ecore_evas_window_get(ee);
@@ -413,7 +441,8 @@ bool RenderWidgetHostViewEfl::IsSurfaceAvailableForCopy() const {
 }
 
 void RenderWidgetHostViewEfl::Show() {
-  evas_object_show(content_image_);
+//  if (is_hw_accelerated_)
+    evas_object_show(content_image_);
 }
 
 void RenderWidgetHostViewEfl::Hide() {
@@ -886,9 +915,11 @@ void RenderWidgetHostViewEfl::AcceleratedSurfaceBuffersSwapped(
   const GpuHostMsg_AcceleratedSurfaceBuffersSwapped_Params& params,
   int gpu_host_id) {
 #ifdef OS_TIZEN
-  next_pixmap_id_ = params.pixmap_id;
-  evas_object_image_pixels_dirty_set(content_image_, true);
-  surface_id_ = params.surface_id;
+  if (is_hw_accelerated_) {
+    next_pixmap_id_ = params.pixmap_id;
+    evas_object_image_pixels_dirty_set(content_image_, true);
+    surface_id_ = params.surface_id;
+  }
 #endif
 
   AcceleratedSurfaceMsg_BufferPresented_Params ack_params;
@@ -941,8 +972,10 @@ gfx::Rect RenderWidgetHostViewEfl::GetBoundsInRootWindow() {
 }
 
 gfx::GLSurfaceHandle RenderWidgetHostViewEfl::GetCompositingSurface() {
-  gfx::NativeViewId window_id = GetNativeViewId();
-  return gfx::GLSurfaceHandle(static_cast<gfx::PluginWindowHandle>(window_id), gfx::NATIVE_TRANSPORT);
+  if (is_hw_accelerated_) {
+    gfx::NativeViewId window_id = GetNativeViewId();
+    return gfx::GLSurfaceHandle(static_cast<gfx::PluginWindowHandle>(window_id), gfx::NATIVE_TRANSPORT);
+  }
 }
 
 void RenderWidgetHostViewEfl::ResizeCompositingSurface(const gfx::Size& size) {
@@ -980,7 +1013,8 @@ void RenderWidgetHostViewEfl::HandleHide() {
 
 void RenderWidgetHostViewEfl::HandleResize(int width, int height) {
 #if defined(OS_TIZEN_MOBILE)
-  UpdateScreenInfo(GetNativeView());
+  if (is_hw_accelerated_)
+    UpdateScreenInfo(GetNativeView());
 #else
   host_->WasResized();
 #endif
@@ -1274,7 +1308,7 @@ void RenderWidgetHostViewEfl::OnDidChangeContentsSize(int width, int height) {
   host_->ScrollFocusedEditableNodeIntoRect(gfx::Rect(0, 0, 0, 0));
 
 #ifdef OS_TIZEN
-  if(!m_IsEvasGLInit)
+  if (is_hw_accelerated_ && !m_IsEvasGLInit)
     Init_EvasGL(width, height);
 #endif
 }

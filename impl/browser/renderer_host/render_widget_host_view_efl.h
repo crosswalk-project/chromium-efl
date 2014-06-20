@@ -310,6 +310,7 @@ class RenderWidgetHostViewEfl
   unsigned long next_pixmap_id_;
   GLuint texture_id_;
   int surface_id_;
+  bool is_hw_accelerated_;
 
   typedef std::queue<int> KeyUpEventQueue;
   KeyUpEventQueue keyupev_queue_;

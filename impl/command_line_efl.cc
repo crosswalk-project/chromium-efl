@@ -60,20 +60,26 @@ content::MainFunctionParams CommandLineEfl::GetDefaultPortParams() {
   p_command_line->AppendSwitch(switches::kDisableDelegatedRenderer);
   p_command_line->AppendSwitch(switches::kDisableImplSidePainting);
 
-  p_command_line->AppendSwitch(switches::kEnableThreadedCompositing);
-  p_command_line->AppendSwitch(switches::kIgnoreGpuBlacklist);
-
+  //if we use software path we dont need to have next switches
+#if defined(OS_TIZEN)
+  if (!p_command_line->HasSwitch(switches::kUseSWRenderingPath))
+#endif
+  {
 #warning "[M37] Investigae removed command line switches, are they still needed, do they have a replacement?"
-  //p_command_line->AppendSwitch(switches::kForceCompositingMode);
-  //p_command_line->AppendSwitch(switches::kAllowWebUICompositing);
+    //p_command_line->AppendSwitch(switches::kForceCompositingMode);
   // [M37] Note: The commit "Temporarily disable zero copy as it causes browser crash during regression"
   // is to deprecate kEnableMapImage option.
   // But it was already deprecated during fixing M37 build as no command line option with such name (see above comment)
   // TODO: remove this commit if it turn out the option is unnecessary
   //Disabling temporarily, as it causes browser crash ID:335 in regression
-  //p_command_line->AppendSwitch(cc::switches::kEnableMapImage);
+    //p_command_line->AppendSwitch(cc::switches::kEnableMapImage);
+    //p_command_line->AppendSwitch(cc::switches::kEnableImplSidePainting);
+    p_command_line->AppendSwitch(switches::kEnableThreadedCompositing);
+    p_command_line->AppendSwitch(switches::kIgnoreGpuBlacklist);
+  }
 
-  p_command_line->AppendSwitch(switches::kEnableImplSidePainting);
+#warning "[M37] Investigae removed command line switches, are they still needed, do they have a replacement?"
+  //p_command_line->AppendSwitch(switches::kAllowWebUICompositing);
 
   // XXX: Skia benchmarking should be only used for testing,
   // when enabled the following warning is printed to stderr:
