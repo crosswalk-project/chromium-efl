@@ -251,6 +251,8 @@
       '<(chrome_src_dir)/tizen_webview/public/tw_url.h',
       '<(chrome_src_dir)/tizen_webview/public/tw_web_context.h',
       '<(chrome_src_dir)/tizen_webview/public/tw_web_context.cc',
+      '<(chrome_src_dir)/tizen_webview/public/tw_webview.h',
+      '<(chrome_src_dir)/tizen_webview/public/tw_webview.cc',
       '<(chrome_src_dir)/tizen_webview/public/tw_wrt.h',
       '<(chrome_src_dir)/tizen_webview/public/tw_wrt.cc',
       '<(chrome_src_dir)/tizen_webview/tw_misc_utility.h',

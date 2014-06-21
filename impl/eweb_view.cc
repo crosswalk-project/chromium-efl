@@ -61,6 +61,8 @@
 #include "tizen_webview/public/tw_hit_test.h"
 #include "tizen_webview/public/tw_touch_point.h"
 #include "tizen_webview/public/tw_web_context.h"
+#include "tizen_webview/public/tw_webview.h"
+
 #ifdef OS_TIZEN
 #include <vconf.h>
 #include "browser/selectpicker/popup_menu_item.h"
@@ -233,7 +235,8 @@ static void GetEinaRectFromGfxRect(const gfx::Rect& gfx_rect, Eina_Rectangle* ei
   eina_rect->h = gfx_rect.height();
 }
 
-EWebView* EWebView::Create(tizen_webview::WebContext* context, Evas* canvas, Evas_Smart* smart) {
+EWebView* EWebView::Create(tizen_webview::WebView* owner, tizen_webview::WebContext* context, Evas* canvas, Evas_Smart* smart) {
+  DCHECK(owner);
   EINA_SAFETY_ON_NULL_RETURN_VAL(canvas, 0);
 
   Evas_Object* evasObject = evas_object_smart_add(canvas, smart ? smart : DefaultSmartClassInstance());
@@ -246,8 +249,30 @@ EWebView* EWebView::Create(tizen_webview::WebContext* context, Evas* canvas, Eva
   }
 
   DCHECK(!smartData->priv);
-  smartData->priv = new EWebView(context, evasObject);
-  return smartData->priv;
+  EWebView* ewv = new EWebView(context, evasObject);
+  smartData->priv = ewv;
+  ewv->SetPublicWebView(owner);
+  return ewv;
+}
+
+void EWebView::Delete(EWebView* ewv) {
+  delete ewv;
+}
+
+void EWebView::SetPublicWebView(tizen_webview::WebView* wv) {
+  DCHECK(public_webview_ == NULL);
+  if (public_webview_ != NULL) {
+     DLOG(ERROR) << "WebView is already set. To reset WebView is prohibited";
+  }
+  public_webview_ = wv;
+}
+
+tizen_webview::WebView* EWebView::GetPublicWebView() {
+  DCHECK(public_webview_);
+  if (public_webview_ == NULL) {
+     DLOG(ERROR) << "WebView is not set. Something wrong on construction";
+  }
+  return public_webview_;
 }
 
 Evas_Object* EWebView::GetContentImageObject() const {
@@ -288,6 +313,7 @@ EWebView::EWebView(tizen_webview::WebContext* context, Evas_Object* object)
 #ifndef NDEBUG
       ,renderer_crashed_(false)
 #endif
+      , public_webview_(NULL)
 {
   if (contents_for_new_window_) {
     web_contents_delegate_.reset(new WebContentsDelegateEfl(this, contents_for_new_window_));
@@ -363,6 +389,7 @@ EWebView::~EWebView() {
   if (popupPicker_)
     popup_picker_del(popupPicker_);
 #endif
+  public_webview_ = NULL;
 }
 
 void EWebView::SubscribeMouseEvents() {
@@ -621,7 +648,7 @@ void EWebView::InvokePolicyNavigationCallback(RenderViewHost* rvh,
   if (!policy_decision_->isDecided() && !policy_decision_->isSuspended())
     policy_decision_->Use();
 
-  *handled = policy_decision_->GetNavigationPolicyHandler()->GetDecision() == NavigationPolicyHandlerEfl::Handled;
+  *handled = policy_decision_->GetImpl()->GetNavigationPolicyHandler()->GetDecision() == NavigationPolicyHandlerEfl::Handled;
 }
 
 void EWebView::handleEvasObjectAdd(Evas_Object* evas_object) {

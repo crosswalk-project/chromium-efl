@@ -100,10 +100,6 @@ int PolicyDecision::GetResponseStatusCode() const {
   return impl_->GetResponseStatusCode();
 }
 
-NavigationPolicyHandlerEfl* PolicyDecision::GetNavigationPolicyHandler() const {
-  return impl_->GetNavigationPolicyHandler();
-}
-
 Ewk_Frame* PolicyDecision::GetFrameRef() const {
   return impl_->GetFrameRef();
 }

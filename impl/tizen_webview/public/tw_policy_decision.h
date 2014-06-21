@@ -12,7 +12,6 @@
 namespace content {
 class WebContentsDelegateEfl;
 class RenderViewHost;
-
 }
 
 // TODO: break below dependency
@@ -27,6 +26,7 @@ class GURL;
 class _Ewk_Policy_Decision;
 class PolicyResponseDelegateEfl;
 struct NavigationPolicyParams;
+class EWebView;
 
 namespace tizen_webview {
 
@@ -54,7 +54,6 @@ class PolicyDecision {
   PolicyDecision(const NavigationPolicyParams &params, content::RenderViewHost* rvh);
   // for POLICY_NEWWINDOW
   PolicyDecision(content::WebContentsDelegateEfl* view, const GURL& url);
-
   ~PolicyDecision();
 
   void Use();
@@ -76,9 +75,7 @@ class PolicyDecision {
   tizen_webview::Policy_Decision_Type GetDecisionType() const;
   Eina_Hash* GetResponseHeaders() const;
   int GetResponseStatusCode() const;
-  NavigationPolicyHandlerEfl* GetNavigationPolicyHandler() const;
   Ewk_Frame* GetFrameRef() const;
-  //void InitializeOnUIThread();
  private:
   typedef ::_Ewk_Policy_Decision Impl;
   Impl* impl_;
@@ -86,6 +83,7 @@ class PolicyDecision {
 
   DISALLOW_COPY_AND_ASSIGN(PolicyDecision);
   friend class ::PolicyResponseDelegateEfl;
+  friend class ::EWebView;
 }; // class PolicyDecision
 
 } // namespace tizen_webview

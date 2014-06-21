@@ -96,8 +96,9 @@ class TouchEvent;
 }
 
 namespace tizen_webview {
-class WebContext;
 class Hit_Test;
+class WebContext;
+class WebView;
 class PolicyDecision;
 }
 
@@ -199,7 +200,8 @@ class EWebView
  public:
   static bool InitSmartClassInterface(Ewk_View_Smart_Class&);
 
-  static EWebView* Create(tizen_webview::WebContext*, Evas* canvas, Evas_Smart* smart = 0);
+  static EWebView* Create(tizen_webview::WebView* owner,
+    tizen_webview::WebContext* context, Evas* canvas, Evas_Smart* smart = 0);
 
   void CreateNewWindow(content::WebContents* new_contents);
 
@@ -262,8 +264,6 @@ class EWebView
   void InvokeAuthCallback(LoginDelegateEfl* login_delegate, const GURL& url, const std::string& realm);
   void Find(const char* text, tizen_webview::Find_Options);
   void InvokeAuthCallbackOnUI(_Ewk_Auth_Challenge* auth_challenge);
-  void set_auth_challenge(_Ewk_Auth_Challenge* ac) { auth_challenge_.reset(ac); }
-  _Ewk_Auth_Challenge* get_auth_challenge() const { return auth_challenge_.get(); }
   void SetContentSecurityPolicy(const char* policy, tizen_webview::ContentSecurityPolicyType type);
   void ShowPopupMenu(const gfx::Rect& rect, WebCore::TextDirection textDirection, double pageScaleFactor, const std::vector<content::MenuItem>& items, int data, int selectedIndex, bool multiple);
   Eina_Bool HidePopupMenu();
@@ -378,7 +378,7 @@ class EWebView
   gfx::Rect GetIMERect();
 
   // Returns TCP port number with Inspector, or 0 if error.
-  int StartInspectorServer(int = 0);
+  int StartInspectorServer(int port = 0);
   bool StopInspectorServer();
 
   std::string GetErrorPage(const std::string& invalidUrl);
@@ -524,6 +524,13 @@ class EWebView
 #if defined(OS_TIZEN_MOBILE)
   content::FileChooserParams::Mode filechooser_mode_;
 #endif
+
+  // should not used outside of WebView
+  friend class tizen_webview::WebView;
+  static void Delete(EWebView* ewv);
+  void SetPublicWebView(tizen_webview::WebView* wv);
+  tizen_webview::WebView* GetPublicWebView();
+  tizen_webview::WebView* public_webview_;
 };
 
 bool IsEWebViewObject(const Evas_Object*);
