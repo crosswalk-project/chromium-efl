@@ -228,6 +228,10 @@ struct Ewk_View_Smart_Class {
     Eina_Bool (*input_picker_color_request)(Ewk_View_Smart_Data *sd, int r, int g, int b, int a);
     Eina_Bool (*input_picker_color_dismiss)(Ewk_View_Smart_Data *sd);
 
+    // storage:
+    //   - Web database.
+    unsigned long long (*exceeded_database_quota)(Ewk_View_Smart_Data *sd, const char *databaseName, const char *displayName, unsigned long long currentQuota, unsigned long long currentOriginUsage, unsigned long long currentDatabaseUsage, unsigned long long expectedUsage);
+
     Eina_Bool (*formdata_candidate_show)(Ewk_View_Smart_Data *sd, int x, int y, int w, int h);
     Eina_Bool (*formdata_candidate_hide)(Ewk_View_Smart_Data *sd);
     Eina_Bool (*formdata_candidate_update_data)(Ewk_View_Smart_Data *sd, Eina_List *dataList);

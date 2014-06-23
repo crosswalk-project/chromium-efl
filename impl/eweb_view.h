@@ -328,6 +328,8 @@ class EWebView
   static Eina_Bool handleTextSelectionDown(Ewk_View_Smart_Data* d, int x, int y);
   static Eina_Bool handleTextSelectionUp(Ewk_View_Smart_Data* d, int x, int y);
 
+  static unsigned long long handleExceededDatabaseQuota(Ewk_View_Smart_Data *sd, const char *databaseName, const char *displayName, unsigned long long currentQuota, unsigned long long currentOriginUsage, unsigned long long currentDatabaseUsage, unsigned long long expectedUsage);
+
   static void OnTouchDown(void*, Evas*, Evas_Object*, void*);
   static void OnTouchUp(void*, Evas*, Evas_Object*, void*);
   static void OnTouchMove(void*, Evas*, Evas_Object*, void*);

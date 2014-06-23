@@ -194,6 +194,7 @@ bool EWebView::InitSmartClassInterface(Ewk_View_Smart_Class& api) {
   api.key_up = &handleKeyUp;
   api.text_selection_down = &handleTextSelectionDown;
   api.text_selection_up = &handleTextSelectionUp;
+  api.exceeded_database_quota = &handleExceededDatabaseQuota;
 
   // Type identifier.
   api.sc.data = SmartClassName;
@@ -778,6 +779,12 @@ Eina_Bool EWebView::handleTextSelectionDown(Ewk_View_Smart_Data* d, int x, int y
 
 Eina_Bool EWebView::handleTextSelectionUp(Ewk_View_Smart_Data* d, int x, int y) {
   // temporary mockup codes
+  NOTIMPLEMENTED();
+  return EINA_FALSE;
+}
+
+unsigned long long EWebView::handleExceededDatabaseQuota(Ewk_View_Smart_Data *sd, const char *databaseName, const char *displayName, unsigned long long currentQuota, unsigned long long currentOriginUsage, unsigned long long currentDatabaseUsage, unsigned long long expectedUsage) {
+  // Chromium does not support quota per origin right now, this API can't be implemented
   NOTIMPLEMENTED();
   return EINA_FALSE;
 }
