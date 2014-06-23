@@ -70,7 +70,6 @@
       'API/ewk_settings_private.h',
       'API/ewk_text_style_private.h',
       'API/ewk_user_media_private.h',
-      'API/ewk_view_private.h',
       'API/ewk_web_application_icon_data_private.h',
       'API/ewk_web_application_icon_data_private.cc',
       'EdgeEffect.cpp',

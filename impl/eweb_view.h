@@ -42,7 +42,6 @@
 #include "eweb_context.h"
 #include "API/ewk_hit_test_private.h"
 #include "API/ewk_auth_challenge_private.h"
-#include "API/ewk_view_private.h"
 #include "API/ewk_settings_private.h"
 #include "API/ewk_web_application_icon_data_private.h"
 #include "eweb_view_callbacks.h"

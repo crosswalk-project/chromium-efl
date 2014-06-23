@@ -165,6 +165,7 @@ struct Ewk_View_Smart_Class {
  * The version you have to put into the version field
  * in the @a Ewk_View_Smart_Class structure.
  */
+// TODO: mobile 6UL, tv 8UL
 #define EWK_VIEW_SMART_CLASS_VERSION 1UL
 
 /**

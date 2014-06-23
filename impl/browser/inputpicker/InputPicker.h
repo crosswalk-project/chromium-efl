@@ -27,11 +27,6 @@
 
 #include "tizen_webview/public/tw_input_type.h"
 
-// FIXME : DJKim : not implemented yet
-#if 0 //ENABLE(TIZEN_DATALIST_ELEMENT)
-#include "ewk_view_private.h"
-#endif
-
 namespace content {
 
 class WebContents;

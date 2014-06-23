@@ -5,7 +5,6 @@
 #include "API/ewk_certificate_private.h"
 #include "API/ewk_policy_decision_private.h"
 #include "API/ewk_user_media_private.h"
-#include "API/ewk_view_private.h"
 #include "browser/policy_response_delegate_efl.h"
 #include "browser/renderer_host/render_widget_host_view_efl.h"
 #include "browser/inputpicker/color_chooser_efl.h"
