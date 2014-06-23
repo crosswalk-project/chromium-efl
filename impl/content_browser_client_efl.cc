@@ -251,6 +251,10 @@ void ContentBrowserClientEfl::RenderProcessWillLaunch(
 
   BrowserContextEfl* browser_context = static_cast<BrowserContextEfl*>(
                                           host->GetBrowserContext());
+
+  // TODO: is this situation possible? Should it ever happen?
+  DCHECK(browser_context);
+
   if (browser_context)
     web_context_ = browser_context->WebContext();
 

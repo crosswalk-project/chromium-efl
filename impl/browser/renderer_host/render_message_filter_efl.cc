@@ -40,15 +40,17 @@ RenderMessageFilterEfl::~RenderMessageFilterEfl() { }
 void RenderMessageFilterEfl::OverrideThreadForMessage(const IPC::Message& message,
                                                       content::BrowserThread::ID* thread)
 {
-  if(message.type() == EwkHostMsg_DecideNavigationPolicy::ID)
+  switch (message.type()) {
+  case EwkHostMsg_DecideNavigationPolicy::ID:
     *thread = content::BrowserThread::UI;
+    break;
+  }
 }
 
 bool RenderMessageFilterEfl::OnMessageReceived(const IPC::Message& message) {
   bool handled = true;
   IPC_BEGIN_MESSAGE_MAP(RenderMessageFilterEfl, message)
     IPC_MESSAGE_HANDLER(EwkHostMsg_DecideNavigationPolicy, OnDecideNavigationPolicy)
-    IPC_MESSAGE_HANDLER(EwkViewHostMsg_HitTestReply, OnReceivedHitTestData)
     IPC_MESSAGE_UNHANDLED(handled = false)
   IPC_END_MESSAGE_MAP()
   return handled;
@@ -66,15 +68,3 @@ void RenderMessageFilterEfl::OnDecideNavigationPolicy(NavigationPolicyParams par
   }
 }
 
-void RenderMessageFilterEfl::OnReceivedHitTestData(int render_view,
-  const _Ewk_Hit_Test& hit_test_data,
-  const NodeAttributesMap& node_attributes) {
-  content::WebContents* web_contents = WebContentsFromViewID(
-      render_process_id_, render_view);
-
-  if (web_contents) {
-    content::WebContentsDelegateEfl* delegate =
-    static_cast<content::WebContentsDelegateEfl*>(web_contents->GetDelegate());
-    delegate->web_view()->UpdateHitTestData(hit_test_data, node_attributes);
-  }
-}

@@ -192,6 +192,7 @@ class WebApplicationCapableGetCallback {
 };
 
 class JavaScriptDialogManagerEfl;
+class WebViewBrowserMessageFilter;
 
 class EWebView
     : public ui::GestureConsumer
@@ -517,6 +518,7 @@ class EWebView
 #ifdef TIZEN_EDGE_EFFECT
   scoped_refptr<EdgeEffect> edge_effect_;
 #endif
+  WebViewBrowserMessageFilter* message_filter_;
 
 #ifndef NDEBUG
   bool renderer_crashed_;

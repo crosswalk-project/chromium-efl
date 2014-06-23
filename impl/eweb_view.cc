@@ -41,6 +41,7 @@
 #include "content/browser/renderer_host/ui_events_helper.h"
 #include "content/browser/renderer_host/render_view_host_impl.h"
 #include "content/browser/web_contents/web_contents_view.h"
+#include "content/public/browser/browser_message_filter.h"
 #include "content/public/browser/navigation_controller.h"
 #include "content/public/browser/navigation_entry.h"
 #include "content/public/browser/resource_dispatcher_host.h"
@@ -168,6 +169,54 @@ DEFINE_EVENT_HANDLER(EVAS_CALLBACK_KEY_DOWN, Evas_Event_Key_Down, key_down);
 DEFINE_EVENT_HANDLER(EVAS_CALLBACK_KEY_UP, Evas_Event_Key_Up, key_up);
 
 } // namespace
+
+class WebViewBrowserMessageFilter: public content::BrowserMessageFilter {
+ public:
+  WebViewBrowserMessageFilter(EWebView* web_view)
+    : BrowserMessageFilter(ChromeMsgStart)
+    , web_view_(web_view) {
+    WebContents* web_contents = GetWebContents();
+    DCHECK(web_contents);
+
+    if (web_contents && web_contents->GetRenderProcessHost())
+      web_contents->GetRenderProcessHost()->AddFilter(this);
+  }
+
+  bool OnMessageReceived(const IPC::Message& message) {
+    bool handled = true;
+    IPC_BEGIN_MESSAGE_MAP(WebViewBrowserMessageFilter, message)
+      IPC_MESSAGE_HANDLER(EwkViewHostMsg_HitTestReply, OnReceivedHitTestData)
+      IPC_MESSAGE_UNHANDLED(handled = false)
+    IPC_END_MESSAGE_MAP()
+    return handled;
+  }
+
+ private:
+  void OnReceivedHitTestData(int render_view, const _Ewk_Hit_Test& hit_test_data,
+      const NodeAttributesMap& node_attributes) {
+    DCHECK(BrowserThread::CurrentlyOn(BrowserThread::IO));
+    WebContents* contents = GetWebContents();
+    DCHECK(contents);
+
+    if (contents) {
+      RenderViewHost* render_view_host= contents->GetRenderViewHost();
+      DCHECK(render_view_host);
+
+      if (render_view_host && render_view_host->GetRoutingID() == render_view)
+        web_view_->UpdateHitTestData(hit_test_data, node_attributes);
+    }
+  }
+
+  WebContents* GetWebContents() const {
+    if (web_view_ && web_view_->web_contents_delegate())
+      return web_view_->web_contents_delegate()->web_contents();
+
+    return NULL;
+  }
+
+private:
+  EWebView* web_view_;
+};
 
 Evas_Smart_Class EWebView::parent_smart_class_ = EVAS_SMART_CLASS_INIT_NULL;
 
@@ -309,6 +358,7 @@ EWebView::EWebView(tizen_webview::WebContext* context, Evas_Object* object)
 #ifdef TIZEN_EDGE_EFFECT
       , edge_effect_(EdgeEffect::create(object))
 #endif
+      , message_filter_(NULL)
 #ifndef NDEBUG
       ,renderer_crashed_(false)
 #endif
@@ -1561,17 +1611,30 @@ tizen_webview::Hit_Test* EWebView::RequestHitTestDataAt(int x, int y, tizen_webv
 }
 
 tizen_webview::Hit_Test* EWebView::RequestHitTestDataAtBlinkCoords(int x, int y, tizen_webview::Hit_Test_Mode mode) {
+  DCHECK(BrowserThread::CurrentlyOn(BrowserThread::UI));
+
+  // WebViewBrowserMessageFilter requires RenderProcessHost to be already created.
+  // In EWebView constructor we have no guarantee that related RenderProcessHost is already created
+  // We do not destroy message_filter_ manualy as it is managed by RenderProcessHost after setting it as filter
+  // TODO: this pointer should be set to NULL when WebProcess crash/quits
+  if (!message_filter_) {
+    message_filter_ = new WebViewBrowserMessageFilter(this);
+  }
+
   RenderViewHost* render_view_host = web_contents_delegate()->web_contents()->GetRenderViewHost();
+  content::RenderProcessHost* render_process_host = web_contents_delegate()->web_contents()->GetRenderProcessHost();
   DCHECK(render_view_host);
+  DCHECK(render_process_host);
 
-  render_view_host->Send(new EwkViewMsg_DoHitTest(render_view_host->GetRoutingID(), x, y, mode));
-
-  {
+  if (render_view_host && render_process_host) {
     // We wait on UI thread till hit test data is updated.
     base::ThreadRestrictions::ScopedAllowWait allow_wait;
+    render_view_host->Send(new EwkViewMsg_DoHitTest(render_view_host->GetRoutingID(), x, y, mode));
     hit_test_completion_.Wait();
+    return new tizen_webview::Hit_Test(hit_test_data_);
   }
-  return new tizen_webview::Hit_Test(hit_test_data_);
+
+  return NULL;
 }
 
 void EWebView::UpdateHitTestData(const _Ewk_Hit_Test& hit_test_data, const NodeAttributesMap& node_attributes) {
