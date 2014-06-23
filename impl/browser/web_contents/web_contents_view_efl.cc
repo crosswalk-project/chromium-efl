@@ -182,7 +182,11 @@ void WebContentsViewEfl::ShowPopupMenu(const gfx::Rect& bounds,
                                        bool right_aligned,
                                        bool allow_multiple_selection,
                                        int advanced_ime_options) {
-  NOTIMPLEMENTED();
+  // DJKim : FIXME
+  WebCore::TextDirection textDirection = WebCore::LTR;
+  WebContentsDelegateEfl* delegate = static_cast<WebContentsDelegateEfl*>(web_contents_->GetDelegate());
+  if (delegate)
+    delegate->ShowPopupMenu(bounds, textDirection, 0 , items, 0, selected_item);
 }
 
 void WebContentsViewEfl::ShowContextMenu(RenderFrameHost* render_frame_host, const ContextMenuParams& params) {

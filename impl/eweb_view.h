@@ -35,6 +35,7 @@
 #include "content/public/common/file_chooser_params.h"
 #include "content/browser/renderer_host/event_with_latency_info.h"
 #include "content/common/input/input_event_ack_state.h"
+#include "content/public/common/menu_item.h"
 #include "base/id_map.h"
 #include "context_menu_controller_efl.h"
 #include "eweb_context.h"
@@ -55,12 +56,17 @@
 #include "ui/gfx/point.h"
 #include "ui/gfx/size.h"
 #include "browser/inputpicker/InputPicker.h"
+#include "third_party/WebKit/Source/platform/text/TextDirection.h"
 #ifdef TIZEN_CONTENTS_DETECTION
 #include "popup_controller_efl.h"
 #endif
 
 #ifdef TIZEN_EDGE_EFFECT
 #include "EdgeEffect.h"
+#endif
+
+#if defined(OS_TIZEN)
+#include "browser/selectpicker/popup_picker.h"
 #endif
 
 namespace content {
@@ -227,6 +233,13 @@ class EWebView
   void set_auth_challenge(_Ewk_Auth_Challenge* ac) { auth_challenge_.reset(ac); }
   _Ewk_Auth_Challenge* get_auth_challenge() const { return auth_challenge_.get(); }
   void SetContentSecurityPolicy(const char* policy, Ewk_CSP_Header_Type type);
+  void ShowPopupMenu(const gfx::Rect& rect, WebCore::TextDirection textDirection, double pageScaleFactor, const std::vector<content::MenuItem>& items, int data, int selectedIndex);
+  Eina_Bool HidePopupMenu();
+  bool FormIsNavigating() const { return formIsNavigating_; }
+  void SetFormIsNavigating(bool formIsNavigating);
+  Eina_Bool PopupMenuUpdate(Eina_List* items, int selectedIndex);
+  Eina_Bool DidSelectPopupMenuItem(int selectedindex);
+ Eina_Bool PopupMenuClose();
   void ShowContextMenu(const content::ContextMenuParams& params, content::ContextMenuType type = content::MENU_TYPE_LINK);
   void CancelContextMenu(int request_id);
   void SetScale(double scale_factor, int x, int y);
@@ -417,6 +430,17 @@ class EWebView
   mutable std::string selected_text_;
   scoped_ptr<_Ewk_Auth_Challenge> auth_challenge_;
   scoped_ptr<Ewk_Policy_Decision> policy_decision_;
+#if defined(OS_TIZEN)
+  Eina_List* popupMenuItems_;
+  Popup_Picker* popupPicker_;
+#endif
+  bool formIsNavigating_;
+  struct {
+    int count;
+    int position;
+    bool prevState;
+    bool nextState;
+  } formNavigation;
   scoped_ptr<content::ContextMenuControllerEfl> context_menu_;
   scoped_ptr<content::FileChooserControllerEfl> file_chooser_;
 #ifdef TIZEN_CONTENTS_DETECTION

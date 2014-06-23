@@ -19,6 +19,7 @@
 #include "content/browser/web_contents/web_contents_impl.h"
 #include "url/gurl.h"
 #include "browser/favicon/favicon_downloader.h"
+#include "third_party/WebKit/Source/platform/text/TextDirection.h"
 #include "ui/base/ime/text_input_type.h"
 
 class DidPrintPagesParams;
@@ -134,6 +135,8 @@ class WebContentsDelegateEfl
 
   void OnFormSubmit(const GURL&);
   void SetContentSecurityPolicy(const std::string& policy, Ewk_CSP_Header_Type header_type);
+  void ShowPopupMenu(const gfx::Rect& rect, WebCore::TextDirection textDirection, double pageScaleFactor, const std::vector<MenuItem>& items, int data, int selectedIndex);
+  void HidePopupMenu();
   virtual void ShowContextMenu(RenderFrameHost* render_frame_host, const ContextMenuParams& params) OVERRIDE;
   virtual void CancelContextMenu(int request_id) OVERRIDE;
   void set_new_window_policy(bool policy) { should_open_new_window_ = policy; }

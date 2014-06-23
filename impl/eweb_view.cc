@@ -60,6 +60,9 @@
 
 #ifdef OS_TIZEN
 #include <vconf.h>
+#include "browser/selectpicker/popup_menu_item.h"
+#include "browser/selectpicker/popup_menu_item_private.h"
+#include "browser/selectpicker/WebPopupItem.h"
 #endif
 #include <Ecore_Evas.h>
 #include <Elementary.h>
@@ -319,6 +322,10 @@ EWebView::EWebView(EWebContext* context, Evas_Object* object)
   else
     SetMouseEventsEnabled(true);
 
+#if defined(OS_TIZEN)
+  popupMenuItems_ = 0;
+  popupPicker_ = 0;
+#endif
   //allow this object and its children to get a focus
   elm_object_tree_focus_allow_set (object, EINA_TRUE);
 }
@@ -337,6 +344,15 @@ EWebView::~EWebView() {
   context_menu_.reset();
 
   mhtml_callback_map_.Clear();
+
+#if defined(OS_TIZEN)
+  void* item;
+  EINA_LIST_FREE(popupMenuItems_, item);
+    delete static_cast<Popup_Menu_Item*>(item);
+
+  if (popupPicker_)
+    popup_picker_del(popupPicker_);
+#endif
 }
 
 void EWebView::SubscribeMouseEvents() {
@@ -1183,6 +1199,127 @@ void EWebView::LoadData(const char* data, size_t size, const char* mime_type, co
   data_params.should_replace_current_entry = false;
   WebContents* web_contents = web_contents_delegate_->web_contents();
   web_contents->GetController().LoadURLWithParams(data_params);
+}
+
+void EWebView::ShowPopupMenu(const gfx::Rect& rect, WebCore::TextDirection textDirection, double pageScaleFactor, const std::vector<content::MenuItem>& items, int data, int selectedIndex) {
+#if defined(OS_TIZEN)
+  Eina_List* popupItems = 0;
+  const size_t size = items.size();
+  for (size_t i = 0; i < size; ++i) {
+    popupItems = eina_list_append(popupItems, Popup_Menu_Item::create(blink::WebPopupItem(blink::WebPopupItem::Type(1), base::UTF16ToUTF8(items[i].label), WebCore::TextDirection(items[i].rtl), items[i].has_directional_override, base::UTF16ToUTF8(items[i].tool_tip), base::UTF16ToUTF8(items[i].label), items[i].enabled, true, items[i].checked)).leakPtr());
+  }
+  popupMenuItems_ = popupItems;
+
+  // DJKim : FIXME
+#if 0 //ENABLE(TIZEN_WEBKIT2_FORM_NAVIGATION)
+  if (FormIsNavigating()) {
+#if 0 //ENABLE(TIZEN_MULTIPLE_SELECT
+    popupPicker_->multiSelect = true;
+#endif
+    PopupMenuUpdate(popupMenuItems_, 0);
+    SetFormIsNavigating(false);
+    return;
+  }
+#endif
+  // DJKim : FIXME
+  //if (popupPicker_)
+    //popup_picker_del(popupPicker_);
+
+  popupPicker_ = popup_picker_new(this, evas_object(), popupMenuItems_, selectedIndex);
+  // DJKim : FIXME
+  //popup_picker_buttons_update(popupPicker_, formNavigation.position, formNavigation.count, false);
+#endif
+}
+
+Eina_Bool EWebView::HidePopupMenu() {
+#if defined(OS_TIZEN)
+  if (!popupPicker_)
+    return false;
+
+  // DJKim : FIXME
+  //if (impl->pageProxy->formIsNavigating())
+  //if (FormIsNavigating())
+    //return true;
+
+  popup_picker_del(popupPicker_);
+  popupPicker_ = 0;
+#endif
+  return true;
+}
+
+Eina_Bool EWebView::PopupMenuClose() {
+#if defined(OS_TIZEN)
+// DJKim : FIXME
+#if 0
+  if (!impl->popupMenuProxy)
+    return false;
+
+  impl->popupMenuProxy = 0;
+#endif
+  HidePopupMenu();
+
+// DJKim : FIXME
+#if 1//ENABLE(TIZEN_WEBKIT2_POPUP_INTERNAL)
+  //ewk_view_touch_events_enabled_set(ewkView, true);
+  //releasePopupMenuList(popupMenuItems_);
+  if (!popupMenuItems_)
+    return false;
+
+  void* item;
+  EINA_LIST_FREE(popupMenuItems_, item)
+  delete static_cast<Popup_Menu_Item*>(item);
+  popupMenuItems_ = 0;
+#else
+  void* item;
+  EINA_LIST_FREE(popupMenuItems_, item)
+  delete static_cast<Popup_Menu_Item*>(item);
+#endif
+
+  RenderViewHostImpl* render_view_host = static_cast<RenderViewHostImpl*>(web_contents_delegate_->web_contents()->GetRenderViewHost());
+  if (!render_view_host)
+    return false;
+
+  render_view_host->PopupMenuClose();
+#endif
+  return true;
+}
+
+void EWebView::SetFormIsNavigating(bool formIsNavigating) {
+#if defined(OS_TIZEN)
+  formIsNavigating_ = formIsNavigating;
+#endif
+}
+
+Eina_Bool EWebView::PopupMenuUpdate(Eina_List* items, int selectedIndex) {
+#if defined(OS_TIZEN)
+  if (popupPicker_)
+    return false;
+
+  popup_picker_update(evas_object(), popupPicker_, items, selectedIndex);
+  // DJKim : FIXME
+  //popup_picker_buttons_update(popupPicker_, formIsNavigating_.position, formIsNavigating_.count, false);
+#endif
+  return true;
+}
+
+Eina_Bool EWebView::DidSelectPopupMenuItem(int selectedindex) {
+#if defined(OS_TIZEN)
+  RenderViewHostImpl* render_view_host = static_cast<RenderViewHostImpl*>(web_contents_delegate_->web_contents()->GetRenderViewHost());
+  if (!render_view_host)
+    return false;
+
+  if (!popupMenuItems_)
+    return false;
+
+  //When user select empty space then no index is selected, so selectedIndex value is -1
+  //In that case we should call valueChanged() with -1 index.That in turn call popupDidHide()
+  //in didChangeSelectedIndex() for reseting the value of m_popupIsVisible in RenderMenuList.
+  if (selectedindex != -1 && selectedindex >= eina_list_count(popupMenuItems_))
+    return false;
+
+  render_view_host->DidSelectPopupMenuItem(selectedindex);
+#endif
+  return true;
 }
 
 void EWebView::ShowContextMenu(const content::ContextMenuParams& params, content::ContextMenuType type) {
