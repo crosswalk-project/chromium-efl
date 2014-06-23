@@ -36,6 +36,7 @@ class DevToolsDelegateEfl : public DevToolsHttpHandlerDelegate {
   DevToolsHttpHandler* devtools_http_handler() {
     return devtools_http_handler_;
   }
+  static int StartDevTools();
 
  private:
 

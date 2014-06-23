@@ -317,6 +317,7 @@ class EWebView
 
   bool IsIMEShow();
   gfx::Rect GetIMERect();
+  int StartInspectorServer();
 
   std::string GetErrorPage(const std::string& invalidUrl);
 

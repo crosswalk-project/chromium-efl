@@ -23,6 +23,9 @@
 #include "net/socket/tcp_listen_socket.h"
 #include "ui/base/resource/resource_bundle.h"
 #include "base/logging.h"
+#include <stdlib.h>
+#include <time.h>
+#include <unistd.h>
 
 using content::DevToolsAgentHost;
 using content::RenderViewHost;
@@ -30,13 +33,13 @@ using content::WebContents;
 
 namespace {
 
+static int port = 0;
 const char kTargetTypePage[] = "page";
 
 net::StreamListenSocketFactory* CreateSocketFactory() {
   const CommandLine& command_line = *CommandLine::ForCurrentProcess();
   // See if the user specified a port on the command line (useful for
   // automation). If not, use an ephemeral port by specifying 0.
-  int port = 0;
   if (command_line.HasSwitch(switches::kRemoteDebuggingPort)) {
     int temp_port;
     std::string port_str =
@@ -47,6 +50,10 @@ net::StreamListenSocketFactory* CreateSocketFactory() {
     } else {
       DLOG(WARNING) << "Invalid http debugger port number " << temp_port;
     }
+  } else {
+    //This random port is for old sdk widget debug.
+    srand( (unsigned)time(NULL) + (unsigned)getpid() );
+    port = random() % (65535 - 40000) + 40000;
   }
   return new net::TCPListenSocketFactory("0.0.0.0", port);
 }
@@ -128,6 +135,11 @@ DevToolsDelegateEfl::DevToolsDelegateEfl() {
 }
 
 DevToolsDelegateEfl::~DevToolsDelegateEfl() {
+}
+
+int DevToolsDelegateEfl::StartDevTools() {
+  DevToolsDelegateEfl* start_devtools_ = new DevToolsDelegateEfl();
+  return port;
 }
 
 void DevToolsDelegateEfl::Stop() {

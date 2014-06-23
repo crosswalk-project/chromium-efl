@@ -56,6 +56,7 @@
 #include "browser/motion/wkext_motion.h"
 #include "grit/webkit_strings.h"
 #include "ui/base/l10n/l10n_util.h"
+#include "devtools_delegate_efl.h"
 
 #ifdef OS_TIZEN
 #include <vconf.h>
@@ -1837,6 +1838,10 @@ std::string EWebView::GetErrorPage(const std::string& invalidUrl) {
     "</html>"
     ;
    return html;
+}
+
+int EWebView::StartInspectorServer() {
+  return content::DevToolsDelegateEfl::StartDevTools();
 }
 
 #if defined(OS_TIZEN_MOBILE)
