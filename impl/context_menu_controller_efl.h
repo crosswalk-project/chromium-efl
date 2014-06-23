@@ -21,9 +21,12 @@
 #define context_menu_controller_h
 
 #include <Evas.h>
+#include "content/public/browser/render_view_host.h"
 #include "content/public/common/context_menu_params.h"
 
 namespace content {
+
+class WebContentsDelegateEfl;
 
 enum ContextMenuOption{
   MENU_ITEM_NO_ACTION = 0,
@@ -175,11 +178,12 @@ class ContextMenuControllerEfl {
   static void contextMenuCancelCallback(void* data, Evas_Object* obj, void* eventInfo);
   static void contextMenuItemSelectedCallback(void* data, Evas_Object* obj, void* eventInfo);
 
-  ContextMenuControllerEfl(Evas_Object* evas_object, ContextMenuType type)
+  ContextMenuControllerEfl(Evas_Object* evas_object, ContextMenuType type, WebContentsDelegateEfl* wcd)
     : evas_object_(evas_object)
     , popup_(0)
     , menu_items_(0)
-    , type_(type) {
+    , type_(type)
+    , wcd_(wcd) {
   }
 
   ~ContextMenuControllerEfl();
@@ -201,11 +205,13 @@ class ContextMenuControllerEfl {
                             std::string link_url,
                             std::string icon_path);
   void HideSelectionHandle();
+  base::FilePath DownloadFile(const GURL url, const base::FilePath outputDir);
   Evas_Object* evas_object_;
   Evas_Object* popup_;
   Eina_List* menu_items_;
   ContextMenuType type_;
   ContextMenuParams params_;
+  WebContentsDelegateEfl* wcd_;
 };
 
 } // namespace

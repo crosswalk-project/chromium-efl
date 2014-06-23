@@ -16,12 +16,21 @@
     the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor,
     Boston, MA 02110-1301, USA.
 */
+#include <stdio.h>
+#include <stdlib.h>
 
 #include "API/ewk_context_menu_private.h"
 #include <Elementary.h>
+#include "base/files/file_path.h"
+#include "net/base/filename_util.h"
 #include "components/clipboard/clipboard_helper_efl.h"
 #include "context_menu_controller_efl.h"
+#include "content/public/browser/download_manager.h"
+#include "content/public/browser/download_url_parameters.h"
+#include "content/public/browser/navigation_entry.h"
 #include "eweb_view.h"
+#include "net/base/net_util.h"
+#include "third_party/WebKit/public/platform/WebReferrerPolicy.h"
 #include "ui/base/clipboard/clipboard.h"
 
 namespace content {
@@ -75,13 +84,26 @@ void ContextMenuControllerEfl::AddItemToPropsedList(ContextMenuOptionType item,
 }
 
 void ContextMenuControllerEfl::GetProposedContextMenu() {
-  if (!params_.link_url.is_empty())
+  if (!params_.link_url.is_empty()) {
     AddItemToPropsedList(MENU_ITEM_TYPE_ACTION,
                          MENU_ITEM_OPEN_LINK_IN_NEW_WINDOW,
                          std::string(dgettext("WebKit","IDS_WEBVIEW_OPT_OPEN_LINK_IN_NEW_TAB_ABB")),
                          std::string(),
                          params_.link_url.spec(),
                          std::string());
+    AddItemToPropsedList(MENU_ITEM_TYPE_ACTION,
+                         MENU_ITEM_COPY_LINK_TO_CLIPBOARD,
+                         std::string("Copy link"),
+                         std::string(),
+                         params_.link_url.spec(),
+                         std::string());
+    AddItemToPropsedList(MENU_ITEM_TYPE_ACTION,
+                         MENU_ITEM_DOWNLOAD_LINK_TO_DISK,
+                         std::string("Save link"),
+                         std::string(),
+                         params_.link_url.spec(),
+                         std::string());
+  }
   if (!params_.selection_text.empty())
     AddItemToPropsedList(MENU_ITEM_TYPE_ACTION,
                          MENU_ITEM_CUT,
@@ -130,6 +152,26 @@ void ContextMenuControllerEfl::GetProposedContextMenu() {
                          params_.link_url.spec(),
                          params_.link_url.spec(),
                          std::string());
+  if (params_.has_image_contents && params_.link_url.is_empty()) {
+    AddItemToPropsedList(MENU_ITEM_TYPE_ACTION,
+                         MENU_ITEM_DOWNLOAD_IMAGE_TO_DISK,
+                         std::string("Save Image"),
+                         params_.src_url.spec(),
+                         params_.src_url.spec(),
+                         std::string());
+    AddItemToPropsedList(MENU_ITEM_TYPE_ACTION,
+                         MENU_ITEM_OPEN_IMAGE_IN_NEW_WINDOW,
+                         std::string("View Image"),
+                         params_.src_url.spec(),
+                         params_.src_url.spec(),
+                         std::string());
+    AddItemToPropsedList(MENU_ITEM_TYPE_ACTION,
+                         MENU_ITEM_COPY_IMAGE_TO_CLIPBOARD,
+                         std::string("Copy Image"),
+                         params_.src_url.spec(),
+                         params_.src_url.spec(),
+                         std::string());
+  }
   AddItemToPropsedList(MENU_ITEM_TYPE_ACTION,
                        MENU_ITEM_CLIPBOARD,
                        std::string(dgettext("WebKit","IDS_WEBVIEW_OPT_CLIPBOARD")),
@@ -282,6 +324,36 @@ void ContextMenuControllerEfl::HideSelectionHandle() {
     controller->HideHandle();
 }
 
+base::FilePath ContextMenuControllerEfl::DownloadFile(const GURL url, const base::FilePath outputDir) {
+  const GURL referrer = wcd_->web_contents()->GetVisibleURL();
+  DownloadManager* dlm = BrowserContext::GetDownloadManager(wcd_->web_contents()->GetBrowserContext());
+
+  scoped_ptr<DownloadUrlParameters> dl_params(
+      DownloadUrlParameters::FromWebContents(wcd_->web_contents(), url));
+  dl_params->set_post_id(-1);
+  dl_params->set_referrer(
+      content::Referrer(referrer, blink::WebReferrerPolicyAlways));
+  dl_params->set_referrer_encoding("utf8");
+  base::FilePath fileName = net::GenerateFileName(url,"","","","","");
+  base::FilePath fullPath = outputDir.Append(fileName);
+
+  while (PathExists(fullPath)) {
+    unsigned int i;
+    base::FilePath fileNameTmp;
+    for (i = 0; PathExists(fullPath) && i <= 999; i++) {
+      char buffer[6];
+      snprintf(buffer, sizeof(buffer), "(%d)", i);
+      fileNameTmp = fileName.InsertBeforeExtension(std::string(buffer));
+      fullPath = outputDir.Append(fileNameTmp);
+    }
+  }
+
+  dl_params->set_file_path(fullPath);
+  dl_params->set_prompt(true);
+  dlm->DownloadUrl(dl_params.Pass());
+  return fullPath;
+}
+
 void ContextMenuControllerEfl::MenuItemSelected(ContextMenuItemEfl *menu_item) {
   EWebView* view = ToEWebView(evas_object_);
   if (!view)
@@ -329,6 +401,41 @@ void ContextMenuControllerEfl::MenuItemSelected(ContextMenuItemEfl *menu_item) {
       Evas_Coord x, y;
       evas_object_geometry_get(view->evas_object(), &x, &y, 0, 0);
       view->SelectLinkText(gfx::Point(params_.x - x, params_.y - y));
+      break;
+    }
+    case MENU_ITEM_COPY_IMAGE_TO_CLIPBOARD: {
+      base::FilePath tmpFile = DownloadFile(GURL(menu_item->ImageURL()), base::FilePath("/tmp/"));
+      ClipboardHelperEfl::GetInstance()->SetData(tmpFile.value(),ClipboardHelperEfl::CLIPBOARD_DATA_TYPE_IMAGE);
+      break;
+    }
+    case MENU_ITEM_COPY_LINK_TO_CLIPBOARD: {
+      ClipboardHelperEfl::GetInstance()->SetData(menu_item->LinkURL(),ClipboardHelperEfl::CLIPBOARD_DATA_TYPE_URL);
+      break;
+    }
+    case MENU_ITEM_DOWNLOAD_LINK_TO_DISK: {
+#ifdef OS_TIZEN_MOBILE
+      DownloadFile(GURL(menu_item->LinkURL()), base::FilePath("/opt/usr/media/Downloads/Others/"));
+#else
+      DownloadFile(GURL(menu_item->LinkURL()), base::FilePath("/tmp/"));
+#endif
+      break;
+    }
+    case MENU_ITEM_DOWNLOAD_IMAGE_TO_DISK: {
+#ifdef OS_TIZEN_MOBILE
+      DownloadFile(GURL(menu_item->ImageURL()), base::FilePath("/opt/usr/media/Images/"));
+#else
+      DownloadFile(GURL(menu_item->ImageURL()), base::FilePath("/tmp/"));
+#endif
+      break;
+    }
+    case MENU_ITEM_OPEN_IMAGE_IN_NEW_WINDOW: {
+      WindowOpenDisposition disposition = CURRENT_TAB;
+      GURL url(menu_item->ImageURL());
+      if (!url.is_valid())
+        return;
+      NavigationController::LoadURLParams params(url);
+      WebContents* web_contents = wcd_->web_contents();
+      web_contents->GetController().LoadURLWithParams(params);
       break;
     }
     case MENU_ITEM_SELECT_WORD: {

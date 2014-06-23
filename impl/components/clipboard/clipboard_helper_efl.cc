@@ -92,6 +92,7 @@ const char kCbhmAtomItem[] = "CBHM_ITEM";
 const char kCbhmAtomMessage[] = "CBHM_MSG";
 const char kCbhmAtomTextHtml[] = "text/html;charset=utf-8";
 const char kCbhmAtomTextUri[] = "text/uri";
+const char kCbhmAtomTextUriList[] = "text/uri-list";
 const char kCbhmAtomUTF8String[] = "UTF8_STRING";
 const char kCbhmAtomXWindow[] = "CBHM_XWIN";
 
@@ -112,14 +113,18 @@ ClipboardHelperEfl::ClipboardHelperEfl() {
 void ClipboardHelperEfl::SetData(const std::string& data, ClipboardDataType type) {
   Ecore_X_Atom data_type = 0;
 
-  if (type == CLIPBOARD_DATA_TYPE_PLAIN_TEXT ||
-      type == CLIPBOARD_DATA_TYPE_URI_LIST ||
-      type == CLIPBOARD_DATA_TYPE_URL) {
-    data_type = ecore_x_atom_get(kCbhmAtomUTF8String);
-  } else {
-    //TODO: Other formats need to be added here.
-    NOTIMPLEMENTED();
-    return;
+  switch(type)
+  {
+    case CLIPBOARD_DATA_TYPE_PLAIN_TEXT:
+    case CLIPBOARD_DATA_TYPE_URI_LIST:
+    case CLIPBOARD_DATA_TYPE_URL:
+      data_type = ecore_x_atom_get(kCbhmAtomUTF8String);
+      break;
+    case CLIPBOARD_DATA_TYPE_IMAGE:
+      data_type = ecore_x_atom_get(kCbhmAtomTextUriList);
+      break;
+    default:
+      NOTIMPLEMENTED();
   }
 
   SetClipboardItem(data_type, data);

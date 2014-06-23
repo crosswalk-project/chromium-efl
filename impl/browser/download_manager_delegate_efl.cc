@@ -5,24 +5,22 @@
 #include "content/public/browser/download_item.h"
 
 
-bool DownloadManagerDelegateEfl::DetermineDownloadTarget(content::DownloadItem*,
+bool DownloadManagerDelegateEfl::DetermineDownloadTarget(content::DownloadItem* item,
                                                          const content::DownloadTargetCallback& callback) {
-  callback.Run(base::FilePath() /* Empty file path for cancel */,
+  callback.Run(item->GetForcedFilePath(),
                content::DownloadItem::TARGET_DISPOSITION_OVERWRITE,
                content::DOWNLOAD_DANGER_TYPE_NOT_DANGEROUS,
-               base::FilePath());
+               item->GetForcedFilePath());
   return true;
 }
 
 bool DownloadManagerDelegateEfl::ShouldCompleteDownload(content::DownloadItem*,
                                                         const base::Closure&) {
-  NOTREACHED();
   return true;
 }
 
 bool DownloadManagerDelegateEfl::ShouldOpenDownload(content::DownloadItem*,
                                                     const content::DownloadOpenDelayedCallback&) {
-  NOTREACHED();
   return true;
 }
 

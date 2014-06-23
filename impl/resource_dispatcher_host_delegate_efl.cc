@@ -26,6 +26,7 @@
 #include "content/public/browser/browser_thread.h"
 #include "content/public/browser/web_contents.h"
 #include "content/public/browser/resource_request_info.h"
+#include "net/http/http_response_headers.h"
 
 using web_contents_utils::WebContentsFromFrameID;
 
@@ -34,12 +35,27 @@ namespace content {
 namespace {
 
 void TriggerNewDownloadStartCallbackOnUIThread(
-    EwkDidStartDownloadCallback* start_download_callback,
+    int render_process_id,
+    int render_frame_id,
     const GURL& url,
     const std::string& /*user_agent*/,
     const std::string& /*content_disposition*/,
     const std::string& /*mime_type*/,
     int64 /*content_length*/) {
+  WebContents* web_contents =
+      WebContentsFromFrameID(render_process_id, render_frame_id);
+  if (!web_contents)
+    return;
+
+  BrowserContextEfl* browser_context =
+      static_cast<BrowserContextEfl*>(web_contents->GetBrowserContext());
+  if (!browser_context)
+    return;
+
+  EwkDidStartDownloadCallback* start_download_callback =
+      browser_context->WebContext()->DidStartDownloadCallback();
+  if (!start_download_callback)
+    return;
   DCHECK(BrowserThread::CurrentlyOn(BrowserThread::UI));
   start_download_callback->TriggerCallback(url.spec());
 }
@@ -97,10 +113,15 @@ void ResourceDispatcherHostDelegateEfl::DownloadStarting(
   std::string mime_type;
   int64 content_length = request->GetExpectedContentSize();
 
-  request->GetResponseHeaderByName("content-disposition", &content_disposition);
   request->extra_request_headers().GetHeader(
       net::HttpRequestHeaders::kUserAgent, &user_agent);
-  request->GetMimeType(&mime_type);
+
+  net::HttpResponseHeaders* response_headers = request->response_headers();
+  if (response_headers) {
+    response_headers->GetNormalizedHeader("content-disposition",
+        &content_disposition);
+    response_headers->GetMimeType(&mime_type);
+  }
 
   request->Cancel();
   // POST request cannot be repeated in general, so prevent client from
@@ -130,23 +151,12 @@ void ResourceDispatcherHostDelegateEfl::TriggerNewDownloadStartCallback(
   if (render_process_id == -1 || render_frame_id == -1)
     return;
 
-  WebContents* web_contents = WebContentsFromFrameID(render_process_id, render_frame_id);
-  if (!web_contents)
-    return;
-
-  BrowserContextEfl* browser_context = static_cast<BrowserContextEfl*>(web_contents->GetBrowserContext());
-  if (!browser_context)
-    return;
-
-  EwkDidStartDownloadCallback* start_download_callback = browser_context->WebContext()->DidStartDownloadCallback();
-  if (!start_download_callback)
-    return;
-
   //Since called by IO thread callback trigger needs to be posted to UI thread so that IO thread is unblocked
   BrowserThread::PostTask(
     BrowserThread::UI, FROM_HERE,
     base::Bind(TriggerNewDownloadStartCallbackOnUIThread,
-               start_download_callback,
+               render_process_id,
+               render_frame_id,
                request->url(),
                user_agent,
                content_disposition,
