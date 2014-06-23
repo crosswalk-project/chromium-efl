@@ -43,6 +43,7 @@ class SelectionMagnifierEfl {
   void Show();
   void Hide();
   bool IsShowing() { return shown_; }
+  void OnAnimatorUp();
 
  private:
   static Eina_Bool MoveAnimatorCallback(void* data);

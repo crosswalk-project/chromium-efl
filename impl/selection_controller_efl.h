@@ -108,6 +108,9 @@ class SelectionControllerEfl {
 
   bool IsShowingMagnifier();
 
+  Eina_Bool TextSelectionDown(int x, int y);
+  Eina_Bool TextSelectionUp(int x, int y);
+
  private:
   void ShowHandleAndContextMenuIfRequired(bool anchor_first = true);
   void Clear();

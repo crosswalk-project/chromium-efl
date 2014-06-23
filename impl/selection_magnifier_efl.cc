@@ -92,15 +92,23 @@ Eina_Bool SelectionMagnifierEfl::MoveAnimatorCallback(void* data) {
 
 void SelectionMagnifierEfl::OnAnimatorUp(void* data, Evas*, Evas_Object*, void*) {
   SelectionMagnifierEfl* magnifier_data = static_cast<SelectionMagnifierEfl*>(data);
-  if (magnifier_data->animator_) {
-    ecore_animator_del(magnifier_data->animator_);
-    magnifier_data->animator_ = 0;
+  DCHECK(magnifier_data);
+
+  if (magnifier_data)
+    magnifier_data->OnAnimatorUp();
+}
+
+void SelectionMagnifierEfl::OnAnimatorUp() {
+  if (animator_) {
+    ecore_animator_del(animator_);
+    animator_ = 0;
   }
-  evas_object_event_callback_del(magnifier_data->controller_->GetParentView()->evas_object(),
+
+  evas_object_event_callback_del(controller_->GetParentView()->evas_object(),
                                  EVAS_CALLBACK_MOUSE_UP,
                                  OnAnimatorUp);
-  magnifier_data->Hide();
-  magnifier_data->controller_->HandleLongPressEndEvent();
+  Hide();
+  controller_->HandleLongPressEndEvent();
 }
 
 void SelectionMagnifierEfl::UpdateLocation(const gfx::Point& location) {

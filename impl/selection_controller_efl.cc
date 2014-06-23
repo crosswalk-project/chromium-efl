@@ -503,4 +503,41 @@ void SelectionControllerEfl::ChangeContextMenuPosition(gfx::Point& position, int
   return;
 }
 
+Eina_Bool SelectionControllerEfl::TextSelectionDown(int x, int y) {
+  /*
+   * According to webkit-efl textSelectionDown is used on long press gesture, we already
+   * have implementation for handling this gesture in SelectionControllerEfl so we just
+   * fallback into it. Although I'm not totally sure that this is expected behaviour as there
+   * is no clear explanation what should this API do.
+   *
+   * Reference from webkit-efl:
+   * Source/WebKit2/UIProcess/API/efl/ewk_view.cpp line 614
+   */
+  if (!long_mouse_press_) {
+    HandleLongPressEvent(gfx::Point(x, y));
+    return EINA_TRUE;
+  }
+
+  return EINA_FALSE;
+}
+
+Eina_Bool SelectionControllerEfl::TextSelectionUp(int /*x*/, int /*y*/) {
+  /*
+   * According to webkit-efl textSelectionUp is used when MouseUp event occurs. We already
+   * have implementation for handling MouseUp after long press in SelectionMagnifierEfl so we just
+   * fallback into it. Although I'm not totally sure that this is expected behaviour as there
+   * is no clear explanation what should this API do.
+   *
+   * Reference from webkit-efl:
+   * Source/WebKit2/UIProcess/API/efl/tizen/TextSelection.cpp line 807
+   */
+
+  if (long_mouse_press_) {
+    magnifier_->OnAnimatorUp();
+    return EINA_TRUE;
+  }
+
+  return EINA_FALSE;
+}
+
 }

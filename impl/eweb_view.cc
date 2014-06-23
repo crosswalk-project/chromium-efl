@@ -773,14 +773,20 @@ Eina_Bool EWebView::handleKeyUp(Ewk_View_Smart_Data* d, const Evas_Event_Key_Up*
 }
 
 Eina_Bool EWebView::handleTextSelectionDown(Ewk_View_Smart_Data* d, int x, int y) {
-  // temporary mockup codes
-  NOTIMPLEMENTED();
+  EWebView* webview = ToEWebView(d);
+
+  if (webview && webview->selection_controller_.get())
+    return webview->selection_controller_->TextSelectionDown(x, y);
+
   return EINA_FALSE;
 }
 
 Eina_Bool EWebView::handleTextSelectionUp(Ewk_View_Smart_Data* d, int x, int y) {
-  // temporary mockup codes
-  NOTIMPLEMENTED();
+  EWebView* webview = ToEWebView(d);
+
+  if (webview && webview->selection_controller_.get())
+    return webview->selection_controller_->TextSelectionUp(x, y);
+
   return EINA_FALSE;
 }
 
