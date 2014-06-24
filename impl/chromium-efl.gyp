@@ -190,7 +190,6 @@
       'devtools_delegate_efl.h',
       'eweb_context.cc',
       'eweb_context.h',
-      'eweb_object.h',
       'eweb_view.cc',
       'eweb_view.h',
       'eweb_view_callbacks.h',
@@ -236,6 +235,7 @@
       'selection_magnifier_efl.cc',
       'selection_magnifier_efl.h',
       # tizen_webview
+      #TODO: making separate gyp for tizen_webview
       '<(chrome_src_dir)/tizen_webview/public/tw_custom_handlers.h',
       '<(chrome_src_dir)/tizen_webview/public/tw_custom_handlers.cc',
       '<(chrome_src_dir)/tizen_webview/public/tw_security_origin.cc',
@@ -244,6 +244,8 @@
       '<(chrome_src_dir)/tizen_webview/public/tw_touch_point.cc',
       '<(chrome_src_dir)/tizen_webview/public/tw_url.cc',
       '<(chrome_src_dir)/tizen_webview/public/tw_url.h',
+      '<(chrome_src_dir)/tizen_webview/public/tw_web_context.h',
+      '<(chrome_src_dir)/tizen_webview/public/tw_web_context.cc',
       '<(chrome_src_dir)/tizen_webview/tw_misc_utility.h',
       '<(chrome_src_dir)/tizen_webview/tw_misc_utility.cc',
       'url_request_context_getter_efl.cc',

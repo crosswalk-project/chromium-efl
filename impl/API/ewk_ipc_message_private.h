@@ -24,7 +24,7 @@
 #include <Eina.h>
 #include <string>
 
-typedef struct EWebObject Ewk_Context;
+#include "tizen_webview/public/tw_web_context.h"
 
 struct Ewk_IPC_Wrt_Message_Data {
   std::string type;
@@ -35,7 +35,7 @@ struct Ewk_IPC_Wrt_Message_Data {
 };
 
 Eina_Bool ewk_ipc_plugins_message_send_private(int routingId, const Ewk_IPC_Wrt_Message_Data& data);
-Eina_Bool ewk_ipc_wrt_message_send_private(Ewk_Context* context, const Ewk_IPC_Wrt_Message_Data& data);
+Eina_Bool ewk_ipc_wrt_message_send_private(tizen_webview::WebContext* context, const Ewk_IPC_Wrt_Message_Data& data);
 Eina_Bool ewk_ipc_plugins_sync_message_send_private(int routingId, Ewk_IPC_Wrt_Message_Data* data);
 
 #endif // EWK_IPC_MESSAGE_PRIVATE_H

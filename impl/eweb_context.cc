@@ -209,13 +209,6 @@ void EwkDidStartDownloadCallback::TriggerCallback(const string& url) {
     (*callback_)(url.c_str(),user_data_);
 }
 
-EWebContext* EWebContext::default_context_ = NULL;
-
-EWebContext* ToEWebContext(Ewk_Context* context) {
-  EWebContext* web_context = ewk_object_cast<EWebContext*>(context);
-  return web_context;
-}
-
 void EWebContext::SendWidgetInfo(int widget_id, double scale, const string &theme, const string &encoded_bundle) {
   content::RenderProcessHost::iterator i(content::RenderProcessHost::AllHostsIterator());
   for (; !i.IsAtEnd(); i.Advance()) {
@@ -231,30 +224,6 @@ void EWebContext::SendWrtMessage(const Ewk_IPC_Wrt_Message_Data& data) {
   }
 }
 
-// static
-EWebContext* EWebContext::DefaultContext() {
-  if (!default_context_) {
-    default_context_ = new EWebContext;
-    default_context_->AddRef();
-  }
-
-  return default_context_;
-}
-
-void EWebContext::Delete(EWebContext*const context) {
-  if (!context)
-    return;
-
-  if (context == default_context_ && context->HasOneRef()) {
-    // With chromium engine there is only single context
-    // which is default context hence this delete
-    // function will not be implemented
-    NOTIMPLEMENTED();
-    return;
-  }
-  context->Release();
-}
-
 EWebContext::EWebContext()
   : m_pixmap(0) {
   EwkGlobalData::Ensure();
@@ -267,8 +236,6 @@ EWebContext::EWebContext()
 
 EWebContext::~EWebContext() {
   VibrationProviderClient::DeleteInstance();
-  if (this == default_context_)
-    default_context_= NULL;
 }
 
 void EWebContext::ClearNetworkCache() {

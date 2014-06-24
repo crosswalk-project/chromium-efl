@@ -93,6 +93,10 @@ class GestureEvent;
 class TouchEvent;
 }
 
+namespace tizen_webview {
+class WebContext;
+}
+
 class EwkViewPlainTextGetCallback {
  public:
   EwkViewPlainTextGetCallback(Ewk_View_Plain_Text_Get_Callback callback,
@@ -191,11 +195,11 @@ class EWebView
  public:
   static bool InitSmartClassInterface(Ewk_View_Smart_Class&);
 
-  static EWebView* Create(EWebContext*, Evas* canvas, Evas_Smart* smart = 0);
+  static EWebView* Create(tizen_webview::WebContext*, Evas* canvas, Evas_Smart* smart = 0);
 
   void CreateNewWindow(content::WebContents* new_contents);
 
-  EWebContext* context() const { return context_; }
+  tizen_webview::WebContext* context() const { return context_; }
   Evas_Object* evas_object() const { return evas_object_; }
 
   Evas* GetEvas() const { return evas_object_evas_get(evas_object_); }
@@ -365,7 +369,7 @@ class EWebView
   void UpdateMagnifierScreen(const SkBitmap& bitmap);
 
  private:
-  EWebView(EWebContext*, Evas_Object* smart_object);
+  EWebView(tizen_webview::WebContext*, Evas_Object* smart_object);
   ~EWebView();
 
   // Evas_Smart_Class callback interface:
@@ -438,7 +442,7 @@ class EWebView
   // FIXME: should we add documentation for that?
   static content::WebContents* contents_for_new_window_;
 
-  scoped_refptr<EWebContext> context_;
+  scoped_refptr<tizen_webview::WebContext> context_;
   scoped_ptr<content::WebContentsDelegateEfl> web_contents_delegate_;
   std::string pending_url_request_;
   scoped_ptr<Ewk_Settings> settings_;

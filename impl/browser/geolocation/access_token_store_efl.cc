@@ -24,6 +24,9 @@
 #include "base/strings/utf_string_conversions.h"
 #include "content/public/browser/browser_thread.h"
 #include "eweb_context.h"
+#include "tizen_webview/public/tw_web_context.h"
+
+using tizen_webview::WebContext;
 
 namespace content {
 
@@ -49,7 +52,7 @@ void AccessTokenStoreEfl::LoadAccessTokens(const LoadAccessTokensCallbackType& c
 
 void AccessTokenStoreEfl::GetRequestContextOnUIThread()
 {
-  EWebContext* default_context = EWebContext::DefaultContext();
+  WebContext* default_context = WebContext::DefaultContext();
   net::URLRequestContextGetter* context_getter = default_context->browser_context()->GetRequestContext();
   system_request_context_ = context_getter;
 }

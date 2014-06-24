@@ -20,7 +20,6 @@
 #ifndef EWEB_CONTEXT_H
 #define EWEB_CONTEXT_H
 
-#include "eweb_object.h"
 #include "API/ewk_cookie_manager_private.h"
 #include "browser/renderer_host/web_cache_manager_efl.h"
 #include "tizen_webview/public/tw_cache_model.h"
@@ -28,6 +27,7 @@
 
 namespace tizen_webview {
 class URL;
+class WebContext;
 }
 
 typedef std::map<std::string, std::string> HTTPCustomHeadersEflMap;
@@ -51,15 +51,8 @@ class EwkDidStartDownloadCallback {
   void* user_data_;
 };
 
-class EWebContext : public EWebObject {
+class EWebContext {
  public:
-  EWK_OBJECT_DECLARE(EWebContext);
-
-  EWebContext();
-
-  static EWebContext* DefaultContext();
-  static void Delete(EWebContext*);
-
   content::BrowserContextEfl* browser_context() const { return browser_context_.get(); }
 
   void ClearNetworkCache();
@@ -113,7 +106,9 @@ class EWebContext : public EWebObject {
   int Pixmap() const { return m_pixmap; }
 
  private:
-  virtual ~EWebContext();
+  EWebContext();
+  ~EWebContext();
+  friend class tizen_webview::WebContext;
 
   static EWebContext* default_context_;
   scoped_ptr<WebCacheManagerEfl> web_cache_manager_;
@@ -124,7 +119,5 @@ class EWebContext : public EWebObject {
   scoped_ptr<EwkDidStartDownloadCallback> start_download_callback_;
   int m_pixmap;
 };
-
-EWebContext* ToEWebContext(Ewk_Context* context);
 
 #endif

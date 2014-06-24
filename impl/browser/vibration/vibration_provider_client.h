@@ -16,7 +16,6 @@
 #define Vibration_Provider_Client_h
 
 #include "base/memory/scoped_ptr.h"
-//#include "public/ewk_context.h"
 #include "tizen_webview/public/tw_callbacks.h"
 
 /**

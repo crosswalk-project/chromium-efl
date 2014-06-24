@@ -56,9 +56,8 @@
 #include "grit/webkit_strings.h"
 #include "ui/base/l10n/l10n_util.h"
 #include "devtools_delegate_efl.h"
-
 #include "tizen_webview/public/tw_touch_point.h"
-
+#include "tizen_webview/public/tw_web_context.h"
 #ifdef OS_TIZEN
 #include <vconf.h>
 #include "browser/selectpicker/popup_menu_item.h"
@@ -226,7 +225,7 @@ static void GetEinaRectFromGfxRect(const gfx::Rect& gfx_rect, Eina_Rectangle* ei
   eina_rect->h = gfx_rect.height();
 }
 
-EWebView* EWebView::Create(EWebContext* context, Evas* canvas, Evas_Smart* smart) {
+EWebView* EWebView::Create(tizen_webview::WebContext* context, Evas* canvas, Evas_Smart* smart) {
   EINA_SAFETY_ON_NULL_RETURN_VAL(canvas, 0);
 
   Evas_Object* evasObject = evas_object_smart_add(canvas, smart ? smart : DefaultSmartClassInstance());
@@ -260,7 +259,7 @@ void EWebView::set_renderer_crashed() {
 #endif
 }
 
-EWebView::EWebView(EWebContext* context, Evas_Object* object)
+EWebView::EWebView(tizen_webview::WebContext* context, Evas_Object* object)
     : context_(context),
       evas_object_(object),
       touch_events_enabled_(false),

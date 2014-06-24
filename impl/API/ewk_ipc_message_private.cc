@@ -23,7 +23,6 @@
 #include "content/public/renderer/render_view.h"
 #include "common/render_messages_efl.h"
 #include "eweb_context.h"
-#include "ewk_context.h"
 
 Eina_Bool ewk_ipc_plugins_message_send_private(int routingId, const Ewk_IPC_Wrt_Message_Data &data) {
   content::RenderView* render_view = content::RenderView::FromRoutingID(routingId);
@@ -36,8 +35,8 @@ Eina_Bool ewk_ipc_plugins_message_send_private(int routingId, const Ewk_IPC_Wrt_
   return true;
 }
 
-Eina_Bool ewk_ipc_wrt_message_send_private(Ewk_Context* context, const Ewk_IPC_Wrt_Message_Data &data) {
-  EWebContext* web_context = ewk_object_cast<EWebContext*>(context);
+Eina_Bool ewk_ipc_wrt_message_send_private(tizen_webview::WebContext* context, const Ewk_IPC_Wrt_Message_Data &data) {
+  EWebContext* web_context = context->GetImpl();
   if (!web_context) {
     return false;
   }

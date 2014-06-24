@@ -11,7 +11,6 @@
 #include "base/memory/singleton.h"
 #include "content/public/browser/notification_observer.h"
 #include "content/public/browser/notification_registrar.h"
-#include "public/ewk_context.h"
 #include "tizen_webview/public/tw_cache_model.h"
 
 namespace content {
