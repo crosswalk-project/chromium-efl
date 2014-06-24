@@ -585,8 +585,15 @@ void EWebView::ExecuteEditCommand(const char* command, const char* value) {
 
   rvhi->ExecuteEditCommand(command, value);
 
-  if(!strcmp(command, "InsertOrderedList") || !strcmp(command, "InsertUnorderedList"))
+  // This is workaround for rich text toolbar buttons in email application
+  if ( !strcmp(command, "InsertOrderedList")
+    || !strcmp(command, "InsertUnorderedList")
+    || !strcmp(command, "AlignCenter")
+    || !strcmp(command, "AlignJustified")
+    || !strcmp(command, "AlignLeft")
+    || !strcmp(command, "AlignRight") ) {
     QuerySelectionStyle();
+  }
 }
 
 void EWebView::SendOrientationChangeEventIfNeeded(int orientation) {
