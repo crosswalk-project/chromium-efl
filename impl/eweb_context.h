@@ -102,6 +102,9 @@ class EWebContext {
   void SendWidgetInfo(int widget_id, double scale, const std::string &theme, const std::string &encoded_bundle);
   void SendWrtMessage(const tizen_webview::WrtIpcMessageData& message);
 
+  static void SetMimeOverrideCallback(tizen_webview::Mime_Override_Callback callback);
+  static bool ShouldOverrideMimeForURL(const GURL& url, std::string& mime_type);
+
   void SetPixmap(int pixmap) { m_pixmap = pixmap; }
   int Pixmap() const { return m_pixmap; }
 
@@ -111,6 +114,7 @@ class EWebContext {
   friend class tizen_webview::WebContext;
 
   static EWebContext* default_context_;
+  static tizen_webview::Mime_Override_Callback mime_override_callback_;
   scoped_ptr<WebCacheManagerEfl> web_cache_manager_;
   scoped_ptr<content::BrowserContextEfl> browser_context_;
   HTTPCustomHeadersEflMap http_custom_headers_;

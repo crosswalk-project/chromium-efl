@@ -108,6 +108,9 @@ struct WebContext : public tizen_webview::RefCounted<WebContext> {
   int  Pixmap() const;
   void SetPixmap(int pixmap);
 
+  // Set MIME override callback
+  static void SetMimeOverrideCallback(Mime_Override_Callback callback);
+
   // Note: Do not use outside chromium
   EWebContext* GetImpl() { return impl; }
 

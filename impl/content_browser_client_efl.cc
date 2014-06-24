@@ -51,7 +51,7 @@ using tizen_webview::Security_Origin;
 namespace content {
 
 ContentBrowserClientEfl::ContentBrowserClientEfl()
-  : browser_main_parts_efl_(NULL) {
+  : web_context_(NULL), browser_main_parts_efl_(NULL) {
 }
 
 BrowserMainParts* ContentBrowserClientEfl::CreateBrowserMainParts(

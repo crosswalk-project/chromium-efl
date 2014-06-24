@@ -60,6 +60,8 @@ using tizen_webview::Security_Origin;
 using tizen_webview::GetGURL;
 using tizen_webview::GetURL;
 
+tizen_webview::Mime_Override_Callback EWebContext::mime_override_callback_ = 0;
+
 namespace {
 
 /**
@@ -205,6 +207,27 @@ void EWebContext::SendWrtMessage(const tizen_webview::WrtIpcMessageData& data) {
   for (; !i.IsAtEnd(); i.Advance()) {
     i.GetCurrentValue()->Send(new EwkViewMsg_SendWrtMessage(data));
   }
+}
+
+void EWebContext::SetMimeOverrideCallback(
+    tizen_webview::Mime_Override_Callback callback) {
+  mime_override_callback_ = callback;
+}
+
+bool EWebContext::ShouldOverrideMimeForURL(
+    const GURL& url, std::string& mime_type) {
+  if (mime_override_callback_) {
+    char *new_mime = NULL;
+    bool overriden = mime_override_callback_(
+        url.spec().c_str(), mime_type.c_str(), &new_mime);
+    if (overriden) {
+      DCHECK(new_mime);
+      mime_type.assign(new_mime);
+      ::free(new_mime);
+      return true;
+    }
+  }
+  return false;
 }
 
 EWebContext::EWebContext()

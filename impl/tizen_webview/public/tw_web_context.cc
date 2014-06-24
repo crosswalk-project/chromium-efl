@@ -189,4 +189,8 @@ void WebContext::SetPixmap(int pixmap) {
   impl->SetPixmap( pixmap);
 }
 
+void WebContext::SetMimeOverrideCallback(Mime_Override_Callback callback) {
+  EWebContext::SetMimeOverrideCallback(callback);
+}
+
 } // namespace tizen_webview

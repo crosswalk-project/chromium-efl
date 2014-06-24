@@ -20,6 +20,7 @@ typedef void (*Web_Storage_Origins_Get_Callback)(Eina_List* origins, void* user_
 typedef void (*Context_Did_Start_Download_Callback)(const char* download_url, void* user_data);
 typedef void (*Vibration_Client_Vibrate_Cb)(uint64_t vibration_time, void *user_data);
 typedef void (*Vibration_Client_Vibration_Cancel_Cb)(void *user_data);
+typedef Eina_Bool (*Mime_Override_Callback)(const char *url, const char *current_mime, char **new_mime);
 
 /**
  * Callback for ewk_view_web_app_capable_get

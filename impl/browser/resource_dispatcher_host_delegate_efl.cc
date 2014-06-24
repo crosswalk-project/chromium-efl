@@ -144,7 +144,7 @@ void ResourceDispatcherHostDelegateEfl::TriggerNewDownloadStartCallback(
 
 bool ResourceDispatcherHostDelegateEfl::ShouldOverrideMimeType(
     const GURL& url, std::string& mime_type) {
-  return false;
+  return EWebContext::ShouldOverrideMimeForURL(url, mime_type);
 }
 
 } // namespace content
