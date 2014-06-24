@@ -198,41 +198,39 @@ void RenderWidgetHostViewEfl::EvasObjectImagePixelsGetCallback(void* data, Evas_
 
   gl_api->glUseProgram(rwhv_efl->program_id_);
 
-  GLfloat vertex_attributes[20];
+  const GLfloat* vertex_attributes;
+
+  const GLfloat vertex_attributes_270[] = {
+      -1.0f, 1.0f, 0.0f, 0.0f,
+      1.0f, -1.0f, -1.0f, 0.0f,
+      1.0f, 1.0f, 1.0f, -1.0f,
+      0.0f, 1.0f, 0.0f, 1.0f,
+      1.0f, 0.0f, 0.0f, 0.0f};
+
+  const GLfloat vertex_attributes_90[] = {
+      -1.0f, 1.0f, 0.0f, 1.0f,
+      0.0f, -1.0f, -1.0f, 0.0f,
+      0.0f, 0.0f, 1.0f, -1.0f,
+      0.0f, 0.0f, 1.0f, 1.0f,
+      1.0f, 0.0f, 1.0f, 1.0f};
+
+  const GLfloat vertex_attributes_0[] = {
+      -1.0f, 1.0f, 0.0f, 0.0f,
+      0.0f, -1.0f, -1.0f, 0.0f,
+      0.0f, 1.0f, 1.0f, -1.0f,
+      0.0f, 1.0f, 1.0f, 1.0f,
+      1.0f, 0.0f, 1.0f, 0.0f};
 
   rwhv_efl->current_orientation_ = ecore_evas_rotation_get(ecore_evas_ecore_evas_get(rwhv_efl->evas_));
 
-  if (rwhv_efl->current_orientation_ == 270) {
-    vertex_attributes[0] = -1.0f; vertex_attributes[1] = 1.0f;   vertex_attributes[2] = 0.0f;
-    vertex_attributes[3] = 0.0f;  vertex_attributes[4] = 1.0f;
-    vertex_attributes[5] = -1.0f; vertex_attributes[6] = -1.0f;  vertex_attributes[7] = 0.0f;
-    vertex_attributes[8] = 1.0f;  vertex_attributes[9] = 1.0f;
-    vertex_attributes[10] = 1.0f; vertex_attributes[11] = -1.0f; vertex_attributes[12] = 0.0f;
-    vertex_attributes[13] = 1.0f; vertex_attributes[14] = 0.0f;
-    vertex_attributes[15] = 1.0f; vertex_attributes[16] = 1.0f;  vertex_attributes[17] = 0.0f;
-    vertex_attributes[18] = 0.0f; vertex_attributes[19] = 0.0f;
-  } else if (rwhv_efl->current_orientation_ == 90) {
-    vertex_attributes[0] = -1.0f; vertex_attributes[1] = 1.0f;   vertex_attributes[2] = 0.0f;
-    vertex_attributes[3] = 1.0f;  vertex_attributes[4] = 0.0f;
-    vertex_attributes[5] = -1.0f; vertex_attributes[6] = -1.0f;  vertex_attributes[7] = 0.0f;
-    vertex_attributes[8] = 0.0f;  vertex_attributes[9] = 0.0f;
-    vertex_attributes[10] = 1.0f; vertex_attributes[11] = -1.0f; vertex_attributes[12] = 0.0f;
-    vertex_attributes[13] = 0.0f; vertex_attributes[14] = 1.0f;
-    vertex_attributes[15] = 1.0f; vertex_attributes[16] = 1.0f;  vertex_attributes[17] = 0.0f;
-    vertex_attributes[18] = 1.0f; vertex_attributes[19] = 1.0f;
-  }
-  else {
-    vertex_attributes[0] = -1.0f; vertex_attributes[1] = 1.0f;   vertex_attributes[2] = 0.0f;
-    vertex_attributes[3] = 0.0f;  vertex_attributes[4] = 0.0f;
-    vertex_attributes[5] = -1.0f; vertex_attributes[6] = -1.0f;  vertex_attributes[7] = 0.0f;
-    vertex_attributes[8] = 0.0f;  vertex_attributes[9] = 1.0f;
-    vertex_attributes[10] = 1.0f; vertex_attributes[11] = -1.0f; vertex_attributes[12] = 0.0f;
-    vertex_attributes[13] = 1.0f; vertex_attributes[14] = 1.0f;
-    vertex_attributes[15] = 1.0f; vertex_attributes[16] = 1.0f;  vertex_attributes[17] = 0.0f;
-    vertex_attributes[18] = 1.0f; vertex_attributes[19] = 0.0f;
-  }
+  if (rwhv_efl->current_orientation_ == 270)
+    vertex_attributes = vertex_attributes_270;
+  else if (rwhv_efl->current_orientation_ == 90)
+    vertex_attributes = vertex_attributes_90;
+  else
+    vertex_attributes = vertex_attributes_0;
 
-  GLushort indices[] = {0, 1, 2, 0, 2, 3};
+  const GLushort indices[] = {0, 1, 2, 0, 2, 3};
 
   gl_api->glVertexAttribPointer(rwhv_efl->position_attrib_, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(GLfloat), vertex_attributes);
   gl_api->glVertexAttribPointer(rwhv_efl->texcoord_attrib_, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(GLfloat), &vertex_attributes[3]);
