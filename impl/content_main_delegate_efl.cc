@@ -19,14 +19,14 @@
 
 #include "content_main_delegate_efl.h"
 
-#include "paths_efl.h"
-#include "command_line_efl.h"
-#include "content_browser_client_efl.h"
 #include "base/path_service.h"
 #include "content/browser/gpu/gpu_process_host.h"
 #include "content/gpu/in_process_gpu_thread.h"
 #include "content/public/common/content_switches.h"
 #include "browser/resource_dispatcher_host_delegate_efl.h"
+#include "command_line_efl.h"
+#include "content_browser_client_efl.h"
+#include "paths_efl.h"
 
 namespace content {
 

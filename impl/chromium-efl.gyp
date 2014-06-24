@@ -113,6 +113,8 @@
       'browser/motion/MotionUI.h',
       'browser/navigation_policy_handler_efl.cc',
       'browser/navigation_policy_handler_efl.h',
+      'browser/resource_dispatcher_host_delegate_efl.h',
+      'browser/resource_dispatcher_host_delegate_efl.cc',
       'browser/policy_response_delegate_efl.cc',
       'browser/policy_response_delegate_efl.h',
       # [M37] backing store support removed from chromium. Efl implementations should probably also be removed
@@ -220,8 +222,6 @@
       'resource/Edge.edc',
       'resource/Magnifier.edc',
       'resource/control.edc',
-      'resource_dispatcher_host_delegate_efl.cc',
-      'resource_dispatcher_host_delegate_efl.h',
       'screen_efl.cc',
       'screen_efl.h',
       'selection_box_efl.cc',
