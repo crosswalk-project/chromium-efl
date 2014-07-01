@@ -41,6 +41,9 @@
 #include "webkit/common/quota/quota_types.h"
 #include "content/browser/appcache/appcache_service_impl.h"
 
+using content::BrowserThread;
+
+// Static.
 BrowsingDataRemoverEfl* BrowsingDataRemoverEfl::CreateForUnboundedRange(content::BrowserContext* profile) {
   return new BrowsingDataRemoverEfl(profile, base::Time(), base::Time::Max());
 }
@@ -256,6 +259,17 @@ void BrowsingDataRemoverEfl::RemoveImpl(int remove_mask,
 }
 
 void BrowsingDataRemoverEfl::DeleteAppCachesForOrigin(const GURL& origin) {
+  if (BrowserThread::CurrentlyOn(BrowserThread::UI)) {
+    // TODO: Using base::Unretained is not thread safe
+    // It may happen that on IO thread this ptr will be already deleted
+    BrowserThread::PostTask(
+        BrowserThread::IO, FROM_HERE,
+        base::Bind(&BrowsingDataRemoverEfl::DeleteAppCachesForOrigin,
+                   base::Unretained(this), origin));
+    return;
+  }
+
+  DCHECK(BrowserThread::CurrentlyOn(BrowserThread::IO));
   net::CompletionCallback rm_app_catche_cb;
   static_cast<content::AppCacheServiceImpl*>(app_cache_service_)->DeleteAppCachesForOrigin(origin, rm_app_catche_cb);
 }
