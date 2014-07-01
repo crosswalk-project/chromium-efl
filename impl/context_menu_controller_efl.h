@@ -206,6 +206,7 @@ class ContextMenuControllerEfl {
                             std::string icon_path);
   void HideSelectionHandle();
   base::FilePath DownloadFile(const GURL url, const base::FilePath outputDir);
+  bool TriggerDownloadCb(const GURL url);
   void OpenInNewTab(const GURL url);
   Evas_Object* evas_object_;
   Evas_Object* popup_;

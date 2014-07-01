@@ -25,6 +25,7 @@
 #include "net/base/filename_util.h"
 #include "components/clipboard/clipboard_helper_efl.h"
 #include "context_menu_controller_efl.h"
+#include "content/public/browser/browser_thread.h"
 #include "content/public/browser/download_manager.h"
 #include "content/public/browser/download_url_parameters.h"
 #include "content/public/browser/navigation_entry.h"
@@ -350,6 +351,20 @@ base::FilePath ContextMenuControllerEfl::DownloadFile(const GURL url, const base
   return fullPath;
 }
 
+bool ContextMenuControllerEfl::TriggerDownloadCb(const GURL url) {
+  BrowserContextEfl* browser_context = static_cast<BrowserContextEfl*>(wcd_->web_contents()->GetBrowserContext());
+  if (browser_context) {
+    EwkDidStartDownloadCallback* start_download_callback =
+        browser_context->WebContext()->DidStartDownloadCallback();
+    if (start_download_callback) {
+      DCHECK(BrowserThread::CurrentlyOn(BrowserThread::UI));
+      start_download_callback->TriggerCallback(url.spec());
+      return true;
+    }
+  }
+  return false;
+}
+
 void ContextMenuControllerEfl::OpenInNewTab(const GURL url) {
   WindowOpenDisposition disposition = NEW_FOREGROUND_TAB;
   if (!url.is_valid())
@@ -416,17 +431,21 @@ void ContextMenuControllerEfl::MenuItemSelected(ContextMenuItemEfl *menu_item) {
     }
     case MENU_ITEM_DOWNLOAD_LINK_TO_DISK: {
 #ifdef OS_TIZEN_MOBILE
-      DownloadFile(GURL(menu_item->LinkURL()), base::FilePath("/opt/usr/media/Downloads/Others/"));
+      if (!TriggerDownloadCb(GURL(menu_item->LinkURL())))
+        DownloadFile(GURL(menu_item->LinkURL()), base::FilePath("/opt/usr/media/Downloads/Others/"));
 #else
-      DownloadFile(GURL(menu_item->LinkURL()), base::FilePath("/tmp/"));
+      if (!TriggerDownloadCb(GURL(menu_item->LinkURL())))
+        DownloadFile(GURL(menu_item->LinkURL()), base::FilePath("/tmp/"));
 #endif
       break;
     }
     case MENU_ITEM_DOWNLOAD_IMAGE_TO_DISK: {
 #ifdef OS_TIZEN_MOBILE
-      DownloadFile(GURL(menu_item->ImageURL()), base::FilePath("/opt/usr/media/Images/"));
+      if (!TriggerDownloadCb(GURL(menu_item->LinkURL())))
+        DownloadFile(GURL(menu_item->ImageURL()), base::FilePath("/opt/usr/media/Images/"));
 #else
-      DownloadFile(GURL(menu_item->ImageURL()), base::FilePath("/tmp/"));
+      if (!TriggerDownloadCb(GURL(menu_item->LinkURL())))
+        DownloadFile(GURL(menu_item->ImageURL()), base::FilePath("/tmp/"));
 #endif
       break;
     }

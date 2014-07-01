@@ -106,6 +106,10 @@ void CookieManager::DeleteCookiesAsync(const std::string& url,
 void CookieManager::DeleteCookiesOnIOThread(const std::string& url,
                                               const std::string& cookie_name) {
   DCHECK(BrowserThread::CurrentlyOn(BrowserThread::IO));
+
+  if (!request_context_getter_)
+    return;
+
   scoped_refptr<net::CookieMonster> cookie_monster =
       request_context_getter_->GetURLRequestContext()->
               cookie_store()->GetCookieMonster();
@@ -154,6 +158,10 @@ void CookieManager::GetHostNamesWithCookiesAsync(AsyncHostnamesGetCb callback, v
 
 void CookieManager::FetchCookiesOnIOThread() {
   DCHECK(BrowserThread::CurrentlyOn(BrowserThread::IO));
+  if (!request_context_getter_) {
+    OnFetchComplete(net::CookieList());
+    return;
+  }
   scoped_refptr<net::CookieMonster> cookie_monster =
       request_context_getter_->GetURLRequestContext()->
       cookie_store()->GetCookieMonster();
@@ -187,7 +195,8 @@ void CookieManager::SetStoragePathOnIOThread(const std::string& path,
                                              bool file_storage_type) {  
   DCHECK(BrowserThread::CurrentlyOn(BrowserThread::IO));
   base::FilePath storage_path(path);
-  request_context_getter_->SetCookieStoragePath(storage_path, persist_session_cookies);
+  if (request_context_getter_)
+    request_context_getter_->SetCookieStoragePath(storage_path, persist_session_cookies);
 }
 
 bool CookieManager::GetGlobalAllowAccess() {
@@ -268,6 +277,13 @@ void CookieManager::GetCookieValueOnIOThread(const GURL& host,
   DCHECK(BrowserThread::CurrentlyOn(BrowserThread::IO));
   net::CookieOptions options;
   options.set_include_httponly();
+
+  if (!request_context_getter_) {
+    DCHECK(completion);
+    completion->Signal();
+    return;
+  }
+
   scoped_refptr<net::CookieMonster> cookie_monster =
       request_context_getter_->GetURLRequestContext()->
       cookie_store()->GetCookieMonster();
