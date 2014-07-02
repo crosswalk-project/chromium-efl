@@ -275,7 +275,8 @@ void WebContentsDelegateEfl::DidFinishLoad(RenderFrameHost* render_frame_host,
   if (render_frame_host->GetParent())
     return;
 
-  NavigationEntry *entry = web_contents_.GetController().GetActiveEntry();
+  NavigationEntry *entry = web_contents().GetController().GetVisibleEntry();
+  DCHECK(entry);
   FaviconStatus &favicon = entry->GetFavicon();
 
   // http://107.108.218.239/bugzilla/show_bug.cgi?id=7883
@@ -309,7 +310,7 @@ void WebContentsDelegateEfl::DidUpdateFaviconURL(const std::vector<FaviconURL>& 
   for (unsigned int i = 0; i < candidates.size(); ++i) {
     FaviconURL favicon = candidates[i];
     if (favicon.icon_type == FaviconURL::FAVICON && !favicon.icon_url.is_empty()) {
-      NavigationEntry *entry = web_contents_.GetController().GetActiveEntry();
+      NavigationEntry *entry = web_contents_.GetController().GetVisibleEntry();
       if (!entry)
         return;
       entry->GetFavicon().url = favicon.icon_url;
