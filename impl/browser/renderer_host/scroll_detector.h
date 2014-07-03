@@ -14,8 +14,10 @@ namespace EflWebview {
 class ScrollDetector {
  public:
   ScrollDetector();
-  void OnChangeScrollOffset(EWebView* web_view, const gfx::Vector2d& scroll_delta);
+  void OnChangeScrollOffset(EWebView* web_view,
+                            const gfx::Vector2d& scroll_position);
   void SetMaxScroll(int x, int y);
+  gfx::Vector2d GetLastScrollPosition() const { return last_scroll_position_; }
 
  private:
   void DetectEdge(EWebView* web_view, const gfx::Vector2d& scroll_delta);

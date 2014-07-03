@@ -1058,18 +1058,37 @@ void EWebView::SetScale(double scale_factor, int x, int y) {
   render_view_host->Send(new EwkViewMsg_Scale(render_view_host->GetRoutingID(), scale_factor, x, y));
 }
 
-void EWebView::GetScrollPosition(int* x, int* y) const {
+bool EWebView::GetScrollPosition(int* x, int* y) const {
   DCHECK(x);
   DCHECK(y);
-  const gfx::Vector2dF scroll_position = rwhv()->GetLastScrollOffset();
-  *x = scroll_position.x();
-  *y = scroll_position.y();
+  if (!rwhv()) {
+    *y = *x = 0;
+    return false;
+  }
+
+  if (rwhv()->IsScrollOffsetChanged()) {
+    *x = previous_scroll_position_.x();
+    *y = previous_scroll_position_.y();
+  } else {
+    const gfx::Vector2d scroll_position = rwhv()->scroll_offset();
+    *x = scroll_position.x();
+    *y = scroll_position.y();
+  }
+  return true;
 }
 
 void EWebView::SetScroll(int x, int y) {
   RenderViewHost* render_view_host = web_contents_->GetRenderViewHost();
   if (!render_view_host)
     return;
+
+  if (rwhv()) {
+    rwhv()->SetScrollOffsetChanged();
+    int maxX, maxY;
+    GetScrollSize(&maxX, &maxY);
+    previous_scroll_position_.set_x(std::min(std::max(x, 0), maxX));
+    previous_scroll_position_.set_y(std::min(std::max(y, 0), maxY));
+  }
 
   render_view_host->Send(new EwkViewMsg_SetScroll(render_view_host->GetRoutingID(), x, y));
 }
@@ -1081,7 +1100,6 @@ void EWebView::UseSettingsFont() {
 }
 
 void EWebView::DidChangeContentsArea(int width, int height) {
-  contents_area_ = gfx::Size(width, height);
 }
 
 void EWebView::DidChangeContentsSize(int width, int height) {
@@ -1103,17 +1121,10 @@ void EWebView::GetScrollSize(int* width, int* height) {
   Eina_Rectangle last_view_port =
       WebViewDelegate::GetInstance()->GetLastUsedViewPortArea(evas_object());
 
-#ifdef OS_TIZEN
-  if (width && contents_area_.width() > last_view_port.w)
-    *width = contents_area_.width() - last_view_port.w;
-  if (height && contents_area_.height() > last_view_port.h)
-    *height = contents_area_.height() - last_view_port.h;
-#else
   if (width && contents_size_.width() > last_view_port.w)
     *width = contents_size_.width() - last_view_port.w;
   if (height && contents_size_.height() > last_view_port.h)
     *height = contents_size_.height() - last_view_port.h;
-#endif
 }
 
 void EWebView::SelectRange(const gfx::Point& start, const gfx::Point& end) {

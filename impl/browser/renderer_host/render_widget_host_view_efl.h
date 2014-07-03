@@ -169,6 +169,7 @@ class RenderWidgetHostViewEfl
 
   void OnSelectionTextStyleState(const SelectionStylePrams& params);
   void OnDidChangeMaxScrollOffset(int maxScrollX, int maxScrollY);
+  void OnDidChangeScrollOffset(int scrollX, int scrollY);
 
 #ifdef OS_TIZEN
   void FilterInputMotion(const blink::WebGestureEvent& gesture_event);
@@ -191,6 +192,7 @@ class RenderWidgetHostViewEfl
   EWebView* eweb_view() const { return web_view_; }
   RenderWidgetHostImpl* host() const { return host_; }
   IMContextEfl* im_context() const { return im_context_; }
+  gfx::Vector2d scroll_offset() const;
 
   float device_scale_factor() const { return device_scale_factor_; }
 
@@ -230,6 +232,9 @@ class RenderWidgetHostViewEfl
 
   void SetComposition(const ui::CompositionText& composition_text);
   void ConfirmComposition(base::string16& text);
+  
+  bool IsScrollOffsetChanged() const { return scroll_offset_changed_; }
+  void SetScrollOffsetChanged() { scroll_offset_changed_ = true; }
 
  protected:
   friend class RenderWidgetHostView;
@@ -340,6 +345,8 @@ class RenderWidgetHostViewEfl
 
   // The last scroll offset of the view.
   gfx::Vector2dF last_scroll_offset_;
+  gfx::Point scroll_offset_;
+  bool scroll_offset_changed_;
 
   gpu::Mailbox pending_mailbox_;
 

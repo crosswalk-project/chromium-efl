@@ -106,7 +106,8 @@ RenderWidgetHostViewEfl::RenderWidgetHostViewEfl(RenderWidgetHost* widget, EWebV
     next_pixmap_id_(0),
     surface_id_(0),
     is_hw_accelerated_(true),
-    is_modifier_key_(false) {
+    is_modifier_key_(false),
+    scroll_offset_changed_(false) {
 
 #if defined(OS_TIZEN)
 #if !defined(EWK_BRINGUP)
@@ -389,6 +390,7 @@ bool RenderWidgetHostViewEfl::OnMessageReceived(const IPC::Message& message) {
     IPC_MESSAGE_HANDLER(EwkHostMsg_OrientationChangeEvent, OnOrientationChangeEvent)
     IPC_MESSAGE_HANDLER(EwkViewMsg_SelectionTextStyleState, OnSelectionTextStyleState)
     IPC_MESSAGE_HANDLER(EwkHostMsg_DidChangeMaxScrollOffset, OnDidChangeMaxScrollOffset)
+    IPC_MESSAGE_HANDLER(EwkHostMsg_DidChangeScrollOffset, OnDidChangeScrollOffset)
     IPC_MESSAGE_HANDLER(EwkHostMsg_ReadMHTMLData, OnMHTMLContentGet)
     IPC_MESSAGE_HANDLER(EwkHostMsg_DidChangePageScaleFactor, OnDidChangePageScaleFactor)
     IPC_MESSAGE_HANDLER(EwkHostMsg_DidChangePageScaleRange, OnDidChangePageScaleRange)
@@ -1388,6 +1390,11 @@ void RenderWidgetHostViewEfl::OnDidChangeMaxScrollOffset(int maxScrollX, int max
   scroll_detector_->SetMaxScroll(maxScrollX, maxScrollY);
 }
 
+void RenderWidgetHostViewEfl::OnDidChangeScrollOffset(int scrollX, int scrollY) {
+  scroll_detector_->OnChangeScrollOffset(web_view_, gfx::Vector2d(scrollX, scrollY));
+  scroll_offset_changed_ = false;
+}
+
 void RenderWidgetHostViewEfl::SelectRange(const gfx::Point& start, const gfx::Point& end) {
   RenderViewHost* rvh =  RenderViewHost::From(host_);
   WebContentsImpl* wci = static_cast<WebContentsImpl*>(
@@ -1556,4 +1563,7 @@ void RenderWidgetHostViewEfl::SetViewMode(tizen_webview::View_Mode view_mode) {
   host_->Send(new ViewMsg_SetViewMode(host_->GetRoutingID(), view_mode_for_blink));
 }
 
+gfx::Vector2d RenderWidgetHostViewEfl::scroll_offset() const {
+  return scroll_detector_->GetLastScrollPosition();
+}
 }  // namespace content

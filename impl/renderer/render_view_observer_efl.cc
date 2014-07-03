@@ -223,11 +223,18 @@ void RenderViewObserverEfl::DidChangeScrollOffset(blink::WebLocalFrame* frame)
   if (!frame || (render_view()->GetWebView()->mainFrame() != frame))
     return;
 
-  if (max_scroll_offset_ != frame->maximumScrollOffset()) { //Check for change in MaxScrollOffset
+  if (max_scroll_offset_ != frame->maximumScrollOffset()) {
     max_scroll_offset_ = frame->maximumScrollOffset();
     Send(new EwkHostMsg_DidChangeMaxScrollOffset(render_view()->GetRoutingID(),
                                                  frame->maximumScrollOffset().width,
                                                  frame->maximumScrollOffset().height));
+  }
+
+  if(last_scroll_offset_ != frame->scrollOffset()) {
+    last_scroll_offset_ = frame->scrollOffset();
+    Send(new EwkHostMsg_DidChangeScrollOffset(render_view()->GetRoutingID(),
+                                              frame->scrollOffset().width,
+                                              frame->scrollOffset().height));
   }
 }
 

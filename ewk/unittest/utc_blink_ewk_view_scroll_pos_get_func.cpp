@@ -7,33 +7,27 @@
 class utc_blink_ewk_view_scroll_pos_get : public utc_blink_ewk_base
 {
  protected:
-  static void frameRendered(void* data, Evas_Object* eObject, void* dataFinished)
+  void LoadFinished(Evas_Object*)
   {
-    utc_message("[frameRendered] :: \n");
-    if(data)
+    evas_object_focus_set(GetEwkWebView(), EINA_TRUE);
+    EventLoopStop(Success);
+  }
+
+  static Eina_Bool quitMainLoop(void* data)
+  {
+    if (data)
       static_cast<utc_blink_ewk_view_scroll_pos_get*>(data)->EventLoopStop(Success);
-  }
-
-  /* Startup function */
-  void PostSetUp()
-  {
-    evas_object_smart_callback_add(GetEwkWebView(), "frame,rendered", frameRendered, this);
-  }
-
-  /* Cleanup function */
-  void PreTearDown()
-  {
-    evas_object_smart_callback_del(GetEwkWebView(), "frame,rendered", frameRendered);
+    return EINA_FALSE;
   }
 
 protected:
-  static const char*const resource;
+  static const char* resource;
 };
 
-const char*const utc_blink_ewk_view_scroll_pos_get::resource="/ewk_view/index_big_red_square.html";
+const char* utc_blink_ewk_view_scroll_pos_get::resource="/ewk_view/index_big_red_square.html";
 
 /**
- * @brief Positive test case of ewk_view_scroll_pos_get(),tseting scroll postion against after set, and scroll
+ * @brief Positive test case of ewk_view_scroll_pos_get(), setting scroll position against after set, and scroll
  */
 TEST_F(utc_blink_ewk_view_scroll_pos_get, POS_TEST1)
 {
@@ -51,10 +45,11 @@ TEST_F(utc_blink_ewk_view_scroll_pos_get, POS_TEST1)
   Eina_Bool result = EINA_FALSE;
   if (x == valScrollSet && y == valScrollSet)
     result = EINA_TRUE;
+  ASSERT_TRUE(result);
 }
 
 /**
- * @brief Positive test case of ewk_view_scroll_pos_get(),tseting scroll postion against after set, and scroll
+ * @brief Positive test case of ewk_view_scroll_pos_get(), setting scroll position against after set, and scroll
  */
 TEST_F(utc_blink_ewk_view_scroll_pos_get, POS_TEST2)
 {
@@ -70,6 +65,84 @@ TEST_F(utc_blink_ewk_view_scroll_pos_get, POS_TEST2)
     result = EINA_TRUE;
 
   utc_check_eq(result, EINA_TRUE);
+}
+
+/**
+ * @brief ewk_view_scroll_pos_get() should return the same value as it has been set if main loop wasn't fired
+ */
+TEST_F(utc_blink_ewk_view_scroll_pos_get, POS_TEST3)
+{
+  int x = 0, y = 0;
+
+  ASSERT_TRUE(ewk_view_url_set(GetEwkWebView(),GetResourceUrl(resource).c_str()));
+  ASSERT_EQ(Success, EventLoopStart());
+
+  ASSERT_TRUE(ewk_view_scroll_set(GetEwkWebView(), 10, 10));
+  ASSERT_TRUE(ewk_view_scroll_pos_get(GetEwkWebView(), &x, &y));
+  ASSERT_EQ(10, x);
+  ASSERT_EQ(10, y);
+
+  ASSERT_TRUE(ewk_view_scroll_set(GetEwkWebView(), 20, 20));
+  ASSERT_TRUE(ewk_view_scroll_pos_get(GetEwkWebView(), &x, &y));
+  ASSERT_EQ(20, x);
+  ASSERT_EQ(20, y);
+}
+
+/**
+ * @brief ewk_view_scroll_pos_get() should return proper value after the engine tries to scroll over the page size
+ */
+TEST_F(utc_blink_ewk_view_scroll_pos_get, POS_TEST4)
+{
+  int x = 0, y = 0;
+
+  ASSERT_TRUE(ewk_view_url_set(GetEwkWebView(),GetResourceUrl(resource).c_str()));
+  ASSERT_EQ(Success, EventLoopStart());
+
+  int scrollSizeX = -1, scrollSizeY = -1;
+  ASSERT_TRUE(ewk_view_scroll_size_get(GetEwkWebView(), &scrollSizeX, &scrollSizeY));
+
+  int oversizeX = scrollSizeX + 100;
+  ASSERT_TRUE(ewk_view_scroll_set(GetEwkWebView(), oversizeX, 10));
+  ASSERT_TRUE(ewk_view_scroll_pos_get(GetEwkWebView(), &x, &y));
+  ASSERT_EQ(scrollSizeX, x);
+  ASSERT_EQ(10, y);
+
+  ecore_timer_add(5.0f, quitMainLoop, this);
+  ASSERT_EQ(Success, EventLoopStart());
+
+  ASSERT_TRUE(ewk_view_scroll_pos_get(GetEwkWebView(), &x, &y));
+  ASSERT_NE(scrollSizeX, x);
+  ASSERT_EQ(10, y);
+
+  // Now at the end of the page
+  ASSERT_TRUE(ewk_view_scroll_set(GetEwkWebView(), oversizeX, 10));
+  ecore_timer_add(5.0f, quitMainLoop, this);
+  ASSERT_EQ(Success, EventLoopStart());
+  ASSERT_TRUE(ewk_view_scroll_pos_get(GetEwkWebView(), &x, &y));
+  ASSERT_EQ(scrollSizeX, x);
+}
+
+/**
+ * @brief Same as POS_TEST4, but with negative value
+ */
+TEST_F(utc_blink_ewk_view_scroll_pos_get, POS_TEST5)
+{
+  int x = 0, y = 0;
+
+  ASSERT_TRUE(ewk_view_url_set(GetEwkWebView(),GetResourceUrl(resource).c_str()));
+  ASSERT_EQ(Success, EventLoopStart());
+
+  ASSERT_TRUE(ewk_view_scroll_set(GetEwkWebView(), -100, 10));
+  ASSERT_TRUE(ewk_view_scroll_pos_get(GetEwkWebView(), &x, &y));
+  ASSERT_EQ(0, x);
+  ASSERT_EQ(10, y);
+
+  ecore_timer_add(5.0f, quitMainLoop, this);
+  ASSERT_EQ(Success, EventLoopStart());
+
+  ASSERT_TRUE(ewk_view_scroll_pos_get(GetEwkWebView(), &x, &y));
+  ASSERT_EQ(0, x);
+  ASSERT_EQ(10, y);
 }
 
 /**

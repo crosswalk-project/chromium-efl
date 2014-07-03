@@ -35,13 +35,13 @@ const char*const utc_blink_ewk_view_scroll_size_get::resource="/ewk_view/index_b
  */
 TEST_F(utc_blink_ewk_view_scroll_size_get, POS_TEST)
 {
-  if(!ewk_view_url_set(GetEwkWebView(),GetResourceUrl(resource).c_str()))
-    utc_fail();
-  if(Success!=EventLoopStart())
-    utc_fail();
+  ASSERT_TRUE(ewk_view_url_set(GetEwkWebView(),GetResourceUrl(resource).c_str()));
+  ASSERT_EQ(Success, EventLoopStart());
 
-  int xPossibleScrollArea, yPossibleScrollArea;
-  utc_check_eq(ewk_view_scroll_size_get(GetEwkWebView(), &xPossibleScrollArea, &yPossibleScrollArea), EINA_TRUE);
+  int xPossibleScrollArea = 0, yPossibleScrollArea = 0;
+  ASSERT_TRUE(ewk_view_scroll_size_get(GetEwkWebView(), &xPossibleScrollArea, &yPossibleScrollArea));
+  ASSERT_GT(xPossibleScrollArea, 0);
+  ASSERT_GT(yPossibleScrollArea, 0);
 }
 
 /**
@@ -49,6 +49,19 @@ TEST_F(utc_blink_ewk_view_scroll_size_get, POS_TEST)
   */
 TEST_F(utc_blink_ewk_view_scroll_size_get, NEG_TEST)
 {
-  int xPossibleScrollArea, yPossibleScrollArea;
-  utc_check_eq(ewk_view_scroll_size_get(NULL, &xPossibleScrollArea,&yPossibleScrollArea), EINA_FALSE);
+  ASSERT_TRUE(ewk_view_url_set(GetEwkWebView(),GetResourceUrl(resource).c_str()));
+  ASSERT_EQ(Success, EventLoopStart());
+
+  int xPossibleScrollArea = 0, yPossibleScrollArea = 0;
+  ASSERT_TRUE(ewk_view_scroll_size_get(GetEwkWebView(), NULL, &yPossibleScrollArea));
+  ASSERT_GT(yPossibleScrollArea, 0);
+
+  ASSERT_TRUE(ewk_view_scroll_size_get(GetEwkWebView(), &xPossibleScrollArea, NULL));
+  ASSERT_GT(xPossibleScrollArea, 0);
+
+  ASSERT_TRUE(ewk_view_scroll_size_get(GetEwkWebView(), NULL, NULL));
+
+  ASSERT_FALSE(ewk_view_scroll_size_get(NULL, &xPossibleScrollArea, &yPossibleScrollArea));
+  ASSERT_EQ(0, xPossibleScrollArea);
+  ASSERT_EQ(0, yPossibleScrollArea);
 }

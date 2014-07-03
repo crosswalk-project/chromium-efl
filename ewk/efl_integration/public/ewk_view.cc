@@ -459,8 +459,7 @@ Eina_Bool ewk_view_scroll_pos_get(Evas_Object* ewkView, int* x, int* y)
   EWK_VIEW_IMPL_GET_OR_RETURN(ewkView, impl, false);
   EINA_SAFETY_ON_NULL_RETURN_VAL(x, EINA_FALSE);
   EINA_SAFETY_ON_NULL_RETURN_VAL(y, EINA_FALSE);
-  impl->GetScrollPosition(x, y);
-  return true;
+  return impl->GetScrollPosition(x, y);
 }
 
 Eina_Bool ewk_view_scroll_set(Evas_Object* view, int x, int y)
@@ -473,6 +472,10 @@ Eina_Bool ewk_view_scroll_set(Evas_Object* view, int x, int y)
 
 Eina_Bool ewk_view_scroll_size_get(const Evas_Object* view, int* width, int* height)
 {
+  if (width)
+    *width = 0;
+  if (height)
+    *height = 0;
   EWK_VIEW_IMPL_GET_OR_RETURN(view, impl, EINA_FALSE);
   impl->GetScrollSize(width,height);
   return EINA_TRUE;

@@ -127,7 +127,7 @@ class WebView {
   void GetPageScaleRange(double *min_scale, double *max_scale);
   void DidChangePageScaleRange(double min_scale, double max_scale);
   // > View Scroll
-  void GetScrollPosition(int* x, int* y) const;
+  bool GetScrollPosition(int* x, int* y) const;
   void SetScroll(int x, int y);       // TODO: rename to ScrollTo (x,y) x,y is left top (see GetScrollSize)
   void GetScrollSize(int* w, int* h); // TODO: rename to GetPossibleScrollSize
   // > View Orientation

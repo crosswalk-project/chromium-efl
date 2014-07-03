@@ -270,7 +270,7 @@ class EWebView {
   void ShowContextMenu(const content::ContextMenuParams& params, content::ContextMenuType type = content::MENU_TYPE_LINK);
   void CancelContextMenu(int request_id);
   void SetScale(double scale_factor, int x, int y);
-  void GetScrollPosition(int* x, int* y) const;
+  bool GetScrollPosition(int* x, int* y) const;
   void SetScroll(int x, int y);
   void UrlRequestSet(const char* url, std::string method, Eina_Hash* headers, const char* body);
 
@@ -462,7 +462,6 @@ class EWebView {
   static int find_request_id_counter_;
   IDMap<EwkViewPlainTextGetCallback, IDMapOwnPointer> plain_text_get_callback_map_;
   gfx::Size contents_size_;
-  gfx::Size contents_area_;
   double progress_;
   mutable std::string title_;
   _Ewk_Hit_Test hit_test_data_;
@@ -494,6 +493,8 @@ class EWebView {
   scoped_ptr<tizen_webview::BackForwardList> back_forward_list_;
 
 private:
+  gfx::Vector2d previous_scroll_position_;
+
   // only tizen_webview::WebView can create and delete this
   EWebView(tizen_webview::WebView* owner, tizen_webview::WebContext*, Evas_Object* smart_object);
   ~EWebView();

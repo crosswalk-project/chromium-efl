@@ -15,8 +15,13 @@ ScrollDetector::ScrollDetector()
       edge_Flag_(false) {
 }
 
-void ScrollDetector::OnChangeScrollOffset(EWebView* web_view, const gfx::Vector2d& scroll_delta) {
+void ScrollDetector::OnChangeScrollOffset(EWebView* web_view,
+    const gfx::Vector2d& scroll_position) {
   edge_Flag_ = true;
+
+  gfx::Vector2d scroll_delta = scroll_position;
+  scroll_delta -= last_scroll_position_;
+  last_scroll_position_ = scroll_position;
 
   DetectEdge(web_view, scroll_delta);
 
@@ -31,17 +36,13 @@ void ScrollDetector::OnChangeScrollOffset(EWebView* web_view, const gfx::Vector2
 }
 
 void ScrollDetector::DetectEdge(EWebView* web_view, const gfx::Vector2d& scroll_delta) {
-  int x, y; //current scroll position
-  web_view->GetScrollPosition(&x, &y);
+  if (scroll_delta.x()) {
+    CheckForLeftRightEdges(web_view, last_scroll_position_.x());
+  }
 
-  if (last_scroll_position_.x() != x)
-    CheckForLeftRightEdges(web_view, x);
-
-  if (last_scroll_position_.y() != y)
-    CheckForTopBottomEdges(web_view, y);
-
-  last_scroll_position_.set_x(x);
-  last_scroll_position_.set_y(y);
+  if (scroll_delta.y()) {
+    CheckForTopBottomEdges(web_view, last_scroll_position_.y());
+  }
 }
 
 void ScrollDetector::SetMaxScroll(int x, int y) {

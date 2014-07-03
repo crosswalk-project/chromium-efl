@@ -235,6 +235,10 @@ IPC_MESSAGE_ROUTED2(EwkHostMsg_DidChangeMaxScrollOffset,
                     int, /*max scrollX*/
                     int  /*max scrollY*/)
 
+IPC_MESSAGE_ROUTED2(EwkHostMsg_DidChangeScrollOffset,
+                    int, /*scrollX*/
+                    int  /*scrollY*/)
+
 IPC_MESSAGE_CONTROL3(EwkViewHostMsg_HitTestReply,
                     int, /* render_view_id */
                     _Ewk_Hit_Test, /* Ewk Hit test data without node map */

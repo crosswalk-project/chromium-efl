@@ -75,6 +75,7 @@ class RenderViewObserverEfl: public content::RenderViewObserver {
   void OnSetViewMode(blink::WebViewMode view_mode);
 
   blink::WebSize max_scroll_offset_;
+  blink::WebSize last_scroll_offset_;
   float cached_min_page_scale_factor_;
   float cached_max_page_scale_factor_;
   gfx::Size last_sent_contents_size_;

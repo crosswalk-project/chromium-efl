@@ -265,7 +265,7 @@ void WebView::DidChangePageScaleRange(double min_scale, double max_scale) {
   return impl_->DidChangePageScaleRange(min_scale, max_scale);
 }
 
-void WebView::GetScrollPosition(int* x, int* y) const {
+bool WebView::GetScrollPosition(int* x, int* y) const {
   return impl_->GetScrollPosition(x, y);
 }
 
