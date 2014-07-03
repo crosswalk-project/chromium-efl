@@ -49,6 +49,7 @@ content::MainFunctionParams CommandLineEfl::GetDefaultPortParams() {
   p_command_line->AppendSwitchASCII(switches::kUseGL, gfx::kGLImplementationEGLName);
   p_command_line->AppendSwitch(switches::kEnableGestureTapHighlight);
   p_command_line->AppendSwitch(switches::kEnableSpatialNavigation);
+  p_command_line->AppendSwitch(switches::kMainFrameResizesAreOrientationChanges);
 
   // FIXME(Kapil) Will be removed after permission handling implementation.
   p_command_line->AppendSwitch(switches::kDisableWebSecurity);
