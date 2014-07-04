@@ -1683,8 +1683,15 @@ Evas_Object* EWebView::GetSnapshot(Eina_Rectangle rect) {
 #ifdef OS_TIZEN
   int width = rect.w;
   int height = rect.h;
+
+  if (width > rwhv()->GetViewBoundsInPix().width() - rect.x)
+    width = rwhv()->GetViewBoundsInPix().width() - rect.x;
+  if (height > rwhv()->GetViewBoundsInPix().height() - rect.y)
+    height = rwhv()->GetViewBoundsInPix().height() - rect.y;
+
   int x = rect.x;
-  int y = rwhv()->GetViewBoundsInPix().height() - rect.y + height; // correction of Y axis to take proper snapshot from GL
+  int y = rwhv()->GetViewBoundsInPix().height() - height + rect.y;
+
   Evas_GL_API* gl_api = rwhv()->evasGlApi();
   DCHECK(gl_api);
   int size = width * height;
