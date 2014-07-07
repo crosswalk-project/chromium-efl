@@ -1203,6 +1203,13 @@ void RenderWidgetHostViewEfl::HandleGesture(ui::GestureEvent* event) {
   } else if (event->type() == ui::ET_GESTURE_SCROLL_END) {
     if (GetSelectionController() && GetSelectionController()->GetScrollStatus())
       GetSelectionController()->SetScrollStatus(false);
+  } else if (event->type() == ui::ET_GESTURE_TAP_CANCEL) {
+    if (GetSelectionController() && GetSelectionController()->GetSelectionStatus()) {
+      GetSelectionController()->UpdateSelectionDataAndShow(
+        GetSelectionController()->GetLeftRect(),
+        GetSelectionController()->GetRightRect(),
+        false /* unused */);
+    }
   } else if (event->type() == ui::ET_GESTURE_END) {
     // Gesture end event is received (1) After scroll end (2) After Fling start
 #ifdef TIZEN_EDGE_EFFECT

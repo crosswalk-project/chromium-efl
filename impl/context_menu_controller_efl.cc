@@ -210,6 +210,7 @@ void ContextMenuControllerEfl::contextMenuCancelCallback(void* data, Evas_Object
     evas_object_del(menu_controller->GetPopUp());
     menu_controller->ResetPopUp();
     menu_controller->HideContextMenu();
+    menu_controller->HideSelectionHandle();
     evas_object_data_del(obj, "ContextEfl");
   }
 }
