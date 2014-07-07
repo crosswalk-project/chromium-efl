@@ -297,8 +297,15 @@ class EWebView
   // Callback OnCopyFromBackingStore will be called once we get the snapshot from render
   void OnCopyFromBackingStore(bool success, const SkBitmap& bitmap);
 
-  // scale factor needs to be accommodated once HW acceleration is enabled.
-  bool GetSnapshot(Eina_Rectangle rect, Evas_Object *image);
+  /**
+   * Creates a snapshot of given rectangle from EWebView
+   *
+   * @param rect rectangle of EWebView which will be taken into snapshot
+   *
+   * @return created snapshot or NULL if error occured.
+   * @note ownership of snapshot is passed to caller
+  */
+  Evas_Object* GetSnapshot(Eina_Rectangle rect);
   void set_policy_decision(tizen_webview::PolicyDecision* pr) { policy_decision_.reset(pr); }
   tizen_webview::PolicyDecision* get_policy_decision() const { return policy_decision_.get(); }
   void InvokePolicyResponseCallback(tizen_webview::PolicyDecision* policy_decision);

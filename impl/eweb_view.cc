@@ -73,6 +73,11 @@
 
 #include <iostream>
 
+//this constant is not defined in efl headers so we have to do it here
+#ifndef GL_BGRA
+#define GL_BGRA 0x80E1
+#endif
+
 using namespace content;
 using namespace tizen_webview;
 
@@ -1529,31 +1534,33 @@ void EWebView::GetSnapShotForRect(gfx::Rect& rect) {
 #endif
 }
 
-bool EWebView::GetSnapshot(Eina_Rectangle rect, Evas_Object *image) {
-  DCHECK(image);
-#if 0
-  content::BackingStore* backing_store = RenderWidgetHostImpl::From(
-      rwhv()->GetRenderWidgetHost())->GetBackingStore(false);
+Evas_Object* EWebView::GetSnapshot(Eina_Rectangle rect) {
+  Evas_Object* image = NULL;
+#ifdef OS_TIZEN
+  int width = rect.w;
+  int height = rect.h;
+  int x = rect.x;
+  int y = rwhv()->GetViewBoundsInPix().height() - rect.y + height; // correction of Y axis to take proper snapshot from GL
+  Evas_GL_API* gl_api = rwhv()->evasGlApi();
+  DCHECK(gl_api);
+  int size = width * height;
 
-  if (!backing_store)
-    return false;
+  GLubyte tmp[size*4];
+  GLubyte bits[size*4];
+  gl_api->glReadPixels(x, y, width, height, GL_BGRA, GL_UNSIGNED_BYTE, bits);
 
-  gfx::Rect clip_rect(rect.x, rect.y, rect.w, rect.h);
-  skia::PlatformBitmap output;
-
-  if (!backing_store->CopyFromBackingStore(clip_rect, &output))
-    return false;
-
-  DCHECK(output.GetBitmap().config() == SkBitmap::kARGB_8888_Config);
-
-  evas_object_image_size_set(image, output.GetBitmap().width(), output.GetBitmap().height());
-  evas_object_image_colorspace_set(image, EVAS_COLORSPACE_ARGB8888);
-  evas_object_image_data_copy_set(image, output.GetBitmap().getPixels());
-  return true;
-#else
-  #warning "[M37] Backing store was remvoed from content layer"
-  return false;
+  //flip data after reading
+  for (int i=0; i < height; i++)
+    memcpy(&tmp[i*width*4], &bits[(height-i-1)*width*4], width*4*sizeof(unsigned char));
+  image = evas_object_image_filled_add(rwhv()->evas());
+  if (image) {
+    evas_object_image_size_set(image, width, height);
+    evas_object_image_alpha_set(image, EINA_TRUE);
+    evas_object_image_data_copy_set(image, tmp);
+    evas_object_resize(image, width, height);
+  }
 #endif
+  return image;
 }
 
 void EWebView::BackForwardListClear() {

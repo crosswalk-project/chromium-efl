@@ -214,6 +214,7 @@ class RenderWidgetHostViewEfl
 
   Evas_GL_API* evasGlApi() { return evas_gl_api_; }
   gfx::Point ConvertPointInViewPix(gfx::Point point);
+  gfx::Rect GetViewBoundsInPix() const;
 
   void OnTextInputInFormStateChanged(bool is_in_form_tag);
   void KeyUpEventQueuePush(int key) { keyupev_queue_.push(key); }
@@ -251,7 +252,6 @@ class RenderWidgetHostViewEfl
 
   static void EvasObjectImagePixelsGetCallback(void*, Evas_Object*);
   void initializeProgram();
-  gfx::Rect GetViewBoundsInPix() const;
 
   Ecore_X_Window GetEcoreXWindow() const;
 
