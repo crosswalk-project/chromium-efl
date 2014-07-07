@@ -2,6 +2,10 @@
 #include "browser/javascript_dialog_manager_efl.h"
 #include "browser/javascript_modal_dialog_efl.h"
 
+#include <content/public/browser/browser_thread.h>
+
+using content::BrowserThread;
+
 JavaScriptModalCallbacksData::JavaScriptModalCallbacksData(content::JavaScriptMessageType javascript_message_type,
                                                            void* user_data)
   : alert_callback_(NULL), user_data_(user_data), javascript_message_type_(javascript_message_type)
@@ -81,6 +85,7 @@ void JavaScriptDialogManagerEfl::RunJavaScriptDialog(content::WebContents* web_c
                                                      const base::string16& default_prompt_text,
                                                      const DialogClosedCallback& callback,
                                                      bool* did_suppress_message) {
+  DCHECK(BrowserThread::CurrentlyOn(BrowserThread::UI));
   DCHECK(web_contents);
   dialog_closed_callback_ = callback;
   content::WebContentsDelegateEfl* web_contents_delegate =

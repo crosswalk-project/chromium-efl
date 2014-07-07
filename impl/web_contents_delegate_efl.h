@@ -36,6 +36,7 @@ class WebContentsDelegateEfl
       public WebContentsObserver {
  public:
   WebContentsDelegateEfl(EWebView*);
+  ~WebContentsDelegateEfl();
 
   // Reusing the given WebContents instead of creating a new one.
   WebContentsDelegateEfl(EWebView*, WebContents*);
@@ -93,7 +94,7 @@ class WebContentsDelegateEfl
       CertificateRequestResultType* result);
 
   EWebView* web_view() const { return web_view_; }
-  WebContents* web_contents() const { return web_contents_.get(); }
+  WebContents* web_contents() const { return web_contents_; }
 
   virtual void DidStartProvisionalLoadForFrame(int64 frame_id,
                                                int64 parent_frame_id,
@@ -176,7 +177,7 @@ class WebContentsDelegateEfl
 
   EWebView* web_view_;
   bool is_fullscreen_;
-  scoped_ptr<WebContents> web_contents_;
+  WebContents* web_contents_;
 
   struct ContentSecurityPolicy {
     ContentSecurityPolicy(const std::string& p, tizen_webview::ContentSecurityPolicyType type)
@@ -201,7 +202,7 @@ class WebContentsDelegateEfl
   scoped_ptr<ContentSecurityPolicy> pending_content_security_policy_;
   bool document_created_;
   bool should_open_new_window_;
-  scoped_ptr<JavaScriptDialogManagerEfl> dialog_manager_;
+  JavaScriptDialogManagerEfl* dialog_manager_;
   int forward_backward_list_count_;
   scoped_ptr<FaviconDownloader> favicon_downloader_;
   base::WeakPtrFactory<WebContentsDelegateEfl> weak_ptr_factory_;

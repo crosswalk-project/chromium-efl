@@ -596,8 +596,20 @@ void EWebView::SendOrientationChangeEventIfNeeded(int orientation) {
 #warning "[M37] Fix screen orientation"
 #if 0
   //send new orientation value to RenderView Host to pass to renderer
-  if(rvhi && rvhi->GetOrientation() != orientation)
-    rvhi->SendOrientationChangeEvent(orientation);
+  if(rvhi && rvhi->GetOrientation() != orientation) {
+    switch(orientation) {
+    case -90:
+    case 0:
+    case 90:
+    case 180:
+      rvhi->SendOrientationChangeEvent(orientation);
+      break;
+
+    default:
+      NOTREACHED();
+      break;
+    }
+  }
 #endif
 }
 

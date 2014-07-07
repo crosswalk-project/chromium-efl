@@ -55,36 +55,49 @@ void WritePdfDataToFile(printing::PdfMetafileSkia* metafile, const base::FilePat
 }
 
 WebContentsDelegateEfl::WebContentsDelegateEfl(EWebView* view)
-    : web_view_(view),
-      document_created_(false),
-      should_open_new_window_(true),
-      forward_backward_list_count_(0),
-      weak_ptr_factory_(this) {
+    : web_view_(view)
+    , is_fullscreen_(false)
+    , web_contents_(NULL)
+    , document_created_(false)
+    , should_open_new_window_(true)
+    , dialog_manager_(NULL)
+    , forward_backward_list_count_(0)
+    , weak_ptr_factory_(this) {
   BrowserContext* browser_context = web_view_->context()->browser_context();
-  web_contents_.reset(WebContents::Create(WebContents::CreateParams(browser_context)));
+  web_contents_ = WebContents::Create(WebContents::CreateParams(browser_context));
   web_contents_->SetDelegate(this);
-  Observe(web_contents_.get());
+  Observe(web_contents_);
 
 #ifdef TIZEN_AUTOFILL_SUPPORT
-  AutofillManagerDelegateEfl::CreateForWebContents(web_contents_.get());
+  AutofillManagerDelegateEfl::CreateForWebContents(web_contents_);
   AutofillManagerDelegateEfl * autofill_manager =
-    AutofillManagerDelegateEfl::FromWebContents(web_contents_.get());
+    AutofillManagerDelegateEfl::FromWebContents(web_contents_);
   autofill_manager->SetEWebView(view);
-  AutofillDriverImpl::CreateForWebContentsAndDelegate(web_contents_.get(),
+  AutofillDriverImpl::CreateForWebContentsAndDelegate(web_contents_,
     autofill_manager, EWebView::GetPlatformLocale(), AutofillManager::DISABLE_AUTOFILL_DOWNLOAD_MANAGER);
-  PasswordManagerClientEfl::CreateForWebContents(web_contents_.get());
+  PasswordManagerClientEfl::CreateForWebContents(web_contents_);
 #endif
 }
 
 WebContentsDelegateEfl::WebContentsDelegateEfl(EWebView* view, WebContents* contents)
-  : WebContentsObserver(contents),
-    web_view_(view),
-    web_contents_(contents),
-    document_created_(false),
-    should_open_new_window_(true),
-    forward_backward_list_count_(0),
-    weak_ptr_factory_(this) {
+  : WebContentsObserver(contents)
+  , web_view_(view)
+  , is_fullscreen_(false)
+  , web_contents_(contents)
+  , document_created_(false)
+  , should_open_new_window_(true)
+  , dialog_manager_(NULL)
+  , forward_backward_list_count_(0)
+  , weak_ptr_factory_(this) {
   web_contents_->SetDelegate(this);
+}
+
+WebContentsDelegateEfl::~WebContentsDelegateEfl() {
+  // It's important to delete web_contents_ before dialog_manager_
+  // destructor of web contents uses dialog_manager_
+
+  delete web_contents_;
+  delete dialog_manager_;
 }
 
 void WebContentsDelegateEfl::NavigationStateChanged(const WebContents* source, unsigned changed_flags) {
@@ -407,8 +420,8 @@ void WebContentsDelegateEfl::FindReply(WebContents* web_contents,
 
 JavaScriptDialogManager* WebContentsDelegateEfl::GetJavaScriptDialogManager() {
   if (!dialog_manager_)
-    dialog_manager_.reset(new JavaScriptDialogManagerEfl());
-  return dialog_manager_.get();
+    dialog_manager_ = new JavaScriptDialogManagerEfl();
+  return dialog_manager_;
 }
 
 bool WebContentsDelegateEfl::OnMessageReceived(const IPC::Message& message) {
