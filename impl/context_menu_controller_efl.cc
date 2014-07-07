@@ -462,11 +462,11 @@ void ContextMenuControllerEfl::MenuItemSelected(ContextMenuItemEfl *menu_item) {
       break;
     }
     default:
-      _Ewk_Context_Menu_Item item;
-      item.menu_item_ = menu_item;
-      view->SmartCallback<EWebViewCallbacks::ContextMenuItemSelected>().call(&item);
-      break;
+      NOTREACHED();
   }
+  _Ewk_Context_Menu_Item item;
+  item.menu_item_ = menu_item;
+  view->SmartCallback<EWebViewCallbacks::ContextMenuItemSelected>().call(&item);
 }
 
 void ContextMenuControllerEfl::HideContextMenu() {
