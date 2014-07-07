@@ -21,6 +21,7 @@
 #include "selection_controller_efl.h"
 #include "selection_box_efl.h"
 #include "selection_magnifier_efl.h"
+#include "ui/gfx/screen.h"
 
 #include <Edje.h>
 
@@ -157,6 +158,10 @@ void SelectionControllerEfl::ShowHandleAndContextMenuIfRequired(bool anchor_firs
   if (!selection_data_->GetStatus())
     return;
 
+  if (scrolling_)
+    return;
+
+  float dpi_scale;
   gfx::Rect left, right;
   if (anchor_first) {
     left = selection_data_->GetLeftRect();
@@ -166,8 +171,27 @@ void SelectionControllerEfl::ShowHandleAndContextMenuIfRequired(bool anchor_firs
     left = selection_data_->GetRightRect();
   }
 
+  dpi_scale = gfx::Screen::GetNativeScreen()->GetPrimaryDisplay().device_scale_factor();
+  int hitX, hitY;
+  hitX = selection_data_->GetContextMenuParams()->x;
+  hitY = selection_data_->GetContextMenuParams()->y;
+
+  if (dpi_scale) {
+    hitX = hitX / dpi_scale;
+    hitY = hitY / dpi_scale;
+  }
+
+  scoped_ptr<tizen_webview::Hit_Test> hit_test(
+    parent_view_->RequestHitTestDataAt(hitX, hitY, tizen_webview::TW_HIT_TEST_MODE_DEFAULT));
+
   // Is in edit field and no text is selected. show only single handle
   if (selection_data_->IsInEditField() && left == right) {
+
+    if (hit_test.get() &&
+        selection_data_->IsInEditField() &&
+        !(hit_test->GetResultContext() & tizen_webview::TW_HIT_TEST_RESULT_CONTEXT_EDITABLE))
+      return;
+
     gfx::Rect left = selection_data_->GetLeftRect();
     input_handle_->SetBasePosition(gfx::Point(left.x(), left.y()));
     input_handle_->Move(left.bottom_right());
@@ -187,6 +211,11 @@ void SelectionControllerEfl::ShowHandleAndContextMenuIfRequired(bool anchor_firs
     selection_data_->ClearRectData();
     return;
   }
+
+  if (hit_test.get() &&
+    !(hit_test->GetResultContext() & tizen_webview::TW_HIT_TEST_RESULT_CONTEXT_SELECTION))
+    return;
+
   // The base position of start_handle should be set to the middle of the left rectangle.
   // Otherwise the start_handle may be shifted up when the right_handle is moving
   start_handle_->SetBasePosition(left.CenterPoint());
