@@ -126,6 +126,9 @@ enum CallbackType {
   WrtPluginsMessage,
   IconReceived,
   FormSubmit,
+#if defined(OS_TIZEN_TV)
+  NewWindowNavigationPolicyDecision,
+#endif // OS_TIZEN_TV
   URIChanged
 };
 
@@ -281,6 +284,9 @@ DECLARE_EWK_VIEW_CALLBACK(WebProcessCrashed, "webprocess,crashed", bool*);
 DECLARE_EWK_VIEW_CALLBACK(ConsoleMessage, "console,message", _Ewk_Console_Message*);
 DECLARE_EWK_VIEW_CALLBACK(WrtPluginsMessage, "wrt,message", tizen_webview::WrtIpcMessageData*);
 DECLARE_EWK_VIEW_CALLBACK(IconReceived, "icon,received", void);
+#if defined(OS_TIZEN_TV)
+DECLARE_EWK_VIEW_CALLBACK(NewWindowNavigationPolicyDecision, "policy,decision,new,window", Ewk_Navigation_Policy_Decision*);
+#endif // OS_TIZEN_TV
 }
 
 #endif
