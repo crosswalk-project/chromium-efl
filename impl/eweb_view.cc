@@ -980,7 +980,7 @@ void EWebView::DispatchPostponedGestureEvent(ui::GestureEvent* event) {
       ClearSelection();
 
     if (settings && settings->textSelectionEnabled()) {
-      tizen_webview::Hit_Test* hit_test = RequestHitTestDataAt(event->x(), event->y(), TW_HIT_TEST_MODE_DEFAULT);
+      tizen_webview::Hit_Test* hit_test = RequestHitTestDataAtBlinkCoords(event->x(), event->y(), TW_HIT_TEST_MODE_DEFAULT);
       _Ewk_Hit_Test* hit_test_data = hit_test->impl;
       if (hit_test_data && hit_test_data->context & TW_HIT_TEST_RESULT_CONTEXT_EDITABLE) {
         selection_controller_->SetSelectionStatus(true);
@@ -1009,7 +1009,7 @@ void EWebView::DispatchPostponedGestureEvent(ui::GestureEvent* event) {
       rwhv()->HandleGesture(event);
     }
   } else if ((event->details().type() == ui::ET_GESTURE_TAP) || (event->details().type() == ui::ET_GESTURE_SHOW_PRESS))  {
-    tizen_webview::Hit_Test* hit_test = RequestHitTestDataAt(event->x(), event->y(), TW_HIT_TEST_MODE_DEFAULT);
+    tizen_webview::Hit_Test* hit_test = RequestHitTestDataAtBlinkCoords(event->x(), event->y(), TW_HIT_TEST_MODE_DEFAULT);
    _Ewk_Hit_Test* hit_test_data = hit_test->impl;
     LOG(INFO) << __PRETTY_FUNCTION__ << " hit_test = " << hit_test_data;
     if (hit_test_data && hit_test_data->context & TW_HIT_TEST_RESULT_CONTEXT_EDITABLE) {
@@ -1543,6 +1543,19 @@ bool EWebView::ClearSelection() {
 }
 
 tizen_webview::Hit_Test* EWebView::RequestHitTestDataAt(int x, int y, tizen_webview::Hit_Test_Mode mode) {
+  // TODO: this calculations should be moved outside and reused everywhere it's required
+  Evas_Coord tmpX, tmpY;
+  evas_object_geometry_get(evas_object_, &tmpX, &tmpY, NULL, NULL);
+
+  x -= tmpX;
+  y -= tmpY;
+  x /= rwhv()->device_scale_factor();
+  y /= rwhv()->device_scale_factor();
+
+  return RequestHitTestDataAtBlinkCoords(x, y, mode);
+}
+
+tizen_webview::Hit_Test* EWebView::RequestHitTestDataAtBlinkCoords(int x, int y, tizen_webview::Hit_Test_Mode mode) {
   RenderViewHost* render_view_host = web_contents_delegate()->web_contents()->GetRenderViewHost();
   DCHECK(render_view_host);
 

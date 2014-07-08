@@ -161,7 +161,6 @@ void SelectionControllerEfl::ShowHandleAndContextMenuIfRequired(bool anchor_firs
   if (scrolling_)
     return;
 
-  float dpi_scale;
   gfx::Rect left, right;
   if (anchor_first) {
     left = selection_data_->GetLeftRect();
@@ -171,15 +170,9 @@ void SelectionControllerEfl::ShowHandleAndContextMenuIfRequired(bool anchor_firs
     left = selection_data_->GetRightRect();
   }
 
-  dpi_scale = gfx::Screen::GetNativeScreen()->GetPrimaryDisplay().device_scale_factor();
   int hitX, hitY;
   hitX = selection_data_->GetContextMenuParams()->x;
   hitY = selection_data_->GetContextMenuParams()->y;
-
-  if (dpi_scale) {
-    hitX = hitX / dpi_scale;
-    hitY = hitY / dpi_scale;
-  }
 
   scoped_ptr<tizen_webview::Hit_Test> hit_test(
     parent_view_->RequestHitTestDataAt(hitX, hitY, tizen_webview::TW_HIT_TEST_MODE_DEFAULT));

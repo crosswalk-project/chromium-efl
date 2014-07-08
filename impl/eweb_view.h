@@ -313,6 +313,7 @@ class EWebView
   void UseSettingsFont();
 
   tizen_webview::Hit_Test* RequestHitTestDataAt(int x, int y, tizen_webview::Hit_Test_Mode mode);
+  tizen_webview::Hit_Test* RequestHitTestDataAtBlinkCoords(int x, int y, tizen_webview::Hit_Test_Mode mode);
   void UpdateHitTestData(const _Ewk_Hit_Test& hit_test_data, const NodeAttributesMap& node_attributes);
 
   int current_find_request_id() const { return current_find_request_id_; }
