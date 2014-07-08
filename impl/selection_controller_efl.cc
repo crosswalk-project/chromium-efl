@@ -139,7 +139,6 @@ void SelectionControllerEfl::UpdateSelectionDataAndShow(const gfx::Rect& left_re
   selection_data_->UpdateRectData(left_rect, right_rect);
 
   if (!IsSelectionValid(left_rect, right_rect)) {
-    selection_data_->ClearRectData();
     Clear();
   } else {
     if (selection_data_->GetEditable()) {
