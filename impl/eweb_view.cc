@@ -769,8 +769,13 @@ void EWebView::handleEvasObjectColorSet(Evas_Object*, int red, int green, int bl
 }
 
 Eina_Bool EWebView::handleFocusIn(Ewk_View_Smart_Data* d) {
-  ToEWebView(d)->rwhv()->HandleFocusIn();
-  return true;
+  DCHECK(d);
+  RenderWidgetHostViewEfl* rwhv = ToEWebView(d)->rwhv();
+  if (rwhv) {
+    rwhv->HandleFocusIn();
+    return EINA_TRUE;
+  }
+  return EINA_FALSE;
 }
 
 Eina_Bool EWebView::handleFocusOut(Ewk_View_Smart_Data* d) {
