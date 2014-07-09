@@ -145,8 +145,11 @@ void WebView::LoadData(const char* data, size_t size, const char* mime_type, con
   return impl_->LoadData(data, size, mime_type, encoding, base_uri, unreachable_uri);
 }
 
-void WebView::UrlRequestSet(const char* url, std::string method, Eina_Hash* headers, const char* body) {
-  return impl_->UrlRequestSet(url, method, headers, body);
+void WebView::UrlRequestSet(const char* url,
+    content::NavigationController::LoadURLType loadtype,
+    Eina_Hash* headers,
+    const char* body) {
+  return impl_->UrlRequestSet(url, loadtype, headers, body);
 }
 
 std::string WebView::GetErrorPage(const std::string& invalidUrl) {

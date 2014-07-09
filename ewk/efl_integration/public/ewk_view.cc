@@ -23,6 +23,7 @@
 #include "ewk_view.h"
 
 #include <Evas.h>
+#include <content/public/browser/navigation_controller.h>
 #include <tizen_webview/public/tw_webview.h>
 
 // TODO: remove dependency
@@ -291,27 +292,20 @@ Eina_Bool ewk_view_url_request_set(Evas_Object* ewkView, const char* url, Ewk_Ht
 {
   EWK_VIEW_IMPL_GET_OR_RETURN(ewkView, impl, EINA_FALSE);
   EINA_SAFETY_ON_NULL_RETURN_VAL(url, EINA_FALSE);
-  std::string str_method;
+  content::NavigationController::LoadURLType loadtype;
   switch (method) {
   case EWK_HTTP_METHOD_GET:
-    str_method = "GET";
-    break;
-  case EWK_HTTP_METHOD_HEAD:
-    str_method = "HEAD";
+    loadtype = content::NavigationController::LOAD_TYPE_DEFAULT;
     break;
   case EWK_HTTP_METHOD_POST:
-    str_method = "POST";
-    break;
-  case EWK_HTTP_METHOD_PUT:
-    str_method = "PUT";
-    break;
-  case EWK_HTTP_METHOD_DELETE:
-    str_method = "DELETE";
+    loadtype = content::NavigationController::LOAD_TYPE_BROWSER_INITIATED_HTTP_POST;
     break;
   default:
+    LOG(ERROR) << "Not supported HTTP Method.";
     return EINA_FALSE;
   }
-  impl->UrlRequestSet(url, str_method, headers, body);
+
+  impl->UrlRequestSet(url, loadtype, headers, body);
   return EINA_TRUE;
 }
 

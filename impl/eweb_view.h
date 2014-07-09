@@ -24,6 +24,7 @@
 #include "content/public/common/file_chooser_params.h"
 #include "content/browser/renderer_host/event_with_latency_info.h"
 #include "content/common/input/input_event_ack_state.h"
+#include "content/public/browser/navigation_controller.h"
 #include "content/public/common/menu_item.h"
 #include "base/id_map.h"
 #include "context_menu_controller_efl.h"
@@ -275,7 +276,10 @@ class EWebView {
   void SetScale(double scale_factor, int x, int y);
   bool GetScrollPosition(int* x, int* y) const;
   void SetScroll(int x, int y);
-  void UrlRequestSet(const char* url, std::string method, Eina_Hash* headers, const char* body);
+  void UrlRequestSet(const char* url,
+      content::NavigationController::LoadURLType loadtype,
+      Eina_Hash* headers,
+      const char* body);
 
   content::SelectionControllerEfl* GetSelectionController() const { return selection_controller_.get(); }
 #ifdef TIZEN_CONTENTS_DETECTION

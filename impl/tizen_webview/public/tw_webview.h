@@ -9,6 +9,7 @@
 #include <Evas.h>
 #include <string>
 #include <map>
+#include "content/public/browser/navigation_controller.h"
 #include "tizen_webview/public/tw_back_forward_history.h"
 #include "tizen_webview/public/tw_back_forward_list_impl.h"
 #include "tizen_webview/public/tw_callbacks.h"
@@ -87,7 +88,10 @@ class WebView {
   void Stop();
   void LoadPlainTextString(const char* plain_text);
   void LoadData(const char* data, size_t size, const char* mime_type, const char* encoding, const char* base_uri, const char* unreachable_uri = NULL); // SetContent
-  void UrlRequestSet(const char* url, std::string method, Eina_Hash* headers, const char* body);
+  void UrlRequestSet(const char* url,
+      content::NavigationController::LoadURLType loadtype,
+      Eina_Hash* headers,
+      const char* body);
   std::string GetErrorPage(const std::string& invalidUrl);
 
   // ---- Navigation

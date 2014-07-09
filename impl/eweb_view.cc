@@ -1929,33 +1929,38 @@ bool EWebView::LaunchCamera(base::string16 mimetype)
 }
 #endif
 
-void EWebView::UrlRequestSet(const char* url, std::string method, Eina_Hash* headers, const char* body) {
-  net::URLRequestContext context;
-  scoped_ptr<net::URLRequest> request(context.CreateRequest(
-      GURL(url), net::DEFAULT_PRIORITY, NULL, NULL));
-  request->set_method(method);
+void EWebView::UrlRequestSet(const char* url,
+    content::NavigationController::LoadURLType loadtype,
+    Eina_Hash* headers, const char* body) {
+  content::NavigationController::LoadURLParams params =
+      content::NavigationController::LoadURLParams(GURL(url));
+  params.load_type = loadtype;
 
-  net::HttpRequestHeaders extra_headers;
+  if (body) {
+    std::string s(body);
+    params.browser_initiated_post_data =
+        base::RefCountedString::TakeString(&s);
+  }
+
+  net::HttpRequestHeaders header;
   if (headers) {
     Eina_Iterator* it = eina_hash_iterator_tuple_new(headers);
-    void* data;
-    while (eina_iterator_next(it, &data)) {
-      Eina_Hash_Tuple* t = static_cast<Eina_Hash_Tuple*>(data);
-      const char* name = static_cast<const char*>(t->key);
-      const char* value = static_cast<const char*>(t->data);
-      extra_headers.SetHeader(base::StringPiece(name), base::StringPiece(value));
-
+    Eina_Hash_Tuple* t;
+    while (eina_iterator_next(it, reinterpret_cast<void**>(&t))) {
+      if (t->key) {
+        const char* value_str =
+            t->data ? static_cast<const char*>(t->data) : "";
+        base::StringPiece name = static_cast<const char*>(t->key);
+        base::StringPiece value = value_str;
+        header.SetHeader(name, value);
+        //net::HttpRequestHeaders.ToString() returns string with newline
+        params.extra_headers += header.ToString();
+      }
     }
     eina_iterator_free(it);
   }
 
-  request->SetExtraRequestHeaders(extra_headers);
-
-  if (body) {
-    std::string str = body;
-    request->EnableChunkedUpload();
-    request->AppendChunkToUpload(str.c_str(), str.length(), true);
-  }
+  web_contents_->GetController().LoadURLWithParams(params);
 }
 
 bool EWebView::HandleShow() {
