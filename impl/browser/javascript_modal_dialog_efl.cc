@@ -21,8 +21,11 @@ JavaScriptModalDialogEfl* JavaScriptModalDialogEfl::CreateDialog(content::WebCon
                            const content::JavaScriptDialogManager::DialogClosedCallback& callback) {
   JavaScriptModalDialogEfl* dialog = new JavaScriptModalDialogEfl(web_contents,
       origin_url, accept_lang, javascript_message_type, message_text, default_prompt_text, callback);
-  if (!dialog->ShowJavaScriptDialog())
+  if (!dialog->ShowJavaScriptDialog()) {
     delete dialog;
+    dialog = NULL;
+  }
+  return dialog;
 }
 
 JavaScriptModalDialogEfl::JavaScriptModalDialogEfl(content::WebContents* web_contents,
