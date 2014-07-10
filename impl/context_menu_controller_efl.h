@@ -21,7 +21,10 @@
 #define context_menu_controller_h
 
 #include <Evas.h>
+#include "base/memory/weak_ptr.h"
 #include "content/public/browser/render_view_host.h"
+#include "content/public/browser/download_item.h"
+#include "content/public/browser/download_url_parameters.h"
 #include "content/public/common/context_menu_params.h"
 
 namespace content {
@@ -172,7 +175,7 @@ class ContextMenuItemEfl {
   std::string icon_path_;
 };
 
-class ContextMenuControllerEfl {
+class ContextMenuControllerEfl : public content::DownloadItem::Observer {
  public:
 
   static void contextMenuCancelCallback(void* data, Evas_Object* obj, void* eventInfo);
@@ -183,7 +186,8 @@ class ContextMenuControllerEfl {
     , popup_(0)
     , menu_items_(0)
     , type_(type)
-    , wcd_(wcd) {
+    , wcd_(wcd)
+    , weak_ptr_factory_(this) {
   }
 
   ~ContextMenuControllerEfl();
@@ -205,7 +209,11 @@ class ContextMenuControllerEfl {
                             std::string link_url,
                             std::string icon_path);
   void HideSelectionHandle();
-  base::FilePath DownloadFile(const GURL url, const base::FilePath outputDir);
+  virtual void OnDownloadUpdated(content::DownloadItem* download) OVERRIDE;
+  void OnDownloadStarted(content::DownloadItem* item, content::DownloadInterruptReason interrupt_reason);
+  base::FilePath DownloadFile(const GURL url,
+                              const base::FilePath outputDir,
+                              const DownloadUrlParameters::OnStartedCallback& callback);
   bool TriggerDownloadCb(const GURL url);
   void OpenInNewTab(const GURL url);
   Evas_Object* evas_object_;
@@ -214,6 +222,7 @@ class ContextMenuControllerEfl {
   ContextMenuType type_;
   ContextMenuParams params_;
   WebContentsDelegateEfl* wcd_;
+  base::WeakPtrFactory<ContextMenuControllerEfl> weak_ptr_factory_;
 };
 
 } // namespace

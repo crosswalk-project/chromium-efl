@@ -27,7 +27,6 @@
 #include "context_menu_controller_efl.h"
 #include "content/public/browser/browser_thread.h"
 #include "content/public/browser/download_manager.h"
-#include "content/public/browser/download_url_parameters.h"
 #include "content/public/browser/navigation_entry.h"
 #include "eweb_view.h"
 #include "net/base/net_util.h"
@@ -321,7 +320,23 @@ void ContextMenuControllerEfl::HideSelectionHandle() {
     controller->HideHandle();
 }
 
-base::FilePath ContextMenuControllerEfl::DownloadFile(const GURL url, const base::FilePath outputDir) {
+void ContextMenuControllerEfl::OnDownloadStarted(
+    content::DownloadItem* item,
+    content::DownloadInterruptReason interrupt_reason) {
+  item->AddObserver(this);
+}
+
+void ContextMenuControllerEfl::OnDownloadUpdated(content::DownloadItem* download) {
+  if(download->AllDataSaved()) {
+    std::string DownloadPath = download->GetForcedFilePath().value();
+    ClipboardHelperEfl::GetInstance()->SetData(DownloadPath.c_str(),ClipboardHelperEfl::CLIPBOARD_DATA_TYPE_IMAGE);
+    download->RemoveObserver(this);
+  }
+}
+
+base::FilePath ContextMenuControllerEfl::DownloadFile(const GURL url,
+                                                      const base::FilePath outputDir,
+                                                      const DownloadUrlParameters::OnStartedCallback& callback = DownloadUrlParameters::OnStartedCallback()) {
   const GURL referrer = wcd_->web_contents()->GetVisibleURL();
   DownloadManager* dlm = BrowserContext::GetDownloadManager(wcd_->web_contents()->GetBrowserContext());
 
@@ -347,6 +362,7 @@ base::FilePath ContextMenuControllerEfl::DownloadFile(const GURL url, const base
 
   dl_params->set_file_path(fullPath);
   dl_params->set_prompt(true);
+  dl_params->set_callback(callback);
   dlm->DownloadUrl(dl_params.Pass());
   return fullPath;
 }
@@ -421,8 +437,9 @@ void ContextMenuControllerEfl::MenuItemSelected(ContextMenuItemEfl *menu_item) {
       break;
     }
     case MENU_ITEM_COPY_IMAGE_TO_CLIPBOARD: {
-      base::FilePath tmpFile = DownloadFile(GURL(menu_item->ImageURL()), base::FilePath("/tmp/"));
-      ClipboardHelperEfl::GetInstance()->SetData(tmpFile.value(),ClipboardHelperEfl::CLIPBOARD_DATA_TYPE_IMAGE);
+      DownloadFile(GURL(menu_item->ImageURL()),
+                        base::FilePath("/tmp/"),
+                        base::Bind(&ContextMenuControllerEfl::OnDownloadStarted,weak_ptr_factory_.GetWeakPtr()));
       break;
     }
     case MENU_ITEM_COPY_LINK_TO_CLIPBOARD: {
