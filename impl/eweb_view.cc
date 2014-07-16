@@ -250,6 +250,9 @@ EWebView::EWebView(EWebContext* context, Evas_Object* object)
       page_scale_factor_(1.0),
       min_page_scale_factor_(-1.0),
       max_page_scale_factor_(-1.0)
+#ifdef TIZEN_EDGE_EFFECT
+      , edge_effect_(EdgeEffect::create(object))
+#endif
 #ifndef NDEBUG
       ,renderer_crashed_(false)
 #endif
@@ -1489,6 +1492,12 @@ inline JavaScriptDialogManagerEfl* EWebView::GetJavaScriptDialogManagerEfl() {
 void EWebView::SetJavaScriptAlertCallback(Ewk_View_JavaScript_Alert_Callback callback, void* user_data) {
   GetJavaScriptDialogManagerEfl()->SetAlertCallback(callback, user_data);
 }
+
+#ifdef TIZEN_EDGE_EFFECT
+void EWebView::SetSettingsGetCallback(Ewk_View_Settings_Get callback, void* user_data) {
+  edge_effect_->setEwkSettingsGetCallback(callback, user_data);
+}
+#endif
 
 void EWebView::JavaScriptAlertReply() {
   GetJavaScriptDialogManagerEfl()->ExecuteDialogClosedCallBack(true, std::string());

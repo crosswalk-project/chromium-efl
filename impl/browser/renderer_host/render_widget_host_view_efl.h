@@ -119,6 +119,13 @@ class RenderWidgetHostViewEfl
   virtual void BeginFrameSubscription(
       scoped_ptr<RenderWidgetHostViewFrameSubscriber> subscriber) OVERRIDE;
   virtual void EndFrameSubscription() OVERRIDE;
+
+#ifdef TIZEN_EDGE_EFFECT
+  virtual void OnOverscrolled(
+      gfx::Vector2dF accumulated_overscroll,
+      gfx::Vector2dF latest_overscroll_delta) OVERRIDE;
+#endif
+
   virtual void OnAcceleratedCompositingStateChange() OVERRIDE;
   virtual void AcceleratedSurfaceInitialized(int, int) OVERRIDE;
   virtual void AcceleratedSurfaceBuffersSwapped(

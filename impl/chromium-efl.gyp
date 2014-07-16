@@ -2,6 +2,7 @@
   'variables': {
     'data_dir%': '/usr/share/chromium-efl/',
     'exe_dir%': '/usr/lib/chromium-efl/',
+    'edje_dir%': '/usr/share/chromium-efl/themes/',
     'edje_compiler%': 'edje_cc',
   },
 
@@ -39,6 +40,7 @@
       'CHROMIUMCORE_IMPLEMENTATION=1',
       'DATA_DIR="<(data_dir)"',
       'EXE_DIR="<(exe_dir)"',
+      'EDJE_DIR="<(edje_dir)"',
     ],
     'sources': [
       'API/ewk_auth_challenge_private.h',
@@ -61,6 +63,8 @@
       'API/ewk_text_style_private.h',
       'API/ewk_user_media_private.h',
       'API/ewk_view_private.h',
+      'EdgeEffect.cpp',
+      'EdgeEffect.h',
       'browser/device_sensors/data_fetcher_impl_tizen.cc',
       'browser/device_sensors/data_fetcher_impl_tizen.h',
       'browser/device_sensors/data_fetcher_shared_memory_tizen.cc',
@@ -181,6 +185,7 @@
       'renderer/render_view_observer_efl.cc',
       'renderer/render_view_observer_efl.h',
       'resource/JavaScriptPopup.edc',
+      'resource/Edge.edc',
       'resource/Magnifier.edc',
       'resource/control.edc',
       'resource_dispatcher_host_delegate_efl.cc',
@@ -248,6 +253,7 @@
     'defines': [
       'DATA_DIR="<(data_dir)"',
       'EXE_DIR="<(exe_dir)"',
+      'EDJE_DIR="<(edje_dir)"',
     ],
     'type': 'executable',
     'include_dirs': [

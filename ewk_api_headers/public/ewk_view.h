@@ -663,6 +663,11 @@ EAPI void ewk_view_intercept_request_callback_set (Evas_Object *o, Ewk_View_Inte
  */
 EAPI Ewk_Settings *ewk_view_settings_get(const Evas_Object *o);
 
+// #if PLATFORM(TIZEN)
+typedef Ewk_Settings* (*Ewk_View_Settings_Get)(const Evas_Object* o);
+EAPI void ewk_view_settings_get_callback_set(Evas_Object *o, Ewk_View_Settings_Get callback, void* user_data);
+// #endif
+
 /**
  * Asks the main frame to navigate back in the history.
  *

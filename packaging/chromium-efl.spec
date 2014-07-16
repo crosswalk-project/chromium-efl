@@ -148,7 +148,8 @@ export OUTPUT_FOLDER=%{OUTPUT_FOLDER}
 %if %{?_skip_gyp:0}%{!?_skip_gyp:1}
 gyp_chromiumefl \
   -Dexe_dir="%{CHROMIUM_EXE_DIR}" \
-  -Ddata_dir="%{CHROMIUM_DATA_DIR}"
+  -Ddata_dir="%{CHROMIUM_DATA_DIR}" \
+  -Dedje_dir="%{CHROMIUM_DATA_DIR}"/themes
 %endif
 
 ninja %{_smp_mflags} -C"%{OUTPUT_FOLDER}"

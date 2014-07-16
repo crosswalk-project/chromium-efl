@@ -51,6 +51,10 @@
 #include "ui/gfx/size.h"
 #include "browser/inputpicker/InputPicker.h"
 
+#ifdef TIZEN_EDGE_EFFECT
+#include "EdgeEffect.h"
+#endif
+
 namespace content {
 class RenderViewHost;
 class RenderWidgetHostViewEfl;
@@ -248,6 +252,11 @@ class EWebView
   void DismissColorPicker();
   bool SetColorPickerColor(int r, int g, int b, int a);
 
+#ifdef TIZEN_EDGE_EFFECT
+  void SetSettingsGetCallback(Ewk_View_Settings_Get callback, void* user_data);
+  scoped_refptr<EdgeEffect> edgeEffect() { return edge_effect_; }
+#endif
+
  private:
   EWebView(EWebContext*, Evas_Object* smart_object);
   ~EWebView();
@@ -352,6 +361,9 @@ class EWebView
   double max_page_scale_factor_;
   scoped_ptr<OrientationLockCallback> orientation_lock_callback_;
   scoped_ptr<content::InputPicker> inputPicker_;
+#ifdef TIZEN_EDGE_EFFECT
+  scoped_refptr<EdgeEffect> edge_effect_;
+#endif
 
 #ifndef NDEBUG
   bool renderer_crashed_;

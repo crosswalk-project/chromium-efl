@@ -587,6 +587,9 @@ void RenderWidgetHostViewEfl::ScrollOffsetChanged() {
 }
 
 void RenderWidgetHostViewEfl::DidStopFlinging() {
+#ifdef TIZEN_EDGE_EFFECT
+  web_view_->edgeEffect()->hide();
+#endif
   // Unhide Selection UI when scrolling with fling gesture
   if (GetSelectionController() && GetSelectionController()->GetScrollStatus())
     GetSelectionController()->SetScrollStatus(false);
@@ -648,6 +651,21 @@ void RenderWidgetHostViewEfl::EndFrameSubscription() {
   idle_frame_subscriber_textures_.clear();
   frame_subscriber_.reset();
 }
+
+#ifdef TIZEN_EDGE_EFFECT
+void RenderWidgetHostViewEfl::OnOverscrolled(
+    gfx::Vector2dF accumulated_overscroll,
+    gfx::Vector2dF latest_overscroll_delta) {
+  if (latest_overscroll_delta.x() < 0 && (int)accumulated_overscroll.x() < 0)
+    web_view_->edgeEffect()->show("edge,left");
+  if (latest_overscroll_delta.x() > 0 && (int)accumulated_overscroll.x() > 0)
+    web_view_->edgeEffect()->show("edge,right");
+  if (latest_overscroll_delta.y() < 0 && (int)accumulated_overscroll.y() < 0)
+    web_view_->edgeEffect()->show("edge,top");
+  if (latest_overscroll_delta.y() > 0 && (int)accumulated_overscroll.y() > 0)
+    web_view_->edgeEffect()->show("edge,bottom");
+}
+#endif
 
 void RenderWidgetHostViewEfl::ReturnSubscriberTexture(
     base::WeakPtr<RenderWidgetHostViewEfl> rwhvefl,
@@ -1056,7 +1074,26 @@ void RenderWidgetHostViewEfl::HandleGesture(ui::GestureEvent* event) {
       GetSelectionController()->SetScrollStatus(false);
   } else if (event->type() == ui::ET_GESTURE_END) {
     // Gesture end event is received (1) After scroll end (2) After Fling start
+#ifdef TIZEN_EDGE_EFFECT
+    web_view_->edgeEffect()->hide();
+#endif
   }
+#ifdef TIZEN_EDGE_EFFECT
+  else if (event->type() == ui::ET_GESTURE_SCROLL_UPDATE) {
+    if (gesture.data.scrollUpdate.deltaX < 0)
+      web_view_->edgeEffect()->hide("edge,left");
+    else if (gesture.data.scrollUpdate.deltaX > 0)
+      web_view_->edgeEffect()->hide("edge,right");
+    if (gesture.data.scrollUpdate.deltaY < 0)
+      web_view_->edgeEffect()->hide("edge,top");
+    else if (gesture.data.scrollUpdate.deltaY > 0)
+      web_view_->edgeEffect()->hide("edge,bottom");
+  } else if (event->type() == ui::ET_GESTURE_PINCH_BEGIN) {
+      web_view_->edgeEffect()->disable();
+  } else if (event->type() == ui::ET_GESTURE_PINCH_END) {
+      web_view_->edgeEffect()->enable();
+  }
+#endif
 
 #ifdef OS_TIZEN
   FilterInputMotion(gesture);
