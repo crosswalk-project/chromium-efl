@@ -45,6 +45,7 @@ content::MainFunctionParams CommandLineEfl::GetDefaultPortParams() {
 #if defined(OS_TIZEN)
   p_command_line->AppendSwitch(switches::kEnableOverscrollNotifications);
   p_command_line->AppendSwitch(switches::kTouchEvents);
+  p_command_line->AppendSwitch(switches::kEnablePinch);
   p_command_line->AppendSwitchASCII(switches::kUseGL, gfx::kGLImplementationEGLName);
   p_command_line->AppendSwitch(switches::kEnableGestureTapHighlight);
   p_command_line->AppendSwitch(switches::kEnableSpatialNavigation);
@@ -56,21 +57,20 @@ content::MainFunctionParams CommandLineEfl::GetDefaultPortParams() {
   p_command_line->AppendSwitch(switches::kDisableDelegatedRenderer);
   p_command_line->AppendSwitch(switches::kDisableImplSidePainting);
 
-  p_command_line->AppendSwitch(switches::kForceCompositingMode);
   p_command_line->AppendSwitch(switches::kEnableThreadedCompositing);
   p_command_line->AppendSwitch(switches::kIgnoreGpuBlacklist);
-  p_command_line->AppendSwitch(switches::kAllowWebUICompositing);
-  p_command_line->AppendSwitch(switches::kEnablePinch);
 
-  p_command_line->AppendSwitch(cc::switches::kEnableMapImage);
-  p_command_line->AppendSwitch(cc::switches::kEnableImplSidePainting);
+#warning "[M37] Investigae removed command line switches, are they still needed, do they have a replacement?"
+  //p_command_line->AppendSwitch(switches::kForceCompositingMode);
+  //p_command_line->AppendSwitch(switches::kAllowWebUICompositing);
+  //p_command_line->AppendSwitch(cc::switches::kEnableMapImage);
+
+  p_command_line->AppendSwitch(switches::kEnableImplSidePainting);
 
   // XXX: Skia benchmarking should be only used for testing,
   // when enabled the following warning is printed to stderr:
   // "Enabling unsafe Skia benchmarking extension."
   // p_command_line->AppendSwitch(switches::kEnableSkiaBenchmarking);
-
-  p_command_line->AppendSwitch("--enable-pinch");
 
   AppendUserArgs(*p_command_line);
 
@@ -81,7 +81,6 @@ void CommandLineEfl::AppendProcessSpecificArgs(CommandLine& command_line) {
   std::string process_type = command_line.GetSwitchValueASCII(switches::kProcessType);
 
   if (process_type == switches::kRendererProcess) {
-    command_line.AppendSwitchNative(switches::kUserAgent, content::GetUserAgent(GURL()));
     command_line.AppendSwitch(switches::kDisablePlugins);
   }
   AppendUserArgs(command_line);
