@@ -11,8 +11,11 @@
 #include "content/public/browser/render_process_host.h"
 #include "content/public/browser/utility_process_host.h"
 #include "content/public/common/content_switches.h"
+#include "content/public/app/content_main.h"
 #include "content/renderer/in_process_renderer_thread.h"
 #include "content/utility/in_process_utility_thread.h"
+#include "content/browser/utility_process_host_impl.h"
+#include "content/browser/renderer_host/render_process_host_impl.h"
 #include "ui/base/resource/resource_bundle.h"
 
 #include "command_line_efl.h"
@@ -38,8 +41,8 @@ EwkGlobalData* EwkGlobalData::instance_ = NULL;
 
 namespace {
 
-base::MessagePump* MessagePumpFactory() {
-  return new base::MessagePumpForUIEfl;
+scoped_ptr<base::MessagePump> MessagePumpFactory() {
+  return scoped_ptr<base::MessagePump>(new base::MessagePumpForUIEfl);
 }
 
 } // namespace
@@ -69,13 +72,17 @@ void EwkGlobalData::Ensure() {
 
   instance_ = new EwkGlobalData();
 
-  bool message_pump_overridden = base::MessageLoop::InitMessagePumpForUIFactory(&MessagePumpFactory);
+  bool message_pump_overridden =
+      base::MessageLoop::InitMessagePumpForUIFactory(&MessagePumpFactory);
   DCHECK(message_pump_overridden);
 
   content::InstallScreenInstance();
 
-  instance_->content_main_runner_->Initialize(CommandLineEfl::GetArgc(),
-      CommandLineEfl::GetArgv(), new ContentMainDelegateEfl());
+	content::ContentMainParams params(new ContentMainDelegateEfl());
+	params.argc = CommandLineEfl::GetArgc();
+	params.argv = CommandLineEfl::GetArgv();
+
+  instance_->content_main_runner_->Initialize(params);
   instance_->browser_main_runner_->Initialize(CommandLineEfl::GetDefaultPortParams());
 
   base::ThreadRestrictions::SetIOAllowed(true);
@@ -87,9 +94,9 @@ void EwkGlobalData::Ensure() {
   ui::ResourceBundle::InitSharedInstanceWithPakPath(pak_file);
 
   if (CommandLine::ForCurrentProcess()->HasSwitch(switches::kSingleProcess)) {
-    UtilityProcessHost::RegisterUtilityMainThreadFactory(
+    content::UtilityProcessHostImpl::RegisterUtilityMainThreadFactory(
         content::CreateInProcessUtilityThread);
-    RenderProcessHost::RegisterRendererMainThreadFactory(
+    content::RenderProcessHostImpl::RegisterRendererMainThreadFactory(
         content::CreateInProcessRendererThread);
     GpuProcessHost::RegisterGpuMainThreadFactory(
         content::CreateInProcessGpuThread);
