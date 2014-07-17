@@ -80,6 +80,9 @@ DEFINES+=" enable_google_now=0 enable_language_detection=0 proprietary_codecs=1"
 DEFINES+=" use_cups=0 use_xi2_mt=2 toolkit_uses_gtk=0 use_aura=1 toolkit_efl=1"
 DEFINES+=" use_gstreamer=1"
 
+echo "[M37] TODO: Fix and re-enable notifications (edit build/envsetup.sh)"
+DEFINES+=" notifications=0"
+
 # System dependencies
 if [ -e "${TOP_DIR}/build/TARGET" ]; then
   if [ $(cat "${TOP_DIR}/build/TARGET") = "mobile" ]; then
