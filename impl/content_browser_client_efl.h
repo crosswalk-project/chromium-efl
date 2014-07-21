@@ -48,8 +48,9 @@ class ContentBrowserClientEfl: public ContentBrowserClient {
       RenderViewHostDelegateView** delegate_view) OVERRIDE;
 
   virtual net::URLRequestContextGetter* CreateRequestContext(
-      content::BrowserContext* browser_context,
-      content::ProtocolHandlerMap* protocol_handlers) OVERRIDE;
+      BrowserContext* browser_context,
+      ProtocolHandlerMap* protocol_handlers,
+      URLRequestInterceptorScopedVector request_interceptors) OVERRIDE;
 
   virtual AccessTokenStore* CreateAccessTokenStore() OVERRIDE;
 #if defined(OS_TIZEN)

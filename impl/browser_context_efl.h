@@ -85,7 +85,8 @@ class BrowserContextEfl
   virtual base::FilePath GetPath() const OVERRIDE;
 
   net::URLRequestContextGetter* CreateRequestContext(
-      content::ProtocolHandlerMap* protocol_handlers);
+      content::ProtocolHandlerMap* protocol_handlers,
+      URLRequestInterceptorScopedVector request_interceptors);
   void SetCertificate(const char* certificate_file);
   EWebContext* WebContext() const
   { return web_context_; }

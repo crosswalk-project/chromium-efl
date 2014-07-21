@@ -111,7 +111,8 @@ BrowserContextEfl::GetNotificationController() const {
 }
 
 net::URLRequestContextGetter* BrowserContextEfl::CreateRequestContext(
-    content::ProtocolHandlerMap* protocol_handlers) {
+    content::ProtocolHandlerMap* protocol_handlers,
+    URLRequestInterceptorScopedVector request_interceptors) {
   // TODO: Implement support for chromium network log
   request_context_getter_ = new URLRequestContextGetterEfl(
       *web_context_,
@@ -120,6 +121,7 @@ net::URLRequestContextGetter* BrowserContextEfl::CreateRequestContext(
       BrowserThread::UnsafeGetMessageLoopForThread(BrowserThread::IO),
       BrowserThread::UnsafeGetMessageLoopForThread(BrowserThread::FILE),
       protocol_handlers,
+      request_interceptors.Pass(),
       NULL);
   GetRequestContext();
   resource_context_->set_url_request_context_getter(request_context_getter_.get());

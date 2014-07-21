@@ -30,6 +30,7 @@
 #include "net/url_request/file_protocol_handler.h"
 #include "net/url_request/static_http_user_agent_settings.h"
 #include "net/url_request/url_request_context_storage.h"
+#include "net/url_request/url_request_intercepting_job_factory.h"
 #include "net/url_request/url_request_job_factory_impl.h"
 #include "network_delegate_efl.h"
 #include "eweb_context.h"
@@ -61,12 +62,14 @@ URLRequestContextGetterEfl::URLRequestContextGetterEfl(
     base::MessageLoop* io_loop,
     base::MessageLoop* file_loop,
     ProtocolHandlerMap* protocol_handlers,
+    URLRequestInterceptorScopedVector request_interceptors,
     net::NetLog* net_log)
     : web_context_(web_context),
       ignore_certificate_errors_(ignore_certificate_errors),
       base_path_(base_path),
       io_loop_(io_loop),
       file_loop_(file_loop),
+      request_interceptors_(request_interceptors.Pass()),
       net_log_(net_log) {
   // Must first be created on the UI thread.
   DCHECK(BrowserThread::CurrentlyOn(BrowserThread::UI));
@@ -201,7 +204,20 @@ net::URLRequestContext* URLRequestContextGetterEfl::GetURLRequestContext() {
                 GetTaskRunnerWithShutdownBehavior(
                     base::SequencedWorkerPool::SKIP_ON_SHUTDOWN)));
     DCHECK(set_protocol);
-    storage_->set_job_factory(job_factory.release());
+
+    // Set up interceptors in the reverse order.
+    scoped_ptr<net::URLRequestJobFactory> top_job_factory =
+        job_factory.PassAs<net::URLRequestJobFactory>();
+    for (URLRequestInterceptorScopedVector::reverse_iterator i =
+             request_interceptors_.rbegin();
+         i != request_interceptors_.rend();
+         ++i) {
+      top_job_factory.reset(new net::URLRequestInterceptingJobFactory(
+          top_job_factory.Pass(), make_scoped_ptr(*i)));
+    }
+    request_interceptors_.weak_clear();
+
+    storage_->set_job_factory(top_job_factory.release());
   }
 
   return url_request_context_.get();
