@@ -1113,17 +1113,11 @@ void EWebView::set_magnifier(bool status) {
 }
 
 const char* EWebView::GetUserAgent() const {
-#warning "[M37] Fix GetUserAgent"
-// NOTE: web_contents_delegate_->web_contents()->GetUserAgentOverride();
-//       can be used to get an override, what about not verriden UA?
-#if 0
   if (overridden_user_agent_.empty()) {
-    //return default user agent
-    return (content::GetUserAgent(GURL())).c_str();
+    return (GetContentClient()->GetUserAgent()).c_str();
   } else {
     return overridden_user_agent_.c_str();
   }
-#endif
 }
 
 const char* EWebView::GetUserAgentAppName() const {
