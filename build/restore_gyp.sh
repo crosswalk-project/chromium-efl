@@ -26,11 +26,13 @@
 #   'use_system_zlib': 'third_party/zlib/zlib.gyp',
 # }
 
+SCRIPTDIR=$( cd $(dirname ${BASH_SOURCE[0]}) ; pwd -P )
+
 # get changed gyp files, above data
 CHANGE_GYP_PATH="third_party/expat/expat.gyp third_party/ffmpeg/ffmpeg.gyp third_party/flac/flac.gyp third_party/harfbuzz-ng/harfbuzz.gyp third_party/icu/icu.gyp third_party/jsoncpp/jsoncpp.gyp third_party/libevent/libevent.gyp third_party/libjpeg/libjpeg.gyp third_party/libpng/libpng.gyp third_party/libusb/libusb.gyp third_party/libvpx/libvpx.gyp third_party/libwebp/libwebp.gyp third_party/libxml/libxml.gyp third_party/libxslt/libxslt.gyp third_party/openssl/openssl.gyp third_party/opus/opus.gyp third_party/re2/re2.gyp third_party/snappy/snappy.gyp third_party/speex/speex.gyp third_party/sqlite/sqlite.gyp v8/tools/gyp/v8.gyp third_party/zlib/zlib.gyp"
 
 # move chromium root directory
-pushd ${CHROME_SRC} > /dev/null
+pushd ${SCRIPTDIR}/../src > /dev/null
 
 # git checkout each gyp files
 git checkout -- ${CHANGE_GYP_PATH}

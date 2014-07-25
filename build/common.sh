@@ -21,3 +21,15 @@ function applyPatch {
   popd > /dev/null
 }
 
+function getHostOs() {
+  echo $(uname -s | sed -e 's/Linux/linux/;s/Darwin/mac/')
+}
+
+function getHostArch() {
+  echo $(uname -m | sed -e \
+        's/i.86/ia32/;s/x86_64/x64/;s/amd64/x64/;s/arm.*/arm/;s/i86pc/ia32/')
+}
+
+function getPythonVersion() {
+  echo $(python --version  2>&1 | sed -e 's/Python \([0-9]\+\.[0-9]\+\)\.[0-9]\+/\1/')
+}
