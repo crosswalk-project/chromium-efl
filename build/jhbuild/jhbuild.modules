@@ -18,6 +18,7 @@
       <dep package="gst-plugins-ugly"/>
       <dep package="gst-plugins-bad"/>
       <dep package="gst-ffmpeg"/>
+      <dep package="pango"/>
     </dependencies>
   </metamodule>
 
@@ -169,7 +170,9 @@
              autogenargs="--disable-examples --disable-tests --disable-failing-tests">
     <branch repo="gstreamer"
             module="gstreamer/gstreamer-0.10.36.tar.xz" version="0.10.36"
-            hash="md5:15389c73e091b1dda915279c388b9cb2"/>
+            hash="md5:15389c73e091b1dda915279c388b9cb2">
+      <patch file="gst-yylex-param-is-no-longer-supported-in-bison-3.patch" strip="1"/>
+    </branch>
   </autotools>
 
   <autotools id="gst-plugins-base"
@@ -192,7 +195,10 @@
     </dependencies>
     <branch repo="gstreamer"
             module="gst-plugins-good/gst-plugins-good-0.10.31.tar.xz" version="0.10.31"
-            hash="md5:555845ceab722e517040bab57f9ace95"/>
+            hash="md5:555845ceab722e517040bab57f9ace95">
+    <patch file="gst-plugins-good-fix-build-with-recent-kernels.patch" strip="1"/>
+    <patch file="gst-plugins-good-fix-build-with-recent-kernels-part-2.patch" strip="1"/>
+    </branch>
   </autotools>
 
   <autotools id="gst-plugins-ugly"
@@ -214,7 +220,8 @@
     </dependencies>
     <branch repo="gstreamer"
             module="gst-plugins-bad/gst-plugins-bad-0.10.23.tar.xz" version="0.10.23"
-            hash="md5:e4822fa2cc933768e2998311a1565979"/>
+            hash="md5:e4822fa2cc933768e2998311a1565979">
+    </branch>
   </autotools>
 
   <autotools id="gst-ffmpeg"
@@ -226,7 +233,16 @@
     </dependencies>
     <branch repo="gstreamer"
             module="gst-ffmpeg/gst-ffmpeg-0.10.13.tar.gz" version="0.10.13"
-            hash="md5:3e52d69a15d42f0a11abfc02f80effa1"/>
+            hash="md5:3e52d69a15d42f0a11abfc02f80effa1">
+    <patch file="gst-ffmpeg-fixes-compilation-for-gcc-4.7-or-higher.patch" strip="1"/>
+    </branch>
+  </autotools>
+
+  <autotools id="pango"
+             autogen-sh="configure">
+    <branch module="/pub/GNOME/sources/pango/1.30/pango-1.30.1.tar.xz" version="1.30.1"
+            repo="ftp.gnome.org"
+            hash="sha256:3a8c061e143c272ddcd5467b3567e970cfbb64d1d1600a8f8e62435556220cbe"/>
   </autotools>
 
 </moduleset>
