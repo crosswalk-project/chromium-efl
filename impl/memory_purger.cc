@@ -114,6 +114,8 @@ void MemoryPurger::PurgeRenderers() {
 
 // static
 void MemoryPurger::PurgeRendererForHost(content::RenderProcessHost* host) {
+#if !defined(EWK_BRINGUP)
   // Direct the renderer to free everything it can.
   host->Send(new EwkViewMsg_PurgeMemory());
+#endif
 }

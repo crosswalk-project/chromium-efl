@@ -1476,8 +1476,10 @@ void EWebView::Find(const char* text, tizen_webview::Find_Options find_options) 
 }
 
 void EWebView::SetScale(double scale_factor, int x, int y) {
+#if !defined(EWK_BRINGUP)
   RenderViewHost* render_view_host = web_contents_delegate_->web_contents()->GetRenderViewHost();
   render_view_host->Send(new EwkViewMsg_Scale(render_view_host->GetRoutingID(), scale_factor, x, y));
+#endif
 }
 
 void EWebView::GetScrollPosition(int* x, int* y) const {
@@ -1489,17 +1491,24 @@ void EWebView::GetScrollPosition(int* x, int* y) const {
 }
 
 void EWebView::SetScroll(int x, int y) {
+  // This adds extra api's to blink and extra craft to chromium. Chrome doesn't have it yet you can scroll. Let's rethink it.
+  // Probably scroll offset does can do the same.
+#if !defined(EWK_BRINGUP)
   RenderViewHost* render_view_host = web_contents_delegate()->web_contents()->GetRenderViewHost();
   if (!render_view_host)
     return;
 
   render_view_host->Send(new EwkViewMsg_SetScroll(render_view_host->GetRoutingID(), x, y));
+#endif
 }
 
 void EWebView::UseSettingsFont() {
+  // Intrusive API forcing blink to do a layout. Maybe we should just do a reload?
+#if !defined(EWK_BRINGUP)
   RenderViewHost* render_view_host = web_contents_delegate()->web_contents()->GetRenderViewHost();
   if (render_view_host)
     render_view_host->Send(new EwkViewMsg_UseSettingsFont(render_view_host->GetRoutingID()));
+#endif
 }
 
 void EWebView::DidChangeContentsArea(int width, int height) {
@@ -1546,11 +1555,13 @@ void EWebView::MoveCaret(const gfx::Point& point) {
 }
 
 void EWebView::QuerySelectionStyle() {
+#if !defined(EWK_BRINGUP)
   Ewk_Settings* settings = GetSettings();
   if (settings->textStyleStateState()) {
     RenderViewHost* render_view_host = web_contents_delegate_->web_contents()->GetRenderViewHost();
     render_view_host->Send(new EwkViewMsg_GetSelectionStyle(render_view_host->GetRoutingID()));
   }
+#endif
 }
 
 void EWebView::OnQuerySelectionStyleReply(const SelectionStylePrams& params) {
@@ -1561,15 +1572,19 @@ void EWebView::OnQuerySelectionStyleReply(const SelectionStylePrams& params) {
 }
 
 void EWebView::SelectClosestWord(const gfx::Point& touch_point) {
+#if !defined(EWK_BRINGUP)
   float device_scale_factor = rwhv()->device_scale_factor();
   RenderViewHost* render_view_host = web_contents_delegate_->web_contents()->GetRenderViewHost();
   render_view_host->Send(new EwkViewMsg_SelectClosestWord(render_view_host->GetRoutingID(), touch_point.x() / device_scale_factor, touch_point.y() / device_scale_factor));
+#endif
 }
 
 void EWebView::SelectLinkText(const gfx::Point& touch_point) {
+#if !defined(EWK_BRINGUP)
   float device_scale_factor = rwhv()->device_scale_factor();
   RenderViewHost* render_view_host = web_contents_delegate_->web_contents()->GetRenderViewHost();
   render_view_host->Send(new ViewMsg_SelectLinkText(render_view_host->GetRoutingID(), gfx::Point(touch_point.x() / device_scale_factor, touch_point.y() / device_scale_factor)));
+#endif
 }
 
 bool EWebView::GetSelectionRange(Eina_Rectangle* left_rect, Eina_Rectangle* right_rect) {
@@ -1611,6 +1626,9 @@ tizen_webview::Hit_Test* EWebView::RequestHitTestDataAt(int x, int y, tizen_webv
 }
 
 tizen_webview::Hit_Test* EWebView::RequestHitTestDataAtBlinkCoords(int x, int y, tizen_webview::Hit_Test_Mode mode) {
+#if defined(EWK_BRINGUP)
+  return new tizen_webview::Hit_Test;
+#else
   DCHECK(BrowserThread::CurrentlyOn(BrowserThread::UI));
 
   // WebViewBrowserMessageFilter requires RenderProcessHost to be already created.
@@ -1635,6 +1653,7 @@ tizen_webview::Hit_Test* EWebView::RequestHitTestDataAtBlinkCoords(int x, int y,
   }
 
   return NULL;
+#endif
 }
 
 void EWebView::UpdateHitTestData(const _Ewk_Hit_Test& hit_test_data, const NodeAttributesMap& node_attributes) {
@@ -1738,6 +1757,9 @@ void EWebView::InvokeBackForwardListChangedCallback() {
 }
 
 bool EWebView::WebAppCapableGet(tizen_webview::Web_App_Capable_Get_Callback callback, void *userData) {
+#if defined(EWK_BRINGUP)
+  return false;
+#else
   RenderViewHost *renderViewHost = web_contents_delegate()->web_contents()->GetRenderViewHost();
   if (!renderViewHost) {
     return false;
@@ -1745,9 +1767,13 @@ bool EWebView::WebAppCapableGet(tizen_webview::Web_App_Capable_Get_Callback call
   WebApplicationCapableGetCallback *cb = new WebApplicationCapableGetCallback(callback, userData);
   int callbackId = web_app_capable_get_callback_map_.Add(cb);
   return renderViewHost->Send(new EwkViewMsg_WebAppCapableGet(renderViewHost->GetRoutingID(), callbackId));
+#endif
 }
 
 bool EWebView::WebAppIconUrlGet(tizen_webview::Web_App_Icon_URL_Get_Callback callback, void *userData) {
+#if defined(EWK_BRINGUP)
+  return false;
+#else
   RenderViewHost* renderViewHost = web_contents_delegate()->web_contents()->GetRenderViewHost();
   if (!renderViewHost) {
     return false;
@@ -1755,9 +1781,13 @@ bool EWebView::WebAppIconUrlGet(tizen_webview::Web_App_Icon_URL_Get_Callback cal
   WebApplicationIconUrlGetCallback *cb = new WebApplicationIconUrlGetCallback(callback, userData);
   int callbackId = web_app_icon_url_get_callback_map_.Add(cb);
   return renderViewHost->Send(new EwkViewMsg_WebAppIconUrlGet(renderViewHost->GetRoutingID(), callbackId));
+#endif
 }
 
 bool EWebView::WebAppIconUrlsGet(tizen_webview::Web_App_Icon_URLs_Get_Callback callback, void *userData) {
+#if defined(EWK_BRINGUP)
+  return false;
+#else
   RenderViewHost* renderViewHost = web_contents_delegate()->web_contents()->GetRenderViewHost();
   if (!renderViewHost) {
     return false;
@@ -1765,13 +1795,16 @@ bool EWebView::WebAppIconUrlsGet(tizen_webview::Web_App_Icon_URLs_Get_Callback c
   WebApplicationIconUrlsGetCallback *cb = new WebApplicationIconUrlsGetCallback(callback, userData);
   int callbackId = web_app_icon_urls_get_callback_map_.Add(cb);
   return renderViewHost->Send(new EwkViewMsg_WebAppIconUrlsGet(renderViewHost->GetRoutingID(), callbackId));
+#endif
 }
 
 void EWebView::InvokeWebAppCapableGetCallback(bool capable, int callbackId) {
+#if !defined(EWK_BRINGUP)
   WebApplicationCapableGetCallback *callback = web_app_capable_get_callback_map_.Lookup(callbackId);
   if (!callback)
     return;
   callback->Run(capable);
+#endif
 }
 
 void EWebView::InvokeWebAppIconUrlGetCallback(const std::string& iconUrl, int callbackId) {
@@ -1835,11 +1868,15 @@ int EWebView::SetEwkViewPlainTextGetCallback(tizen_webview::View_Plain_Text_Get_
 }
 
 bool EWebView::PlainTextGet(tizen_webview::View_Plain_Text_Get_Callback callback, void* user_data) {
+#if defined(EWK_BRINGUP)
+  return false;
+#else
   RenderViewHost* render_view_host = web_contents_delegate()->web_contents()->GetRenderViewHost();
   if (!render_view_host)
     return false;
   int plain_text_get_callback_id = SetEwkViewPlainTextGetCallback(callback, user_data);
   return render_view_host->Send(new EwkViewMsg_PlainTextGet(render_view_host->GetRoutingID(), plain_text_get_callback_id));
+#endif
 }
 
 void EWebView::InvokePlainTextGetCallback(const std::string& content_text, int plain_text_get_callback_id) {
@@ -1866,15 +1903,22 @@ const char* EWebView::GetTitle() {
 }
 
 bool EWebView::SaveAsPdf(int width, int height, const std::string& filename) {
+#if defined(EWK_BRINGUP)
+  return false;
+#else
   RenderViewHost* render_view_host = web_contents_delegate()->web_contents()->GetRenderViewHost();
   if (!render_view_host)
     return false;
 
   return render_view_host->Send(new EwkViewMsg_PrintToPdf(render_view_host->GetRoutingID(),
       width, height, base::FilePath(filename)));
+#endif
 }
 
 bool EWebView::GetMHTMLData(tizen_webview::View_MHTML_Data_Get_Callback callback, void* user_data) {
+#if defined(EWK_BRINGUP)
+  return false;
+#else
   RenderViewHost* render_view_host = web_contents_delegate()->web_contents()->GetRenderViewHost();
   if (!render_view_host)
     return false;
@@ -1882,6 +1926,7 @@ bool EWebView::GetMHTMLData(tizen_webview::View_MHTML_Data_Get_Callback callback
   MHTMLCallbackDetails* callback_details = new MHTMLCallbackDetails(callback, user_data);
   int mhtml_callback_id = mhtml_callback_map_.Add(callback_details);
   return render_view_host->Send(new EwkViewMsg_GetMHTMLData(render_view_host->GetRoutingID(), mhtml_callback_id));
+#endif
 }
 
 void EWebView::OnMHTMLContentGet(const std::string& mhtml_content, int callback_id) {
@@ -1966,11 +2011,13 @@ void EWebView::DidChangePageScaleRange(double min_scale, double max_scale) {
 }
 
 void EWebView::SetDrawsTransparentBackground(bool enabled) {
+#if !defined(EWK_BRINGUP)
   RenderViewHost* render_view_host = web_contents_delegate()->web_contents()->GetRenderViewHost();
   if (!render_view_host)
     return;
 
   render_view_host->Send(new EwkViewMsg_SetDrawsTransparentBackground(render_view_host->GetRoutingID(), enabled));
+#endif
 }
 
 void EWebView::GetSessionData(const char **data, unsigned *length) const {
@@ -2035,9 +2082,11 @@ bool EWebView::RestoreFromSessionData(const char *data, unsigned length) {
 }
 
 void EWebView::SetBrowserFont() {
+#if !defined(EWK_BRINGUP)
   RenderViewHost* render_view_host = web_contents_delegate()->web_contents()->GetRenderViewHost();
   if (render_view_host)
     render_view_host->Send(new EwkViewMsg_SetBrowserFont(render_view_host->GetRoutingID()));
+#endif
 }
 
 #ifdef OS_TIZEN

@@ -5,6 +5,7 @@
     'edje_dir%': '/usr/share/chromium-efl/themes/',
     'webdb_dir%': '/usr/share/chromium-efl/db/',
     'edje_compiler%': 'edje_cc',
+    'ewk_bringup%': 0,
   },
 
   'targets': [{
@@ -342,6 +343,11 @@
           '<(PRODUCT_DIR)/resources/<(RULE_INPUT_ROOT).edj',
         ],
     }], #rules
+    'conditions': [
+      ['ewk_bringup==1', {
+        'defines': [ 'EWK_BRINGUP=1' ],
+      }],
+    ],
   },
   {
     'target_name': 'efl_webprocess',

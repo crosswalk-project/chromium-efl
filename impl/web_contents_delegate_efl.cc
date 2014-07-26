@@ -381,6 +381,9 @@ void WebContentsDelegateEfl::RequestCertificateConfirm(WebContents* /*web_conten
 }
 
 void WebContentsDelegateEfl::SetContentSecurityPolicy(const std::string& policy, tizen_webview::ContentSecurityPolicyType header_type) {
+  // Might makes sense as it only uses existing functionality already exposed for javascript. Needs extra api at blink side.
+  // Not necessary for eflwebview bringup.
+#if !defined(EWK_BRINGUP)
   if (document_created_) {
     RenderViewHost* rvh = web_contents_->GetRenderViewHost();
     rvh->Send(new EwkViewMsg_SetCSP(rvh->GetRoutingID(), policy, header_type));
@@ -388,6 +391,7 @@ void WebContentsDelegateEfl::SetContentSecurityPolicy(const std::string& policy,
     DCHECK(!pending_content_security_policy_.get());
     pending_content_security_policy_.reset(new ContentSecurityPolicy(policy, header_type));
   }
+#endif
 }
 
 void WebContentsDelegateEfl::ShowPopupMenu(const gfx::Rect& rect, WebCore::TextDirection textDirection, double pageScaleFactor, const std::vector<MenuItem>& items, int data, int selectedIndex, bool multiple) {

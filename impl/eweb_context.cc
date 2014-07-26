@@ -196,18 +196,22 @@ void EwkDidStartDownloadCallback::TriggerCallback(const string& url) {
 }
 
 void EWebContext::SendWidgetInfo(int widget_id, double scale, const string &theme, const string &encoded_bundle) {
+#if !defined(EWK_BRINGUP)
   content::RenderProcessHost::iterator i(content::RenderProcessHost::AllHostsIterator());
   for (; !i.IsAtEnd(); i.Advance()) {
     i.GetCurrentValue()->Send(
       new EwkViewMsg_SetWidgetInfo(widget_id, scale, theme, encoded_bundle));
   }
+#endif
 }
 
 void EWebContext::SendWrtMessage(const tizen_webview::WrtIpcMessageData& data) {
+#if !defined(EWK_BRINGUP)
   content::RenderProcessHost::iterator i(content::RenderProcessHost::AllHostsIterator());
   for (; !i.IsAtEnd(); i.Advance()) {
     i.GetCurrentValue()->Send(new EwkViewMsg_SendWrtMessage(data));
   }
+#endif
 }
 
 void EWebContext::SetMimeOverrideCallback(
@@ -253,11 +257,15 @@ void EWebContext::ClearNetworkCache() {
 }
 
 void EWebContext::ClearWebkitCache() {
+#if !defined(EWK_BRINGUP)
   web_cache_manager_->ClearCache();
+#endif
 }
 
 void EWebContext::SetCacheModel(Cache_Model model) {
+#if !defined(EWK_BRINGUP)
   web_cache_manager_->SetCacheModel(model);
+#endif
 }
 
 Cache_Model EWebContext::GetCacheModel() const {
