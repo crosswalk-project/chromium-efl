@@ -19,7 +19,11 @@
 #include "ipc/ipc_message_macros.h"
 #include "ipc/ipc_message_utils.h"
 
+#if defined(EWK_BRINGUP)
+#define IPC_MESSAGE_START LastIPCMsgStart
+#else
 #define IPC_MESSAGE_START EditingMsgStart
+#endif
 
 // Editor messages sent from the renderer to the browser.
 
