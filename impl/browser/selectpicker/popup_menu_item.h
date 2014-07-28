@@ -71,7 +71,7 @@ const char *popup_menu_item_text_get(const Popup_Menu_Item *item);
  *
  * @return the text direction of the @a item.
  */
-WebCore::TextDirection popup_menu_item_text_direction_get(const Popup_Menu_Item *item);
+blink::TextDirection popup_menu_item_text_direction_get(const Popup_Menu_Item *item);
 
 /**
  * Returns whether the popup menu item has text direction override.

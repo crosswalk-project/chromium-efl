@@ -24,7 +24,7 @@
 
 Popup_Menu_Item::Popup_Menu_Item(const blink::WebPopupItem& item)
     : type(static_cast<Popup_Menu_Item_Type>(item.m_type))
-    , textDirection(static_cast<WebCore::TextDirection>(item.m_textDirection))
+    , textDirection(static_cast<blink::TextDirection>(item.m_textDirection))
     , hasTextDirectionOverride(item.m_hasTextDirectionOverride)
     , isEnabled(item.m_isEnabled)
     , isLabel(item.m_isLabel)
@@ -46,7 +46,7 @@ const char* popup_menu_item_text_get(const Popup_Menu_Item* item) {
     return item->text.c_str();
 }
 
-WebCore::TextDirection popup_menu_item_text_direction_get(const Popup_Menu_Item* item) {
+blink::TextDirection popup_menu_item_text_direction_get(const Popup_Menu_Item* item) {
     EINA_SAFETY_ON_NULL_RETURN_VAL(item, WebCore::LTR);
 
     return item->textDirection;

@@ -265,7 +265,7 @@ class EWebView
   void Find(const char* text, tizen_webview::Find_Options);
   void InvokeAuthCallbackOnUI(_Ewk_Auth_Challenge* auth_challenge);
   void SetContentSecurityPolicy(const char* policy, tizen_webview::ContentSecurityPolicyType type);
-  void ShowPopupMenu(const gfx::Rect& rect, WebCore::TextDirection textDirection, double pageScaleFactor, const std::vector<content::MenuItem>& items, int data, int selectedIndex, bool multiple);
+  void ShowPopupMenu(const gfx::Rect& rect, blink::TextDirection textDirection, double pageScaleFactor, const std::vector<content::MenuItem>& items, int data, int selectedIndex, bool multiple);
   Eina_Bool HidePopupMenu();
   bool FormIsNavigating() const { return formIsNavigating_; }
   void SetFormIsNavigating(bool formIsNavigating);

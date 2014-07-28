@@ -38,7 +38,7 @@
 class Popup_Menu_Item {
 public:
     Popup_Menu_Item_Type type;
-    WebCore::TextDirection textDirection;
+    blink::TextDirection textDirection;
 
     bool hasTextDirectionOverride;
     bool isEnabled;

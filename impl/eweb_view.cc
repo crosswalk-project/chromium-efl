@@ -1300,12 +1300,12 @@ void EWebView::LoadData(const char* data, size_t size, const char* mime_type, co
   web_contents->GetController().LoadURLWithParams(data_params);
 }
 
-void EWebView::ShowPopupMenu(const gfx::Rect& rect, WebCore::TextDirection textDirection, double pageScaleFactor, const std::vector<content::MenuItem>& items, int data, int selectedIndex, bool multiple) {
+void EWebView::ShowPopupMenu(const gfx::Rect& rect, blink::TextDirection textDirection, double pageScaleFactor, const std::vector<content::MenuItem>& items, int data, int selectedIndex, bool multiple) {
 #if defined(OS_TIZEN)
   Eina_List* popupItems = 0;
   const size_t size = items.size();
   for (size_t i = 0; i < size; ++i) {
-    popupItems = eina_list_append(popupItems, Popup_Menu_Item::create(blink::WebPopupItem(blink::WebPopupItem::Type(items[i].type), base::UTF16ToUTF8(items[i].label), WebCore::TextDirection(items[i].rtl), items[i].has_directional_override, base::UTF16ToUTF8(items[i].tool_tip), base::UTF16ToUTF8(items[i].label), items[i].enabled, true, items[i].checked)).leakPtr());
+    popupItems = eina_list_append(popupItems, Popup_Menu_Item::create(blink::WebPopupItem(blink::WebPopupItem::Type(items[i].type), base::UTF16ToUTF8(items[i].label), blink::TextDirection(items[i].rtl), items[i].has_directional_override, base::UTF16ToUTF8(items[i].tool_tip), base::UTF16ToUTF8(items[i].label), items[i].enabled, true, items[i].checked)).leakPtr());
   }
   popupMenuItems_ = popupItems;
 
