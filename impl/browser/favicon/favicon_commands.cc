@@ -43,11 +43,12 @@ scoped_refptr<SerializedBitmap> Command::serialize(const SkBitmap &bitmap) {
   if (bitmap.isNull()) {
     return res;
   }
-  res->alloc(bitmap.getSize() + 3 * sizeof(int));
-  static_cast<int *>(res->data)[0] = static_cast<int>(bitmap.config());
-  static_cast<int *>(res->data)[1] = bitmap.width();
-  static_cast<int *>(res->data)[2] = bitmap.height();
-  if (!bitmap.copyPixelsTo(static_cast<int *>(res->data) + 3, bitmap.getSize())) {
+  res->alloc(bitmap.getSize() + 4 * sizeof(int));
+  static_cast<int *>(res->data)[0] = static_cast<int>(bitmap.colorType());
+  static_cast<int *>(res->data)[1] = static_cast<int>(bitmap.alphaType());
+  static_cast<int *>(res->data)[2] = bitmap.width();
+  static_cast<int *>(res->data)[3] = bitmap.height();
+  if (!bitmap.copyPixelsTo(static_cast<int *>(res->data) + 4, bitmap.getSize())) {
     res->free();
   }
   return res;
@@ -58,19 +59,20 @@ SkBitmap Command::deserialize(const void *data) {
     return SkBitmap();
   }
 
-  SkBitmap::Config config = static_cast<SkBitmap::Config>(static_cast<const int *>(data)[0]);
+  SkColorType colorType = static_cast<SkColorType>(static_cast<const int *>(data)[0]);
+  SkAlphaType alphaType = static_cast<SkAlphaType>(static_cast<const int *>(data)[1]);
   int width = static_cast<const int *>(data)[1];
   int height = static_cast<const int *>(data)[2];
   SkBitmap bitmap;
-  bitmap.setConfig(config, width, height);
-  bitmap.setPixels(static_cast<int *>(const_cast<void *>(data)) + 3);
+  bitmap.setInfo(SkImageInfo::Make(width, height, colorType, alphaType), 0);
+  bitmap.setPixels(static_cast<int *>(const_cast<void *>(data)) + 4);
 
   // as the |data| set to the |bitmap| are retrieved from sqlite blob,
   // this |data| would be freed by sqlite on finalize, so to be sure that
   // the deserialized SkBitmap owns and holds it's internal image data
   // for it's whole lifetime, we create a deep copy of the |bitmap|.
   SkBitmap copy;
-  bitmap.copyTo(&copy, SkBitmapConfigToColorType(bitmap.config()));
+  bitmap.copyTo(&copy, colorType);
   return copy;
 }
 
