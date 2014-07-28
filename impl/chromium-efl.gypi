@@ -17,9 +17,10 @@
       'TIZEN_EDGE_EFFECT=1',
       'BUILDING_V8_SHARED=1',
       'V8_SHARED=1',
-      'ENABLE_ORIENTATION_EVENTS=1'
       'ENABLE_ORIENTATION_EVENTS=1',
-      'USE_DL_PREFIX=1'
+      'USE_DL_PREFIX=1',
+# [M37] TODO:Autofill related code chagned. Need to enable after Fixing.
+      #'TIZEN_AUTOFILL_SUPPORT=1',
     ],
     'cflags': [
       '<!@(<(pkg-config) --cflags ecore)',

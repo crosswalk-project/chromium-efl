@@ -37,18 +37,16 @@
 #include <Elementary.h>
 #include "browser/autofill/autofill_manager_delegate_efl.h"
 
-
 DEFINE_WEB_CONTENTS_USER_DATA_KEY(autofill::AutofillManagerDelegateEfl);
 
 namespace autofill {
 
-AutofillManagerDelegateEfl::AutofillManagerDelegateEfl(
-    content::WebContents* web_contents)
-    : content::WebContentsObserver(web_contents),
-      web_contents_(web_contents),
-      database_(WebDataServiceFactory::GetInstance()->GetAutofillWebDataForProfile()),
-      is_autofill_enabled_(true),
-      popup_controller_(NULL) {
+AutofillManagerDelegateEfl::AutofillManagerDelegateEfl(content::WebContents* web_contents)
+    : content::WebContentsObserver(web_contents)
+    , web_contents_(web_contents)
+    , database_(WebDataServiceFactory::GetInstance()->GetAutofillWebDataForProfile())
+    , is_autofill_enabled_(true)
+    , popup_controller_(NULL) {
   DCHECK(web_contents);
 }
 
@@ -79,18 +77,12 @@ void AutofillManagerDelegateEfl::ShowAutofillSettings() {
   NOTIMPLEMENTED();
 }
 
-void AutofillManagerDelegateEfl::ConfirmSaveCreditCard(
-    const AutofillMetrics& metric_logger,
-    const base::Closure& save_card_callback) {
+void AutofillManagerDelegateEfl::ConfirmSaveCreditCard(const AutofillMetrics& metric_logger, const base::Closure& save_card_callback) {
   NOTIMPLEMENTED();
 }
 
-void AutofillManagerDelegateEfl::ShowRequestAutocompleteDialog(
-    const FormData& form,
-    const GURL& source_url,
-    const base::Callback<void(const FormStructure*)>& callback) {
+void AutofillManagerDelegateEfl::ShowRequestAutocompleteDialog(const FormData& form, const GURL& source_url, const base::Callback<void(const FormStructure*)>& callback) {
   HideRequestAutocompleteDialog();
-
   NOTIMPLEMENTED();
 }
 
@@ -102,11 +94,11 @@ void AutofillManagerDelegateEfl::ShowAutofillPopup(
     const std::vector<base::string16>& icons,
     const std::vector<int>& identifiers,
     base::WeakPtr<AutofillPopupDelegate> delegate) {
+  DCHECK(web_contents_);
 #if defined(OS_TIZEN)
   gfx::Rect client_area;
   web_contents_->GetView()->GetContainerBounds(&client_area);
-  gfx::RectF element_bounds_in_screen_space =
-      element_bounds + client_area.OffsetFromOrigin();
+  gfx::RectF element_bounds_in_screen_space = element_bounds + client_area.OffsetFromOrigin();
 #endif
 
   if (GetOrCreatePopupController()) {
@@ -120,18 +112,16 @@ void AutofillManagerDelegateEfl::ShowAutofillPopup(
   }
 }
 
-void AutofillManagerDelegateEfl::UpdateAutofillPopupDataListValues(
-    const std::vector<base::string16>& values,
-    const std::vector<base::string16>& labels) {
+void AutofillManagerDelegateEfl::UpdateAutofillPopupDataListValues(const std::vector<base::string16>& values, const std::vector<base::string16>& labels) {
   NOTIMPLEMENTED();
 }
 
 void AutofillManagerDelegateEfl::HideAutofillPopup() {
+  DCHECK(web_contents_);
   if (popup_controller_) {
     popup_controller_->Hide();
-    PasswordGenerationManager * manager =
-      PasswordManagerClientEfl::GetGenerationManagerFromWebContents(web_contents_);
-    if(manager)
+    PasswordGenerationManager * manager = PasswordManagerClientEfl::GetGenerationManagerFromWebContents(web_contents_);
+    if (manager)
       manager->HidePopup();
   }
 }
@@ -157,9 +147,7 @@ void AutofillManagerDelegateEfl::WasShown() {
     host->Send(new AutofillMsg_PageShown(host->GetRoutingID()));
 }
 
-void AutofillManagerDelegateEfl::DidNavigateMainFrame(
-    const content::LoadCommittedDetails& details,
-    const content::FrameNavigateParams& params) {
+void AutofillManagerDelegateEfl::DidNavigateMainFrame(const content::LoadCommittedDetails& details, const content::FrameNavigateParams& params) {
   HideRequestAutocompleteDialog();
 }
 
@@ -168,15 +156,13 @@ void AutofillManagerDelegateEfl::ShowSavePasswordPopup(PasswordFormManager * for
     popup_controller_->ShowSavePasswordPopup(form_to_save);
 }
 
-void AutofillManagerDelegateEfl::WebContentsDestroyed(
-    content::WebContents* web_contents) {
+void AutofillManagerDelegateEfl::WebContentsDestroyed(content::WebContents* web_contents) {
   HideAutofillPopup();
 }
 
-void AutofillManagerDelegateEfl::DetectAccountCreationForms(
-    const std::vector<autofill::FormStructure*>& forms) {
-  PasswordGenerationManager * manager =
-    PasswordManagerClientEfl::GetGenerationManagerFromWebContents(web_contents_);
+void AutofillManagerDelegateEfl::DetectAccountCreationForms(const std::vector<autofill::FormStructure*>& forms) {
+  DCHECK(web_contents_);
+  PasswordGenerationManager * manager = PasswordManagerClientEfl::GetGenerationManagerFromWebContents(web_contents_);
   if (manager)
     manager->DetectAccountCreationForms(forms);
 }

@@ -49,8 +49,7 @@ class PersonalDataManagerServiceImpl : public PersonalDataManagerService {
 
 PersonalDataManagerServiceImpl::PersonalDataManagerServiceImpl() {
   personal_data_manager_.reset(new PersonalDataManager(EWebView::GetPlatformLocale()));
-  personal_data_manager_->Init(
-      WebDataServiceFactory::GetAutofillWebDataForProfile(), false);
+  personal_data_manager_->Init(WebDataServiceFactory::GetAutofillWebDataForProfile(), false);
 }
 
 PersonalDataManagerServiceImpl::~PersonalDataManagerServiceImpl() {
@@ -68,12 +67,9 @@ PersonalDataManager* PersonalDataManagerServiceImpl::GetPersonalDataManager() {
 
 // static
 PersonalDataManager* PersonalDataManagerFactory::GetDataManager() {
-  PersonalDataManagerService* service =
-    (PersonalDataManagerService*)(PersonalDataManagerServiceImpl::GetInstance());
-
+  PersonalDataManagerService* service = (PersonalDataManagerService*)(PersonalDataManagerServiceImpl::GetInstance());
   if (service)
     return service->GetPersonalDataManager();
-
   // |service| can be NULL in Incognito mode.
   return NULL;
 }
@@ -84,55 +80,75 @@ PersonalDataManagerFactory* PersonalDataManagerFactory::GetInstance() {
 }
 
 int PersonalDataManagerFactory::GetProfileCount() {
-  return GetDataManager()->GetProfiles().size();
+  if (GetDataManager())
+    return GetDataManager()->GetProfiles().size();
+  return 0;
 }
 
 AutofillProfile* PersonalDataManagerFactory::GetProfileByIndex(int index) {
-  const std::vector<AutofillProfile*>& profiles =
-      GetDataManager()->GetProfiles();
-  size_t index_size_t = static_cast<size_t>(index);
-  DCHECK_LT(index_size_t, profiles.size());
-  return (profiles[index_size_t]);
+  if (GetDataManager()) {
+    const std::vector<AutofillProfile*>& profiles = GetDataManager()->GetProfiles();
+    size_t index_size_t = static_cast<size_t>(index);
+    DCHECK_LT(index_size_t, profiles.size());
+    return (profiles[index_size_t]);
+  }
+  return NULL;
 }
 
 void PersonalDataManagerFactory::AddProfile(const AutofillProfile& profile) {
-  GetDataManager()->AddProfile(profile);
+  if (GetDataManager())
+    GetDataManager()->AddProfile(profile);
 }
 
 void PersonalDataManagerFactory::UpdateProfile(const AutofillProfile& profile) {
-  GetDataManager()->UpdateProfile(profile);
+  if (GetDataManager())
+    GetDataManager()->UpdateProfile(profile);
 }
 
 void PersonalDataManagerFactory::RemoveByGUID(const std::string& guid) {
-  GetDataManager()->RemoveByGUID(guid);
+  if (GetDataManager())
+    GetDataManager()->RemoveByGUID(guid);
 }
 
 AutofillProfile* PersonalDataManagerFactory::GetProfileByGUID(const std::string& guid) {
-  return GetDataManager()->GetProfileByGUID(guid);
+  if (GetDataManager())
+    return GetDataManager()->GetProfileByGUID(guid);
+
+  return NULL;
 }
 
 void PersonalDataManagerFactory::AddCreditCard(const CreditCard& credit_card) {
-  GetDataManager()->AddCreditCard(credit_card);
+  if (GetDataManager())
+    GetDataManager()->AddCreditCard(credit_card);
 }
 
 void PersonalDataManagerFactory::UpdateCreditCard(const CreditCard& credit_card) {
-  GetDataManager()->UpdateCreditCard(credit_card);
+  if (GetDataManager())
+    GetDataManager()->UpdateCreditCard(credit_card);
 }
 
 CreditCard* PersonalDataManagerFactory::GetCreditCardByGUID(const std::string& guid) {
-  return GetDataManager()->GetCreditCardByGUID(guid);
+  if (GetDataManager())
+    return GetDataManager()->GetCreditCardByGUID(guid);
+
+  return NULL;
 }
 
 int PersonalDataManagerFactory::GetCreditCardCount() {
-  return GetDataManager()->GetCreditCards().size();
+  if (GetDataManager())
+    return GetDataManager()->GetCreditCards().size();
+
+  return 0;
 }
 
 CreditCard* PersonalDataManagerFactory::GetCreditCardByIndex(int index) {
-  const std::vector<CreditCard*>& credit_cards =
-      GetDataManager()->GetCreditCards();
-  size_t index_size_t = static_cast<size_t>(index);
-  DCHECK_LT(index_size_t, credit_cards.size());
-  return (credit_cards[index_size_t]);
+  if (GetDataManager()) {
+    const std::vector<CreditCard*>& credit_cards = GetDataManager()->GetCreditCards();
+    size_t index_size_t = static_cast<size_t>(index);
+    DCHECK_LT(index_size_t, credit_cards.size());
+    return (credit_cards[index_size_t]);
+  }
+  return NULL;
 }
 
 PersonalDataManagerFactory::PersonalDataManagerFactory() {

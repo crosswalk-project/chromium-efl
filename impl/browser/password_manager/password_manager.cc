@@ -60,7 +60,7 @@ PasswordManager::PasswordManager(PasswordManagerClient* client)
     : client_(client), driver_(client->GetDriver()) {
   DCHECK(client_);
   DCHECK(driver_);
-  password_manager_enabled_ = false;
+  password_manager_enabled_ = true;
 }
 
 PasswordManager::~PasswordManager()

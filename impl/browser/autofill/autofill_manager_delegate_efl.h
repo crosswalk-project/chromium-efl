@@ -50,24 +50,16 @@ class AutofillManagerDelegateEfl
       public content::WebContentsObserver {
  public:
   virtual ~AutofillManagerDelegateEfl();
-
   // Called when the tab corresponding to |this| instance is activated.
   void TabActivated();
-
   // AutofillManagerDelegate implementation.
   virtual PersonalDataManager* GetPersonalDataManager() OVERRIDE;
-  virtual scoped_refptr<AutofillWebDataService>
-      GetDatabase() OVERRIDE;
+  virtual scoped_refptr<AutofillWebDataService> GetDatabase() OVERRIDE;
   virtual PrefService* GetPrefs() OVERRIDE;
   virtual void HideRequestAutocompleteDialog() OVERRIDE;
   virtual void ShowAutofillSettings() OVERRIDE;
-  virtual void ConfirmSaveCreditCard(
-      const AutofillMetrics& metric_logger,
-      const base::Closure& save_card_callback) OVERRIDE;
-  virtual void ShowRequestAutocompleteDialog(
-      const FormData& form,
-      const GURL& source_url,
-      const base::Callback<void(const FormStructure*)>& callback) OVERRIDE;
+  virtual void ConfirmSaveCreditCard(const AutofillMetrics& metric_logger, const base::Closure& save_card_callback) OVERRIDE;
+  virtual void ShowRequestAutocompleteDialog(const FormData& form, const GURL& source_url, const base::Callback<void(const FormStructure*)>& callback) OVERRIDE;
   virtual void ShowAutofillPopup(
       const gfx::RectF& element_bounds,
       base::i18n::TextDirection text_direction,
@@ -76,21 +68,13 @@ class AutofillManagerDelegateEfl
       const std::vector<base::string16>& icons,
       const std::vector<int>& identifiers,
       base::WeakPtr<AutofillPopupDelegate> delegate) OVERRIDE;
-  virtual void UpdateAutofillPopupDataListValues(
-      const std::vector<base::string16>& values,
-      const std::vector<base::string16>& labels) OVERRIDE;
+  virtual void UpdateAutofillPopupDataListValues(const std::vector<base::string16>& values, const std::vector<base::string16>& labels) OVERRIDE;
   virtual void HideAutofillPopup() OVERRIDE;
   virtual bool IsAutocompleteEnabled() OVERRIDE;
-
-  virtual void DetectAccountCreationForms(
-      const std::vector<autofill::FormStructure*>& forms) OVERRIDE;
-
+  virtual void DetectAccountCreationForms(const std::vector<autofill::FormStructure*>& forms) OVERRIDE;
   // content::WebContentsObserver implementation.
-  virtual void DidNavigateMainFrame(
-      const content::LoadCommittedDetails& details,
-      const content::FrameNavigateParams& params) OVERRIDE;
-  virtual void WebContentsDestroyed(
-      content::WebContents* web_contents) OVERRIDE;
+  virtual void DidNavigateMainFrame(const content::LoadCommittedDetails& details, const content::FrameNavigateParams& params) OVERRIDE;
+  virtual void WebContentsDestroyed(content::WebContents* web_contents) OVERRIDE;
   virtual void WasShown() OVERRIDE;
   void SetAutocompleteEnabled(bool enable);
   void ShowSavePasswordPopup(PasswordFormManager * form_to_save);
@@ -101,6 +85,7 @@ class AutofillManagerDelegateEfl
   explicit AutofillManagerDelegateEfl(content::WebContents* web_contents);
   friend class content::WebContentsUserData<AutofillManagerDelegateEfl>;
 
+ private:
   content::WebContents* const web_contents_;
   EWebView * webview_;
   scoped_refptr<AutofillWebDataService> database_;
