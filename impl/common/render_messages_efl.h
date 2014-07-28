@@ -14,6 +14,7 @@
 #include "renderer/print_pages_params.h"
 #include "third_party/WebKit/public/web/WebNavigationPolicy.h"
 #include "third_party/WebKit/public/web/WebNavigationType.h"
+#include "ui/gfx/ipc/gfx_param_traits.h"
 #include "url/gurl.h"
 
 #include "tizen_webview/public/tw_content_security_policy.h"
