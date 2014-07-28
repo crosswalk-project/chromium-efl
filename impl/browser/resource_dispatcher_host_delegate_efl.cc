@@ -142,9 +142,11 @@ void ResourceDispatcherHostDelegateEfl::TriggerNewDownloadStartCallback(
                content_length));
 }
 
+#if !defined(EWK_BRINGUP)
 bool ResourceDispatcherHostDelegateEfl::ShouldOverrideMimeType(
     const GURL& url, std::string& mime_type) {
   return EWebContext::ShouldOverrideMimeForURL(url, mime_type);
 }
+#endif
 
 } // namespace content

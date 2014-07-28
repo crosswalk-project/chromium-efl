@@ -44,9 +44,11 @@ class ResourceDispatcherHostDelegateEfl
       bool must_download,
       ScopedVector<content::ResourceThrottle>* throttles) OVERRIDE;
 
+#if !defined(EWK_BRINGUP)
   // Return true if it should override mime type, otherwise, return false.
   virtual bool ShouldOverrideMimeType(
       const GURL& url, std::string& mime_type) OVERRIDE;
+#endif
 
  private:
   void TriggerNewDownloadStartCallback(
