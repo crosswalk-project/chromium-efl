@@ -65,6 +65,7 @@ void ContentRendererClientEfl::RenderViewCreated(content::RenderView* render_vie
 #endif
 }
 
+#if !defined(EWK_BRINGUP)
 bool ContentRendererClientEfl::HandleNavigation(content::RenderFrame* render_frame,
                                                 content::DocumentState* document_state,
                                                 int opener_id,
@@ -100,6 +101,7 @@ bool ContentRendererClientEfl::HandleNavigation(content::RenderFrame* render_fra
 
   return result;
 }
+#endif
 
 bool ContentRendererClientEfl::WillSendRequest(blink::WebFrame* frame,
                                                content::PageTransition transition_type,
