@@ -319,7 +319,9 @@ std::string CookieManager::GetCookiesForURL(const std::string& url) {
                                                  &cookie_value,
                                                  &completion));
   //allow wait temporarily
+#if !defined(EWK_BRINGUP)
   base::ThreadRestrictions::ScopedAllowWait allow_wait;
+#endif
   completion.Wait();
   return cookie_value;
 }
