@@ -45,7 +45,8 @@ class WebContentsDelegateEfl
                                       unsigned changed_flags) OVERRIDE;
 
   virtual void LoadProgressChanged(WebContents* source, double progress) OVERRIDE;
-  virtual void LoadingStateChanged(WebContents* source) OVERRIDE;
+  virtual void LoadingStateChanged(WebContents* source,
+                                   bool to_different_document) OVERRIDE;
 
   virtual bool ShouldCreateWebContents(
       WebContents*,
@@ -58,7 +59,7 @@ class WebContentsDelegateEfl
 
   virtual void WebContentsCreated(
       WebContents* source_contents,
-      int64 source_frame_id,
+      int opener_render_frame_id,
       const base::string16& frame_name,
       const GURL& target_url,
       WebContents* new_contents) OVERRIDE;
@@ -76,7 +77,6 @@ class WebContentsDelegateEfl
   void RegisterProtocolHandler(WebContents* web_contents,
                                const std::string& protocol,
                                const GURL& url,
-                               const base::string16& title,
                                bool user_gesture) OVERRIDE;
 
   void FindReply(WebContents* web_contents,
@@ -96,59 +96,45 @@ class WebContentsDelegateEfl
   EWebView* web_view() const { return web_view_; }
   WebContents* web_contents() const { return web_contents_; }
 
-  virtual void DidStartProvisionalLoadForFrame(int64 frame_id,
-                                               int64 parent_frame_id,
-                                               bool is_main_frame,
+  virtual void DidStartProvisionalLoadForFrame(RenderFrameHost* render_frame_host,
                                                const GURL& validated_url,
                                                bool is_error_page,
-                                               bool is_iframe_srcdoc,
-                                               RenderViewHost* render_view_host) OVERRIDE;
+                                               bool is_iframe_srcdoc) OVERRIDE;
 
-  virtual void DidCommitProvisionalLoadForFrame(int64 frame_id,
-                                                bool is_main_frame,
+  virtual void DidCommitProvisionalLoadForFrame(RenderFrameHost* render_frame_host,
                                                 const GURL& url,
-                                                PageTransition transition_type,
-                                                RenderViewHost* render_view_host) OVERRIDE;
+                                                PageTransition transition_type) OVERRIDE;
 
   virtual void DidNavigateAnyFrame(const LoadCommittedDetails& details, const FrameNavigateParams& params) OVERRIDE;
   void OnAuthRequired(net::URLRequest* request,
                       const std::string& realm,
                       LoginDelegateEfl* login_delegate);
-  virtual void DidFailProvisionalLoad(int64 frame_id,
-                                      const base::string16& frame_unique_name,
-                                      bool is_main_frame,
+  virtual void DidFailProvisionalLoad(RenderFrameHost* render_frame_host,
                                       const GURL& validated_url,
                                       int error_code,
-                                      const base::string16& error_description,
-                                      RenderViewHost* render_view_host) OVERRIDE;
-  virtual void DidFailLoad(int64 frame_id,
+                                      const base::string16& error_description) OVERRIDE;
+  virtual void DidFailLoad(RenderFrameHost* render_frame_host,
                            const GURL& validated_url,
-                           bool is_main_frame,
                            int error_code,
-                           const base::string16& error_description,
-                           RenderViewHost* render_view_host) OVERRIDE;
+                           const base::string16& error_description) OVERRIDE;
 
-  virtual void DidFinishLoad(int64 frame_id,
-                             const GURL& validated_url,
-                             bool is_main_frame,
-                             RenderViewHost* render_view_host) OVERRIDE;
+  virtual void DidFinishLoad(RenderFrameHost* render_frame_host,
+                             const GURL& validated_url) OVERRIDE;
 
   virtual void DidStartLoading(RenderViewHost* render_view_host) OVERRIDE;
-  virtual void DidUpdateFaviconURL(int32 page_id,
-                                   const std::vector<FaviconURL>& candidates) OVERRIDE;
+  virtual void DidUpdateFaviconURL(const std::vector<FaviconURL>& candidates) OVERRIDE;
   virtual void DidDownloadFavicon(bool success, const GURL& icon_url, const SkBitmap& bitmap);
 
   void OnFormSubmit(const GURL&);
   void SetContentSecurityPolicy(const std::string& policy, tizen_webview::ContentSecurityPolicyType header_type);
   void ShowPopupMenu(const gfx::Rect& rect, blink::TextDirection textDirection, double pageScaleFactor, const std::vector<MenuItem>& items, int data, int selectedIndex, bool multiple);
   void HidePopupMenu();
-  virtual void ShowContextMenu(RenderFrameHost* render_frame_host, const ContextMenuParams& params) OVERRIDE;
-  virtual void CancelContextMenu(int request_id) OVERRIDE;
+
   void set_new_window_policy(bool policy) { should_open_new_window_ = policy; }
   bool get_new_window_policy() const { return should_open_new_window_; }
   JavaScriptDialogManager* GetJavaScriptDialogManager() OVERRIDE;
 
-  void DidFirstVisuallyNonEmptyPaint(int32 page_id) OVERRIDE;
+  void DidFirstVisuallyNonEmptyPaint() OVERRIDE;
 
   bool OnMessageReceived(const IPC::Message& message) OVERRIDE;
   void OnPrintedMetafileReceived(const DidPrintPagesParams& params);

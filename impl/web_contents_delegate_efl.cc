@@ -108,7 +108,8 @@ void WebContentsDelegateEfl::NavigationStateChanged(const WebContents* source, u
   }
 }
 
-void WebContentsDelegateEfl::LoadingStateChanged(WebContents* source) {
+void WebContentsDelegateEfl::LoadingStateChanged(WebContents* source,
+                                                 bool to_different_document) {
   if (source->IsLoading())
     web_view_->SmartCallback<EWebViewCallbacks::LoadProgressStarted>().call();
   else
@@ -142,7 +143,7 @@ bool WebContentsDelegateEfl::ShouldCreateWebContents(
 
 void WebContentsDelegateEfl::WebContentsCreated(
     WebContents* source_contents,
-    int64 source_frame_id,
+    int opener_render_frame_id,
     const string16& frame_name,
     const GURL& target_url,
     WebContents* new_contents) {
@@ -174,10 +175,10 @@ bool WebContentsDelegateEfl::IsFullscreenForTabOrPending(
 }
 
 void WebContentsDelegateEfl::RegisterProtocolHandler(WebContents* web_contents,
-        const std::string& protocol, const GURL& url, const string16& title, bool user_gesture) {
+        const std::string& protocol, const GURL& url, bool user_gesture) {
   scoped_ptr<tizen_webview::Custom_Handlers_Data> protocol_data(
       new tizen_webview::Custom_Handlers_Data(protocol.c_str(),
-          url.host().c_str(), url.spec().c_str(), UTF16ToUTF8(title).c_str()));
+          url.host().c_str(), url.spec().c_str()));
   web_view_->SmartCallback<EWebViewCallbacks::RegisterProtocolHandler>().call(protocol_data.get());
 }
 
@@ -245,21 +246,16 @@ void WebContentsDelegateEfl::OnAuthRequired(net::URLRequest* request,
   web_view_->InvokeAuthCallback(login_delegate, request->url(), realm);
 }
 
-void WebContentsDelegateEfl::DidStartProvisionalLoadForFrame(int64 frame_id,
-                                                             int64 parent_frame_id,
-                                                             bool is_main_frame,
+void WebContentsDelegateEfl::DidStartProvisionalLoadForFrame(RenderFrameHost* render_frame_host,
                                                              const GURL& validated_url,
                                                              bool is_error_page,
-                                                             bool is_iframe_srcdoc,
-                                                             RenderViewHost* render_view_host) {
+                                                             bool is_iframe_srcdoc) {
   web_view_->SmartCallback<EWebViewCallbacks::ProvisionalLoadStarted>().call();
 }
 
-void WebContentsDelegateEfl::DidCommitProvisionalLoadForFrame(int64 frame_id,
-                                                              bool is_main_frame,
+void WebContentsDelegateEfl::DidCommitProvisionalLoadForFrame(RenderFrameHost* render_frame_host,
                                                               const GURL& url,
-                                                              PageTransition transition_type,
-                                                              RenderViewHost* render_view_host) {
+                                                              PageTransition transition_type) {
   web_view_->SmartCallback<EWebViewCallbacks::LoadCommitted>().call();
 }
 
@@ -268,22 +264,17 @@ void WebContentsDelegateEfl::DidNavigateAnyFrame(const LoadCommittedDetails& det
   static_cast<BrowserContextEfl*>(web_contents_->GetBrowserContext())->AddVisitedURLs(params.redirects);
 }
 
-void WebContentsDelegateEfl::DidFailProvisionalLoad(int64 frame_id,
-                                                    const string16& frame_unique_name,
-                                                    bool is_main_frame,
+void WebContentsDelegateEfl::DidFailProvisionalLoad(RenderFrameHost* render_frame_host,
                                                     const GURL& validated_url,
                                                     int error_code,
-                                                    const string16& error_description,
-                                                    RenderViewHost* render_view_host) {
-  DidFailLoad(frame_id, validated_url, is_main_frame, error_code, error_description, render_view_host);
+                                                    const string16& error_description) {
+  DidFailLoad(render_frame_host, validated_url, error_code, error_description);
 }
-void WebContentsDelegateEfl::DidFailLoad(int64 frame_id,
+void WebContentsDelegateEfl::DidFailLoad(RenderFrameHost* render_frame_host,
                                          const GURL& validated_url,
-                                         bool is_main_frame,
                                          int error_code,
-                                         const string16& error_description,
-                                         RenderViewHost* render_view_host) {
-  if (!is_main_frame)
+                                         const string16& error_description) {
+  if (render_frame_host->GetParent())
     return;
 
   scoped_ptr<_Ewk_Error> error(new _Ewk_Error(error_code,
@@ -295,16 +286,16 @@ void WebContentsDelegateEfl::DidFailLoad(int64 frame_id,
   web_view_->SmartCallback<EWebViewCallbacks::LoadError>().call(error.get());
 }
 
-void WebContentsDelegateEfl::DidFinishLoad(int64 frame_id,
-                                           const GURL& validated_url,
-                                           bool is_main_frame,
-                                           RenderViewHost* render_view_host) {
-  if (!is_main_frame)
+void WebContentsDelegateEfl::DidFinishLoad(RenderFrameHost* render_frame_host,
+                                           const GURL& validated_url) {
+  if (render_frame_host->GetParent())
     return;
 
   NavigationEntry *entry = web_contents()->GetController().GetActiveEntry();
   FaviconStatus &favicon = entry->GetFavicon();
 
+  // http://107.108.218.239/bugzilla/show_bug.cgi?id=7883
+#if !defined(EWK_BRINGUP)
   // check/update the url and favicon url in favicon database
   FaviconService fs;
   fs.SetFaviconURLForPageURL(favicon.url, validated_url);
@@ -320,6 +311,7 @@ void WebContentsDelegateEfl::DidFinishLoad(int64 frame_id,
   } else {
     web_view_->SmartCallback<EWebViewCallbacks::IconReceived>().call();
   }
+#endif
 
   web_view_->SmartCallback<EWebViewCallbacks::LoadFinished>().call();
 }
@@ -328,7 +320,7 @@ void WebContentsDelegateEfl::DidStartLoading(RenderViewHost* render_view_host) {
   web_view_->SmartCallback<EWebViewCallbacks::LoadStarted>().call();
 }
 
-void WebContentsDelegateEfl::DidUpdateFaviconURL(int32 page_id, const std::vector<FaviconURL>& candidates) {
+void WebContentsDelegateEfl::DidUpdateFaviconURL(const std::vector<FaviconURL>& candidates) {
   // select and set proper favicon
   for (unsigned int i = 0; i < candidates.size(); ++i) {
     FaviconURL favicon = candidates[i];
@@ -402,14 +394,6 @@ void WebContentsDelegateEfl::HidePopupMenu() {
   web_view_->HidePopupMenu();
 }
 
-void WebContentsDelegateEfl::ShowContextMenu(RenderFrameHost* render_frame_host, const ContextMenuParams& params) {
-  web_view_->ShowContextMenu(params);
-}
-
-void WebContentsDelegateEfl::CancelContextMenu(int request_id) {
-  web_view_->CancelContextMenu(request_id);
-}
-
 void WebContentsDelegateEfl::FindReply(WebContents* web_contents,
                                        int request_id,
                                        int number_of_matches,
@@ -465,7 +449,7 @@ void WebContentsDelegateEfl::OnWrtPluginSyncMessage(const tizen_webview::WrtIpcM
   Send(reply);
 }
 
-void WebContentsDelegateEfl::DidFirstVisuallyNonEmptyPaint(int32 page_id) {
+void WebContentsDelegateEfl::DidFirstVisuallyNonEmptyPaint() {
   web_view_->SmartCallback<EWebViewCallbacks::FrameRendered>().call(0);
 }
 
