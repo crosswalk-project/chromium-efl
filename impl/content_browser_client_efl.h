@@ -43,10 +43,6 @@ class ContentBrowserClientEfl: public ContentBrowserClient {
   virtual BrowserMainParts* CreateBrowserMainParts(
       const MainFunctionParams& parameters) OVERRIDE;
 
-  virtual WebContentsView* OverrideCreateWebContentsView(
-      WebContents* web_contents,
-      RenderViewHostDelegateView** delegate_view) OVERRIDE;
-
   virtual net::URLRequestContextGetter* CreateRequestContext(
       BrowserContext* browser_context,
       ProtocolHandlerMap* protocol_handlers,

@@ -64,14 +64,6 @@ BrowserMainParts* ContentBrowserClientEfl::CreateBrowserMainParts(
   return browser_main_parts_efl_;
 }
 
-WebContentsView* ContentBrowserClientEfl::OverrideCreateWebContentsView(
-    WebContents* web_contents,
-    RenderViewHostDelegateView** delegate_view) {
-  WebContentsViewEfl* view = new WebContentsViewEfl(web_contents);
-  *delegate_view = view;
-  return view;
-}
-
 net::URLRequestContextGetter* ContentBrowserClientEfl::CreateRequestContext(
       BrowserContext* browser_context,
       ProtocolHandlerMap* protocol_handlers,
