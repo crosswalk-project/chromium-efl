@@ -30,13 +30,16 @@ class RenderViewObserverEfl: public content::RenderViewObserver {
   explicit RenderViewObserverEfl(content::RenderView* render_view);
   virtual ~RenderViewObserverEfl();
 
-  void DidChangeScrollOffset(blink::WebFrame* frame) OVERRIDE;
+  void DidChangeScrollOffset(blink::WebLocalFrame* frame) OVERRIDE;
   bool OnMessageReceived(const IPC::Message& message) OVERRIDE;
-  virtual void DidCreateDocumentElement(blink::WebFrame* frame) OVERRIDE;
+  virtual void DidCreateDocumentElement(blink::WebLocalFrame* frame) OVERRIDE;
+#if !defined(EWK_BRINGUP)
   virtual void DidChangeContentsSize(blink::WebFrame* frame, const blink::WebSize& size) OVERRIDE;
-  virtual void OrientationChangeEvent(int orientation) OVERRIDE;
+#endif
+  virtual void OrientationChangeEvent() OVERRIDE;
+#if !defined(EWK_BRINGUP)
   virtual void DidChangePageScaleFactor() OVERRIDE;
-
+#endif
   //Changes in PageScaleFactorLimits are applied when layoutUpdated is called
   //So using this notification to update minimum and maximum page scale factor values
   virtual void DidUpdateLayout() OVERRIDE;

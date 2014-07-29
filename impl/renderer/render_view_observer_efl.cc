@@ -17,8 +17,8 @@
 #include "third_party/WebKit/public/web/WebDocument.h"
 #include "third_party/WebKit/public/web/WebFormElement.h"
 #include "third_party/WebKit/public/web/WebFrame.h"
-#include "third_party/WebKit/public/web/WebFrame.h"
 #include "third_party/WebKit/public/web/WebHitTestResult.h"
+#include "third_party/WebKit/public/web/WebLocalFrame.h"
 #include "third_party/WebKit/public/web/WebPageSerializer.h"
 #include "third_party/WebKit/public/web/WebView.h"
 #include "third_party/WebKit/public/web/WebNodeList.h"
@@ -94,7 +94,9 @@ void PopulateEwkHitTestData(const blink::WebHitTestResult& web_hit_test, _Ewk_Hi
       (ewk_hit_test->context & TW_HIT_TEST_RESULT_CONTEXT_IMAGE)) {
     blink::WebElement hit_element = web_hit_test.node().toConst<blink::WebElement>();
     ewk_hit_test->imageData.imageBitmap = hit_element.imageContents().getSkBitmap();
+#if !defined(EWK_BRINGUP)
     ewk_hit_test->imageData.fileNameExtension = hit_element.imageFilenameExtension().utf8();
+#endif
   }
 }
 
@@ -148,23 +150,28 @@ bool RenderViewObserverEfl::OnMessageReceived(const IPC::Message& message)
   return handled;
 }
 
-void RenderViewObserverEfl::DidCreateDocumentElement(blink::WebFrame* frame)
+void RenderViewObserverEfl::DidCreateDocumentElement(blink::WebLocalFrame* frame)
 {
   std::string policy;
   tizen_webview::ContentSecurityPolicyType type = TW_CSP_DEFAULT_POLICY;
   Send(new EwkHostMsg_GetContentSecurityPolicy(render_view()->GetRoutingID(), &policy, &type));
+
+#if !defined(EWK_BRINGUP)
   // Since, Webkit supports some more types and we cast ewk type to Webkit type.
   // We allow only ewk types.
   if (type == TW_CSP_REPORT_ONLY || type == TW_CSP_ENFORCE_POLICY)
     frame->document().setContentSecurityPolicyUsingHeader(blink::WebString::fromUTF8(policy), type);
+#endif
 }
 
 void RenderViewObserverEfl::OnSetContentSecurityPolicy(const std::string& policy, tizen_webview::ContentSecurityPolicyType header_type)
 {
+#if !defined(EWK_BRINGUP)
   blink::WebView* view = render_view()->GetWebView();
   DCHECK(view);
   blink::WebDocument document = view->mainFrame()->document();
   document.setContentSecurityPolicyUsingHeader(blink::WebString::fromUTF8(policy), header_type);
+#endif
 }
 
 void RenderViewObserverEfl::OnScale(double scale_factor, int x, int y)
@@ -183,16 +190,21 @@ void RenderViewObserverEfl::OnSetScroll(int x, int y)
   if (!frame)
     return;
 
+#if !defined(EWK_BRINGUP)
+  // I think we should use SetCrollOffset here!
   frame->setScrollPosition(blink::WebSize(x, y));
+#endif
 }
 
 void RenderViewObserverEfl::OnUseSettingsFont()
 {
   WebCore::FontCache::fontCache()->invalidate();
 
+#if !defined(EWK_BRINGUP)
   blink::WebView* view = render_view()->GetWebView();
   if (view)
     view->sendResizeEventAndForceLayout();
+#endif
 }
 
 void RenderViewObserverEfl::OnPlainTextGet(int plain_text_get_callback_id)
@@ -204,14 +216,16 @@ void RenderViewObserverEfl::OnPlainTextGet(int plain_text_get_callback_id)
   Send(new EwkHostMsg_PlainTextGetContents(render_view()->GetRoutingID(), content.utf8(), plain_text_get_callback_id));
 }
 
+#if !defined(EWK_BRINGUP)
 void RenderViewObserverEfl::DidChangeContentsSize(blink::WebFrame* frame, const blink::WebSize& size)
 {
   Send(new EwkHostMsg_DidChangeContentsSize(render_view()->GetRoutingID(),
                                             size.width,
                                             size.height));
 }
+#endif
 
-void RenderViewObserverEfl::DidChangeScrollOffset(blink::WebFrame* frame)
+void RenderViewObserverEfl::DidChangeScrollOffset(blink::WebLocalFrame* frame)
 {
   if (!frame || (render_view()->GetWebView()->mainFrame() != frame))
     return;
@@ -308,6 +322,7 @@ void RenderViewObserverEfl::OnGetMHTMLData(int callback_id)
   Send(new EwkHostMsg_ReadMHTMLData(render_view()->GetRoutingID(), content_string, callback_id));
 }
 
+#if !defined(EWK_BRINGUP)
 void RenderViewObserverEfl::DidChangePageScaleFactor()
 {
   blink::WebView* view = render_view()->GetWebView();
@@ -316,6 +331,7 @@ void RenderViewObserverEfl::DidChangePageScaleFactor()
 
   Send(new EwkHostMsg_DidChangePageScaleFactor(render_view()->GetRoutingID(), view->pageScaleFactor()));
 }
+#endif
 
 void RenderViewObserverEfl::DidUpdateLayout()
 {
@@ -458,9 +474,14 @@ void RenderViewObserverEfl::OnWebAppCapableGet(int callback_id) {
   Send(new EwkHostMsg_WebAppCapableGet(render_view()->GetRoutingID(), capable, callback_id));
 }
 
-void RenderViewObserverEfl::OrientationChangeEvent(int orientation)
+void RenderViewObserverEfl::OrientationChangeEvent()
 {
+#if !defined(EWK_BRINGUP)
+  // Previosly OrientationChangeEvent() had orientation parameter.
+  // Now it was removed. Thanks Mounir.
+  // Need to figure out how to get orientation.
   Send(new EwkHostMsg_OrientationChangeEvent(render_view()->GetRoutingID(), orientation));
+#endif
 }
 
 void RenderViewObserverEfl::WillSubmitForm(blink::WebFrame* frame, const blink::WebFormElement& form)
@@ -471,8 +492,10 @@ void RenderViewObserverEfl::WillSubmitForm(blink::WebFrame* frame, const blink::
 
 void RenderViewObserverEfl::OnSetBrowserFont()
 {
+#if !defined(EWK_BRINGUP)
   blink::WebView* view = render_view()->GetWebView();
   if (view) {
     view->setBrowserFont();
   }
+#endif
 }
