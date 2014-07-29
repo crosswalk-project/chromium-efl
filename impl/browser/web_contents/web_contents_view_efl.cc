@@ -136,10 +136,6 @@ void WebContentsViewEfl::GetContainerBounds(gfx::Rect* out) const {
     *out = view->GetBoundsInRootWindow();
 }
 
-void WebContentsViewEfl::OnTabCrashed(base::TerminationStatus status, int error_code) {
-  NOTIMPLEMENTED();
-}
-
 void WebContentsViewEfl::SizeContents(const gfx::Size& size) {
   RenderWidgetHostView* rwhv = web_contents_->GetRenderWidgetHostView();
   if (rwhv)

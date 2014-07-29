@@ -36,7 +36,6 @@ class WebContentsViewEfl
   virtual gfx::NativeView GetContentNativeView() const OVERRIDE;
   virtual gfx::NativeWindow GetTopLevelNativeWindow() const OVERRIDE;
   virtual void GetContainerBounds(gfx::Rect* out) const OVERRIDE;
-  virtual void OnTabCrashed(base::TerminationStatus status, int error_code) OVERRIDE;
   virtual void SizeContents(const gfx::Size& size) OVERRIDE;
   virtual void Focus() OVERRIDE;
   virtual void SetInitialFocus() OVERRIDE;
