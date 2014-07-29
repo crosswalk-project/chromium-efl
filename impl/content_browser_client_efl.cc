@@ -121,9 +121,10 @@ void ContentBrowserClientEfl::AllowCertificateError(
 }
 
 void ContentBrowserClientEfl::RequestDesktopNotificationPermission(
-    const GURL& source_origin, int callback_context,
-    int render_process_id, int render_view_id) {
-#if defined(ENABLE_NOTIFICATIONS)
+    const GURL& source_origin,
+    content::RenderFrameHost* render_frame_host,
+    const base::Closure& callback) {
+#if defined(ENABLE_NOTIFICATIONS) && !defined(EWK_BRINGUP)
   WebContents* web_contents = WebContentsFromViewID(render_process_id,
                                                     render_view_id);
   if (!web_contents)
@@ -154,9 +155,11 @@ void ContentBrowserClientEfl::RequestDesktopNotificationPermission(
 }
 
 void ContentBrowserClientEfl::ShowDesktopNotification(
-    const ShowDesktopNotificationHostMsgParams& params,
-    int render_process_id, int render_view_id, bool /*worker*/) {
-#if defined(ENABLE_NOTIFICATIONS)
+      const content::ShowDesktopNotificationHostMsgParams& params,
+      content::RenderFrameHost* render_frame_host,
+      content::DesktopNotificationDelegate* delegate,
+      base::Closure* cancel_callback) {
+#if defined(ENABLE_NOTIFICATIONS) && !defined(EWK_BRINGUP)
   WebContents* web_contents = WebContentsFromViewID(render_process_id, render_view_id);
   if (!web_contents)
     return;
