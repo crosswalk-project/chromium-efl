@@ -9,5 +9,7 @@ void Ewk_Settings::setSpdyEnabled(bool flag)
 
 void Ewk_Settings::setCurrentLegacyFontSizeMode(tizen_webview::Legacy_Font_Size_Mode mode) {
     m_currentLegacyFontSizeMode = mode;
+#if !defined(EWK_BRINGUP)
     m_preferences.current_legacy_font_size_mode = static_cast<content::LegacyFontSizeMode>(mode);
+#endif
 }
