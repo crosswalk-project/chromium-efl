@@ -131,11 +131,11 @@ void Clipboard::ReadAvailableTypes(ClipboardType type, std::vector<string16>* ty
   types->clear();
   *contains_filenames = false;
   if (IsFormatAvailable(GetPlainTextFormatType(), type))
-    types->push_back(base::ASCIIToUTF16(WebCore::mimeTypeTextPlain));
+    types->push_back(base::ASCIIToUTF16(blink::mimeTypeTextPlain));
   if (IsFormatAvailable(GetHtmlFormatType(), type))
-    types->push_back(base::ASCIIToUTF16(WebCore::mimeTypeTextHTML));
+    types->push_back(base::ASCIIToUTF16(blink::mimeTypeTextHTML));
   if (IsFormatAvailable(GetBitmapFormatType(), type))
-    types->push_back(base::ASCIIToUTF16(WebCore::mimeTypeImagePng));
+    types->push_back(base::ASCIIToUTF16(blink::mimeTypeImagePng));
 }
 
 void Clipboard::ReadText(ClipboardType type, string16* result) const {
