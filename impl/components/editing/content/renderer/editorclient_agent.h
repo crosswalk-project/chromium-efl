@@ -19,12 +19,18 @@
 
 #include "base/basictypes.h"
 #include "content/public/renderer/render_view_observer.h"
+#if !defined(EWK_BRINGUP)
 #include "third_party/WebKit/public/web/WebEditorClient.h"
+#endif
 
 namespace editing {
 
+#if !defined(EWK_BRINGUP)
 class EditorClientAgent : public content::RenderViewObserver,
                           public blink::WebEditorClient {
+#else
+class EditorClientAgent : public content::RenderViewObserver {
+#endif
  public:
   EditorClientAgent(content::RenderView* render_view);
 

@@ -18,14 +18,13 @@
 #include "content/public/renderer/render_view.h"
 #include "components/editing/content/common/editing_messages.h"
 
-using blink::WebEditorClient;
-using blink::WebString;
-
 namespace editing {
 
 EditorClientAgent::EditorClientAgent(content::RenderView* render_view)
     : content::RenderViewObserver(render_view) {
+#if !defined(EWK_BRINGUP)
   render_view->GetWebView()->setEditorClient(this);
+#endif
 }
 
 bool EditorClientAgent::OnMessageReceived(const IPC::Message& message) {
