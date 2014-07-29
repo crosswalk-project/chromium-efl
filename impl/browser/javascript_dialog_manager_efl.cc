@@ -30,11 +30,13 @@ bool JavaScriptModalCallbacksData::Run(Evas_Object* obj, const char* message_tex
           return prompt_callback_(obj, message_text, default_text, user_data_);
       break;
     }
+#if !defined(EWK_BRINGUP)
     case content::JAVASCRIPT_MESSAGE_TYPE_NAVIGATION_PROMPT: {
       if (prompt_callback_)
         return prompt_callback_(obj, message_text, default_text, user_data_);
       break;
     }
+#endif
   }
   return false;
 }
@@ -148,5 +150,7 @@ void JavaScriptDialogManagerEfl::RunBeforeUnloadDialog(content::WebContents* web
                                      const base::string16& message_text,
                                      bool is_reload,
                                      const DialogClosedCallback& callback) {
+#if !defined(EWK_BRINGUP)
   RunJavaScriptDialog(web_contents, GURL(), std::string(), content::JAVASCRIPT_MESSAGE_TYPE_NAVIGATION_PROMPT, base::UTF8ToUTF16(std::string("Confirm Navigation")), message_text, callback, &is_reload);
+#endif
 }

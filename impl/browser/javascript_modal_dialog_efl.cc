@@ -104,6 +104,7 @@ bool JavaScriptModalDialogEfl::ShowJavaScriptDialog() {
     evas_object_focus_set(ok_button_, true);
     evas_object_smart_callback_add(ok_button_, "clicked", OkButtonHandlerForPrompt, this);
 
+#if !defined(EWK_BRINGUP)
   } else if (javascript_message_type_ == content::JAVASCRIPT_MESSAGE_TYPE_NAVIGATION_PROMPT) {
     LOG(INFO) << "JAVASCRIPT_MESSAGE_TYPE_NAVIGATION_PROMPT() ";
 
@@ -129,6 +130,7 @@ bool JavaScriptModalDialogEfl::ShowJavaScriptDialog() {
     elm_object_text_set(ok_button_, "Stay");
     elm_object_part_content_set(popup_, "button2", ok_button_);
     evas_object_smart_callback_add(ok_button_, "clicked", CancelButtonHandlerForPrompt, this);
+#endif
   } else if (javascript_message_type_ == content::JAVASCRIPT_MESSAGE_TYPE_ALERT) {
     LOG(INFO) << "JAVASCRIPT_MESSAGE_TYPE_ALERT() ";
     if (!setLabelText(UTF16ToUTF8(message_text_).c_str()))
