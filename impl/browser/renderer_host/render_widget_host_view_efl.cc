@@ -24,7 +24,6 @@
 #include "content/public/browser/browser_thread.h"
 #include "content/browser/renderer_host/dip_util.h"
 #include "content/browser/gpu/gpu_process_host.h"
-#include "content/common/cursors/webcursor_efl.h"
 #include "content/common/gpu/client/gl_helper.h"
 #include "content/public/browser/render_widget_host_view_frame_subscriber.h"
 #include "content/public/common/content_switches.h"
@@ -46,6 +45,7 @@
 #include "ui/events/event_utils.h"
 #include "browser/motion/wkext_motion.h"
 #include "content/common/input_messages.h"
+#include "common/webcursor_efl.h"
 
 #include <assert.h>
 #include <Ecore.h>

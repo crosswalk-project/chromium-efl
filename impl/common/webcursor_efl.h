@@ -2,8 +2,8 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-#ifndef CONTENT_COMMON_CURSORS_WEBCURSOR_EFL_H_
-#define CONTENT_COMMON_CURSORS_WEBCURSOR_EFL_H_
+#ifndef WEBCURSOR_EFL_H_
+#define WEBCURSOR_EFL_H_
 
 int GetCursorType(int type);
 

@@ -1,4 +1,4 @@
-#include "content/common/cursors/webcursor_efl.h"
+#include "common/webcursor_efl.h"
 
 #include "base/logging.h"
 #include "third_party/WebKit/public/platform/WebCursorInfo.h"

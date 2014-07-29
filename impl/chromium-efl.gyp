@@ -5,7 +5,7 @@
     'edje_dir%': '/usr/share/chromium-efl/themes/',
     'webdb_dir%': '/usr/share/chromium-efl/db/',
     'edje_compiler%': 'edje_cc',
-    'ewk_bringup%': 0,
+    'ewk_bringup%': 1,
   },
 
   'targets': [{
@@ -201,6 +201,8 @@
       'common/version_info_efl.h',
       'common/web_contents_utils.cc',
       'common/web_contents_utils.h',
+      'common/webcursor_efl.cc',
+      'common/webcursor_efl.h',
       'components/clipboard/clipboard_efl.cc',
       'components/clipboard/clipboard_helper_efl.cc',
       'components/clipboard/clipboard_helper_efl.h',
