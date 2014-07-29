@@ -49,6 +49,7 @@
 #include "selection_controller_efl.h"
 #include "web_contents_delegate_efl.h"
 #include "ui/events/gestures/gesture_types.h"
+#include "ui/events/gestures/gesture_sequence.h"
 #include "context_menu_controller_efl.h"
 #include "file_chooser_controller_efl.h"
 #include "ui/gfx/point.h"
@@ -196,7 +197,8 @@ class WebViewBrowserMessageFilter;
 
 class EWebView
     : public ui::GestureConsumer
-    , public ui::GestureEventHelper {
+    , public ui::GestureEventHelper
+    , public ui::GestureSequenceDelegate {
  public:
   static bool InitSmartClassInterface(Ewk_View_Smart_Class&);
 
@@ -444,9 +446,11 @@ class EWebView
 
   // GestureEventHelper overrides
   virtual bool CanDispatchToConsumer(ui::GestureConsumer* consumer) OVERRIDE;
-  virtual void DispatchPostponedGestureEvent(ui::GestureEvent* event) OVERRIDE;
   virtual void DispatchCancelTouchEvent(ui::TouchEvent* event) OVERRIDE;
   virtual void DispatchGestureEvent(ui::GestureEvent*) OVERRIDE;
+
+  // GestureSequenceDelegate overrides
+  virtual void DispatchPostponedGestureEvent(ui::GestureEvent* event) OVERRIDE;
 
 #if defined(OS_TIZEN_MOBILE)
   bool LaunchCamera(base::string16 mimetype);
