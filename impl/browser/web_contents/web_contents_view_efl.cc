@@ -189,10 +189,4 @@ void WebContentsViewEfl::ShowContextMenu(RenderFrameHost* render_frame_host, con
     delegate->ShowContextMenu(render_frame_host, params);
 }
 
-void WebContentsViewEfl::CancelContextMenu(int request_id) {
-  WebContentsDelegateEfl* delegate = static_cast<WebContentsDelegateEfl*>(web_contents_->GetDelegate());
-  if (delegate)
-    delegate->CancelContextMenu(request_id);
-}
-
 } // namespace content

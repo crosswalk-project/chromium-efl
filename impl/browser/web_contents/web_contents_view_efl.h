@@ -55,7 +55,6 @@ class WebContentsViewEfl
                              int advanced_ime_options = 0) OVERRIDE;
 
   virtual void ShowContextMenu(RenderFrameHost* render_frame_host, const ContextMenuParams& params) OVERRIDE;
-  virtual void CancelContextMenu(int request_id) OVERRIDE;
 
   void UpdateDragDest(RenderViewHost* host);
 
