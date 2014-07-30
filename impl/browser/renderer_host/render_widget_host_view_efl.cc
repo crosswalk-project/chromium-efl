@@ -536,23 +536,6 @@ void RenderWidgetHostViewEfl::SetIsLoading(bool is_loading) {
   UpdateCursor(WebCursor());
 }
 
-void RenderWidgetHostViewEfl::TextInputTypeChanged(ui::TextInputType type, ui::TextInputMode input_mode, bool can_compose_inline) {
-  if (im_context_) {
-    im_context_->UpdateInputMethodState(type, can_compose_inline, input_mode);
-    // Make Empty Rect for inputFieldZoom Gesture
-    // Finally, the empty rect is not used.
-    host_->ScrollFocusedEditableNodeIntoRect(gfx::Rect(0, 0, 0, 0));
-  }
-
-  if (GetSelectionController()) {
-    GetSelectionController()->SetSelectionEditable(
-      type == ui::TEXT_INPUT_TYPE_TEXT ||
-      type == ui::TEXT_INPUT_TYPE_PASSWORD ||
-      type == ui::TEXT_INPUT_TYPE_TEXT_AREA ||
-      type == ui::TEXT_INPUT_TYPE_CONTENT_EDITABLE);
-  }
-}
-
 void RenderWidgetHostViewEfl::TextInputStateChanged(
     const ViewHostMsg_TextInputState_Params& params) {
   LOG(INFO) << "RenderWidgetHostViewEfl::TextInputStateChanged";
@@ -562,6 +545,12 @@ void RenderWidgetHostViewEfl::TextInputStateChanged(
   if (im_context_) {
     im_context_->UpdateInputMethodState(params.type);
     web_view_->QuerySelectionStyle();
+
+    // Obsolete TextInputTypeChanged was doing it in similar code block
+    // Probably also required here
+    // Make Empty Rect for inputFieldZoom Gesture
+    // Finally, the empty rect is not used.
+    // host_->ScrollFocusedEditableNodeIntoRect(gfx::Rect(0, 0, 0, 0));}
   }
 
   if (GetSelectionController()) {

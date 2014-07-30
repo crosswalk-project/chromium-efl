@@ -89,7 +89,6 @@ class RenderWidgetHostViewEfl
   virtual void Blur() OVERRIDE;
   virtual void UpdateCursor(const WebCursor&) OVERRIDE;
   virtual void SetIsLoading(bool) OVERRIDE;
-  virtual void TextInputTypeChanged(ui::TextInputType, ui::TextInputMode, bool) OVERRIDE;
   virtual void TextInputStateChanged(
       const ViewHostMsg_TextInputState_Params& params) OVERRIDE;
 
