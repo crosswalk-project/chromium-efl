@@ -19,7 +19,7 @@
 
 #include "WebPopupItem.h"
 
-using namespace WebCore;
+using namespace blink;
 
 namespace blink {
 
