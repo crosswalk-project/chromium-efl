@@ -950,10 +950,6 @@ void RenderWidgetHostViewEfl::ResizeCompositingSurface(const gfx::Size& size) {
   web_view_->DidChangeContentsArea(size.width(), size.height());
 }
 
-void RenderWidgetHostViewEfl::SetScrollOffsetPinning(bool, bool) {
-  NOTIMPLEMENTED();
-}
-
 void RenderWidgetHostViewEfl::OnAccessibilityEvents(const std::vector<AccessibilityHostMsg_EventParams>&) {
   NOTIMPLEMENTED();
 }
