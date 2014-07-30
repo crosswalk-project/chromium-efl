@@ -950,10 +950,6 @@ void RenderWidgetHostViewEfl::ResizeCompositingSurface(const gfx::Size& size) {
   web_view_->DidChangeContentsArea(size.width(), size.height());
 }
 
-void RenderWidgetHostViewEfl::SetHasHorizontalScrollbar(bool) {
-  NOTIMPLEMENTED();
-}
-
 void RenderWidgetHostViewEfl::SetScrollOffsetPinning(bool, bool) {
   NOTIMPLEMENTED();
 }

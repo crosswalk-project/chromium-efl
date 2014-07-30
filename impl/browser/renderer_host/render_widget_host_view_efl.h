@@ -143,7 +143,6 @@ class RenderWidgetHostViewEfl
   virtual gfx::Rect GetBoundsInRootWindow() OVERRIDE;
   virtual gfx::GLSurfaceHandle GetCompositingSurface() OVERRIDE;
   virtual void ResizeCompositingSurface(const gfx::Size&);
-  virtual void SetHasHorizontalScrollbar(bool) OVERRIDE;
   virtual void SetScrollOffsetPinning(bool, bool) OVERRIDE;
   virtual void OnAccessibilityEvents(const std::vector<AccessibilityHostMsg_EventParams>&) OVERRIDE;
   virtual void RenderProcessGone(base::TerminationStatus, int) OVERRIDE;
