@@ -950,10 +950,6 @@ void RenderWidgetHostViewEfl::ResizeCompositingSurface(const gfx::Size& size) {
   web_view_->DidChangeContentsArea(size.width(), size.height());
 }
 
-void RenderWidgetHostViewEfl::OnAccessibilityEvents(const std::vector<AccessibilityHostMsg_EventParams>&) {
-  NOTIMPLEMENTED();
-}
-
 void RenderWidgetHostViewEfl::RenderProcessGone(base::TerminationStatus, int error_code) {
   // RenderWidgetHostImpl sets |view_| i.e. RenderWidgetHostViewEfl to NULL immediately after this call.
   // It expects RenderWidgetHostView to delete itself.
