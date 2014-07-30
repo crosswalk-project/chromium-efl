@@ -582,7 +582,7 @@ void RenderWidgetHostViewEfl::ImeCompositionRangeChanged(
   }
 }
 
-void RenderWidgetHostViewEfl::FocusedNodeChanged(bool is_editable_node, long node_id) {
+void RenderWidgetHostViewEfl::FocusedNodeChanged(bool is_editable_node) {
   SelectionControllerEfl* controller = web_view_->GetSelectionController();
   if (controller) {
     controller->SetCaretSelectionStatus(false);
