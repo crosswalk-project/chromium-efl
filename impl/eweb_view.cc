@@ -2191,8 +2191,15 @@ std::string EWebView::GetErrorPage(const std::string& invalidUrl) {
   base::string16 url16;
   url16.assign(invalidUrl.begin(), invalidUrl.end());
 
+#if defined(EWK_BRINGUP)
+  std::string errorHead = "This webpage is not available";
+  std::string errorMessage = "The server at <ph name=\"" + invalidUrl + "\">&lt;strong&gt;$1&lt;/strong&gt;</ph> can't be found, because the DNS lookup failed.";
+#else
+  // Those strings were removed form webkit_strings.grd
+  // They exist in chrome/app/generated_resources.grd, but it is part of chrome that we don't use currently.
   std::string errorHead = l10n_util::GetStringUTF8(IDS_ERRORPAGES_HEADING_NOT_AVAILABLE);
   std::string errorMessage = l10n_util::GetStringFUTF8(IDS_ERRORPAGES_SUMMARY_NAME_NOT_RESOLVED, url16);
+#endif
 
   std::string html =
     "<html>"
