@@ -19,7 +19,9 @@
 
 #include "message_pump_for_ui_efl.h"
 
+#define private public
 #include "base/run_loop.h"
+#undef private
 #include "base/time/time.h"
 #include <Ecore.h>
 
