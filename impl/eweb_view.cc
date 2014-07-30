@@ -83,6 +83,13 @@
 using namespace content;
 using namespace tizen_webview;
 
+// GetContentClient() is defined in content_client.cc, but in content_client.h
+// it is hidden by CONTENT_IMPLEMENTATION ifdef. We don't want to define
+// CONTENT_IMPLEMENTATION because it may bring a lot of things we don't need.
+namespace content {
+  ContentClient* GetContentClient();
+}
+
 namespace {
 
 #ifndef SET_EMPTY_STRING_IF_NULL
