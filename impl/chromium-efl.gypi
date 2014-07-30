@@ -71,6 +71,7 @@
       ['exclude', 'browser/renderer_host/native_web_keyboard_event_aura\\.cc$'],
       ['exclude', 'browser/renderer_host/render_widget_host_view_aura\\.cc$'],
       ['exclude', 'browser/web_contents/web_contents_view_aura\\.cc$'],
+      ['exclude', 'clipboard/clipboard_aurax11\\.cc$'],
     ],
     'conditions': [
        ['building_for_tizen==1', {
