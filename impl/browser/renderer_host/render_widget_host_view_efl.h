@@ -127,7 +127,6 @@ class RenderWidgetHostViewEfl
   virtual void OnContentsDetected(const char*) OVERRIDE;
 #endif
 
-  virtual void OnAcceleratedCompositingStateChange() OVERRIDE;
   virtual void AcceleratedSurfaceInitialized(int, int) OVERRIDE;
   virtual void AcceleratedSurfaceBuffersSwapped(
     const GpuHostMsg_AcceleratedSurfaceBuffersSwapped_Params&,

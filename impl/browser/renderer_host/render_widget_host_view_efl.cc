@@ -874,10 +874,6 @@ bool RenderWidgetHostViewEfl::CanCopyToVideoFrame() const {
   return false;
 }
 
-void RenderWidgetHostViewEfl::OnAcceleratedCompositingStateChange() {
-  NOTIMPLEMENTED();
-}
-
 void RenderWidgetHostViewEfl::AcceleratedSurfaceInitialized(int host_id, int route_id) {
   // FIXME: new API in M34. need proper implementation.
   NOTIMPLEMENTED();
