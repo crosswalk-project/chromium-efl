@@ -95,10 +95,6 @@ class RenderWidgetHostViewEfl
   virtual void ImeCancelComposition() OVERRIDE;
   virtual void ImeCompositionRangeChanged(const gfx::Range&, const std::vector<gfx::Rect>&) OVERRIDE;
   virtual void FocusedNodeChanged(bool is_editable_node) OVERRIDE;
-  virtual void DidUpdateBackingStore(const gfx::Rect&,
-    const gfx::Vector2d&,
-    const std::vector<gfx::Rect>&,
-    const std::vector<ui::LatencyInfo>&) OVERRIDE;
 
   virtual void Destroy() OVERRIDE;
   virtual void SetTooltipText(const base::string16&) OVERRIDE;

@@ -590,17 +590,6 @@ void RenderWidgetHostViewEfl::FocusedNodeChanged(bool is_editable_node) {
   }
 }
 
-void RenderWidgetHostViewEfl::DidUpdateBackingStore(
-  const gfx::Rect& scroll_rect,
-  const gfx::Vector2d& scroll_delta,
-  const std::vector<gfx::Rect>& copy_rects,
-  const std::vector<ui::LatencyInfo>& latency_info) {
-  if (scroll_delta.x() || scroll_delta.y())
-    scroll_detector_->OnChangeScrollOffset(web_view_, scroll_delta);
-  // FIXME: Probably we should separate content_image from BackingStore
-  // and set updates here.
-}
-
 void RenderWidgetHostViewEfl::Destroy() {
   delete this;
 }
