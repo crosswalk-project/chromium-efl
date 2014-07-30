@@ -635,12 +635,6 @@ void RenderWidgetHostViewEfl::ScrollOffsetChanged() {
   NOTIMPLEMENTED();
 }
 
-void RenderWidgetHostViewEfl::SelectionRootBoundsChanged(const gfx::Rect& rect) {
-  if (GetSelectionController())
-    GetSelectionController()->SetVisibilityBounds(
-      ConvertRectToPixel(device_scale_factor_, rect));
-}
-
 void RenderWidgetHostViewEfl::DidStopFlinging() {
 #ifdef TIZEN_EDGE_EFFECT
   web_view_->edgeEffect()->hide();

@@ -104,7 +104,6 @@ class RenderWidgetHostViewEfl
   virtual void SetTooltipText(const base::string16&) OVERRIDE;
   virtual void SelectionChanged(const base::string16&, size_t, const gfx::Range&) OVERRIDE;
   virtual void SelectionBoundsChanged(const ViewHostMsg_SelectionBounds_Params&) OVERRIDE;
-  virtual void SelectionRootBoundsChanged(const gfx::Rect&) OVERRIDE;
   virtual void ScrollOffsetChanged() OVERRIDE;
   virtual void CopyFromCompositingSurface(
     const gfx::Rect&,
