@@ -30,6 +30,7 @@
 #include "browser/vibration/vibration_message_filter.h"
 #include "content/public/browser/resource_dispatcher_host.h"
 #include "content/public/browser/web_contents.h"
+#include "content/public/common/show_desktop_notification_params.h"
 #include "common/web_contents_utils.h"
 #include "components/editing/content/browser/editor_client_observer.h"
 
@@ -47,6 +48,9 @@ using web_contents_utils::WebContentsFromViewID;
 using tizen_webview::NotificationPermissionRequest;
 using tizen_webview::URL;
 using tizen_webview::Security_Origin;
+
+#warning "[M38] tempoary disable notification. remove below line"
+#undef ENABLE_NOTIFICATIONS
 
 namespace content {
 

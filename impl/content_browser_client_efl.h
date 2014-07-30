@@ -29,12 +29,12 @@ class CommandLine;
 class EWebContext;
 
 namespace content {
-
 class ResourceDispatcherHostDelegateEfl;
 class BrowserMainPartsEfl;
 class RenderViewHostDelegateView;
 class WebContents;
 class WebContentsView;
+struct ShowDesktopNotificationHostMsgParams;
 
 class ContentBrowserClientEfl: public ContentBrowserClient {
  public:
