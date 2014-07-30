@@ -57,8 +57,9 @@ void NotificationControllerEfl::DeleteNotification(uint64_t notification_id, int
     return;
 
   RenderViewHost* render_view_host = RenderViewHost::FromID(saved_data->render_process_id, saved_data->render_view_id);
-  if (render_view_host)
-    render_view_host->DesktopNotificationPostClose(notification_id, by_user);
+#warning "[M38] need proper impl. for desktop notification"
+  //if (render_view_host)
+  //  render_view_host->DesktopNotificationPostClose(notification_id, by_user);
 
   notification_map.Remove(notification_id);
 }
@@ -70,8 +71,9 @@ void NotificationControllerEfl::NotifyNotificationClicked(uint64_t notification_
 
   RenderViewHost* render_view_host = RenderViewHost::FromID(saved_data->render_process_id, saved_data->render_view_id);
 
-  if (render_view_host)
-    render_view_host->DesktopNotificationPostClick(notification_id);
+#warning "[M38] need proper impl. for desktop notification"
+  //if (render_view_host)
+  //  render_view_host->DesktopNotificationPostClick(notification_id);
 }
 
 void NotificationControllerEfl::SetPermissionForNotification(
@@ -79,13 +81,15 @@ void NotificationControllerEfl::SetPermissionForNotification(
   RenderViewHost* render_view_host =
     ToEWebView(notification->GetWebviewEvasObject())->web_contents_delegate()
         ->web_contents()->GetRenderViewHost();
-  if (render_view_host) {
-    render_view_host->DesktopNotificationPermissionRequestDone(
-                          notification->GetInternalCallbackContext());
-    if (isAllowed)
-      render_view_host->DesktopNotificationPostDisplay(
-                            notification->GetInternalCallbackContext());
-  }
+
+#warning "[M38] need proper impl. for desktop notification"
+//  if (render_view_host) {
+//    render_view_host->DesktopNotificationPermissionRequestDone(
+//                          notification->GetInternalCallbackContext());
+//    if (isAllowed)
+//      render_view_host->DesktopNotificationPostDisplay(
+//                            notification->GetInternalCallbackContext());
+//  }
 }
 
 bool NotificationControllerEfl::IsNotificationPresent(const base::string16& replaceid, uint64_t& notification_id) {
