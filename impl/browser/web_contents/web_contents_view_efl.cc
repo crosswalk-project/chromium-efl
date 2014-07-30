@@ -184,9 +184,8 @@ void WebContentsViewEfl::ShowPopupMenu(const gfx::Rect& bounds,
 }
 
 void WebContentsViewEfl::ShowContextMenu(RenderFrameHost* render_frame_host, const ContextMenuParams& params) {
-  WebContentsDelegateEfl* delegate = static_cast<WebContentsDelegateEfl*>(web_contents_->GetDelegate());
-  if (delegate)
-    delegate->ShowContextMenu(render_frame_host, params);
+  if (delegate_)
+    delegate_->ShowContextMenu(render_frame_host, params);
 }
 
 } // namespace content
