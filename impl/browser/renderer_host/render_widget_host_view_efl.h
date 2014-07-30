@@ -118,11 +118,11 @@ class RenderWidgetHostViewEfl
       scoped_ptr<RenderWidgetHostViewFrameSubscriber> subscriber) OVERRIDE;
   virtual void EndFrameSubscription() OVERRIDE;
 
+
 #ifdef TIZEN_EDGE_EFFECT
-  virtual void OnOverscrolled(
-      gfx::Vector2dF accumulated_overscroll,
-      gfx::Vector2dF latest_overscroll_delta) OVERRIDE;
+  virtual void DidOverscroll(const DidOverscrollParams& params) OVERRIDE;
 #endif
+
 #ifdef TIZEN_CONTENTS_DETECTION
   virtual void OnContentsDetected(const char*) OVERRIDE;
 #endif

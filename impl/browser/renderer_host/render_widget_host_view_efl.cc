@@ -25,6 +25,7 @@
 #include "content/browser/renderer_host/dip_util.h"
 #include "content/browser/gpu/gpu_process_host.h"
 #include "content/common/gpu/client/gl_helper.h"
+#include "content/common/input/did_overscroll_params.h"
 #include "content/public/browser/render_widget_host_view_frame_subscriber.h"
 #include "content/public/common/content_switches.h"
 #include "content/common/view_messages.h"
@@ -672,9 +673,10 @@ void RenderWidgetHostViewEfl::EndFrameSubscription() {
 }
 
 #ifdef TIZEN_EDGE_EFFECT
-void RenderWidgetHostViewEfl::OnOverscrolled(
-    gfx::Vector2dF accumulated_overscroll,
-    gfx::Vector2dF latest_overscroll_delta) {
+void RenderWidgetHostViewEfl::DidOverscroll(const DidOverscrollParams& params) {
+  const gfx::Vector2dF& accumulated_overscroll = params.accumulated_overscroll;
+  const gfx::Vector2dF& latest_overscroll_delta = params.latest_overscroll_delta;
+
   if (latest_overscroll_delta.x() < 0 && (int)accumulated_overscroll.x() < 0)
     web_view_->edgeEffect()->show("edge,left");
   if (latest_overscroll_delta.x() > 0 && (int)accumulated_overscroll.x() > 0)
