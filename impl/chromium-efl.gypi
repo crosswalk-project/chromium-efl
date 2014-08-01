@@ -132,7 +132,7 @@
   #        ['exclude', 'renderer/media/tizen/audio_decoder_tizen\\.(h|cc)$'],
         ],
       }],
-      ['building_for_tizen_mobile==1', {
+      ['building_for_tizen==1 and building_for_tizen_mobile==1', {
          'defines': [
            'OS_TIZEN_MOBILE=1',
            'TIZEN_CONTENTS_DETECTION=1',
@@ -156,7 +156,7 @@
            ],
          },
       }],
-      ['building_for_tizen_tv==1', {
+      ['building_for_tizen==1 and building_for_tizen_tv==1', {
        'defines': ['OS_TIZEN_TV=1'],
       }],
     ],
