@@ -24,6 +24,26 @@ sys.path.insert(0, script_dir)
 import gyp_helper
 sys.path.insert(0, os.path.join(chrome_src, 'tools', 'gyp', 'pylib'))
 import gyp
+import gyp.generator.ninja
+
+
+def gyp_ninja_override_CalculateVariables(default_variables, params):
+  """Calculate additional variables for use in the build (called by gyp)."""
+
+  default_variables.setdefault('OS', 'linux')
+  default_variables.setdefault('SHARED_LIB_SUFFIX', '.so')
+  default_variables.setdefault('SHARED_LIB_DIR',
+                               os.path.join('$!PRODUCT_DIR', 'lib'))
+  # Take into account the fact that toplevel_dir might not be equal to depth
+  toplevel_offset = ''
+  if 'options' in params:
+    options = params['options']
+    toplevel_offset = os.path.relpath(options.depth, options.toplevel_dir)
+  default_variables.setdefault('LIB_DIR',
+                               os.path.join('$!PRODUCT_DIR', 'obj', toplevel_offset))
+
+# Override CalculateVariables functions in gyp ninja generator instead of patching gyp.
+gyp.generator.ninja.CalculateVariables = gyp_ninja_override_CalculateVariables
 
 # Add paths so that pymod_do_main(...) can import files.
 sys.path.insert(1, os.path.join(chrome_src, 'tools', 'generate_shim_headers'))

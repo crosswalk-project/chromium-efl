@@ -29,7 +29,7 @@ if [ ! -e ${TOPDIR}/src/build/util/LASTCHANGE.blink ]; then
   ${TOPDIR}/src/build/util/lastchange.py -s ${TOPDIR}/src/third_party/WebKit -o ${TOPDIR}/src/build/util/LASTCHANGE.blink
 fi
 
-${TOPDIR}/src/build/gyp_chromium --depth=${TOPDIR}/src -I${TOPDIR}/impl/chromium-efl.gypi \
+${TOPDIR}/build/gyp_chromiumefl --depth=${TOPDIR}/src -I${TOPDIR}/impl/chromium-efl.gypi \
                                  --generator-output ${TOPDIR}/${GYP_GENERATOR_OUTPUT} \
                                  --format=ninja \
                                  --check \
