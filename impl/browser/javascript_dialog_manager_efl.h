@@ -6,7 +6,6 @@
 #include "content/public/browser/javascript_dialog_manager.h"
 #include "content/public/common/javascript_message_type.h"
 #include "eweb_view.h"
-#include "public/ewk_view.h"
 #include "url/gurl.h"
 
 #include "tizen_webview/public/tw_content_security_policy.h"

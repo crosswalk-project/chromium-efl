@@ -9,7 +9,6 @@
 #include "API/ewk_hit_test_private.h"
 #include "API/ewk_text_style_private.h"
 #include "cache_params_efl.h"
-#include "public/ewk_view.h"
 #include "navigation_policy_params.h"
 #include "renderer/print_pages_params.h"
 #include "third_party/WebKit/public/web/WebNavigationPolicy.h"

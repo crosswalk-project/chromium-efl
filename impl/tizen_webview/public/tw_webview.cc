@@ -8,16 +8,20 @@
 #include <base/logging.h>
 #include <base/memory/scoped_ptr.h>
 
+#include "browser/renderer_host/render_widget_host_view_efl.h"
+#include <tizen_webview/public/tw_webview_delegate.h>
+
 namespace {
+
 }
 
 namespace tizen_webview {
 
-WebView* WebView::Create(WebContext* wc, Evas* canvas, Evas_Smart* smart) {
+WebView* WebView::Create(WebContext* wc, Evas_Object* eo) {
   WebView* wv = new WebView();
   DCHECK(wv);
 
-  Impl* impl = Impl::Create(wv, wc, canvas, smart);
+  Impl* impl = new Impl(wv, wc, eo);
   if (!impl) {
     DLOG(ERROR) << "[tizen_webview] Cannot create webview";
     delete wv;
@@ -32,13 +36,16 @@ void WebView::Delete(WebView* wv) {
   delete wv;
 }
 
+void WebView::Initialize() {
+  impl_->Initialize();
+}
+
 WebView::WebView()
     : impl_(NULL) {
 }
 
 WebView::~WebView() {
-  Impl::Delete(impl_);
-  impl_ = NULL;
+  delete impl_;
 }
 
 Evas_Object* WebView::AsEvasObject() {
@@ -46,24 +53,33 @@ Evas_Object* WebView::AsEvasObject() {
 }
 
 WebView* WebView::FromEvasObject(Evas_Object* eo) {
-  DCHECK(ToEWebView(eo));
-  return ToEWebView(eo)->GetPublicWebView();
+  return WebViewDelegate::GetInstance()->GetWebViewFromEvasObject(eo);
 }
 
-WebView* WebView::FromEvasObjectChecked(Evas_Object* eo) {
-  if (!IsEWebViewObject(eo)) {
-    return NULL;
-  }
-  return ToEWebView(eo)->GetPublicWebView();
-}
-
-WebContext* WebView::context() {
+WebContext* WebView::GetWebContext() {
   return impl_->context();
 }
 
 Ewk_Settings* WebView::GetSettings() {
   return impl_->GetSettings();
 }
+
+SelectionController* WebView::GetSelectionController() {
+  return impl_->selection_controller_.get();
+}
+
+WebViewEvasEventHandler* WebView::GetEvasEventHandler() {
+  return impl_->GetEvasEventHandler();
+}
+
+ContextMenuController* WebView::GetContextMenuController() {
+  return impl_->context_menu_.get();
+}
+
+void WebView::ResetContextMenuController() {
+  return impl_->context_menu_.reset();
+}
+
 
 bool WebView::SetUserAgent(const char* userAgent) {
   return impl_->SetUserAgent(userAgent);
@@ -372,12 +388,6 @@ void WebView::UpdateWebKitPreferences() {
   return impl_->UpdateWebKitPreferences();
 }
 
-#ifdef TIZEN_EDGE_EFFECT
-void WebView::SetSettingsGetCallback(Ewk_View_Settings_Get callback, void* user_data) {
-  return impl_->SetSettingsGetCallback(callback, user_data);
-}
-#endif
-
 bool WebView::ExecuteJavaScript(const char* script, View_Script_Execute_Callback callback, void* userdata) {
   return impl_->ExecuteJavaScript(script, callback, userdata);
 }
@@ -440,6 +450,62 @@ int WebView::StartInspectorServer(int port ) {
 
 bool WebView::StopInspectorServer() {
   return impl_->StopInspectorServer();
+}
+
+bool WebView::HandleShow() {
+  return impl_->HandleShow();
+}
+
+bool WebView::HandleHide() {
+  return impl_->HandleHide();
+}
+
+bool WebView::HandleMove(int x, int y) {
+  return impl_->HandleMove(x, y);
+}
+
+bool WebView::HandleResize(int width, int height) {
+  return impl_->HandleResize(width, height);
+}
+
+bool WebView::HandleFocusIn() {
+  return impl_->HandleFocusIn();
+}
+
+bool WebView::HandleFocusOut() {
+  return impl_->HandleFocusOut();
+}
+
+bool WebView::HandleEvasEvent(const Evas_Event_Mouse_Down* event) {
+  return impl_->HandleEvasEvent(event);
+}
+
+bool WebView::HandleEvasEvent(const Evas_Event_Mouse_Up* event) {
+  return impl_->HandleEvasEvent(event);
+}
+
+bool WebView::HandleEvasEvent(const Evas_Event_Mouse_Move* event) {
+  return impl_->HandleEvasEvent(event);
+}
+
+bool WebView::HandleEvasEvent(const Evas_Event_Mouse_Wheel* event) {
+  return impl_->HandleEvasEvent(event);
+}
+
+bool WebView::HandleEvasEvent(const Evas_Event_Key_Down* event) {
+  return impl_->HandleEvasEvent(event);
+}
+
+bool WebView::HandleEvasEvent(const Evas_Event_Key_Up* event) {
+  return impl_->HandleEvasEvent(event);
+}
+
+bool WebView::HandleGesture(ui::GestureEvent* event) {
+  return impl_->HandleGesture(event);
+}
+
+bool WebView::HandleTouchEvent(ui::TouchEvent* event) {
+  return impl_->HandleTouchEvent(event);
 }
 
 } // namespace tizen_webview

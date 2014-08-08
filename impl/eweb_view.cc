@@ -62,6 +62,8 @@
 #include "tizen_webview/public/tw_touch_point.h"
 #include "tizen_webview/public/tw_web_context.h"
 #include "tizen_webview/public/tw_webview.h"
+#include "tizen_webview/public/tw_webview_delegate.h"
+#include "tizen_webview/public/tw_webview_evas_event_handler.h"
 
 #ifdef OS_TIZEN
 #include <vconf.h>
@@ -92,88 +94,37 @@ namespace content {
 
 namespace {
 
-#ifndef SET_EMPTY_STRING_IF_NULL
-static const char* EMPTY_STRING = "";
-#define SET_STRING_IF_NULL(variable, string) (variable) = ((variable) ? (variable) : (string))
-#define SET_EMPTY_STRING_IF_NULL(variable) SET_STRING_IF_NULL(variable, EMPTY_STRING)
-#endif
-
-static const char SmartClassName[] = "EWebView";
-
-inline EWebView* ToEWebView(const Ewk_View_Smart_Data* smartData) {
-  DCHECK(smartData);
-  DCHECK(smartData->priv);
-  return smartData->priv;
+inline void SetDefaultStringIfNull(const char*& variable,
+                                   const char* default_string) {
+  if (!variable) {
+    variable = default_string;
+  }
 }
 
-inline Ewk_View_Smart_Data* ToSmartData(const Evas_Object* evas_object) {
-  DCHECK(evas_object);
-  DCHECK(IsEWebViewObject(evas_object));
-  return static_cast<Ewk_View_Smart_Data*>(evas_object_smart_data_get(evas_object));
-}
-
-static inline bool isHardwareBackKey(const Evas_Event_Key_Down *event) {
 #ifdef OS_TIZEN
-  return (strcmp(event->key, "XF86Stop") == 0);
-#else
-  return (strcmp(event->key, "Escape") == 0);
-#endif
-}
-
-void SmartDataChanged(Ewk_View_Smart_Data* d) {
-  DCHECK(d);
-  if (d->changed.any)
-    return;
-  d->changed.any = true;
-  evas_object_smart_changed(d->self);
-}
-
-template <Evas_Callback_Type EventType>
-class EWebEventHandler {
- public:
-  static void Subscribe(Evas_Object* evas_object) {
-    evas_object_event_callback_add(evas_object, EventType, func_ptr(), ToSmartData(evas_object));
+bool GetTiltZoomEnabled()
+{
+  int motion_enabled = 0;
+  vconf_get_bool(VCONFKEY_SETAPPL_MOTION_ACTIVATION, &motion_enabled);
+  if (motion_enabled) {
+    int tilt_enabled = 0;
+    vconf_get_bool(VCONFKEY_SETAPPL_USE_TILT, &tilt_enabled);
+    //BROWSER_LOGD("******* motion_enabled=[%d], tilt_enabled=[%d]", motion_enabled, tilt_enabled);
+    if (tilt_enabled) {
+      return true;
+    }
   }
-  static void Unsubscribe(Evas_Object* evas_object) {
-    evas_object_event_callback_del(evas_object, EventType, func_ptr());
-  }
-  static void HandleEvent(Ewk_View_Smart_Data*, Evas*, Evas_Object*, void* event_info) {}
-
- private:
-  // Convenient automatic cast of the data pointer.
-  typedef void (*HandleEventFuncPtr)(Ewk_View_Smart_Data*, Evas*, Evas_Object*, void* event_info);
-  typedef void (*CallbackFuncPtr)(void*, Evas*, Evas_Object*, void* event_info);
-  static CallbackFuncPtr func_ptr()
-  { return reinterpret_cast<CallbackFuncPtr>(&HandleEvent); }
-};
-
-template <>
-void EWebEventHandler<EVAS_CALLBACK_FOCUS_IN>::HandleEvent(Ewk_View_Smart_Data* d, Evas*, Evas_Object*, void*) {
-  if (d->api->focus_in)
-    d->api->focus_in(d);
+  return false;
 }
+#endif // OS_TIZEN
 
-template <>
-void EWebEventHandler<EVAS_CALLBACK_FOCUS_OUT>::HandleEvent(Ewk_View_Smart_Data* d, Evas*, Evas_Object*, void*) {
-  if (d->api->focus_out)
-    d->api->focus_out(d);
+void GetEinaRectFromGfxRect(const gfx::Rect& gfx_rect, Eina_Rectangle* eina_rect)
+{
+  eina_rect->x = gfx_rect.x();
+  eina_rect->y = gfx_rect.y();
+  eina_rect->w = gfx_rect.width();
+  eina_rect->h = gfx_rect.height();
 }
-
-#define DEFINE_EVENT_HANDLER(EVENT_TYPE_ID, EVENT_TYPE, handler_func_ptr) \
-  template <> \
-  void EWebEventHandler< EVENT_TYPE_ID >::HandleEvent(Ewk_View_Smart_Data* d, Evas* e, Evas_Object*, void* event) \
-  { \
-    if (d->api->handler_func_ptr) \
-      d->api->handler_func_ptr(d, static_cast<EVENT_TYPE*>(event)); \
-  } \
-  typedef int ForceSemicolon
-
-DEFINE_EVENT_HANDLER(EVAS_CALLBACK_MOUSE_DOWN, Evas_Event_Mouse_Down, mouse_down);
-DEFINE_EVENT_HANDLER(EVAS_CALLBACK_MOUSE_UP, Evas_Event_Mouse_Up, mouse_up);
-DEFINE_EVENT_HANDLER(EVAS_CALLBACK_MOUSE_WHEEL, Evas_Event_Mouse_Wheel, mouse_wheel);
-DEFINE_EVENT_HANDLER(EVAS_CALLBACK_MOUSE_MOVE, Evas_Event_Mouse_Move, mouse_move);
-DEFINE_EVENT_HANDLER(EVAS_CALLBACK_KEY_DOWN, Evas_Event_Key_Down, key_down);
-DEFINE_EVENT_HANDLER(EVAS_CALLBACK_KEY_UP, Evas_Event_Key_Up, key_up);
 
 } // namespace
 
@@ -225,101 +176,17 @@ private:
   EWebView* web_view_;
 };
 
-Evas_Smart_Class EWebView::parent_smart_class_ = EVAS_SMART_CLASS_INIT_NULL;
-
 WebContents* EWebView::contents_for_new_window_ = NULL;
 
 int EWebView::find_request_id_counter_ = 0;
 
-bool EWebView::InitSmartClassInterface(Ewk_View_Smart_Class& api) {
-  if (api.version != EWK_VIEW_SMART_CLASS_VERSION) {
-    EINA_LOG_CRIT("Ewk_View_Smart_Class %p is version %lu while %lu was expected.",
-                  &api, api.version, EWK_VIEW_SMART_CLASS_VERSION);
-    return false;
+EWebView* EWebView::FromEvasObject(Evas_Object* eo) {
+  WebView *wv = WebView::FromEvasObject(eo);
+  if (!wv) {
+    DLOG(ERROR) << "Trying to get WebView from non-WebView Evas_Object";
+    return NULL;
   }
-
-  if (!parent_smart_class_.add)
-    evas_object_smart_clipped_smart_set(&parent_smart_class_);
-
-  evas_object_smart_clipped_smart_set(&api.sc);
-
-  // Set Evas_Smart_Class callbacks.
-  api.sc.add = &handleEvasObjectAdd;
-  api.sc.del = &handleEvasObjectDelete;
-  api.sc.move = &handleEvasObjectMove;
-  api.sc.resize = &handleEvasObjectResize;
-  api.sc.show = &handleEvasObjectShow;
-  api.sc.hide = &handleEvasObjectHide;
-  api.sc.calculate = &handleEvasObjectCalculate;
-  api.sc.color_set = &handleEvasObjectColorSet;
-
-  // Set Ewk_View_Smart_Class callbacks.
-  api.focus_in = &handleFocusIn;
-  api.focus_out = &handleFocusOut;
-  api.mouse_down = &handleMouseDown;
-  api.mouse_up = &handleMouseUp;
-  api.mouse_wheel = &handleMouseWheel;
-  api.mouse_move = &handleMouseMove;
-  api.key_down = &handleKeyDown;
-  api.key_up = &handleKeyUp;
-  api.text_selection_down = &handleTextSelectionDown;
-  api.text_selection_up = &handleTextSelectionUp;
-  api.exceeded_database_quota = &handleExceededDatabaseQuota;
-
-  // Type identifier.
-  api.sc.data = SmartClassName;
-
-  return true;
-}
-
-static Evas_Smart* DefaultSmartClassInstance() {
-  static Ewk_View_Smart_Class api = EWK_VIEW_SMART_CLASS_INIT_NAME_VERSION(SmartClassName);
-  static Evas_Smart* smart = 0;
-  if (!smart) {
-    EWebView::InitSmartClassInterface(api);
-    smart = evas_smart_class_new(&api.sc);
-  }
-
-  return smart;
-}
-
-static void GetEinaRectFromGfxRect(const gfx::Rect& gfx_rect, Eina_Rectangle* eina_rect) {
-  eina_rect->x = gfx_rect.x();
-  eina_rect->y = gfx_rect.y();
-  eina_rect->w = gfx_rect.width();
-  eina_rect->h = gfx_rect.height();
-}
-
-EWebView* EWebView::Create(tizen_webview::WebView* owner, tizen_webview::WebContext* context, Evas* canvas, Evas_Smart* smart) {
-  DCHECK(owner);
-  EINA_SAFETY_ON_NULL_RETURN_VAL(canvas, 0);
-
-  Evas_Object* evasObject = evas_object_smart_add(canvas, smart ? smart : DefaultSmartClassInstance());
-  EINA_SAFETY_ON_NULL_RETURN_VAL(evasObject, 0);
-
-  Ewk_View_Smart_Data* smartData = ToSmartData(evasObject);
-  if (!smartData) {
-    evas_object_del(evasObject);
-    return 0;
-  }
-
-  DCHECK(!smartData->priv);
-  EWebView* ewv = new EWebView(context, evasObject);
-  smartData->priv = ewv;
-  ewv->SetPublicWebView(owner);
-  return ewv;
-}
-
-void EWebView::Delete(EWebView* ewv) {
-  delete ewv;
-}
-
-void EWebView::SetPublicWebView(tizen_webview::WebView* wv) {
-  DCHECK(public_webview_ == NULL);
-  if (public_webview_ != NULL) {
-     DLOG(ERROR) << "WebView is already set. To reset WebView is prohibited";
-  }
-  public_webview_ = wv;
+  return wv->GetImpl();
 }
 
 tizen_webview::WebView* EWebView::GetPublicWebView() {
@@ -330,10 +197,9 @@ tizen_webview::WebView* EWebView::GetPublicWebView() {
   return public_webview_;
 }
 
-Evas_Object* EWebView::GetContentImageObject() const {
-  Ewk_View_Smart_Data* smart_data = ToSmartData(evas_object_);
-  DCHECK(smart_data);
-  return smart_data->image;
+Evas_Object* EWebView::GetContentImageObject() const
+{
+  return WebViewDelegate::GetInstance()->GetContentImageEvasObject(evas_object_);
 }
 
 RenderWidgetHostViewEfl* EWebView::rwhv() const {
@@ -347,30 +213,43 @@ void EWebView::set_renderer_crashed() {
 #endif
 }
 
-EWebView::EWebView(tizen_webview::WebContext* context, Evas_Object* object)
-    : context_(context),
+EWebView::EWebView(tizen_webview::WebView* owner, tizen_webview::WebContext* context, Evas_Object* object)
+    : public_webview_(owner),
+      evas_event_handler_(NULL),
+      context_(context),
       evas_object_(object),
       touch_events_enabled_(false),
       mouse_events_enabled_(false),
-      gesture_recognizer_(ui::GestureRecognizer::Create()),
       text_zoom_factor_(1.0),
-      selection_controller_(new content::SelectionControllerEfl(this)),
       current_find_request_id_(find_request_id_counter_++),
       progress_(0.0),
       hit_test_completion_(false, false),
       page_scale_factor_(1.0),
       min_page_scale_factor_(-1.0),
       max_page_scale_factor_(-1.0),
-      inspector_server_(NULL)
-#ifdef TIZEN_EDGE_EFFECT
-      , edge_effect_(EdgeEffect::create(object))
-#endif
-      , message_filter_(NULL)
+      inspector_server_(NULL),
+      message_filter_(NULL),
 #ifndef NDEBUG
-      ,renderer_crashed_(false)
+      renderer_crashed_(false),
 #endif
-      , public_webview_(NULL)
-{
+      is_initialized_(false) {
+}
+
+void EWebView::Initialize() {
+  if (is_initialized_) {
+    return;
+  }
+
+  evas_event_handler_ = new tizen_webview::WebViewEvasEventHandler(public_webview_);
+  gesture_recognizer_.reset(ui::GestureRecognizer::Create());
+  selection_controller_.reset(new content::SelectionControllerEfl(this));
+#ifdef TIZEN_EDGE_EFFECT
+  edge_effect_ = EdgeEffect::create(evas_object_);
+#endif
+#if defined(TIZEN_POPUPZOOMER_SUPPORT)
+  disambiguation_popup_controller_.reset(new content::DisambiguationPopupControllerEfl(this));
+#endif
+
   if (contents_for_new_window_) {
     web_contents_delegate_.reset(new WebContentsDelegateEfl(this, contents_for_new_window_));
 
@@ -392,19 +271,20 @@ EWebView::EWebView(tizen_webview::WebContext* context, Evas_Object* object)
 
   gesture_recognizer_->AddGestureEventHelper(this);
 
-  EWebEventHandler<EVAS_CALLBACK_FOCUS_IN>::Subscribe(object);
-  EWebEventHandler<EVAS_CALLBACK_FOCUS_OUT>::Subscribe(object);
-  EWebEventHandler<EVAS_CALLBACK_KEY_DOWN>::Subscribe(object);
-  EWebEventHandler<EVAS_CALLBACK_KEY_UP>::Subscribe(object);
+  // Activate Event handler
+  evas_event_handler_->BindFocusEventHandlers();
+  evas_event_handler_->BindKeyEventHandlers();
 
 #if defined(OS_TIZEN)
   bool enable = GetTiltZoomEnabled();
   if (enable) {
-    SubscribeMotionEvents();
+    evas_event_handler_->BindMotionEventHandlers();
   } else {
-    UnsubscribeMotionEvents();
+    evas_event_handler_->UnbindMotionEventHandlers();
   }
-  evas_object_smart_callback_call(evas_object(), "motion,enable", (void*)&enable);
+  //evas_object_smart_callback_call(evas_object(), "motion,enable", (void*)&enable);
+  wkext_motion_tilt_enable_set(evas_object_, static_cast<int>(enable),
+      g_default_tilt_motion_sensitivity);
 #endif
 
   CommandLine *cmdline = CommandLine::ForCurrentProcess();
@@ -418,23 +298,22 @@ EWebView::EWebView(tizen_webview::WebContext* context, Evas_Object* object)
   popupPicker_ = 0;
 #endif
   //allow this object and its children to get a focus
-  elm_object_tree_focus_allow_set (object, EINA_TRUE);
+  elm_object_tree_focus_allow_set (evas_object_, EINA_TRUE);
+  is_initialized_ = true;
 }
 
-EWebView::~EWebView() {
+EWebView::~EWebView()
+{
+  if (!is_initialized_) {
+    return;
+  }
   StopInspectorServer(); // inside is check to Inspector is running
-  EWebEventHandler<EVAS_CALLBACK_FOCUS_IN>::Unsubscribe(evas_object());
-  EWebEventHandler<EVAS_CALLBACK_FOCUS_OUT>::Unsubscribe(evas_object());
-  EWebEventHandler<EVAS_CALLBACK_KEY_DOWN>::Unsubscribe(evas_object());
-  EWebEventHandler<EVAS_CALLBACK_KEY_UP>::Unsubscribe(evas_object());
+  GetEvasEventHandler()->UnbindFocusEventHandlers();
+  GetEvasEventHandler()->UnbindKeyEventHandlers();
+  GetEvasEventHandler()->UnbindTouchEventHandlers();
+  GetEvasEventHandler()->UnbindMouseEventHandlers();
 
-  if (touch_events_enabled_)
-    UnsubscribeTouchEvents();
-
-  if (mouse_events_enabled_)
-    UnsubscribeMouseEvents();
   context_menu_.reset();
-
   mhtml_callback_map_.Clear();
 
 #if defined(OS_TIZEN)
@@ -445,62 +324,16 @@ EWebView::~EWebView() {
   if (popupPicker_)
     popup_picker_del(popupPicker_);
 #endif
+//  evas_object_del(evas_object());
+  delete evas_event_handler_;
   public_webview_ = NULL;
 }
 
-void EWebView::SubscribeMouseEvents() {
-  EWebEventHandler<EVAS_CALLBACK_MOUSE_DOWN>::Subscribe(evas_object());
-  EWebEventHandler<EVAS_CALLBACK_MOUSE_UP>::Subscribe(evas_object());
-  EWebEventHandler<EVAS_CALLBACK_MOUSE_WHEEL>::Subscribe(evas_object());
-  EWebEventHandler<EVAS_CALLBACK_MOUSE_MOVE>::Subscribe(evas_object());
-}
-
-void EWebView::UnsubscribeMouseEvents() {
-  EWebEventHandler<EVAS_CALLBACK_MOUSE_DOWN>::Unsubscribe(evas_object());
-  EWebEventHandler<EVAS_CALLBACK_MOUSE_UP>::Unsubscribe(evas_object());
-  EWebEventHandler<EVAS_CALLBACK_MOUSE_WHEEL>::Unsubscribe(evas_object());
-  EWebEventHandler<EVAS_CALLBACK_MOUSE_MOVE>::Unsubscribe(evas_object());
-}
-
-void EWebView::SubscribeTouchEvents() {
-  Ewk_View_Smart_Data* sd = ToSmartData(evas_object_);
-  evas_object_event_callback_add(evas_object(), EVAS_CALLBACK_MOUSE_DOWN, OnTouchDown, sd);
-  evas_object_event_callback_add(evas_object(), EVAS_CALLBACK_MOUSE_UP, OnTouchUp, sd);
-  evas_object_event_callback_add(evas_object(), EVAS_CALLBACK_MOUSE_MOVE, OnTouchMove, sd);
-  evas_object_event_callback_add(evas_object(), EVAS_CALLBACK_MULTI_DOWN, OnTouchDown, sd);
-  evas_object_event_callback_add(evas_object(), EVAS_CALLBACK_MULTI_UP, OnTouchUp, sd);
-  evas_object_event_callback_add(evas_object(), EVAS_CALLBACK_MULTI_MOVE, OnTouchMove, sd);
-}
-
-void EWebView::UnsubscribeTouchEvents() {
-  evas_object_event_callback_del(evas_object(), EVAS_CALLBACK_MOUSE_DOWN, OnTouchDown);
-  evas_object_event_callback_del(evas_object(), EVAS_CALLBACK_MOUSE_UP, OnTouchUp);
-  evas_object_event_callback_del(evas_object(), EVAS_CALLBACK_MOUSE_MOVE, OnTouchMove);
-  evas_object_event_callback_del(evas_object(), EVAS_CALLBACK_MULTI_DOWN, OnTouchDown);
-  evas_object_event_callback_del(evas_object(), EVAS_CALLBACK_MULTI_UP, OnTouchUp);
-  evas_object_event_callback_del(evas_object(), EVAS_CALLBACK_MULTI_MOVE, OnTouchMove);
-}
-
-#ifdef OS_TIZEN
-void EWebView::SubscribeMotionEvents()
+void EWebView::SetFocus(Eina_Bool focus)
 {
-  Ewk_View_Smart_Data* sd = ToSmartData(evas_object_);
-  evas_object_smart_callback_add(evas_object(), "motion,enable", OnMotionEnable, sd);
-  evas_object_smart_callback_add(evas_object(), "motion,move", OnMotionMove,sd);
-  evas_object_smart_callback_add(evas_object(), "motion,zoom", OnMotionZoom,sd);
-}
-
-void EWebView::UnsubscribeMotionEvents()
-{
-  evas_object_smart_callback_del(evas_object(), "motion,enable", OnMotionEnable);
-  evas_object_smart_callback_del(evas_object(), "motion,move", OnMotionMove);
-  evas_object_smart_callback_del(evas_object(), "motion,zoom", OnMotionZoom);
-}
-#endif
-
-void EWebView::SetFocus(Eina_Bool focus) {
-  if (HasFocus() != focus)
+  if (HasFocus() != focus) {
     elm_object_focus_set(evas_object_, focus);
+  }
 }
 
 void EWebView::CreateNewWindow(WebContents* new_contents) {
@@ -726,215 +559,8 @@ void EWebView::InvokePolicyNavigationCallback(RenderViewHost* rvh,
   *handled = policy_decision_->GetImpl()->GetNavigationPolicyHandler()->GetDecision() == NavigationPolicyHandlerEfl::Handled;
 }
 
-void EWebView::handleEvasObjectAdd(Evas_Object* evas_object) {
-  const Evas_Smart* smart = evas_object_smart_smart_get(evas_object);
-  const Evas_Smart_Class* smart_class = evas_smart_class_get(smart);
-  const Ewk_View_Smart_Class* api = reinterpret_cast<const Ewk_View_Smart_Class*>(smart_class);
-  DCHECK(api);
-
-  Ewk_View_Smart_Data* d = ToSmartData(evas_object);
-
-  if (!d) {
-    // Allocating with 'calloc' as the API contract is that it should be deleted with 'free()'.
-    d = static_cast<Ewk_View_Smart_Data*>(calloc(1, sizeof(Ewk_View_Smart_Data)));
-    evas_object_smart_data_set(evas_object, d);
-  }
-
-  d->self = evas_object;
-  d->api = api;
-
-  parent_smart_class_.add(evas_object);
-
-  d->priv = 0; // Will be initialized later.
-
-  // Create evas_object_image to draw web contents.
-  d->image = evas_object_image_add(d->base.evas);
-  evas_object_image_alpha_set(d->image, false);
-  evas_object_image_filled_set(d->image, true);
-  evas_object_smart_member_add(d->image, evas_object);
-  evas_object_show(d->image);
-}
-
-void EWebView::handleEvasObjectDelete(Evas_Object* evas_object) {
-  Ewk_View_Smart_Data* smart_data = ToSmartData(evas_object);
-  if (smart_data) {
-    DCHECK(smart_data->priv);
-    delete smart_data->priv;
-  }
-
-  parent_smart_class_.del(evas_object);
-}
-
-void EWebView::handleEvasObjectShow(Evas_Object* o) {
-  Ewk_View_Smart_Data* d = ToSmartData(o);
-  // WebKit bails here if widget accelerated compositing is used.
-  // TODO: consider this when we will have AC support.
-  if (evas_object_clipees_get(d->base.clipper))
-    evas_object_show(d->base.clipper);
-  evas_object_show(d->image);
-
-  ToEWebView(d)->rwhv()->HandleShow();
-}
-
-void EWebView::handleEvasObjectHide(Evas_Object* o) {
-  Ewk_View_Smart_Data* d = ToSmartData(o);
-  evas_object_hide(d->base.clipper);
-  evas_object_hide(d->image);
-  // Deleting view by app results in calling hide method.
-  // We assert that, RWHV is null only when renderer has crashed.
-  if (!ToEWebView(d)->rwhv()) {
-    // DLOG_ASSERT is used because it is controlled by NDEBUG
-    DLOG_ASSERT(ToEWebView(d)->renderer_crashed_);
-    return;
-  }
-  ToEWebView(d)->rwhv()->HandleHide();
-}
-
-void EWebView::handleEvasObjectMove(Evas_Object* o, Evas_Coord x, Evas_Coord y) {
-  Ewk_View_Smart_Data* d = ToSmartData(o);
-  evas_object_move(d->image, x, y);
-
-  ToEWebView(d)->rwhv()->HandleMove(x, y);
-
-  SmartDataChanged(d);
-}
-
-void EWebView::handleEvasObjectResize(Evas_Object* o, Evas_Coord width, Evas_Coord height) {
-  Ewk_View_Smart_Data* d = ToSmartData(o);
-  evas_object_resize(d->image, width, height);
-  evas_object_image_size_set(d->image, width, height);
-  evas_object_image_fill_set(d->image, 0, 0, width, height);
-  d->view.w = width;
-  d->view.h = height;
-  ToEWebView(d)->rwhv()->HandleResize(width, height);
-
-  SmartDataChanged(d);
-}
-
-void EWebView::handleEvasObjectCalculate(Evas_Object* o) {
-  Ewk_View_Smart_Data* d = ToSmartData(o);
-  Evas_Coord x, y, width, height;
-  evas_object_geometry_get(o, &x, &y, &width, &height);
-  d->view.x = x;
-  d->view.y = y;
-  d->view.w = width;
-  d->view.h = height;
-}
-
-void EWebView::handleEvasObjectColorSet(Evas_Object*, int red, int green, int blue, int alpha) {
-  // FIXME: implement.
-}
-
-Eina_Bool EWebView::handleFocusIn(Ewk_View_Smart_Data* d) {
-  DCHECK(d);
-  RenderWidgetHostViewEfl* rwhv = ToEWebView(d)->rwhv();
-  if (rwhv) {
-    rwhv->HandleFocusIn();
-    return EINA_TRUE;
-  }
-  return EINA_FALSE;
-}
-
-Eina_Bool EWebView::handleFocusOut(Ewk_View_Smart_Data* d) {
-  // Deleting view by app results in calling focus out method.
-  // We assert that, RWHV is null only when renderer has crashed.
-  if (!ToEWebView(d)->rwhv()) {
-    // DLOG_ASSERT is used because it is controlled by NDEBUG
-   DLOG_ASSERT(ToEWebView(d)->renderer_crashed_);
-   return false;
-  }
-
-  ToEWebView(d)->rwhv()->HandleFocusOut();
-  return true;
-}
-
-Eina_Bool EWebView::handleMouseWheel(Ewk_View_Smart_Data* d, const Evas_Event_Mouse_Wheel* event) {
-  ToEWebView(d)->rwhv()->HandleEvasEvent(event);
-  return true;
-}
-
-Eina_Bool EWebView::handleMouseDown(Ewk_View_Smart_Data* d, const Evas_Event_Mouse_Down* event) {
-  ToEWebView(d)->SetFocus(EINA_TRUE);
-  ToEWebView(d)->rwhv()->HandleEvasEvent(event);
-  return true;
-}
-
-Eina_Bool EWebView::handleMouseUp(Ewk_View_Smart_Data* d, const Evas_Event_Mouse_Up* event) {
-  ToEWebView(d)->rwhv()->HandleEvasEvent(event);
-  return true;
-}
-
-Eina_Bool EWebView::handleMouseMove(Ewk_View_Smart_Data* d, const Evas_Event_Mouse_Move* event) {
-  ToEWebView(d)->rwhv()->HandleEvasEvent(event);
-  return true;
-}
-
-Eina_Bool EWebView::handleKeyDown(Ewk_View_Smart_Data* d, const Evas_Event_Key_Down* event) {
-  bool handled = false;
-  EWebView *webview = ToEWebView(d);
-  if (isHardwareBackKey(event)) {
-    if (webview->context_menu_) {
-      DVLOG(1) << "Hiding context menu due to back key press";
-      webview->context_menu_.reset();
-      handled = true;
-    }
-    if (webview->selection_controller_->IsAnyHandleVisible()) {
-      DVLOG(1) << "Clearing text selection due to back key press";
-      webview->ClearSelection();
-      handled = true;
-    }
-#ifndef OS_TIZEN_TV
-    if (!handled)
-      webview->GoBack();
-#endif
-    return EINA_TRUE;
-  }
-  webview->rwhv()->HandleEvasEvent(event);
-  return EINA_TRUE;
-}
-
-Eina_Bool EWebView::handleKeyUp(Ewk_View_Smart_Data* d, const Evas_Event_Key_Up* event) {
-  ToEWebView(d)->rwhv()->HandleEvasEvent(event);
-  return true;
-}
-
-Eina_Bool EWebView::handleTextSelectionDown(Ewk_View_Smart_Data* d, int x, int y) {
-  EWebView* webview = ToEWebView(d);
-
-  if (webview && webview->selection_controller_.get())
-    return webview->selection_controller_->TextSelectionDown(x, y);
-
-  return EINA_FALSE;
-}
-
-Eina_Bool EWebView::handleTextSelectionUp(Ewk_View_Smart_Data* d, int x, int y) {
-  EWebView* webview = ToEWebView(d);
-
-  if (webview && webview->selection_controller_.get())
-    return webview->selection_controller_->TextSelectionUp(x, y);
-
-  return EINA_FALSE;
-}
-
-unsigned long long EWebView::handleExceededDatabaseQuota(Ewk_View_Smart_Data *sd, const char *databaseName, const char *displayName, unsigned long long currentQuota, unsigned long long currentOriginUsage, unsigned long long currentDatabaseUsage, unsigned long long expectedUsage) {
-  // Chromium does not support quota per origin right now, this API can't be implemented
-  NOTIMPLEMENTED();
-  return EINA_FALSE;
-}
-
-void EWebView::OnTouchDown(void* sd, Evas*, Evas_Object*, void*) {
-  ToEWebView(static_cast<Ewk_View_Smart_Data*>(sd))->HandleTouchEvents(TW_TOUCH_START);
-}
-
-void EWebView::OnTouchUp(void* sd, Evas*, Evas_Object*, void*) {
-  ToEWebView(static_cast<Ewk_View_Smart_Data*>(sd))->HandleTouchEvents(TW_TOUCH_END);
-}
-
-void EWebView::OnTouchMove(void* sd, Evas*, Evas_Object*, void*) {
-  ToEWebView(static_cast<Ewk_View_Smart_Data*>(sd))->HandleTouchEvents(TW_TOUCH_MOVE);
-}
-
-void EWebView::HandleTouchEvents(tizen_webview::Touch_Event_Type type, const Eina_List *points, const Evas_Modifier *modifiers) {
+void EWebView::HandleTouchEvents(tizen_webview::Touch_Event_Type type, const Eina_List *points, const Evas_Modifier *modifiers)
+{
   const Eina_List* l;
   void* data;
   EINA_LIST_FOREACH(points, l, data) {
@@ -964,73 +590,8 @@ void EWebView::ProcessAckedTouchEvent(const TouchEventWithLatencyInfo& touch,
   }
 }
 
-void EWebView::HandleTouchEvents(tizen_webview::Touch_Event_Type type) {
-  // These constants are used to map multi touch's touch id(s).
-  // The poorly-written Tizen API document says:
-  //  "0 for Mouse Event and device id for Multi Event."
-  //  "The point which comes from Mouse Event has id 0 and"
-  //  "The point which comes from Multi Event has id that is same as Multi Event's device id."
-  static const int kMultiTouchIDMapPart0SingleIndex = 0; // This constant is to map touch id 0 to 0, or [0] -> [0]
-  static const int kMultiTouchIDMapPart1StartIndex = 13; // This constant is to map [13, 23] -> [1, 11]
-  static const int kMultiTouchIDMapPart1EndIndex = 23; // This constant is to map [13, 23] -> [1, 11]
-  static const int kMultiTouchIDMapPart1DiffValue = 12; // 13 - 1 = 12, 23 - 11 = 12
-
-  Ewk_View_Smart_Data* sd = ToSmartData(evas_object_);
-
-  unsigned count = evas_touch_point_list_count(sd->base.evas);
-  if (!count)
-    return;
-
-  Evas_Coord_Point pt;
-  Eina_List* points = 0;
-  for (unsigned i = 0; i < count; ++i) {
-    tizen_webview::Touch_Point* point = new tizen_webview::Touch_Point;
-    // evas_touch_point_list_nth_id_get returns [0] or [13, )
-    // Multi touch's touch id [[0], [13, 23]] should be mapped to [[0], [1, 11]]
-    // Internet Blame URL:
-    //   https://groups.google.com/d/msg/mailing-enlightenment-devel/-R-ezCzpkTk/HJ0KBCdz6CgJ
-    point->id = evas_touch_point_list_nth_id_get(sd->base.evas, i);
-    DCHECK(point->id == kMultiTouchIDMapPart0SingleIndex || point->id >= kMultiTouchIDMapPart1StartIndex);
-    if (point->id >= kMultiTouchIDMapPart1StartIndex && point->id <= kMultiTouchIDMapPart1EndIndex) {
-      point->id -= kMultiTouchIDMapPart1DiffValue;
-    } else if (point->id > kMultiTouchIDMapPart1EndIndex) {
-      LOG(ERROR) << "evas_touch_point_list_nth_id_get() returned a value greater than ("
-                 << kMultiTouchIDMapPart1EndIndex << "). It is ignored.";
-    }
-    evas_touch_point_list_nth_xy_get(sd->base.evas, i, &point->x, &point->y);
-    pt.x = point->x;
-    pt.y = point->y;
-    point->state = evas_touch_point_list_nth_state_get(sd->base.evas, i);
-    if (type == TW_TOUCH_CANCEL)
-      point->state = EVAS_TOUCH_POINT_CANCEL;
-    points = eina_list_append(points, point);
-  }
-
-  if (type == TW_TOUCH_START)
-    SetFocus(EINA_TRUE);
-
-  HandleTouchEvents(type, points, evas_key_modifier_get(sd->base.evas));
-
-#ifdef OS_TIZEN
-  if (count >=2) {
-    if (type == TW_TOUCH_START) {
-      LOG(ERROR) << " wkext_motion_tilt_start";
-      wkext_motion_tilt_start(evas_object(), &pt);
-    } else if (type == TW_TOUCH_END) {
-      wkext_motion_tilt_stop();
-    }
-  }
-#else
-  // Silence unused variable warning
-  (void)(pt);
-#endif
-
-  void* data;
-  EINA_LIST_FREE(points, data)
-  delete static_cast<Touch_Point*>(data);
-}
-
-bool EWebView::CanDispatchToConsumer(ui::GestureConsumer* consumer) {
+bool EWebView::CanDispatchToConsumer(ui::GestureConsumer* consumer)
+{
   return true;
 }
 
@@ -1126,10 +687,13 @@ void EWebView::SetTouchEventsEnabled(bool enabled) {
   touch_events_enabled_ = enabled;
 
   if (enabled) {
-    UnsubscribeMouseEvents();
-    SubscribeTouchEvents();
-  } else
-    UnsubscribeTouchEvents();
+    GetEvasEventHandler()->UnbindMouseEventHandlers();
+    GetEvasEventHandler()->BindTouchEventHandlers();
+  } else {
+    // TODO(sns.park): Why not call BindMouseEventHandlers()?
+    // I think it should be called to be symmetric with "enabled" case
+    GetEvasEventHandler()->UnbindTouchEventHandlers();
+  }
 }
 
 bool EWebView::MouseEventsEnabled() const {
@@ -1143,10 +707,13 @@ void EWebView::SetMouseEventsEnabled(bool enabled) {
   mouse_events_enabled_ = enabled;
 
   if (enabled) {
-    UnsubscribeTouchEvents();
-    SubscribeMouseEvents();
-  } else
-    UnsubscribeMouseEvents();
+    GetEvasEventHandler()->UnbindTouchEventHandlers();
+    GetEvasEventHandler()->BindMouseEventHandlers();
+  } else {
+    // TODO(sns.park): Why not call BindTouchEventHandlers()?
+    // I think it should be called to be symmetric with "enabled" case
+    GetEvasEventHandler()->UnbindMouseEventHandlers();
+  }
 }
 
 namespace {
@@ -1274,15 +841,12 @@ void EWebView::LoadPlainTextString(const char* plain_text) {
   LoadData(plain_text, std::string::npos, "text/plain", NULL, NULL, NULL);
 }
 
-void EWebView::LoadData(const char* data, size_t size, const char* mime_type, const char* encoding, const char* base_uri, const char* unreachable_uri) {
-  SET_STRING_IF_NULL(mime_type, "text/html");
-  SET_STRING_IF_NULL(encoding, "utf-8");
-
-  if (!base_uri) {
-    // Webkit2 compatible
-    base_uri = "about:blank";
-  }
-  SET_EMPTY_STRING_IF_NULL(unreachable_uri);
+void EWebView::LoadData(const char* data, size_t size, const char* mime_type, const char* encoding, const char* base_uri, const char* unreachable_uri)
+{
+  SetDefaultStringIfNull(mime_type, "text/html");
+  SetDefaultStringIfNull(encoding, "utf-8");
+  SetDefaultStringIfNull(base_uri, "about:blank");  // Webkit2 compatible
+  SetDefaultStringIfNull(unreachable_uri, "");
 
   std::string str_data = data;
 
@@ -1425,7 +989,7 @@ Eina_Bool EWebView::DidSelectPopupMenuItem(int selectedindex) {
   //When user select empty space then no index is selected, so selectedIndex value is -1
   //In that case we should call valueChanged() with -1 index.That in turn call popupDidHide()
   //in didChangeSelectedIndex() for reseting the value of m_popupIsVisible in RenderMenuList.
-  if (selectedindex != -1 && selectedindex >= eina_list_count(popupMenuItems_))
+  if (selectedindex != -1 && selectedindex >= (int)eina_list_count(popupMenuItems_))
     return false;
 
 #if !defined(EWK_BRINGUP)
@@ -1462,9 +1026,12 @@ void EWebView::ShowContextMenu(const content::ContextMenuParams& params, content
     convertedParams.y = convertedPoint.y();
   }
 
-  context_menu_.reset(new content::ContextMenuControllerEfl(evas_object(), type, web_contents_delegate()));
-  if (!context_menu_->PopulateAndShowContextMenu(convertedParams))
-    context_menu_.reset();
+  context_menu_.reset(new content::ContextMenuControllerEfl(GetPublicWebView(), type, web_contents_delegate()));
+
+  if(!selection_controller_->IsShowingMagnifier()) {
+    if(!context_menu_->PopulateAndShowContextMenu(convertedParams))
+      context_menu_.reset();
+  }
 }
 
 void EWebView::CancelContextMenu(int request_id) {
@@ -1489,10 +1056,8 @@ void EWebView::Find(const char* text, tizen_webview::Find_Options find_options) 
 }
 
 void EWebView::SetScale(double scale_factor, int x, int y) {
-#if !defined(EWK_BRINGUP)
   RenderViewHost* render_view_host = web_contents_delegate_->web_contents()->GetRenderViewHost();
   render_view_host->Send(new EwkViewMsg_Scale(render_view_host->GetRoutingID(), scale_factor, x, y));
-#endif
 }
 
 void EWebView::GetScrollPosition(int* x, int* y) const {
@@ -1504,24 +1069,17 @@ void EWebView::GetScrollPosition(int* x, int* y) const {
 }
 
 void EWebView::SetScroll(int x, int y) {
-  // This adds extra api's to blink and extra craft to chromium. Chrome doesn't have it yet you can scroll. Let's rethink it.
-  // Probably scroll offset does can do the same.
-#if !defined(EWK_BRINGUP)
   RenderViewHost* render_view_host = web_contents_delegate()->web_contents()->GetRenderViewHost();
   if (!render_view_host)
     return;
 
   render_view_host->Send(new EwkViewMsg_SetScroll(render_view_host->GetRoutingID(), x, y));
-#endif
 }
 
 void EWebView::UseSettingsFont() {
-  // Intrusive API forcing blink to do a layout. Maybe we should just do a reload?
-#if !defined(EWK_BRINGUP)
   RenderViewHost* render_view_host = web_contents_delegate()->web_contents()->GetRenderViewHost();
   if (render_view_host)
     render_view_host->Send(new EwkViewMsg_UseSettingsFont(render_view_host->GetRoutingID()));
-#endif
 }
 
 void EWebView::DidChangeContentsArea(int width, int height) {
@@ -1544,18 +1102,19 @@ void EWebView::GetScrollSize(int* width, int* height) {
   if (height)
     *height = 0;
 
-  Ewk_View_Smart_Data* smart_data = ToSmartData(evas_object());
+  Eina_Rectangle last_view_port =
+      WebViewDelegate::GetInstance()->GetLastUsedViewPortArea(evas_object());
 
 #ifdef OS_TIZEN
-  if (width && contents_area_.width() > smart_data->view.w)
-    *width = contents_area_.width() - smart_data->view.w;
-  if (height && contents_area_.height() > smart_data->view.h)
-    *height = contents_area_.height() - smart_data->view.h;
+  if (width && contents_area_.width() > last_view_port.w)
+    *width = contents_area_.width() - last_view_port.w;
+  if (height && contents_area_.height() > last_view_port.h)
+    *height = contents_area_.height() - last_view_port.h;
 #else
-  if (width && contents_size_.width() > smart_data->view.w)
-    *width = contents_size_.width() - smart_data->view.w;
-  if (height && contents_size_.height() > smart_data->view.h)
-    *height = contents_size_.height() - smart_data->view.h;
+  if (width && contents_size_.width() > last_view_port.w)
+    *width = contents_size_.width() - last_view_port.w;
+  if (height && contents_size_.height() > last_view_port.h)
+    *height = contents_size_.height() - last_view_port.h;
 #endif
 }
 
@@ -1568,13 +1127,11 @@ void EWebView::MoveCaret(const gfx::Point& point) {
 }
 
 void EWebView::QuerySelectionStyle() {
-#if !defined(EWK_BRINGUP)
   Ewk_Settings* settings = GetSettings();
   if (settings->textStyleStateState()) {
     RenderViewHost* render_view_host = web_contents_delegate_->web_contents()->GetRenderViewHost();
     render_view_host->Send(new EwkViewMsg_GetSelectionStyle(render_view_host->GetRoutingID()));
   }
-#endif
 }
 
 void EWebView::OnQuerySelectionStyleReply(const SelectionStylePrams& params) {
@@ -1585,19 +1142,15 @@ void EWebView::OnQuerySelectionStyleReply(const SelectionStylePrams& params) {
 }
 
 void EWebView::SelectClosestWord(const gfx::Point& touch_point) {
-#if !defined(EWK_BRINGUP)
   float device_scale_factor = rwhv()->device_scale_factor();
   RenderViewHost* render_view_host = web_contents_delegate_->web_contents()->GetRenderViewHost();
   render_view_host->Send(new EwkViewMsg_SelectClosestWord(render_view_host->GetRoutingID(), touch_point.x() / device_scale_factor, touch_point.y() / device_scale_factor));
-#endif
 }
 
 void EWebView::SelectLinkText(const gfx::Point& touch_point) {
-#if !defined(EWK_BRINGUP)
   float device_scale_factor = rwhv()->device_scale_factor();
   RenderViewHost* render_view_host = web_contents_delegate_->web_contents()->GetRenderViewHost();
   render_view_host->Send(new ViewMsg_SelectLinkText(render_view_host->GetRoutingID(), gfx::Point(touch_point.x() / device_scale_factor, touch_point.y() / device_scale_factor)));
-#endif
 }
 
 bool EWebView::GetSelectionRange(Eina_Rectangle* left_rect, Eina_Rectangle* right_rect) {
@@ -1611,7 +1164,9 @@ bool EWebView::GetSelectionRange(Eina_Rectangle* left_rect, Eina_Rectangle* righ
   return false;
 }
 
-bool EWebView::ClearSelection() {
+// TODO(sns.park) : better to move this method to SelectionController
+bool EWebView::ClearSelection()
+{
     LOG(INFO) << "EWebView::ClearSelection";
     bool retval = false;
     if (selection_controller_->GetSelectionStatus()) {
@@ -1639,9 +1194,6 @@ tizen_webview::Hit_Test* EWebView::RequestHitTestDataAt(int x, int y, tizen_webv
 }
 
 tizen_webview::Hit_Test* EWebView::RequestHitTestDataAtBlinkCoords(int x, int y, tizen_webview::Hit_Test_Mode mode) {
-#if defined(EWK_BRINGUP)
-  return new tizen_webview::Hit_Test;
-#else
   DCHECK(BrowserThread::CurrentlyOn(BrowserThread::UI));
 
   // WebViewBrowserMessageFilter requires RenderProcessHost to be already created.
@@ -1659,14 +1211,15 @@ tizen_webview::Hit_Test* EWebView::RequestHitTestDataAtBlinkCoords(int x, int y,
 
   if (render_view_host && render_process_host) {
     // We wait on UI thread till hit test data is updated.
+#if !defined(EWK_BRINGUP)
     base::ThreadRestrictions::ScopedAllowWait allow_wait;
+#endif
     render_view_host->Send(new EwkViewMsg_DoHitTest(render_view_host->GetRoutingID(), x, y, mode));
     hit_test_completion_.Wait();
     return new tizen_webview::Hit_Test(hit_test_data_);
   }
 
   return NULL;
-#endif
 }
 
 void EWebView::UpdateHitTestData(const _Ewk_Hit_Test& hit_test_data, const NodeAttributesMap& node_attributes) {
@@ -1770,9 +1323,6 @@ void EWebView::InvokeBackForwardListChangedCallback() {
 }
 
 bool EWebView::WebAppCapableGet(tizen_webview::Web_App_Capable_Get_Callback callback, void *userData) {
-#if defined(EWK_BRINGUP)
-  return false;
-#else
   RenderViewHost *renderViewHost = web_contents_delegate()->web_contents()->GetRenderViewHost();
   if (!renderViewHost) {
     return false;
@@ -1780,13 +1330,9 @@ bool EWebView::WebAppCapableGet(tizen_webview::Web_App_Capable_Get_Callback call
   WebApplicationCapableGetCallback *cb = new WebApplicationCapableGetCallback(callback, userData);
   int callbackId = web_app_capable_get_callback_map_.Add(cb);
   return renderViewHost->Send(new EwkViewMsg_WebAppCapableGet(renderViewHost->GetRoutingID(), callbackId));
-#endif
 }
 
 bool EWebView::WebAppIconUrlGet(tizen_webview::Web_App_Icon_URL_Get_Callback callback, void *userData) {
-#if defined(EWK_BRINGUP)
-  return false;
-#else
   RenderViewHost* renderViewHost = web_contents_delegate()->web_contents()->GetRenderViewHost();
   if (!renderViewHost) {
     return false;
@@ -1794,13 +1340,9 @@ bool EWebView::WebAppIconUrlGet(tizen_webview::Web_App_Icon_URL_Get_Callback cal
   WebApplicationIconUrlGetCallback *cb = new WebApplicationIconUrlGetCallback(callback, userData);
   int callbackId = web_app_icon_url_get_callback_map_.Add(cb);
   return renderViewHost->Send(new EwkViewMsg_WebAppIconUrlGet(renderViewHost->GetRoutingID(), callbackId));
-#endif
 }
 
 bool EWebView::WebAppIconUrlsGet(tizen_webview::Web_App_Icon_URLs_Get_Callback callback, void *userData) {
-#if defined(EWK_BRINGUP)
-  return false;
-#else
   RenderViewHost* renderViewHost = web_contents_delegate()->web_contents()->GetRenderViewHost();
   if (!renderViewHost) {
     return false;
@@ -1808,16 +1350,13 @@ bool EWebView::WebAppIconUrlsGet(tizen_webview::Web_App_Icon_URLs_Get_Callback c
   WebApplicationIconUrlsGetCallback *cb = new WebApplicationIconUrlsGetCallback(callback, userData);
   int callbackId = web_app_icon_urls_get_callback_map_.Add(cb);
   return renderViewHost->Send(new EwkViewMsg_WebAppIconUrlsGet(renderViewHost->GetRoutingID(), callbackId));
-#endif
 }
 
 void EWebView::InvokeWebAppCapableGetCallback(bool capable, int callbackId) {
-#if !defined(EWK_BRINGUP)
   WebApplicationCapableGetCallback *callback = web_app_capable_get_callback_map_.Lookup(callbackId);
   if (!callback)
     return;
   callback->Run(capable);
-#endif
 }
 
 void EWebView::InvokeWebAppIconUrlGetCallback(const std::string& iconUrl, int callbackId) {
@@ -1835,42 +1374,8 @@ void EWebView::InvokeWebAppIconUrlsGetCallback(const StringMap &iconUrls, int ca
   callback->Run(iconUrls);
 }
 
-bool IsEWebViewObject(const Evas_Object* evas_object) {
-  DCHECK(evas_object);
-
-  const char* object_type = evas_object_type_get(evas_object);
-  const Evas_Smart* evas_smart = evas_object_smart_smart_get(evas_object);
-  if (!evas_smart) {
-    EINA_LOG_CRIT("%p (%s) is not a smart object!", evas_object,
-                  object_type ? object_type : "(null)");
-    return false;
-  }
-
-  const Evas_Smart_Class* smart_class = evas_smart_class_get(evas_smart);
-  if (!smart_class) {
-    EINA_LOG_CRIT("%p (%s) is not a smart class object!", evas_object,
-                  object_type ? object_type : "(null)");
-    return false;
-  }
-
-  if (smart_class->data != SmartClassName) {
-    EINA_LOG_CRIT("%p (%s) is not of an ewk_view (need %p, got %p)!",
-                  evas_object, object_type ? object_type : "(null)",
-                  SmartClassName, smart_class->data);
-    return false;
-  }
-
-  return true;
-}
-
-EWebView* ToEWebView(const Evas_Object* evas_object) {
-  DCHECK(evas_object);
-  DCHECK(IsEWebViewObject(evas_object));
-
-  return ToEWebView(static_cast<Ewk_View_Smart_Data*>(evas_object_smart_data_get(evas_object)));
-}
-
-void EwkViewPlainTextGetCallback::TriggerCallback(Evas_Object* obj, const std::string& content_text) {
+void EwkViewPlainTextGetCallback::TriggerCallback(Evas_Object* obj, const std::string& content_text)
+{
   if(callback_)
     (callback_)(obj, content_text.c_str(), user_data_);
 }
@@ -1881,15 +1386,11 @@ int EWebView::SetEwkViewPlainTextGetCallback(tizen_webview::View_Plain_Text_Get_
 }
 
 bool EWebView::PlainTextGet(tizen_webview::View_Plain_Text_Get_Callback callback, void* user_data) {
-#if defined(EWK_BRINGUP)
-  return false;
-#else
   RenderViewHost* render_view_host = web_contents_delegate()->web_contents()->GetRenderViewHost();
   if (!render_view_host)
     return false;
   int plain_text_get_callback_id = SetEwkViewPlainTextGetCallback(callback, user_data);
   return render_view_host->Send(new EwkViewMsg_PlainTextGet(render_view_host->GetRoutingID(), plain_text_get_callback_id));
-#endif
 }
 
 void EWebView::InvokePlainTextGetCallback(const std::string& content_text, int plain_text_get_callback_id) {
@@ -1916,22 +1417,15 @@ const char* EWebView::GetTitle() {
 }
 
 bool EWebView::SaveAsPdf(int width, int height, const std::string& filename) {
-#if defined(EWK_BRINGUP)
-  return false;
-#else
   RenderViewHost* render_view_host = web_contents_delegate()->web_contents()->GetRenderViewHost();
   if (!render_view_host)
     return false;
 
   return render_view_host->Send(new EwkViewMsg_PrintToPdf(render_view_host->GetRoutingID(),
       width, height, base::FilePath(filename)));
-#endif
 }
 
 bool EWebView::GetMHTMLData(tizen_webview::View_MHTML_Data_Get_Callback callback, void* user_data) {
-#if defined(EWK_BRINGUP)
-  return false;
-#else
   RenderViewHost* render_view_host = web_contents_delegate()->web_contents()->GetRenderViewHost();
   if (!render_view_host)
     return false;
@@ -1939,7 +1433,6 @@ bool EWebView::GetMHTMLData(tizen_webview::View_MHTML_Data_Get_Callback callback
   MHTMLCallbackDetails* callback_details = new MHTMLCallbackDetails(callback, user_data);
   int mhtml_callback_id = mhtml_callback_map_.Add(callback_details);
   return render_view_host->Send(new EwkViewMsg_GetMHTMLData(render_view_host->GetRoutingID(), mhtml_callback_id));
-#endif
 }
 
 void EWebView::OnMHTMLContentGet(const std::string& mhtml_content, int callback_id) {
@@ -1982,12 +1475,6 @@ void EWebView::SetJavaScriptAlertCallback(tizen_webview::View_JavaScript_Alert_C
   GetJavaScriptDialogManagerEfl()->SetAlertCallback(callback, user_data);
 }
 
-#ifdef TIZEN_EDGE_EFFECT
-void EWebView::SetSettingsGetCallback(Ewk_View_Settings_Get callback, void* user_data) {
-  edge_effect_->setEwkSettingsGetCallback(callback, user_data);
-}
-#endif
-
 void EWebView::JavaScriptAlertReply() {
   GetJavaScriptDialogManagerEfl()->ExecuteDialogClosedCallBack(true, std::string());
   SmartCallback<EWebViewCallbacks::PopupReplyWaitFinish>().call(0);
@@ -2024,13 +1511,11 @@ void EWebView::DidChangePageScaleRange(double min_scale, double max_scale) {
 }
 
 void EWebView::SetDrawsTransparentBackground(bool enabled) {
-#if !defined(EWK_BRINGUP)
   RenderViewHost* render_view_host = web_contents_delegate()->web_contents()->GetRenderViewHost();
   if (!render_view_host)
     return;
 
   render_view_host->Send(new EwkViewMsg_SetDrawsTransparentBackground(render_view_host->GetRoutingID(), enabled));
-#endif
 }
 
 void EWebView::GetSessionData(const char **data, unsigned *length) const {
@@ -2085,7 +1570,7 @@ bool EWebView::RestoreFromSessionData(const char *data, unsigned length) {
   if (currentEntry < 0)
     currentEntry = 0;
 
-  if (currentEntry >= navigationEntries.size())
+  if (currentEntry >= static_cast<int>(navigationEntries.size()))
     currentEntry = navigationEntries.size() - 1;
 
   navigationController.Restore(currentEntry,
@@ -2095,40 +1580,10 @@ bool EWebView::RestoreFromSessionData(const char *data, unsigned length) {
 }
 
 void EWebView::SetBrowserFont() {
-#if !defined(EWK_BRINGUP)
   RenderViewHost* render_view_host = web_contents_delegate()->web_contents()->GetRenderViewHost();
   if (render_view_host)
     render_view_host->Send(new EwkViewMsg_SetBrowserFont(render_view_host->GetRoutingID()));
-#endif
 }
-
-#ifdef OS_TIZEN
-void EWebView::OnMotionEnable(void *data, Evas_Object *obj, void *eventInfo) {
-  bool* enable = static_cast<bool*>(eventInfo);
-  wkext_motion_tilt_enable_set(obj, *enable, 3);
-}
-
-void EWebView::OnMotionMove(void *data, Evas_Object *obj, void *eventInfo) {
-}
-
-void EWebView::OnMotionZoom(void *data, Evas_Object *obj, void *eventInfo) {
-  EWebView* view = ToEWebView(static_cast<Ewk_View_Smart_Data*>(data));
-  view->rwhv()->makePinchZoom(eventInfo);
-}
-
-bool EWebView::GetTiltZoomEnabled() {
-  int motion_enabled = 0;
-  vconf_get_bool(VCONFKEY_SETAPPL_MOTION_ACTIVATION, &motion_enabled);
-  if (motion_enabled) {
-    int tilt_enabled = 0;
-    vconf_get_bool(VCONFKEY_SETAPPL_USE_TILT, &tilt_enabled);
-    //BROWSER_LOGD("******* motion_enabled=[%d], tilt_enabled=[%d]", motion_enabled, tilt_enabled);
-    if (tilt_enabled)
-      return true;
-  }
-  return false;
-}
-#endif // OS_TIZEN
 
 void EWebView::ShowFileChooser(const content::FileChooserParams& params) {
   RenderViewHost* render_view_host = web_contents_delegate()->web_contents()->GetRenderViewHost();
@@ -2198,6 +1653,7 @@ gfx::Rect EWebView::GetIMERect() {
 std::string EWebView::GetErrorPage(const std::string& invalidUrl) {
   base::string16 url16;
   url16.assign(invalidUrl.begin(), invalidUrl.end());
+
 
 #if defined(EWK_BRINGUP)
   std::string errorHead = "This webpage is not available";
@@ -2372,4 +1828,116 @@ void EWebView::UrlRequestSet(const char* url, std::string method, Eina_Hash* hea
     request.EnableChunkedUpload();
     request.AppendChunkToUpload(str.c_str(), str.length(), true);
   }
+}
+
+bool EWebView::HandleShow() {
+  if (rwhv()) {
+    rwhv()->HandleShow();
+    return true;
+  }
+  return false;
+}
+
+bool EWebView::HandleHide() {
+  if (rwhv()) {
+    rwhv()->HandleHide();
+    return true;
+  }
+  return false;
+}
+
+bool EWebView::HandleMove(int x, int y) {
+  if (rwhv()) {
+    rwhv()->HandleMove(x, y);
+    return true;
+  }
+  return false;
+}
+
+bool EWebView::HandleResize(int width, int height) {
+  if (rwhv()) {
+    rwhv()->HandleResize(width, height);
+    return true;
+  }
+  return false;
+}
+
+bool EWebView::HandleFocusIn() {
+  if (rwhv()) {
+    rwhv()->HandleFocusIn();
+    return true;
+  }
+  return false;
+}
+
+bool EWebView::HandleFocusOut() {
+  if (rwhv()) {
+    rwhv()->HandleFocusOut();
+    return true;
+  }
+  return false;
+}
+
+bool EWebView::HandleEvasEvent(const Evas_Event_Mouse_Down* event) {
+  if (rwhv()) {
+    rwhv()->HandleEvasEvent(event);
+    return true;
+  }
+  return false;
+}
+
+bool EWebView::HandleEvasEvent(const Evas_Event_Mouse_Up* event) {
+  if (rwhv()) {
+    rwhv()->HandleEvasEvent(event);
+    return true;
+  }
+  return false;
+}
+
+bool EWebView::HandleEvasEvent(const Evas_Event_Mouse_Move* event) {
+  if (rwhv()) {
+    rwhv()->HandleEvasEvent(event);
+    return true;
+  }
+  return false;
+}
+
+bool EWebView::HandleEvasEvent(const Evas_Event_Mouse_Wheel* event) {
+  if (rwhv()) {
+    rwhv()->HandleEvasEvent(event);
+    return true;
+  }
+  return false;
+}
+
+bool EWebView::HandleEvasEvent(const Evas_Event_Key_Down* event) {
+  if (rwhv()) {
+    rwhv()->HandleEvasEvent(event);
+    return true;
+  }
+  return false;
+}
+
+bool EWebView::HandleEvasEvent(const Evas_Event_Key_Up* event) {
+  if (rwhv()) {
+    rwhv()->HandleEvasEvent(event);
+    return true;
+  }
+  return false;
+}
+
+bool EWebView::HandleGesture(ui::GestureEvent* event) {
+  if (rwhv()) {
+    rwhv()->HandleGesture(event);
+    return true;
+  }
+  return false;
+}
+
+bool EWebView::HandleTouchEvent(ui::TouchEvent* event) {
+  if (rwhv()) {
+    rwhv()->HandleTouchEvent(event);
+    return true;
+  }
+  return false;
 }

@@ -45,7 +45,7 @@ EAPI int wkext_motion_tilt_is_running();
 EAPI void wkext_motion_tilt_position_update(Evas_Coord_Point* position);
 EAPI void wkext_motion_tilt_scale_initialize(double scale);
 EAPI double wkext_motion_tilt_scale_sync(double scale, Wkext_Motion_Type type);
-EAPI void wkext_motion_tilt_enable_set(Evas_Object *view, int eable, unsigned int sensitivity);
+EAPI void wkext_motion_tilt_enable_set(Evas_Object *view, int enable, unsigned int sensitivity);
 #ifdef __cplusplus
 }
 #endif

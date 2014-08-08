@@ -20,9 +20,6 @@
       '<(chrome_src_dir)',
       '<(chrome_src_dir)/third_party/WebKit', # [M34] without this, build errors occur due to #include path changes in M34. for example, see WebFrame.h.
       '<(chrome_src_dir)/third_party/skia/include/core',
-      # XXX: This should be fixed, no ewk api headers should be required by the chromium-efl port
-      '../ewk_api_headers',
-      '../ewk_api_headers/public',
 
       '<(PRODUCT_DIR)/gen',
       '<(SHARED_INTERMEDIATE_DIR)',
@@ -276,6 +273,8 @@
       # tizen_webview
       #TODO: making separate gyp for tizen_webview
       'tizen_webview/public/tw_content_security_policy.h',
+      'tizen_webview/public/tw_context_menu_controller.h',
+      'tizen_webview/public/tw_context_menu_controller.cc',
       'tizen_webview/public/tw_custom_handlers.h',
       'tizen_webview/public/tw_custom_handlers.cc',
       'tizen_webview/public/tw_hit_test.h',
@@ -286,6 +285,8 @@
       'tizen_webview/public/tw_policy_decision.cc',
       'tizen_webview/public/tw_security_origin.cc',
       'tizen_webview/public/tw_security_origin.h',
+      'tizen_webview/public/tw_selection_controller.h',
+      'tizen_webview/public/tw_selection_controller.cc',
       'tizen_webview/public/tw_touch_point.h',
       'tizen_webview/public/tw_touch_point.cc',
       'tizen_webview/public/tw_url.cc',
@@ -293,6 +294,10 @@
       'tizen_webview/public/tw_web_context.h',
       'tizen_webview/public/tw_web_context.cc',
       'tizen_webview/public/tw_webview.cc',
+      'tizen_webview/public/tw_webview_delegate.h',
+      'tizen_webview/public/tw_webview_delegate.cc',
+      'tizen_webview/public/tw_webview_evas_event_handler.h',
+      'tizen_webview/public/tw_webview_evas_event_handler.cc',
       'tizen_webview/public/tw_wrt.h',
       'tizen_webview/public/tw_wrt.h',
       'tizen_webview/public/tw_wrt.cc',
@@ -362,7 +367,6 @@
     'type': 'executable',
     'include_dirs': [
       '.',
-      '../ewk_api_headers',
     ],
     'sources': [
       'web_process.cc',

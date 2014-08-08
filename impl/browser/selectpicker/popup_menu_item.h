@@ -20,7 +20,6 @@
 #ifndef popup_menu_item_h
 #define popup_menu_item_h
 
-#include "ewk_view.h"
 #include <Eina.h>
 #include <string>
 #include "third_party/WebKit/Source/platform/text/TextDirection.h"

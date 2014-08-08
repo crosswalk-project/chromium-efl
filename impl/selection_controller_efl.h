@@ -29,6 +29,8 @@
 #include "selection_handle_efl.h"
 #include "selection_magnifier_efl.h"
 
+#include "tizen_webview/public/tw_selection_controller.h"
+
 #if defined(OS_TIZEN)
 #include "vconf/vconf.h"
 #endif
@@ -46,7 +48,7 @@ namespace content {
 // On long tap up selection handlers are shown and context menu event is sent.
 // Hnadlers are shown to extent selection, On handler move touch points are sent to engine
 // by SelectRange to extend the selection
-class SelectionControllerEfl {
+class SelectionControllerEfl : public tizen_webview::SelectionController {
 
   enum ContextMenuDirection {
     DirectionDown = 0,
@@ -90,7 +92,7 @@ class SelectionControllerEfl {
   void ClearSelection();
   void ClearSelectionViaEWebView();
   EWebView* GetParentView() { return parent_view_; }
-  void HideHandle();
+  void HideHandle() OVERRIDE;
   void HideHandleAndContextMenu();
   bool IsAnyHandleVisible() const;
 
@@ -108,8 +110,8 @@ class SelectionControllerEfl {
 
   bool IsShowingMagnifier();
 
-  Eina_Bool TextSelectionDown(int x, int y);
-  Eina_Bool TextSelectionUp(int x, int y);
+  bool TextSelectionDown(int x, int y);
+  bool TextSelectionUp(int x, int y);
 
  private:
   void ShowHandleAndContextMenuIfRequired(bool anchor_first = true);
@@ -160,5 +162,9 @@ class SelectionControllerEfl {
   gfx::Rect visibility_rect_;
 };
 
-}
+SelectionControllerEfl* CastToSelectionControllerEfl(
+    tizen_webview::SelectionController* sc);
+
+} // namespace content
+
 #endif

@@ -33,6 +33,15 @@
 #include "third_party/WebKit/public/platform/WebReferrerPolicy.h"
 #include "ui/base/clipboard/clipboard.h"
 
+#include "tizen_webview/public/tw_webview.h"
+#include "tizen_webview/public/tw_selection_controller.h"
+
+// TODO: remove this header dependency
+#include "selection_controller_efl.h"
+
+using tizen_webview::WebView;
+using tizen_webview::SelectionController;
+
 namespace content {
 
 ContextMenuControllerEfl::~ContextMenuControllerEfl() {
@@ -53,7 +62,7 @@ ContextMenuControllerEfl::~ContextMenuControllerEfl() {
 
 bool ContextMenuControllerEfl::PopulateAndShowContextMenu(const ContextMenuParams &params) {
   LOG(INFO) << __PRETTY_FUNCTION__;
-  EWebView* view = ToEWebView(evas_object_);
+  EWebView* view = webview_->GetImpl();
   if (!view)
     return false;
 
@@ -182,7 +191,7 @@ bool ContextMenuControllerEfl::CreateContextMenu() {
   if (!eina_list_count(menu_items_))
     return false;
 
-  popup_ = elm_ctxpopup_add(evas_object_);
+  popup_ = elm_ctxpopup_add(GetWebViewEvasObject());
   evas_object_data_set(popup_, "ContextEfl", this);
   elm_object_tree_focus_allow_set(popup_, false);
 
@@ -250,21 +259,21 @@ bool ContextMenuControllerEfl::ShowContextMenu() {
 
     gfx::Point popupPosition = gfx::Point(params_.x, params_.y);
 
-    EWebView* view = ToEWebView(evas_object_);
-    if (!view)
+    if (!webview_)
       return false;
 
-    evas_object_geometry_get(view->evas_object(), &webViewX, &webViewY, &webViewWidth, &webViewHeight);
+    Evas_Object* wv_evas_obj = GetWebViewEvasObject();
+    evas_object_geometry_get(wv_evas_obj, &webViewX, &webViewY, &webViewWidth, &webViewHeight);
     popupPosition.set_x(popupPosition.x() + webViewX);
     popupPosition.set_y(popupPosition.y() + webViewY);
 
     point.x = popupPosition.x();
     point.y = popupPosition.y();
 
-    evas_object_smart_callback_call(view->evas_object(), "contextmenu,willshow", &point);
+    evas_object_smart_callback_call(wv_evas_obj, "contextmenu,willshow", &point);
 
     bool allowed = true;
-    evas_object_smart_callback_call(view->evas_object(), "contextmenu,allowed", &allowed);
+    evas_object_smart_callback_call(wv_evas_obj, "contextmenu,allowed", &allowed);
     if (!allowed) {
       evas_object_del(popup_);
       return false;
@@ -274,14 +283,14 @@ bool ContextMenuControllerEfl::ShowContextMenu() {
     elm_ctxpopup_horizontal_set(popup_, EINA_TRUE);
 
     int drawDirection;
-    SelectionControllerEfl* controller = view->GetSelectionController();
+    SelectionController* controller = webview_->GetSelectionController();
 
     if (!controller) {
       evas_object_del(popup_);
       return false;
     }
 
-    controller->ChangeContextMenuPosition(popupPosition, drawDirection);
+    CastToSelectionControllerEfl(controller)->ChangeContextMenuPosition(popupPosition, drawDirection);
     switch(drawDirection) {
       case 0:
         elm_ctxpopup_direction_priority_set(popup_, ELM_CTXPOPUP_DIRECTION_DOWN, ELM_CTXPOPUP_DIRECTION_DOWN, ELM_CTXPOPUP_DIRECTION_DOWN, ELM_CTXPOPUP_DIRECTION_DOWN);
@@ -311,11 +320,7 @@ bool ContextMenuControllerEfl::ShowContextMenu() {
 }
 
 void ContextMenuControllerEfl::HideSelectionHandle() {
-  EWebView* view = ToEWebView(evas_object_);
-  if (!view)
-    return;
-
-  SelectionControllerEfl* controller = view->GetSelectionController();
+  SelectionController* controller = webview_->GetSelectionController();
   if (controller)
     controller->HideHandle();
 }
@@ -391,7 +396,7 @@ void ContextMenuControllerEfl::OpenInNewTab(const GURL url) {
 }
 
 void ContextMenuControllerEfl::MenuItemSelected(ContextMenuItemEfl *menu_item) {
-  EWebView* view = ToEWebView(evas_object_);
+  EWebView* view = webview_->GetImpl();
   if (!view)
     return;
 
@@ -520,6 +525,10 @@ void ContextMenuControllerEfl::HideContextMenu() {
     delete item;
   }
   menu_items_ = 0;
+}
+
+Evas_Object* ContextMenuControllerEfl::GetWebViewEvasObject() {
+  return webview_->AsEvasObject();
 }
 
 }

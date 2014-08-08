@@ -31,8 +31,6 @@
 #include "base/strings/utf_string_conversions.h"
 #include "base/id_map.h"
 
-class EWebView;
-
 namespace tizen_webview {
 class NotificationPermissionRequest;
 }

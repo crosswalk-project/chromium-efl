@@ -27,6 +27,9 @@
 #include "content/public/browser/download_url_parameters.h"
 #include "content/public/common/context_menu_params.h"
 
+#include "tizen_webview/public/tw_context_menu_controller.h"
+#include "tizen_webview/public/tw_webview.h"
+
 namespace content {
 
 class WebContentsDelegateEfl;
@@ -175,19 +178,21 @@ class ContextMenuItemEfl {
   std::string icon_path_;
 };
 
-class ContextMenuControllerEfl : public content::DownloadItem::Observer {
+class ContextMenuControllerEfl
+    : public tizen_webview::ContextMenuController,
+      public content::DownloadItem::Observer {
  public:
 
   static void contextMenuCancelCallback(void* data, Evas_Object* obj, void* eventInfo);
   static void contextMenuItemSelectedCallback(void* data, Evas_Object* obj, void* eventInfo);
 
-  ContextMenuControllerEfl(Evas_Object* evas_object, ContextMenuType type, WebContentsDelegateEfl* wcd)
-    : evas_object_(evas_object)
-    , popup_(0)
-    , menu_items_(0)
-    , type_(type)
-    , wcd_(wcd)
-    , weak_ptr_factory_(this) {
+  ContextMenuControllerEfl(tizen_webview::WebView* wv, ContextMenuType type, WebContentsDelegateEfl* wcd)
+    : webview_(wv),
+      popup_(0),
+      menu_items_(0),
+      type_(type),
+      wcd_(wcd),
+      weak_ptr_factory_(this) {
   }
 
   ~ContextMenuControllerEfl();
@@ -216,7 +221,9 @@ class ContextMenuControllerEfl : public content::DownloadItem::Observer {
                               const DownloadUrlParameters::OnStartedCallback& callback);
   bool TriggerDownloadCb(const GURL url);
   void OpenInNewTab(const GURL url);
-  Evas_Object* evas_object_;
+  Evas_Object* GetWebViewEvasObject();
+
+  tizen_webview::WebView* webview_;
   Evas_Object* popup_;
   Eina_List* menu_items_;
   ContextMenuType type_;

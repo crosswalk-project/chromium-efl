@@ -45,7 +45,6 @@
 #include "API/ewk_settings_private.h"
 #include "API/ewk_web_application_icon_data_private.h"
 #include "eweb_view_callbacks.h"
-#include "public/ewk_view.h"
 #include "selection_controller_efl.h"
 #include "web_contents_delegate_efl.h"
 #include "ui/events/gestures/gesture_types.h"
@@ -99,6 +98,8 @@ namespace tizen_webview {
 class Hit_Test;
 class WebContext;
 class WebView;
+class WebViewDelegate;
+class WebViewEvasEventHandler;
 class PolicyDecision;
 }
 
@@ -200,16 +201,19 @@ class EWebView
     , public ui::GestureEventHelper
     , public ui::GestureSequenceDelegate {
  public:
-  static bool InitSmartClassInterface(Ewk_View_Smart_Class&);
 
-  static EWebView* Create(tizen_webview::WebView* owner,
-    tizen_webview::WebContext* context, Evas* canvas, Evas_Smart* smart = 0);
+  static EWebView* FromEvasObject(Evas_Object* eo);
+
+  // initialize data members and activate event handlers.
+  // call this once after created and before use
+  void Initialize();
 
   void CreateNewWindow(content::WebContents* new_contents);
 
+  tizen_webview::WebView* GetPublicWebView();
+  tizen_webview::WebViewEvasEventHandler* GetEvasEventHandler() { return evas_event_handler_; }
   tizen_webview::WebContext* context() const { return context_; }
   Evas_Object* evas_object() const { return evas_object_; }
-
   Evas* GetEvas() const { return evas_object_evas_get(evas_object_); }
   Evas_Object* GetContentImageObject() const;
 
@@ -370,7 +374,6 @@ class EWebView
   void InputPickerShow(tizen_webview::Input_Type inputType, const char* inputValue);
 
 #ifdef TIZEN_EDGE_EFFECT
-  void SetSettingsGetCallback(Ewk_View_Settings_Get callback, void* user_data);
   scoped_refptr<EdgeEffect> edgeEffect() { return edge_effect_; }
 #endif
 #ifdef TIZEN_CONTENTS_DETECTION
@@ -392,56 +395,27 @@ class EWebView
 
   void SetOverrideEncoding(const std::string& encoding);
 
+  /// ---- Event handling
+  bool HandleShow();
+  bool HandleHide();
+  bool HandleMove(int x, int y);
+  bool HandleResize(int width, int height);
+  bool HandleFocusIn();
+  bool HandleFocusOut();
+
+  bool HandleEvasEvent(const Evas_Event_Mouse_Down* event);
+  bool HandleEvasEvent(const Evas_Event_Mouse_Up* event);
+  bool HandleEvasEvent(const Evas_Event_Mouse_Move* event);
+  bool HandleEvasEvent(const Evas_Event_Mouse_Wheel* event);
+  bool HandleEvasEvent(const Evas_Event_Key_Down* event);
+  bool HandleEvasEvent(const Evas_Event_Key_Up* event);
+  bool HandleGesture(ui::GestureEvent* event);
+  bool HandleTouchEvent(ui::TouchEvent* event);
+
  private:
-  EWebView(tizen_webview::WebContext*, Evas_Object* smart_object);
-  ~EWebView();
-
-  // Evas_Smart_Class callback interface:
-  static void handleEvasObjectAdd(Evas_Object*);
-  static void handleEvasObjectDelete(Evas_Object*);
-  static void handleEvasObjectShow(Evas_Object*);
-  static void handleEvasObjectHide(Evas_Object*);
-  static void handleEvasObjectMove(Evas_Object*, Evas_Coord x, Evas_Coord y);
-  static void handleEvasObjectResize(Evas_Object*, Evas_Coord width, Evas_Coord height);
-  static void handleEvasObjectCalculate(Evas_Object*);
-  static void handleEvasObjectColorSet(Evas_Object*, int red, int green, int blue, int alpha);
-
-  // Ewk_View_Smart_Class callback interface:
-  static Eina_Bool handleFocusIn(Ewk_View_Smart_Data* d);
-  static Eina_Bool handleFocusOut(Ewk_View_Smart_Data* d);
-  static Eina_Bool handleMouseWheel(Ewk_View_Smart_Data* d, const Evas_Event_Mouse_Wheel* wheelEvent);
-  static Eina_Bool handleMouseDown(Ewk_View_Smart_Data* d, const Evas_Event_Mouse_Down* downEvent);
-  static Eina_Bool handleMouseUp(Ewk_View_Smart_Data* d, const Evas_Event_Mouse_Up* upEvent);
-  static Eina_Bool handleMouseMove(Ewk_View_Smart_Data* d, const Evas_Event_Mouse_Move* moveEvent);
-  static Eina_Bool handleKeyDown(Ewk_View_Smart_Data* d, const Evas_Event_Key_Down* downEvent);
-  static Eina_Bool handleKeyUp(Ewk_View_Smart_Data* d, const Evas_Event_Key_Up* upEvent);
-  static Eina_Bool handleTextSelectionDown(Ewk_View_Smart_Data* d, int x, int y);
-  static Eina_Bool handleTextSelectionUp(Ewk_View_Smart_Data* d, int x, int y);
-
-  static unsigned long long handleExceededDatabaseQuota(Ewk_View_Smart_Data *sd, const char *databaseName, const char *displayName, unsigned long long currentQuota, unsigned long long currentOriginUsage, unsigned long long currentDatabaseUsage, unsigned long long expectedUsage);
-
-  static void OnTouchDown(void*, Evas*, Evas_Object*, void*);
-  static void OnTouchUp(void*, Evas*, Evas_Object*, void*);
-  static void OnTouchMove(void*, Evas*, Evas_Object*, void*);
 #if defined(OS_TIZEN_MOBILE)
   static void cameraResultCb(service_h request, service_h reply,
     service_result_e result, void* data);
-#endif
-
-  void HandleTouchEvents(tizen_webview::Touch_Event_Type);
-
-  void SubscribeMouseEvents();
-  void UnsubscribeMouseEvents();
-  void SubscribeTouchEvents();
-  void UnsubscribeTouchEvents();
-#ifdef OS_TIZEN
-  void SubscribeMotionEvents();
-  void UnsubscribeMotionEvents();
-  bool GetTiltZoomEnabled();
-
-  static void OnMotionZoom(void *data, Evas_Object *obj, void *eventInfo);
-  static void OnMotionEnable(void *data, Evas_Object *obj, void *eventInfo);
-  static void OnMotionMove(void *data, Evas_Object *obj, void *eventInfo);
 #endif
 
   // GestureEventHelper overrides
@@ -458,8 +432,6 @@ class EWebView
   content::RenderWidgetHostViewEfl* rwhv() const;
   JavaScriptDialogManagerEfl* GetJavaScriptDialogManagerEfl();
 
-  static Evas_Smart_Class parent_smart_class_;
-
   // For popup windows the WebContents is created internally and we need to associate it with the
   // new view created by the embedder. We set this before calling the "create,window" callback and
   // use it for the new view. This is a hack! It would break if the first view the embedder creates
@@ -468,6 +440,8 @@ class EWebView
   // FIXME: should we add documentation for that?
   static content::WebContents* contents_for_new_window_;
 
+  tizen_webview::WebView* public_webview_;
+  tizen_webview::WebViewEvasEventHandler* evas_event_handler_;
   scoped_refptr<tizen_webview::WebContext> context_;
   scoped_ptr<content::WebContentsDelegateEfl> web_contents_delegate_;
   std::string pending_url_request_;
@@ -530,16 +504,21 @@ class EWebView
 #if defined(OS_TIZEN_MOBILE)
   content::FileChooserParams::Mode filechooser_mode_;
 #endif
+  bool is_initialized_;
 
-  // should not used outside of WebView
+private:
+  // only tizen_webview::WebView can create and delete this
+  EWebView(tizen_webview::WebView* owner, tizen_webview::WebContext*, Evas_Object* smart_object);
+  ~EWebView();
   friend class tizen_webview::WebView;
-  static void Delete(EWebView* ewv);
-  void SetPublicWebView(tizen_webview::WebView* wv);
-  tizen_webview::WebView* GetPublicWebView();
-  tizen_webview::WebView* public_webview_;
+  friend class tizen_webview::WebViewEvasEventHandler;
 };
 
-bool IsEWebViewObject(const Evas_Object*);
-EWebView* ToEWebView(const Evas_Object*);
+namespace tizen_webview {
+typedef ::EWebView WebViewImpl;
+};
+
+const unsigned int g_default_tilt_motion_sensitivity = 3;
+
 
 #endif

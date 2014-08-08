@@ -524,7 +524,7 @@ void SelectionControllerEfl::ChangeContextMenuPosition(gfx::Point& position, int
   return;
 }
 
-Eina_Bool SelectionControllerEfl::TextSelectionDown(int x, int y) {
+bool SelectionControllerEfl::TextSelectionDown(int x, int y) {
   /*
    * According to webkit-efl textSelectionDown is used on long press gesture, we already
    * have implementation for handling this gesture in SelectionControllerEfl so we just
@@ -536,13 +536,13 @@ Eina_Bool SelectionControllerEfl::TextSelectionDown(int x, int y) {
    */
   if (!long_mouse_press_) {
     HandleLongPressEvent(gfx::Point(x, y));
-    return EINA_TRUE;
+    return true;
   }
 
-  return EINA_FALSE;
+  return false;
 }
 
-Eina_Bool SelectionControllerEfl::TextSelectionUp(int /*x*/, int /*y*/) {
+bool SelectionControllerEfl::TextSelectionUp(int /*x*/, int /*y*/) {
   /*
    * According to webkit-efl textSelectionUp is used when MouseUp event occurs. We already
    * have implementation for handling MouseUp after long press in SelectionMagnifierEfl so we just
@@ -555,10 +555,15 @@ Eina_Bool SelectionControllerEfl::TextSelectionUp(int /*x*/, int /*y*/) {
 
   if (long_mouse_press_) {
     magnifier_->OnAnimatorUp();
-    return EINA_TRUE;
+    return true;
   }
 
-  return EINA_FALSE;
+  return false;
+}
+
+SelectionControllerEfl* CastToSelectionControllerEfl(
+    tizen_webview::SelectionController* sc) {
+  return static_cast<content::SelectionControllerEfl*>(sc);
 }
 
 }

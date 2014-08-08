@@ -11,7 +11,6 @@
 #include "common/render_messages_efl.h"
 #include "eweb_view.h"
 #include "eweb_view_callbacks.h"
-#include "public/ewk_view.h"
 
 #include "base/strings/utf_string_conversions.h"
 #include "content/common/view_messages.h"

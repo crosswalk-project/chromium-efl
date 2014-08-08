@@ -28,22 +28,39 @@ namespace gfx {
 class Point;
 }
 
+// TODO: remove ui event
+namespace ui {
+class GestureEvent;
+class TouchEvent;
+}
+
 namespace tizen_webview {
 
+class ContextMenuController;
+class SelectionController;
 class WebContext;
+class WebViewDelegate;
+class WebViewEvasEventHandler;
 
 class WebView {
  public:
   // ---- create/delete
-  static WebView* Create(WebContext* wc, Evas* canvas, Evas_Smart* smart = 0) WARN_UNUSED_RESULT;
+  static WebView* Create(WebContext* wc, Evas_Object* eo) WARN_UNUSED_RESULT;
   static void Delete(WebView* wv);
+
+  // initialize data members and activate event handlers.
+  // call this once after Create() and before using EWebView
+  void Initialize();
 
   // ---- Get various objects related with this webview
   Evas_Object* AsEvasObject();
   static WebView* FromEvasObject(Evas_Object* eo);
-  static WebView* FromEvasObjectChecked(Evas_Object* eo);
-  WebContext* context();
+  WebContext* GetWebContext();
   Ewk_Settings* GetSettings();
+  SelectionController* GetSelectionController();
+  WebViewEvasEventHandler* GetEvasEventHandler();
+  ContextMenuController* GetContextMenuController();
+  void ResetContextMenuController();
 
   // ---- User Agent
   bool SetUserAgent(const char* userAgent);
@@ -146,9 +163,6 @@ class WebView {
   void SetLinkMagnifierEnabled(bool enabled);
   void SetBrowserFont(); // browser specific? make static?
   void UpdateWebKitPreferences(); // global? make static
-#ifdef TIZEN_EDGE_EFFECT
-  void SetSettingsGetCallback(Ewk_View_Settings_Get callback, void* user_data);
-#endif
 
   //---- JavaScript
   bool ExecuteJavaScript(const char* script, View_Script_Execute_Callback callback, void* userdata);
@@ -173,16 +187,32 @@ class WebView {
   int StartInspectorServer(int port = 0);
   bool StopInspectorServer();
 
+
+  /// ---- Event handling
+  bool HandleShow();
+  bool HandleHide();
+  bool HandleMove(int x, int y);
+  bool HandleResize(int width, int height);
+  bool HandleFocusIn();
+  bool HandleFocusOut();
+  bool HandleEvasEvent(const Evas_Event_Mouse_Down* event);
+  bool HandleEvasEvent(const Evas_Event_Mouse_Up* event);
+  bool HandleEvasEvent(const Evas_Event_Mouse_Move* event);
+  bool HandleEvasEvent(const Evas_Event_Mouse_Wheel* event);
+  bool HandleEvasEvent(const Evas_Event_Key_Down* event);
+  bool HandleEvasEvent(const Evas_Event_Key_Up* event);
+  bool HandleGesture(ui::GestureEvent* event);
+  bool HandleTouchEvent(ui::TouchEvent* event);
+
   // TODO: move to private
   typedef ::EWebView Impl;
-  void SetImpl(Impl* impl) { impl_ = impl; }
   Impl* GetImpl() { return impl_; }
   const Impl* GetImpl() const { return impl_; }
 
  private:
   Impl* impl_;
+  void SetImpl(Impl* impl) { impl_ = impl; }
 
-  explicit WebView(Impl*);
   WebView();
   ~WebView();
   DISALLOW_COPY_AND_ASSIGN(WebView);
