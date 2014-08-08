@@ -569,6 +569,9 @@ void EWebView::InvokePolicyResponseCallback(tizen_webview::PolicyDecision* polic
 void EWebView::InvokePolicyNavigationCallback(RenderViewHost* rvh,
     const NavigationPolicyParams params, bool* handled) {
   DCHECK(BrowserThread::CurrentlyOn(BrowserThread::UI));
+
+  SmartCallback<EWebViewCallbacks::SaveSessionData>().call();
+
   policy_decision_.reset(new tizen_webview::PolicyDecision(params, rvh));
 
   SmartCallback<EWebViewCallbacks::NavigationPolicyDecision>().call(policy_decision_.get());
