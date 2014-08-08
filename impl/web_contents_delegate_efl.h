@@ -87,7 +87,7 @@ class WebContentsDelegateEfl
                  bool final_update) OVERRIDE;
 
   void RequestCertificateConfirm(WebContents* web_contents, int cert_error,
-      const net::SSLInfo& ssl_info, const GURL& url, ResourceType::Type resource_type,
+      const net::SSLInfo& ssl_info, const GURL& url, ResourceType resource_type,
       bool overridable,
       bool strict_enforcement,
       const base::Callback<void(bool)>& callback,

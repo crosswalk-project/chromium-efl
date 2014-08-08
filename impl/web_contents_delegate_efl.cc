@@ -350,7 +350,7 @@ void WebContentsDelegateEfl::RequestCertificateConfirm(WebContents* /*web_conten
                                                       int cert_error,
                                                       const net::SSLInfo& ssl_info,
                                                       const GURL& url,
-                                                      ResourceType::Type /*resource_type*/,
+                                                      ResourceType /*resource_type*/,
                                                       bool /*overridable*/,
                                                       bool /*strict_enforcement*/,
                                                       const base::Callback<void(bool)>& callback,

@@ -174,4 +174,9 @@ void BrowserContextEfl::RebuildTable(const scoped_refptr<URLEnumerator>& enumera
   enumerator->OnComplete(true);
 }
 
+SSLHostStateDelegate* BrowserContextEfl::GetSSLHostStateDelegate() {
+  // Pure method in BrowserContext class. Need implementation.
+  NOTIMPLEMENTED();
+}
+
 }

@@ -198,7 +198,7 @@ void RenderViewObserverEfl::OnSetScroll(int x, int y)
 
 void RenderViewObserverEfl::OnUseSettingsFont()
 {
-  WebCore::FontCache::fontCache()->invalidate();
+  blink::FontCache::fontCache()->invalidate();
 
 #if !defined(EWK_BRINGUP)
   blink::WebView* view = render_view()->GetWebView();
@@ -248,6 +248,8 @@ void RenderViewObserverEfl::OnGetSelectionStyle()
   if (!frame)
     return;
 
+#if !defined(EWK_BRINGUP)
+  // Unifdef it when this change will be relanded: http://165.213.202.130:8080/#/c/68152/
   SelectionStylePrams params;
   params.underline_state = frame->stateCommand(blink::WebString::fromUTF8("underline"));
   params.italic_state = frame->stateCommand(blink::WebString::fromUTF8("italic"));
@@ -266,6 +268,7 @@ void RenderViewObserverEfl::OnGetSelectionStyle()
   params.text_align_full_state = frame->stateCommand(blink::WebString::fromUTF8("JustifyFull"));
   params.has_composition = frame->hasMarkedText();
   Send(new EwkViewMsg_SelectionTextStyleState(render_view()->GetRoutingID(), params));
+#endif
 }
 
 void RenderViewObserverEfl::OnSelectClosestWord(int x, int y)

@@ -114,6 +114,7 @@ class BrowserContextEfl
 
  private:
   static void ReadCertificateAndAdd(base::FilePath* file_path);
+  virtual SSLHostStateDelegate* GetSSLHostStateDelegate() OVERRIDE;
 
   scoped_ptr<visitedlink::VisitedLinkMaster> visitedlink_master_;
   ResourceContextEfl* resource_context_;

@@ -71,13 +71,13 @@ void RenderProcessObserverEfl::OnPurgeMemory()
   // freed).
   OnClearCache();
   // Clear the font/glyph cache.
-  WebCore::FontCache::fontCache()->invalidate();
+  blink::FontCache::fontCache()->invalidate();
   // TODO(pk): currently web process not linking sqlite. when used this should enable
   // Release all freeable memory from the SQLite process-global page cache (a
   // low-level object which backs the Connection-specific page caches).
   //while (sqlite3_release_memory(std::numeric_limits<int>::max()) > 0) {
   //}
-  v8::V8::LowMemoryNotification();
+  v8::Isolate::GetCurrent()->LowMemoryNotification();
   // Tell our allocator to release any free pages it's still holding.
   base::allocator::ReleaseFreeMemory();
 }

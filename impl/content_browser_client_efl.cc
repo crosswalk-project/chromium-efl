@@ -101,7 +101,7 @@ void ContentBrowserClientEfl::ResourceDispatcherHostCreated() {
 void ContentBrowserClientEfl::AllowCertificateError(
     int render_process_id, int render_frame_id, int cert_error,
     const net::SSLInfo& ssl_info, const GURL& request_url,
-    ResourceType::Type resource_type, bool overridable,
+    ResourceType resource_type, bool overridable,
     bool strict_enforcement, const base::Callback<void(bool)>& callback,
     CertificateRequestResultType* result) {
 
@@ -123,7 +123,7 @@ void ContentBrowserClientEfl::AllowCertificateError(
 void ContentBrowserClientEfl::RequestDesktopNotificationPermission(
     const GURL& source_origin,
     content::RenderFrameHost* render_frame_host,
-    const base::Closure& callback) {
+    const base::Callback<void(blink::WebNotificationPermission)>& callback) {
 #if defined(ENABLE_NOTIFICATIONS) && !defined(EWK_BRINGUP)
   WebContents* web_contents = WebContentsFromViewID(render_process_id,
                                                     render_view_id);

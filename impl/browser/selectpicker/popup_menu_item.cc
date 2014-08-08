@@ -47,7 +47,7 @@ const char* popup_menu_item_text_get(const Popup_Menu_Item* item) {
 }
 
 blink::TextDirection popup_menu_item_text_direction_get(const Popup_Menu_Item* item) {
-    EINA_SAFETY_ON_NULL_RETURN_VAL(item, WebCore::LTR);
+    EINA_SAFETY_ON_NULL_RETURN_VAL(item, blink::LTR);
 
     return item->textDirection;
 }

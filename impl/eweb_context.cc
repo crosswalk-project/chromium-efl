@@ -370,7 +370,7 @@ void EWebContext::DeleteApplicationCacheForSite(const tizen_webview::URL& site) 
   partition->ClearDataForOrigin(content::StoragePartition::REMOVE_DATA_MASK_APPCACHE,
                                 content::StoragePartition::QUOTA_MANAGED_STORAGE_MASK_ALL,
                                 GetGURL(site),
-                                partition->GetURLRequestContext());
+                                partition->GetURLRequestContext(), base::Bind(&base::DoNothing));
 }
 
 void EWebContext::GetAllOriginsWithApplicationCache(tizen_webview::Web_Application_Cache_Origins_Get_Callback callback,
