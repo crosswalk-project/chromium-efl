@@ -117,6 +117,7 @@ enum CallbackType {
   ScrollRight,
   ScrollUp,
   ScrollDown,
+  SaveSessionData,
   UndoSize,
   RedoSize,
   MagnifierShow,
@@ -276,6 +277,7 @@ DECLARE_EWK_VIEW_CALLBACK(ScrollRight, "scroll,right", void);
 DECLARE_EWK_VIEW_CALLBACK(ScrollLeft, "scroll,left", void);
 DECLARE_EWK_VIEW_CALLBACK(ScrollUp, "scroll,up", void);
 DECLARE_EWK_VIEW_CALLBACK(ScrollDown, "scroll,down", void);
+DECLARE_EWK_VIEW_CALLBACK(SaveSessionData, "save,session,data", void);
 DECLARE_EWK_VIEW_CALLBACK(UndoSize, "undo,size", size_t*);
 DECLARE_EWK_VIEW_CALLBACK(RedoSize, "redo,size", size_t*);
 DECLARE_EWK_VIEW_CALLBACK(MagnifierShow, "magnifier,show", void);
