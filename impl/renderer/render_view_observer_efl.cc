@@ -248,27 +248,24 @@ void RenderViewObserverEfl::OnGetSelectionStyle()
   if (!frame)
     return;
 
-#if !defined(EWK_BRINGUP)
-  // Unifdef it when this change will be relanded: http://165.213.202.130:8080/#/c/68152/
   SelectionStylePrams params;
-  params.underline_state = frame->stateCommand(blink::WebString::fromUTF8("underline"));
-  params.italic_state = frame->stateCommand(blink::WebString::fromUTF8("italic"));
-  params.bold_state = frame->stateCommand(blink::WebString::fromUTF8("bold"));
-  blink::WebString bg_color = frame->valueCommand(blink::WebString::fromUTF8("BackColor"));
+  params.underline_state = frame->commandState(blink::WebString::fromUTF8("underline"));
+  params.italic_state = frame->commandState(blink::WebString::fromUTF8("italic"));
+  params.bold_state = frame->commandState(blink::WebString::fromUTF8("bold"));
+  blink::WebString bg_color = frame->commandValue(blink::WebString::fromUTF8("BackColor"));
   GetGRBAValuesFromString(std::string(bg_color.utf8()), &params.bg_color.r, &params.bg_color.g, &params.bg_color.b, &params.bg_color.a);
-  blink::WebString color = frame->valueCommand(blink::WebString::fromUTF8("ForeColor"));
+  blink::WebString color = frame->commandValue(blink::WebString::fromUTF8("ForeColor"));
   GetGRBAValuesFromString(std::string(color.utf8()), &params.color.r, &params.color.g, &params.color.b, &params.color.a);
-  blink::WebString  font_size = frame->valueCommand(blink::WebString::fromUTF8("FontSize"));
+  blink::WebString  font_size = frame->commandValue(blink::WebString::fromUTF8("FontSize"));
   params.font_size = font_size.utf8();
-  params.order_list_state = frame->stateCommand(blink::WebString::fromUTF8("InsertOrderedList"));
-  params.un_order_list_state = frame->stateCommand(blink::WebString::fromUTF8("InsertUnorderedList"));
-  params.text_align_center_state = frame->stateCommand(blink::WebString::fromUTF8("JustifyCenter"));
-  params.text_align_left_state = frame->stateCommand(blink::WebString::fromUTF8("JustifyLeft"));
-  params.text_align_right_state = frame->stateCommand(blink::WebString::fromUTF8("JustifyRight"));
-  params.text_align_full_state = frame->stateCommand(blink::WebString::fromUTF8("JustifyFull"));
+  params.order_list_state = frame->commandState(blink::WebString::fromUTF8("InsertOrderedList"));
+  params.un_order_list_state = frame->commandState(blink::WebString::fromUTF8("InsertUnorderedList"));
+  params.text_align_center_state = frame->commandState(blink::WebString::fromUTF8("JustifyCenter"));
+  params.text_align_left_state = frame->commandState(blink::WebString::fromUTF8("JustifyLeft"));
+  params.text_align_right_state = frame->commandState(blink::WebString::fromUTF8("JustifyRight"));
+  params.text_align_full_state = frame->commandState(blink::WebString::fromUTF8("JustifyFull"));
   params.has_composition = frame->hasMarkedText();
   Send(new EwkViewMsg_SelectionTextStyleState(render_view()->GetRoutingID(), params));
-#endif
 }
 
 void RenderViewObserverEfl::OnSelectClosestWord(int x, int y)
