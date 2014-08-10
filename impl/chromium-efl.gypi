@@ -166,6 +166,15 @@
       ['building_for_tizen==1 and building_for_tizen_tv==1', {
        'defines': ['OS_TIZEN_TV=1'],
       }],
+      ['host_arch=="arm"', {
+        'target_conditions': [
+          ['_toolset=="host"', {
+            'cflags!': [ '-m32' ],
+            'ldflags!': [ '-m32' ],
+            'asflags!': [ '-32' ],
+          }],
+        ],
+      }],
     ],
   },
 }
