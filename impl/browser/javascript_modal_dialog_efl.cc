@@ -164,9 +164,12 @@ bool JavaScriptModalDialogEfl::ShowJavaScriptDialog() {
   if (EflAssistHandle) {
     void (*webkit_ea_object_event_callback_add)(Evas_Object *, Ea_Callback_Type , Ea_Event_Cb func, void *);
     webkit_ea_object_event_callback_add = (void (*)(Evas_Object *, Ea_Callback_Type , Ea_Event_Cb func, void *))dlsym(EflAssistHandle, "ea_object_event_callback_add");
+#if !defined(EWK_BRINGUP)
     if(javascript_message_type_ == content::JAVASCRIPT_MESSAGE_TYPE_PROMPT || javascript_message_type_ == content::JAVASCRIPT_MESSAGE_TYPE_NAVIGATION_PROMPT)
       (*webkit_ea_object_event_callback_add)(popup_, EA_CALLBACK_BACK, CancelButtonHandlerForPrompt, this);
-    else if(javascript_message_type_ == content::JAVASCRIPT_MESSAGE_TYPE_ALERT)
+    else 
+#endif
+    if(javascript_message_type_ == content::JAVASCRIPT_MESSAGE_TYPE_ALERT)
       (*webkit_ea_object_event_callback_add)(popup_, EA_CALLBACK_BACK, CancelButtonHandlerForAlert, this);
     else
       (*webkit_ea_object_event_callback_add)(popup_, EA_CALLBACK_BACK, CancelButtonHandlerForConfirm, this);

@@ -94,11 +94,13 @@ RenderWidgetHostViewEfl::RenderWidgetHostViewEfl(RenderWidgetHost* widget)
   host_->SetView(this);
 
 #if defined(OS_TIZEN)
+#if !defined(EWK_BRINGUP)
   const CommandLine& command_line = *CommandLine::ForCurrentProcess();
 
   if (command_line.HasSwitch(switches::kUseSWRenderingPath))
       is_hw_accelerated_ = false;
   else
+#endif
 #endif
       is_hw_accelerated_ = true;
 
@@ -337,7 +339,9 @@ bool RenderWidgetHostViewEfl::OnMessageReceived(const IPC::Message& message) {
     IPC_MESSAGE_HANDLER(ViewHostMsg_TextInputInFormStateChanged, OnTextInputInFormStateChanged)
 #endif
 #if defined(OS_TIZEN)
+#if !defined(EWK_BRINGUP)
     IPC_MESSAGE_HANDLER(InputHostMsg_DidInputEventHandled, OnDidInputEventHandled)
+#endif
 #endif
     IPC_MESSAGE_UNHANDLED(handled = false)
   IPC_END_MESSAGE_MAP()
@@ -646,10 +650,12 @@ void RenderWidgetHostViewEfl::SetRectSnapshot(const SkBitmap& bitmap) {
 }
 
 void RenderWidgetHostViewEfl::GetSnapshotForRect(gfx::Rect& rect) {
+#if !defined(EWK_BRINGUP)
   GpuProcessHost::SendOnIO(
     GpuProcessHost::GPU_PROCESS_KIND_SANDBOXED,
     CAUSE_FOR_GPU_LAUNCH_NO_LAUNCH,
     new GpuMsg_GetPixelRegion(surface_id_, rect));
+#endif
 }
 #endif
 
@@ -889,11 +895,13 @@ void RenderWidgetHostViewEfl::AcceleratedSurfaceBuffersSwapped(
   const GpuHostMsg_AcceleratedSurfaceBuffersSwapped_Params& params,
   int gpu_host_id) {
 #ifdef OS_TIZEN
+#if !defined(EWK_BRINGUP)
   if (is_hw_accelerated_) {
     next_pixmap_id_ = params.pixmap_id;
     evas_object_image_pixels_dirty_set(content_image_, true);
     surface_id_ = params.surface_id;
   }
+#endif
 #endif
 
   AcceleratedSurfaceMsg_BufferPresented_Params ack_params;
@@ -1106,15 +1114,18 @@ void RenderWidgetHostViewEfl::FilterInputMotion(const blink::WebGestureEvent& ge
 }
 
 void RenderWidgetHostViewEfl::makePinchZoom(void* eventInfo) {
+#if !defined(EWK_BRINGUP)
   Wkext_Motion_Event* motionEvent = static_cast<Wkext_Motion_Event*>(eventInfo);
 
   ui::GestureEvent event(ui::ET_GESTURE_PINCH_UPDATE,
       motionEvent->position.x, motionEvent->position.y, 0, ui::EventTimeForNow(),
       ui::GestureEventDetails(ui::ET_GESTURE_PINCH_UPDATE, motionEvent->scale, 0), 1);
   HandleGesture(&event);
+#endif
 }
 
 void RenderWidgetHostViewEfl::OnDidInputEventHandled(const blink::WebInputEvent* input_event, bool processed) {
+#if !defined(EWK_BRINGUP)
   if (!im_context_)
     return;
 
@@ -1128,6 +1139,7 @@ void RenderWidgetHostViewEfl::OnDidInputEventHandled(const blink::WebInputEvent*
       HandleKeyDownQueue();
     }
   }
+#endif
 }
 #endif
 

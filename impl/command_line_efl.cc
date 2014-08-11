@@ -47,7 +47,9 @@ content::MainFunctionParams CommandLineEfl::GetDefaultPortParams() {
   p_command_line->AppendSwitch(switches::kTouchEvents);
   p_command_line->AppendSwitch(switches::kEnablePinch);
   p_command_line->AppendSwitchASCII(switches::kUseGL, gfx::kGLImplementationEGLName);
+#if !defined(EWK_BRINGUP)
   p_command_line->AppendSwitch(switches::kEnableGestureTapHighlight);
+#endif
   p_command_line->AppendSwitch(switches::kEnableSpatialNavigation);
   p_command_line->AppendSwitch(switches::kMainFrameResizesAreOrientationChanges);
 
@@ -63,7 +65,9 @@ content::MainFunctionParams CommandLineEfl::GetDefaultPortParams() {
 
   //if we use software path we dont need to have next switches
 #if defined(OS_TIZEN)
+#if !defined(EWK_BRINGUP)
   if (!p_command_line->HasSwitch(switches::kUseSWRenderingPath))
+#endif
 #endif
   {
 #warning "[M37] Investigae removed command line switches, are they still needed, do they have a replacement?"

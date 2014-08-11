@@ -64,8 +64,10 @@ bool DataFetcherSharedMemory::Stop(ConsumerType consumer_type) {
   return false;
 }
 
+#if !defined(EWK_BRINGUP)
 DataFetcherSharedMemory::FetcherType DataFetcherSharedMemory::GetType() const {
   return FETCHER_TYPE_SEPARATE_THREAD;
 }
+#endif
 
 }  // namespace content

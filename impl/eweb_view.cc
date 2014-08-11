@@ -1388,7 +1388,9 @@ Eina_Bool EWebView::PopupMenuClose() {
   if (!render_view_host)
     return false;
 
+#if !defined(EWK_BRINGUP)
   render_view_host->PopupMenuClose();
+#endif
 #endif
   return true;
 }
@@ -1426,7 +1428,9 @@ Eina_Bool EWebView::DidSelectPopupMenuItem(int selectedindex) {
   if (selectedindex != -1 && selectedindex >= eina_list_count(popupMenuItems_))
     return false;
 
+#if !defined(EWK_BRINGUP)
   render_view_host->DidSelectPopupMenuItem(selectedindex);
+#endif
 #endif
   return true;
 }
@@ -1440,7 +1444,9 @@ Eina_Bool EWebView::DidMultipleSelectPopupMenuItem(std::vector<int>& selectedind
   if (!popupMenuItems_)
     return false;
 
+#if !defined(EWK_BRINGUP)
   render_view_host->DidMultipleSelectPopupMenuItem(selectedindex);
+#endif
 #endif
   return true;
 }
@@ -2129,6 +2135,7 @@ void EWebView::ShowFileChooser(const content::FileChooserParams& params) {
   if (!render_view_host)
     return;
 #if defined(OS_TIZEN_MOBILE)
+#if !defined(EWK_BRINGUP)
   if (params.capture) {
     const std::string capture_types[] = {"video/*", "audio/*", "image/*"};
     unsigned int capture_types_num = sizeof(capture_types)/sizeof(*capture_types);
@@ -2142,6 +2149,7 @@ void EWebView::ShowFileChooser(const content::FileChooserParams& params) {
       }
     }
   }
+#endif
 #endif
   file_chooser_.reset(new content::FileChooserControllerEfl(render_view_host, &params));
   file_chooser_->open();
