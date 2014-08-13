@@ -94,9 +94,7 @@ void PopulateEwkHitTestData(const blink::WebHitTestResult& web_hit_test, _Ewk_Hi
       (ewk_hit_test->context & TW_HIT_TEST_RESULT_CONTEXT_IMAGE)) {
     blink::WebElement hit_element = web_hit_test.node().toConst<blink::WebElement>();
     ewk_hit_test->imageData.imageBitmap = hit_element.imageContents().getSkBitmap();
-#if !defined(EWK_BRINGUP)
     ewk_hit_test->imageData.fileNameExtension = hit_element.imageFilenameExtension().utf8();
-#endif
   }
 }
 
