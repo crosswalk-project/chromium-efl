@@ -51,7 +51,6 @@ class ContentRendererClientEfl : public content::ContentRendererClient
                                         v8::Handle<v8::Context>,
                                         int world_id);
 
-#if !defined(EWK_BRINGUP)
   // Note that this API requires a change in
   // content/public/renderer/content_renderer_client.h
   // The base class declares this method for OS_ANDROID only.
@@ -63,7 +62,6 @@ class ContentRendererClientEfl : public content::ContentRendererClient
                         blink::WebNavigationType type,
                         blink::WebNavigationPolicy default_policy,
                         bool is_redirect) override;
-#endif
 
   virtual bool WillSendRequest(blink::WebFrame* frame,
                                ui::PageTransition transition_type,

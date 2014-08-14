@@ -70,6 +70,7 @@ class PolicyDecision {
   const char* GetAuthUser() const;
   const char* GetAuthPassword() const;
   const char* GetUrl() const;
+  const char* GetHttpMethod() const;
   const char* GetScheme() const;
   const char* GetHost() const;
   const char* GetResponseMime() const;

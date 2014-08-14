@@ -106,6 +106,7 @@ _Ewk_Policy_Decision::_Ewk_Policy_Decision(const NavigationPolicyParams &params,
   : new_window_policy_delegate_(NULL)
   , navigation_policy_handler_(new NavigationPolicyHandlerEfl(rvh, params))
   , frame_(new tizen_webview::Frame(params))
+  , httpMethod_(params.httpMethod)
   , responseHeaders_(NULL)
   , decisionType_(TW_POLICY_DECISION_USE)
   , navigationType_(static_cast<tizen_webview::Policy_Navigation_Type>(params.type))
@@ -289,6 +290,10 @@ const char* _Ewk_Policy_Decision::GetAuthPassword() const {
 
 const char* _Ewk_Policy_Decision::GetUrl() const {
   return url_.empty() ? NULL : url_.c_str();
+}
+
+const char* _Ewk_Policy_Decision::GetHttpMethod() const {
+  return httpMethod_.empty() ? NULL : httpMethod_.c_str();
 }
 
 const char* _Ewk_Policy_Decision::GetScheme() const {

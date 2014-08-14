@@ -75,7 +75,6 @@ void ContentRendererClientEfl::RenderViewCreated(content::RenderView* render_vie
 #endif
 }
 
-#if !defined(EWK_BRINGUP)
 bool ContentRendererClientEfl::HandleNavigation(content::RenderFrame* render_frame,
                                                 content::DocumentState* document_state,
                                                 int opener_id,
@@ -95,6 +94,7 @@ bool ContentRendererClientEfl::HandleNavigation(content::RenderFrame* render_fra
   NavigationPolicyParams params;
   params.render_view_id = render_view_id;
   params.url = request.url();
+  params.httpMethod = request.httpMethod().utf8();
   params.referrer = content::Referrer(referrer_url, referrer_policy);
   params.auth = request.httpHeaderField(blink::WebString::fromUTF8("Authorization"));
   params.policy = default_policy;
@@ -111,7 +111,6 @@ bool ContentRendererClientEfl::HandleNavigation(content::RenderFrame* render_fra
 
   return result;
 }
-#endif
 
 bool ContentRendererClientEfl::WillSendRequest(blink::WebFrame* frame,
                                                ui::PageTransition transition_type,

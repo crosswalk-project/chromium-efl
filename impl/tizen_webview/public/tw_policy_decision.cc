@@ -73,6 +73,10 @@ const char* PolicyDecision::GetUrl() const {
   return impl_->GetUrl();
 }
 
+const char* PolicyDecision::GetHttpMethod() const {
+  return impl_->GetHttpMethod();
+}
+
 const char* PolicyDecision::GetScheme() const {
   return impl_->GetScheme();
 }

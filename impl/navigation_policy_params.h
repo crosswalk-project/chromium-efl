@@ -14,6 +14,7 @@
 struct NavigationPolicyParams {
   int render_view_id;
   GURL url;
+  std::string httpMethod;
   content::Referrer referrer;
   blink::WebNavigationPolicy policy;
   blink::WebNavigationType type;

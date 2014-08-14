@@ -64,6 +64,7 @@ class _Ewk_Policy_Decision {
   const char* GetAuthUser() const;
   const char* GetAuthPassword() const;
   const char* GetUrl() const;
+  const char* GetHttpMethod() const;
   const char* GetScheme() const;
   const char* GetHost() const;
   const char* GetResponseMime() const;
@@ -104,6 +105,7 @@ class _Ewk_Policy_Decision {
   scoped_ptr<tizen_webview::Frame> frame_;
   std::string cookie_;
   std::string url_;
+  std::string httpMethod_;
   std::string host_;
   std::string scheme_;
   std::string responseMime_;

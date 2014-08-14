@@ -53,11 +53,7 @@ const char* ewk_policy_decision_host_get(Ewk_Policy_Decision* policyDecision)
 const char* ewk_policy_decision_http_method_get(Ewk_Policy_Decision* policyDecision)
 {
   EINA_SAFETY_ON_NULL_RETURN_VAL(policyDecision, NULL);
-#if !defined(EWK_BRINGUP)
   return policyDecision->GetHttpMethod();
-#else
-  return NULL;
-#endif
 }
 
 Ewk_Policy_Decision_Type ewk_policy_decision_type_get(const Ewk_Policy_Decision* policyDecision)
@@ -128,10 +124,6 @@ Ewk_Frame_Ref ewk_policy_decision_frame_get(Ewk_Policy_Decision* policyDecision)
 Eina_Bool ewk_policy_decision_is_main_frame(const Ewk_Policy_Decision* policyDecision)
 {
   EINA_SAFETY_ON_NULL_RETURN_VAL(policyDecision, EINA_FALSE);
-#if !defined(EWK_BRINGUP)
   return policyDecision->GetFrameRef()->IsMainFrame() ? EINA_TRUE : EINA_FALSE;
-#else
-  return EINA_TRUE;
-#endif
 }
 
