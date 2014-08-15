@@ -157,7 +157,7 @@ void ContentBrowserClientEfl::RequestDesktopNotificationPermission(
 void ContentBrowserClientEfl::ShowDesktopNotification(
       const content::ShowDesktopNotificationHostMsgParams& params,
       content::RenderFrameHost* render_frame_host,
-      content::DesktopNotificationDelegate* delegate,
+      scoped_ptr<DesktopNotificationDelegate> delegate,
       base::Closure* cancel_callback) {
 #if defined(ENABLE_NOTIFICATIONS) && !defined(EWK_BRINGUP)
   WebContents* web_contents = WebContentsFromViewID(render_process_id, render_view_id);

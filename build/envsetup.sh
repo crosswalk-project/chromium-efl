@@ -77,7 +77,7 @@ DEFINES="OS=linux"
 DEFINES+=" host_os=${host_os} host_arch=${host_arch} python_ver=${python_ver}"
 DEFINES+=" use_libjpeg_turbo=0 proprietary_codecs=1"
 DEFINES+=" use_xi2_mt=2 toolkit_uses_gtk=0 use_aura=1 toolkit_efl=1"
-DEFINES+=" use_gstreamer=1"
+DEFINES+=" use_gstreamer=1 clang=0 host_clang=0"
 
 echo "[M37] TODO: Fix and re-enable notifications (edit build/envsetup.sh)"
 DEFINES+=" notifications=0"

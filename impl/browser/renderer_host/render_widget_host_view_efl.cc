@@ -476,7 +476,7 @@ void RenderWidgetHostViewEfl::UnlockMouse() {
 }
 
 void RenderWidgetHostViewEfl::WasShown() {
-  host_->WasShown();
+  host_->WasShown(ui::LatencyInfo());
 }
 
 void RenderWidgetHostViewEfl::WasHidden() {
@@ -974,7 +974,7 @@ void RenderWidgetHostViewEfl::RenderProcessGone(base::TerminationStatus, int err
 }
 
 void RenderWidgetHostViewEfl::HandleShow() {
-  host_->WasShown();
+  host_->WasShown(ui::LatencyInfo());
 }
 
 void RenderWidgetHostViewEfl::HandleHide() {
@@ -998,7 +998,7 @@ void RenderWidgetHostViewEfl::HandleFocusIn() {
   host_->GotFocus();
   //Will resume the videos playbacks if any were paused when Application was
   // hidden
-  host_->WasShown();
+  host_->WasShown(ui::LatencyInfo());
 }
 
 void RenderWidgetHostViewEfl::HandleFocusOut() {

@@ -42,7 +42,7 @@ class WebContentsDelegateEfl
   WebContentsDelegateEfl(EWebView*, WebContents*);
 
   virtual void NavigationStateChanged(const WebContents* source,
-                                      unsigned changed_flags) OVERRIDE;
+                                      InvalidateTypes changed_flags) OVERRIDE;
 
   virtual void LoadProgressChanged(WebContents* source, double progress) OVERRIDE;
   virtual void LoadingStateChanged(WebContents* source,

@@ -54,7 +54,6 @@
 #include "ui/events/event_switches.h"
 #include "ui/events/gestures/gesture_recognizer.h"
 #include "browser/motion/wkext_motion.h"
-#include "grit/webkit_strings.h"
 #include "ui/base/l10n/l10n_util.h"
 #include "devtools_delegate_efl.h"
 
@@ -579,8 +578,12 @@ void EWebView::ProcessAckedTouchEvent(const TouchEventWithLatencyInfo& touch,
       ui::ER_HANDLED : ui::ER_UNHANDLED;
   for (ScopedVector<ui::TouchEvent>::const_iterator iter = events.begin(),
       end = events.end(); iter != end; ++iter)  {
+    if (!ui::GestureRecognizer::Get()->ProcessTouchEventPreDispatch(
+        *(*iter), this)) {
+      continue;
+    }    
     scoped_ptr<ui::GestureRecognizer::Gestures> gestures(
-        gesture_recognizer_->ProcessTouchEventForGesture(*(*iter), result, this));
+        gesture_recognizer_->ProcessTouchEventPostDispatch(*(*iter), result, this));
     if (gestures) {
       for (size_t j = 0; j < gestures->size(); ++j) {
         ui::GestureEvent* event = gestures->get().at(j);

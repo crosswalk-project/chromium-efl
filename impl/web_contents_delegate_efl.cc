@@ -99,7 +99,8 @@ WebContentsDelegateEfl::~WebContentsDelegateEfl() {
   delete dialog_manager_;
 }
 
-void WebContentsDelegateEfl::NavigationStateChanged(const WebContents* source, unsigned changed_flags) {
+void WebContentsDelegateEfl::NavigationStateChanged(
+    const WebContents* source, InvalidateTypes changed_flags) {
   if (changed_flags & content::INVALIDATE_TYPE_URL) {
     const char* url = source->GetVisibleURL().spec().c_str();
     web_view_->SmartCallback<EWebViewCallbacks::URLChanged>().call(url);
@@ -279,7 +280,7 @@ void WebContentsDelegateEfl::DidFailLoad(RenderFrameHost* render_frame_host,
   scoped_ptr<_Ewk_Error> error(new _Ewk_Error(error_code,
                                             validated_url.possibly_invalid_spec().c_str(),
                                             error_description.empty() ?
-                                                net::ErrorToString(error_code) :
+                                                net::ErrorToString(error_code).c_str() :
                                                 UTF16ToUTF8(error_description).c_str()));
 
   web_view_->SmartCallback<EWebViewCallbacks::LoadError>().call(error.get());

@@ -327,11 +327,14 @@ void WebMemorySampler::sampleTimerFired() {
 
   size_t totalBytesInUse = 0, totalBytesCommitted = 0;
 
+#ifndef EWK_BRINGUP
+  // WTF::fastMallocStatistics() is gone. Find something for replacement.
   WTF::FastMallocStatistics fastMallocStatistics = WTF::fastMallocStatistics();
   size_t fastMallocBytesInUse = fastMallocStatistics.committedVMBytes - fastMallocStatistics.freeListBytes;
   size_t fastMallocBytesCommitted = fastMallocStatistics.committedVMBytes;
   totalBytesInUse += fastMallocBytesInUse;
   totalBytesCommitted += fastMallocBytesCommitted;
+#endif
 
   values.push_back(now);
 
@@ -345,12 +348,13 @@ void WebMemorySampler::sampleTimerFired() {
   values.push_back(applicationStats.UMPSize);
   values.push_back(applicationStats.graphics3DSize);
 
+#ifndef EWK_BRINGUP
   values.push_back(totalBytesInUse);
   values.push_back(fastMallocBytesInUse);
 
   values.push_back(totalBytesCommitted);
   values.push_back(fastMallocBytesCommitted);
-
+#endif
   sampleSystemMemoryInfo(values);
 
   if (!values.empty()) {
