@@ -9,9 +9,6 @@
       }],
       ['building_for_tizen==1', {
         'use_gnome_keyring': 0,
-        'icu_use_data_file_flag' : 1,
-        'spdy_proxy_auth_origin': '',
-        'data_reduction_proxy_probe_url': '',
         'clang': 0,
       }],
     ],
