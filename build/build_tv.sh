@@ -15,6 +15,7 @@ if [ ! -f "$HOME/.gbs.conf" ]; then
 fi
 
 gbs $CONF_FLAG build $PROFILE_FLAG -A armv7l --incremental \
+    --extra-packs python-base-x86-arm,python-x86-arm,python-xml-x86-arm
     --define "${TIZEN_VERSION}" "$@"
 
 ${SCRIPTDIR}/apply_patches.sh -r
