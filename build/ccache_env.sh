@@ -8,6 +8,10 @@ function usage() {
   echo "source build/ccache_env.sh desktop|mobile|tv"
 }
 
+if ! type ccache &> /dev/null; then
+  echo "WARNING: ccache option used but ccache is not installed"
+  return 0
+fi
 
 if [ "$1" == "desktop" -o  "$1" == "mobile" -o "$1" == "tv" ]; then
   OUTPUT_BASE_FOLDER=out.${1}.$(getHostArch)
