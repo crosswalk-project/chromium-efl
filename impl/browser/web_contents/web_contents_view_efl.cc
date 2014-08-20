@@ -51,8 +51,7 @@ RenderWidgetHostViewBase* WebContentsViewEfl::CreateViewForWidget(
     return NULL;
   }
 
-  RenderWidgetHostViewEfl* view = new RenderWidgetHostViewEfl(render_widget_host);
-  view->set_eweb_view(delegate->web_view());
+  RenderWidgetHostViewEfl* view = new RenderWidgetHostViewEfl(render_widget_host, delegate->web_view());
   view->Show();
 
   return view;
@@ -60,7 +59,9 @@ RenderWidgetHostViewBase* WebContentsViewEfl::CreateViewForWidget(
 
 RenderWidgetHostViewBase* WebContentsViewEfl::CreateViewForPopupWidget(
     RenderWidgetHost* render_widget_host) {
-  return new RenderWidgetHostViewEfl(render_widget_host);
+  WebContentsDelegateEfl* delegate =
+      static_cast<WebContentsDelegateEfl*>(web_contents_->GetDelegate());
+  return new RenderWidgetHostViewEfl(render_widget_host, delegate->web_view());
 }
 
 void WebContentsViewEfl::SetPageTitle(const base::string16& title) {

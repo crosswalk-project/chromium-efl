@@ -61,7 +61,7 @@ class RenderWidgetHostViewEfl
     public IPC::Sender {
  public:
   // RenderWidgetHostViewBase implementation.
-  explicit RenderWidgetHostViewEfl(RenderWidgetHost*);
+  explicit RenderWidgetHostViewEfl(RenderWidgetHost*, EWebView*);
 
   virtual void InitAsChild(gfx::NativeView) OVERRIDE;
   virtual void InitAsPopup(content::RenderWidgetHostView*, const gfx::Rect&) OVERRIDE;

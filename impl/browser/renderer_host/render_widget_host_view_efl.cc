@@ -76,7 +76,7 @@ void RenderWidgetHostViewBase::GetDefaultScreenInfo(blink::WebScreenInfo* result
   results->depthPerComponent = 8;
 }
 
-RenderWidgetHostViewEfl::RenderWidgetHostViewEfl(RenderWidgetHost* widget)
+RenderWidgetHostViewEfl::RenderWidgetHostViewEfl(RenderWidgetHost* widget, EWebView* eweb_view)
   : host_(RenderWidgetHostImpl::From(widget)),
     web_view_(NULL),
     im_context_(NULL),
@@ -91,6 +91,7 @@ RenderWidgetHostViewEfl::RenderWidgetHostViewEfl(RenderWidgetHost* widget)
     current_pixmap_id_(0),
     next_pixmap_id_(0),
     surface_id_(0) {
+  set_eweb_view(eweb_view);
   host_->SetView(this);
 
 #if defined(OS_TIZEN)
