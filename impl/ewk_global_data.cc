@@ -1,5 +1,6 @@
 #include "ewk_global_data.h"
 
+#include "base/cpu.h"
 #include "base/logging.h"
 #include "base/path_service.h"
 #include "base/message_loop/message_loop.h"
@@ -71,6 +72,11 @@ EwkGlobalData* EwkGlobalData::GetInstance() {
 void EwkGlobalData::Ensure() {
   if (instance_)
     return;
+
+  // Workaround for cpu info logging asserting if executed on the wrong thread
+  // during cpu info lazy instance initialization.
+  base::CPU cpu;
+  DCHECK(cpu.cpu_brand() != "");
 
   instance_ = new EwkGlobalData();
 
