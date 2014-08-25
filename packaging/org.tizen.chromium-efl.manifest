@@ -26,12 +26,12 @@
       <smack request="immvibed" type="rw" />
       <smack request="aul::launch" type="x" />
       <smack request="location_fw::client" type="rw" />
-      <smack request="chromium-efl::db" type="rwxat" />
       <smack request="device::video" type="rw" />
       <smack request="mm_qcamera_daemon" type="w" />
       <smack request="pulseaudio" type="rwxat" />
       <smack request="pulseaudio::record" type="r" />
       <smack request="sound_server" type="rw" />
+      <smack request="chromium-efl::db" type="rwxat" />
       <smack request="ui-gadget::client" type="rwx" />
     </request>
   </define>

@@ -3,11 +3,15 @@
 %global debug_package %{nil}
 %endif
 
+%if 0%{?_enable_unittests}
+%define _debug_mode 1
+%endif
+
 Name: org.tizen.chromium-efl
 Summary: Chromium EFL
 # Set by by scripts/update-chromium-version.sh
-%define ChromiumVersion 34.1847.76
-%define Week 28
+%define ChromiumVersion 38.2121.0
+%define Week 34
 Version: %{ChromiumVersion}.%{Week}
 Release: 1
 Group: Applications/Internet
@@ -40,6 +44,7 @@ BuildRequires: pkgconfig(sqlite3)
 BuildRequires: pkgconfig(capi-appfw-application)
 BuildRequires: pkgconfig(capi-system-sensor)
 BuildRequires: pkgconfig(capi-system-info)
+BuildRequires: pkgconfig(capi-system-device)
 BuildRequires: pkgconfig(capi-location-manager)
 BuildRequires: pkgconfig(location)
 BuildRequires: pkgconfig(gles20)
@@ -74,6 +79,8 @@ BuildRequires: pkgconfig(ewebkit2-ext)
 BuildRequires: bzip2-devel
 BuildRequires: pkgconfig(vpx)
 BuildRequires: pkgconfig(efl-assist)
+BuildRequires: pkgconfig(capi-network-connection)
+BuildRequires: pkgconfig(capi-telephony-network-info)
 %endif
 BuildRequires: pkgconfig(gstreamer-0.10)
 BuildRequires: pkgconfig(gstreamer-plugins-base-0.10)
@@ -96,12 +103,23 @@ Requires: %{name} = %{version}-%{release}
 %description devel
 Browser Engine dev library based on Chromium EFL (developement files)
 
+%if 0%{?_enable_unittests}
+%package unittests
+Summary: Chromium unittests
+Group: Development/Libraries
+Requires: %{name} = %{version}-%{release}
+%description unittests
+Chromium unite tests
+%endif
+
 # Directory for internal chromium executable components
 %global CHROMIUM_EXE_DIR %{_libdir}/%{name}
 # Constant read only data used by chromium-efl port
 %global CHROMIUM_DATA_DIR %{_datadir}/%{name}
 # Web Databse read write data used by chromium-efl port
 %global CHROMIUM_WEBDB_DIR /opt/usr/apps/%{name}
+# Chromium unit tests install directory
+%global CHROMIUM_UNITTESTS_DIR /opt/usr/chromium-unittests/
 
 %prep
 %setup -q
@@ -111,106 +129,103 @@ Browser Engine dev library based on Chromium EFL (developement files)
 # workaround for new nss library : search it in /usr/lib first, rather than /lib (system nss)
 export LD_RUN_PATH=%{_libdir}
 #/usr/lib
-export BUILDING_WITH_GBS=1
 
-# Temporary workaround
+# architecture related configuration + neon temporary workaround
 %ifarch %{arm}
-export CFLAGS="$(echo $CFLAGS | sed 's/-mfpu=[a-zA-Z0-9-]*/-mfpu=neon/g')"
-export CXXFLAGS="$(echo $CXXFLAGS | sed 's/-mfpu=[a-zA-Z0-9-]*/-mfpu=neon/g')"
-export FFLAGS="$(echo $FFLAGS | sed 's/-mfpu=[a-zA-Z0-9-]*/-mfpu=neon/g')"
+  export CFLAGS="$(echo $CFLAGS | sed 's/-mfpu=[a-zA-Z0-9-]*/-mfpu=neon/g')"
+  export CXXFLAGS="$(echo $CXXFLAGS | sed 's/-mfpu=[a-zA-Z0-9-]*/-mfpu=neon/g')"
+  export FFLAGS="$(echo $FFLAGS | sed 's/-mfpu=[a-zA-Z0-9-]*/-mfpu=neon/g')"
+  %define EFL_TARGET arm
 %else
-export CFLAGS="$(echo $CFLAGS | sed 's/-Wl,--as-needed//g')"
-export CXXFLAGS="$(echo $CXXFLAGS | sed 's/-Wl,--as-needed//g')"
+  export CFLAGS="$(echo $CFLAGS | sed 's/-Wl,--as-needed//g')"
+  export CXXFLAGS="$(echo $CXXFLAGS | sed 's/-Wl,--as-needed//g')"
+  %if 0%{?simulator}
+    %define EFL_TARGET emulator
+  %else
+    %define EFL_TARGET i386
+  %endif
 %endif
 
 %if 0%{?nodebug}
-CFLAGS=$(echo $CFLAGS | sed 's/ -g / /')
-CXXFLAGS=$(echo $CXXFLAGS | sed 's/ -g / /')
+  CFLAGS=$(echo $CFLAGS | sed 's/ -g / /')
+  CXXFLAGS=$(echo $CXXFLAGS | sed 's/ -g / /')
 %endif
 
 %if %{!?TIZEN_PROFILE_TV:1}%{?TIZEN_PROFILE_TV:0}
-%define OUTPUT_BUILD_PROFILE_TARGET mobile
+  %define OUTPUT_BUILD_PROFILE_TARGET mobile
 %else
-%define OUTPUT_BUILD_PROFILE_TARGET tv
+  %define OUTPUT_BUILD_PROFILE_TARGET tv
 %endif
-
-%ifarch %{arm}
-%define EFL_TARGET arm
-%else
-%if 0%{?simulator}
-%define EFL_TARGET emulator
-%else
-%define EFL_TARGET i386
-%endif
-%endif
-
-#TODO: This hardcoding should go
-%define INSTALL_ROOT /home/abuild/rpmbuild/BUILDROOT/%{name}-%{version}-%{release}.arm
-
-. ./build/envsetup.sh
 
 %define OUTPUT_BASE_FOLDER out.%{OUTPUT_BUILD_PROFILE_TARGET}.%{EFL_TARGET}
 
 #set build mode
 %if 0%{?_debug_mode}
-%global OUTPUT_FOLDER %{OUTPUT_BASE_FOLDER}/Debug
-# Building the RPM in the GBS chroot fails with errors such as
-#   /usr/lib/gcc/i586-tizen-linux/4.7/../../../../i586-tizen-linux/bin/ld:
-#       failed to set dynamic section sizes: Memory exhausted
-# For now, work around it by passing a GNU ld-specific flag that optimizes the
-# linker for memory usage.
-export LDFLAGS="${LDFLAGS} -Wl,--no-keep-memory"
+  %global OUTPUT_FOLDER %{OUTPUT_BASE_FOLDER}/Debug
+  # Building the RPM in the GBS chroot fails with errors such as
+  #   /usr/lib/gcc/i586-tizen-linux/4.7/../../../../i586-tizen-linux/bin/ld:
+  #       failed to set dynamic section sizes: Memory exhausted
+  # For now, work around it by passing a GNU ld-specific flag that optimizes the
+  # linker for memory usage.
+  export LDFLAGS="${LDFLAGS} -Wl,--no-keep-memory"
 %else
-%global OUTPUT_FOLDER %{OUTPUT_BASE_FOLDER}/Release
+  %global OUTPUT_FOLDER %{OUTPUT_BASE_FOLDER}/Release
 %endif
-# to workaround mess in ./build/envsetup.sh
-export GYP_GENERATOR_OUTPUT=%{OUTPUT_BASE_FOLDER}
 
 if type ccache &> /dev/null; then
-export CCACHE_CPP2=yes
-export CCACHE_SLOPPINESS=time_macros
-export CCACHE_BASEDIR=$PWD/src
-export CCACHE_DIR=$PWD/%{OUTPUT_BASE_FOLDER}.ccache
-export CCACHE_COMPILERCHECK=content
-CCACHESIZE=$(ccache -s | grep max | grep -oE "[0-9]+" | head -1)
-  if [ $CCACHESIZE == "1" ]; then
-    ccache -M 10
-  fi
+  source build/ccache_env.sh %{OUTPUT_BUILD_PROFILE_TARGET}
 fi
 
 #gyp generate
 %if %{?_skip_gyp:0}%{!?_skip_gyp:1}
-gyp_chromiumefl \
+#run standard gyp_chromiumefl wrapper
+   ./build/gyp_chromiumefl.sh \
   -Dexe_dir="%{CHROMIUM_EXE_DIR}" \
   -Ddata_dir="%{CHROMIUM_DATA_DIR}" \
   -Dedje_dir="%{CHROMIUM_DATA_DIR}"/themes \
 %if 0%{?_remove_webcore_debug_symbols:1}
   -Dremove_webcore_debug_symbols=1 \
 %endif
-  -Dwebdb_dir="%{CHROMIUM_WEBDB_DIR}"/data/db
+  -Dwebdb_dir="%{CHROMIUM_WEBDB_DIR}"/data/db \
+  -Dbuilding_for_tizen_"%{OUTPUT_BUILD_PROFILE_TARGET}"=1
 %endif
 
-ninja %{_smp_mflags} -C"%{OUTPUT_FOLDER}"
+build/prebuild/ninja %{_smp_mflags} -C"%{OUTPUT_FOLDER}"
+
+%if 0%{?_enable_unittests}
+ninja %{_smp_mflags} -C"%{OUTPUT_FOLDER}" angle_unittests env_chromium_unittests cacheinvalidation_unittests \
+  url_unittests sandbox_linux_unittests crypto_unittests sql_unittests accessibility_unittests \
+  gfx_unittests printing_unittests events_unittests ppapi_unittests jingle_unittests \
+  flip_in_mem_edsm_server_unittests breakpad_unittests dbus_unittests libphonenumber_unittests \
+  base_unittests ffmpeg_unittests gin_unittests net_unittests snapshot_unittests \
+  google_apis_unittests
+# TODO: Fix compilation of the following tests content_unittests cc_unittests shell_dialogs_unittests
+# gpu_unittests compositor_unittests media_unittests
+%endif
 
 %install
-install -d "%{INSTALL_ROOT}"%{_sysconfdir}/smack/accesses2.d
-install -d "%{INSTALL_ROOT}"%{_libdir}/pkgconfig
-install -d "%{INSTALL_ROOT}"%{_includedir}/v8
-install -d "%{INSTALL_ROOT}%{CHROMIUM_EXE_DIR}"
-install -d "%{INSTALL_ROOT}%{CHROMIUM_DATA_DIR}"/themes
+install -d "%{buildroot}"%{_sysconfdir}/smack/accesses2.d
+install -d "%{buildroot}"%{_libdir}/pkgconfig
+install -d "%{buildroot}"%{_includedir}/v8
+install -d "%{buildroot}%{CHROMIUM_EXE_DIR}"
+install -d "%{buildroot}%{CHROMIUM_DATA_DIR}"/themes
 
-# Generate pkg-confg file
-sed -e 's#?VERSION?#%{version}#' pkgconfig/chromium-efl.pc.in > "%{OUTPUT_FOLDER}"/chromium-efl.pc
+install -m 0755 "%{OUTPUT_FOLDER}"/lib/libchromium-efl.so    "%{buildroot}"%{_libdir}
 
-install -m 0755 "%{OUTPUT_FOLDER}"/lib/libchromium-efl.so    "%{INSTALL_ROOT}"%{_libdir}
+install -m 0755 "%{OUTPUT_FOLDER}"/libffmpegsumo.so  "%{buildroot}%{CHROMIUM_EXE_DIR}"
+install -m 0755 "%{OUTPUT_FOLDER}"/efl_webprocess    "%{buildroot}%{CHROMIUM_EXE_DIR}"
+install -m 0755 "%{OUTPUT_FOLDER}"/content_shell.pak "%{buildroot}%{CHROMIUM_EXE_DIR}"
+install -m 0644 "%{OUTPUT_FOLDER}"/resources/*.edj   "%{buildroot}%{CHROMIUM_DATA_DIR}"/themes
 
-install -m 0755 "%{OUTPUT_FOLDER}"/libffmpegsumo.so  "%{INSTALL_ROOT}%{CHROMIUM_EXE_DIR}"
-install -m 0755 "%{OUTPUT_FOLDER}"/efl_webprocess    "%{INSTALL_ROOT}%{CHROMIUM_EXE_DIR}"
-install -m 0755 "%{OUTPUT_FOLDER}"/content_shell.pak "%{INSTALL_ROOT}%{CHROMIUM_EXE_DIR}"
-install -m 0644 "%{OUTPUT_FOLDER}"/resources/*.edj   "%{INSTALL_ROOT}%{CHROMIUM_DATA_DIR}"/themes
+install -m 0644 "%{OUTPUT_FOLDER}"/pkgconfig/*.pc    "%{buildroot}"%{_libdir}/pkgconfig/
+install -m 0644 src/v8/include/*.h                   "%{buildroot}"%{_includedir}/v8/
 
-install -m 0644 "%{OUTPUT_FOLDER}"/*.pc              "%{INSTALL_ROOT}"%{_libdir}/pkgconfig/
-install -m 0644 src/v8/include/*.h                   "%{INSTALL_ROOT}"%{_includedir}/v8/
+%if 0%{?_enable_unittests}
+install -d "%{INSTALL_ROOT}%{CHROMIUM_UNITTESTS_DIR}"
+for test in "%{OUTPUT_FOLDER}/*_unittests"; do
+  install -m 0755 ${test} "%{INSTALL_ROOT}%{CHROMIUM_UNITTESTS_DIR}"
+done
+%endif
 
 %post
 # apply smack rule
@@ -260,3 +275,9 @@ fi
 %defattr(-,root,root,-)
 %{_includedir}/v8/*
 %{_libdir}/pkgconfig/*.pc
+
+%if 0%{?_enable_unittests}
+%files unittests
+%defattr(-,root,root,-)
+%{CHROMIUM_UNITTESTS_DIR}/*
+%endif

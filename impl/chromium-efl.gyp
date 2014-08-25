@@ -349,12 +349,31 @@
           '<(RULE_INPUT_PATH)',
           '<(PRODUCT_DIR)/resources/<(RULE_INPUT_ROOT).edj',
         ],
-    }], #rules
+    }], # rules
     'conditions': [
       ['ewk_bringup==1', {
         'defines': [ 'EWK_BRINGUP=1' ],
       }],
     ],
+    'actions': [{
+      'action_name': 'generate_pkgconfigs',
+      'variables': {
+        'generator_path': 'pkgconfig/gen_pkgconfigs.py',
+      },
+      'inputs': [
+        '<(generator_path)',
+      ],
+      'outputs': [
+        '<(PRODUCT_DIR)/pkgconfig/chromium-efl.pc',
+        '<(PRODUCT_DIR)/pkgconfig/desktop/chromium-efl.pc',
+      ],
+      'action': [
+        'python', '<(generator_path)',
+        '--out-dir', '<(PRODUCT_DIR)',
+        '--defines', '${defines}',
+        '--chrome-src', '<(chrome_src_dir)',
+      ],
+    }], # actions
   },
   {
     'target_name': 'efl_webprocess',

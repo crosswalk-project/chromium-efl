@@ -4,8 +4,8 @@ TOPDIR=$(cd ${SCRIPTDIR}/.. ; pwd -P)
 source ${SCRIPTDIR}/common.sh
 
 function usage() {
- echo "Usage:"
- echo "source build/ccache_env.sh desktop|mobile|tv"
+  echo "Usage:"
+  echo "source build/ccache_env.sh desktop|mobile|tv"
 }
 
 
@@ -20,9 +20,12 @@ if [ "$1" == "desktop" -o  "$1" == "mobile" -o "$1" == "tv" ]; then
   if [ $CCACHESIZE == "1" ]; then
      ccache -M 10
   fi
-  ccacheInPath=$(echo $PATH | grep -c /usr/lib/ccache)
-  if [ "$ccacheInPath" == "0" -a "$1" == "desktop" ]; then
-    export PATH=/usr/lib/ccache:$PATH
+
+  if [ "$1" == "desktop" ]; then
+    ccacheInPath=$(echo $PATH | grep -c /usr/lib/ccache)
+    if [ "$ccacheInPath" == "0" ]; then
+      export PATH=/usr/lib/ccache:$PATH
+    fi
   fi
 else
   echo "Warning! You need to pick correct profile when you include ccache_env.sh"
