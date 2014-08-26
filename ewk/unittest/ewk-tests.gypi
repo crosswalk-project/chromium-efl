@@ -110,6 +110,7 @@
         'utc_blink_ewk_context_new_func.cpp',
         'utc_blink_ewk_context_notify_low_memory_func.cpp',
         'utc_blink_ewk_context_pixmap_set_func.cpp',
+        'utc_blink_ewk_context_preferred_languages_set_func.cpp',
         'utc_blink_ewk_context_proxy_uri_get_func.cpp',
         'utc_blink_ewk_context_proxy_uri_set_func.cpp',
         'utc_blink_ewk_context_vibration_client_callbacks_set_func.cpp',

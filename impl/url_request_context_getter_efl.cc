@@ -34,6 +34,7 @@
 #include "net/url_request/url_request_job_factory_impl.h"
 #include "network_delegate_efl.h"
 #include "eweb_context.h"
+#include "http_user_agent_settings_efl.h"
 
 
 namespace content {
@@ -105,8 +106,7 @@ net::URLRequestContext* URLRequestContextGetterEfl::GetURLRequestContext() {
     storage_->set_channel_id_service(new net::ChannelIDService(
         new net::DefaultChannelIDStore(NULL),
         base::WorkerPool::GetTaskRunner(true)));
-    storage_->set_http_user_agent_settings(
-        new net::StaticHttpUserAgentSettings("en-us,en", std::string()));
+    storage_->set_http_user_agent_settings(new HttpUserAgentSettingsEfl());
 
     scoped_ptr<net::HostResolver> host_resolver(
         net::HostResolver::CreateDefaultResolver(
