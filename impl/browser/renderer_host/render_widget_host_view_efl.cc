@@ -18,6 +18,7 @@
 #include "browser/renderer_host/im_context_efl.h"
 #include "browser/renderer_host/scroll_detector.h"
 #include "browser/renderer_host/web_event_factory_efl.h"
+#include "content/browser/gpu/browser_gpu_channel_host_factory.h"
 #include "content/browser/renderer_host/render_widget_host_impl.h"
 #include "content/browser/renderer_host/ui_events_helper.h"
 #include "content/browser/renderer_host/event_with_latency_info.h"
@@ -91,8 +92,6 @@ RenderWidgetHostViewEfl::RenderWidgetHostViewEfl(RenderWidgetHost* widget, EWebV
     current_pixmap_id_(0),
     next_pixmap_id_(0),
     surface_id_(0) {
-  set_eweb_view(eweb_view);
-  host_->SetView(this);
 
 #if defined(OS_TIZEN)
 #if !defined(EWK_BRINGUP)
@@ -104,6 +103,9 @@ RenderWidgetHostViewEfl::RenderWidgetHostViewEfl(RenderWidgetHost* widget, EWebV
 #endif
 #endif
       is_hw_accelerated_ = true;
+
+  set_eweb_view(eweb_view);
+  host_->SetView(this);
 
   static bool scale_factor_initialized = false;
   if (!scale_factor_initialized) {
