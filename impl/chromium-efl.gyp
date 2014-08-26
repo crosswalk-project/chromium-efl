@@ -252,6 +252,8 @@
       'gl/gl_shared_context_efl.h',
       'gpu/gpu_thread_override_efl.cc',
       'gpu/gpu_thread_override_efl.h',
+      'http_user_agent_settings_efl.cc',
+      'http_user_agent_settings_efl.h',
       'memory_purger.cc',
       'memory_purger.h',
       'message_pump_for_ui_efl.cc',

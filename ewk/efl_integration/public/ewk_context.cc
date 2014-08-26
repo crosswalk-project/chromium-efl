@@ -8,6 +8,7 @@
 #include <../src/base/memory/ref_counted.h>
 #include <../impl/browser/vibration/vibration_provider_client.h>
 #include <../impl/browser_context_efl.h>
+#include <../impl/http_user_agent_settings_efl.h>
 #include <../impl/API/ewk_cookie_manager_private.h>
 #if !defined(EWK_BRINGUP)
 #include <../impl/API/ewk_context_form_autofill_profile_private.h>
@@ -558,12 +559,29 @@ Eina_Bool ewk_context_favicon_database_directory_set(Ewk_Context* ewkContext, co
   LOG_EWK_API_MOCKUP("Tizen TV Browser");
   return false;
 }
+#endif // OS_TIZEN_TV
 
 void ewk_context_preferred_languages_set(Eina_List* languages)
 {
-  LOG_EWK_API_MOCKUP("Tizen TV Browser");
+  std::string preferredLanguages;
+
+  Eina_List* it;
+  void* data;
+
+  EINA_LIST_FOREACH(languages, it, data) {
+    if (data) {
+      preferredLanguages.append(static_cast<char*>(data));
+      if (it->next) {
+        preferredLanguages.append(",");
+      }
+    }
+  }
+  std::transform(preferredLanguages.begin(), preferredLanguages.end(), preferredLanguages.begin(), ::tolower);
+  std::replace(preferredLanguages.begin(), preferredLanguages.end(), '_', '-');
+  HttpUserAgentSettingsEfl::SetAcceptLanguage(preferredLanguages);
 }
 
+#if defined(OS_TIZEN_TV)
 Ewk_Storage_Manager* ewk_context_storage_manager_get(const Ewk_Context* ewkContext)
 {
   LOG_EWK_API_MOCKUP("Tizen TV Browser");
