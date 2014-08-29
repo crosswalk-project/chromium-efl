@@ -466,6 +466,7 @@ void WebContentsDelegateEfl::OnGetContentSecurityPolicy(IPC::Message* reply_msg)
 }
 
 void WebContentsDelegateEfl::OnPrintedMetafileReceived(const DidPrintPagesParams& params) {
+#if !(defined(EWK_BRINGUP) && defined(OS_TIZEN_MOBILE))
   base::SharedMemory shared_buf(params.metafile_data_handle, true);
   if (!shared_buf.Map(params.data_size)) {
      NOTREACHED() << "couldn't map";
@@ -478,6 +479,7 @@ void WebContentsDelegateEfl::OnPrintedMetafileReceived(const DidPrintPagesParams
   }
   BrowserThread::PostTask(BrowserThread::FILE, FROM_HERE,
         base::Bind(&WritePdfDataToFile, metafile.release(), params.filename));
+#endif
 }
 
 void WebContentsDelegateEfl::NavigationEntryCommitted(const LoadCommittedDetails& load_details) {

@@ -354,6 +354,14 @@
       ['ewk_bringup==1', {
         'defines': [ 'EWK_BRINGUP=1' ],
       }],
+      ['enable_printing==0', {
+        'sources!': [
+          'renderer/print_pages_params.cc',
+          'renderer/print_pages_params.h',
+          'renderer/print_web_view_helper_efl.cc',
+          'renderer/print_web_view_helper_efl.h',
+        ],
+      }],
     ],
     'actions': [{
       'action_name': 'generate_pkgconfigs',
