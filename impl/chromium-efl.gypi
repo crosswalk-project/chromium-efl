@@ -8,7 +8,6 @@
         'pkg-config': 'pkg-config'
       }],
       ['building_for_tizen==1', {
-        'use_gnome_keyring': 0,
         'clang': 0,
       }],
     ],
@@ -21,7 +20,6 @@
       'TIZEN_EDGE_EFFECT=1',
       'BUILDING_V8_SHARED=1',
       'V8_SHARED=1',
-      'ENABLE_ORIENTATION_EVENTS=1',
       'USE_DL_PREFIX=1',
 # [M37] TODO:Autofill related code chagned. Need to enable after Fixing.
       #'TIZEN_AUTOFILL_SUPPORT=1',
