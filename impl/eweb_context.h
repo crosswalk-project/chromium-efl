@@ -110,6 +110,8 @@ class EWebContext {
   void SetPixmap(int pixmap) { m_pixmap = pixmap; }
   int Pixmap() const { return m_pixmap; }
 
+  void Initialize(Evas_Object* object);
+
  private:
   EWebContext();
   ~EWebContext();
@@ -124,6 +126,7 @@ class EWebContext {
   std::string proxy_uri_;
   scoped_ptr<EwkDidStartDownloadCallback> start_download_callback_;
   int m_pixmap;
+  bool initialized_;
 };
 
 #endif

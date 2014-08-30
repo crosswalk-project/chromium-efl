@@ -33,6 +33,8 @@
 #include "content/common/gpu/gpu_messages.h"
 #include "common/render_messages_efl.h"
 #include "eweb_context.h"
+#include "gl/gl_shared_context_efl.h"
+#include "gpu/command_buffer/service/mailbox_manager.h"
 #include "media/base/video_util.h"
 #include "selection_controller_efl.h"
 #include "skia/ext/image_operations.h"
@@ -169,84 +171,71 @@ void RenderWidgetHostViewEfl::initializeProgram() {
   source_texture_location_ = evas_gl_api_->glGetUniformLocation (program_id_, "s_texture" );
 }
 
-void RenderWidgetHostViewEfl::EvasObjectImagePixelsGetCallback(void* data, Evas_Object* obj) {
-  RenderWidgetHostViewEfl* rwhv_efl = reinterpret_cast<RenderWidgetHostViewEfl*>(data);
-  Evas_GL_API* gl_api = rwhv_efl->evasGlApi();
+void RenderWidgetHostViewEfl::PaintTextureToSurface(GLuint texture_id) {
+  Evas_GL_API* gl_api = evasGlApi();
   DCHECK(gl_api);
 
-  evas_gl_make_current(rwhv_efl->evas_gl_, rwhv_efl->evas_gl_surface_, rwhv_efl->evas_gl_context_);
+  evas_gl_make_current(evas_gl_, evas_gl_surface_, evas_gl_context_);
 
-  gfx::Rect bounds = rwhv_efl->GetViewBoundsInPix();
-
+  gfx::Rect bounds = GetViewBoundsInPix();
   gl_api->glViewport(0, 0, bounds.width(), bounds.height());
   gl_api->glClearColor(1.0, 1.0, 1.0, 1.0);
   gl_api->glClear(GL_COLOR_BUFFER_BIT);
-
-  if (rwhv_efl->current_pixmap_id_ != rwhv_efl->next_pixmap_id_) {
-    gl_api->glBindTexture(GL_TEXTURE_2D, 0);
-    gl_api->glDeleteTextures(1, &rwhv_efl->texture_id_);
-    gl_api->evasglDestroyImage(rwhv_efl->egl_image_);
-    rwhv_efl->texture_id_ = 0;
-    rwhv_efl->egl_image_ = 0;
-    rwhv_efl->current_pixmap_id_ = rwhv_efl->next_pixmap_id_;
-  }
-
-  if (!rwhv_efl->egl_image_) {
-    rwhv_efl->egl_image_ = gl_api->evasglCreateImage(EVAS_GL_NATIVE_PIXMAP, (void*)(intptr_t)rwhv_efl->current_pixmap_id_, 0);
-    gl_api->glGenTextures(1, &rwhv_efl->texture_id_);
-    gl_api->glBindTexture(GL_TEXTURE_2D, rwhv_efl->texture_id_);
-    gl_api->glEvasGLImageTargetTexture2DOES(GL_TEXTURE_2D, rwhv_efl->egl_image_);
-    gl_api->glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-    gl_api->glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-    gl_api->glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-    gl_api->glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-  }
-
-  gl_api->glUseProgram(rwhv_efl->program_id_);
+  gl_api->glUseProgram(program_id_);
 
   const GLfloat* vertex_attributes;
 
   const GLfloat vertex_attributes_270[] = {
-      -1.0f, 1.0f, 0.0f, 0.0f,
-      1.0f, -1.0f, -1.0f, 0.0f,
-      1.0f, 1.0f, 1.0f, -1.0f,
-      0.0f, 1.0f, 0.0f, 1.0f,
-      1.0f, 0.0f, 0.0f, 0.0f};
+      -1.0f, -1.0f, 0.0f, 0.0f, 1.0f,
+      -1.0f,  1.0f, 0.0f, 1.0f, 1.0f,
+       1.0f,  1.0f, 0.0f, 1.0f, 0.0f,
+       1.0f, -1.0f, 0.0f, 0.0f, 0.0f};
 
   const GLfloat vertex_attributes_90[] = {
-      -1.0f, 1.0f, 0.0f, 1.0f,
-      0.0f, -1.0f, -1.0f, 0.0f,
-      0.0f, 0.0f, 1.0f, -1.0f,
-      0.0f, 0.0f, 1.0f, 1.0f,
-      1.0f, 0.0f, 1.0f, 1.0f};
+      -1.0f, -1.0f, 0.0f, 1.0f, 0.0f,
+      -1.0f,  1.0f, 0.0f, 0.0f, 0.0f,
+       1.0f,  1.0f, 0.0f, 0.0f, 1.0f,
+       1.0f, -1.0f, 0.0f, 1.0f, 1.0f};
 
   const GLfloat vertex_attributes_0[] = {
-      -1.0f, 1.0f, 0.0f, 0.0f,
-      0.0f, -1.0f, -1.0f, 0.0f,
-      0.0f, 1.0f, 1.0f, -1.0f,
-      0.0f, 1.0f, 1.0f, 1.0f,
-      1.0f, 0.0f, 1.0f, 0.0f};
+      -1.0f, -1.0f, 0.0f, 0.0f, 0.0f,
+      -1.0f,  1.0f, 0.0f, 0.0f, 1.0f,
+       1.0f,  1.0f, 0.0f, 1.0f, 1.0f,
+       1.0f, -1.0f, 0.0f, 1.0f, 0.0f};
 
-  rwhv_efl->current_orientation_ = ecore_evas_rotation_get(ecore_evas_ecore_evas_get(rwhv_efl->evas_));
+  current_orientation_ = ecore_evas_rotation_get(ecore_evas_ecore_evas_get(evas_));
 
-  if (rwhv_efl->current_orientation_ == 270)
-    vertex_attributes = vertex_attributes_270;
-  else if (rwhv_efl->current_orientation_ == 90)
-    vertex_attributes = vertex_attributes_90;
-  else
-    vertex_attributes = vertex_attributes_0;
+  switch (current_orientation_) {
+    case 270:
+      vertex_attributes = vertex_attributes_270;
+      break;
+    case 90:
+      vertex_attributes = vertex_attributes_90;
+      break;
+    default:
+      vertex_attributes = vertex_attributes_0;
+  } // switch(current_orientation_)
 
   const GLushort indices[] = {0, 1, 2, 0, 2, 3};
 
-  gl_api->glVertexAttribPointer(rwhv_efl->position_attrib_, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(GLfloat), vertex_attributes);
-  gl_api->glVertexAttribPointer(rwhv_efl->texcoord_attrib_, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(GLfloat), &vertex_attributes[3]);
+  gl_api->glVertexAttribPointer(position_attrib_, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(GLfloat), vertex_attributes);
+  gl_api->glVertexAttribPointer(texcoord_attrib_, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(GLfloat), &vertex_attributes[3]);
 
-  gl_api->glEnableVertexAttribArray(rwhv_efl->position_attrib_);
-  gl_api->glEnableVertexAttribArray(rwhv_efl->texcoord_attrib_);
+  gl_api->glEnableVertexAttribArray(position_attrib_);
+  gl_api->glEnableVertexAttribArray(texcoord_attrib_);
   gl_api->glActiveTexture(GL_TEXTURE0);
-  gl_api->glBindTexture(GL_TEXTURE_2D, rwhv_efl->texture_id_);
-  gl_api->glUniform1i(rwhv_efl->source_texture_location_, 0);
+  gl_api->glBindTexture(GL_TEXTURE_2D, texture_id);
+  gl_api->glUniform1i(source_texture_location_, 0);
   gl_api->glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_SHORT, indices);
+
+  gl_api->glBindTexture(GL_TEXTURE_2D, 0);
+  gl_api->glFlush();
+  evas_gl_make_current(evas_gl_, 0, 0);
+}
+
+void RenderWidgetHostViewEfl::EvasObjectImagePixelsGetCallback(void* data, Evas_Object* obj) {
+  RenderWidgetHostViewEfl* rwhv_efl = reinterpret_cast<RenderWidgetHostViewEfl*>(data);
+  rwhv_efl->PaintTextureToSurface(rwhv_efl->texture_id_);
 }
 
 void RenderWidgetHostViewEfl::Init_EvasGL(int width, int height) {
@@ -263,7 +252,8 @@ void RenderWidgetHostViewEfl::Init_EvasGL(int width, int height) {
 
   evas_gl_ = evas_gl_new(evas_);
   evas_gl_api_ = evas_gl_api_get(evas_gl_);
-  evas_gl_context_ = evas_gl_context_create(evas_gl_, 0);
+  evas_gl_context_ = evas_gl_context_create(
+      evas_gl_, GLSharedContextEfl::GetEvasGLContext());
   if (!evas_gl_context_) {
     LOG(ERROR) << "set_eweb_view -- Create evas gl context Fail";
   } else {
@@ -304,8 +294,6 @@ void RenderWidgetHostViewEfl::set_eweb_view(EWebView* view) {
   content_image_ = web_view_->GetContentImageObject();
   DCHECK(content_image_);
 
-#ifdef OS_TIZEN
-
   if (is_hw_accelerated_) {
     gfx::Rect bounds = GetViewBoundsInPix();
     if (bounds.width() == 0 && bounds.height() == 0) {
@@ -314,7 +302,6 @@ void RenderWidgetHostViewEfl::set_eweb_view(EWebView* view) {
       Init_EvasGL(bounds.width(), bounds.height());
     }
   }
-#endif
 
   im_context_ = IMContextEfl::Create(this);
 }
@@ -427,18 +414,12 @@ gfx::NativeView RenderWidgetHostViewEfl::GetNativeView() const {
 }
 
 gfx::NativeViewId RenderWidgetHostViewEfl::GetNativeViewId() const {
-#ifdef OS_TIZEN
-  if (is_hw_accelerated_) {
-    return reinterpret_cast<gfx::NativeViewId>(content_image_);
-  } else {
+  if (m_IsEvasGLInit) {
     Ecore_Evas* ee = ecore_evas_ecore_evas_get(evas_);
     return ecore_evas_window_get(ee);
+  } else {
+    return 0;
   }
-
-#else
-  Ecore_Evas* ee = ecore_evas_ecore_evas_get(evas_);
-  return ecore_evas_window_get(ee);
-#endif
 }
 
 gfx::NativeViewAccessible RenderWidgetHostViewEfl::GetNativeViewAccessible() {
@@ -894,18 +875,25 @@ void RenderWidgetHostViewEfl::AcceleratedSurfaceInitialized(int host_id, int rou
   NOTIMPLEMENTED();
 }
 
+// Defined in gl_current_context_efl.cc because of conflicts of
+// texture_manager.h with efl GL API wrappers.
+
+extern GLuint GetTextureIdFromTexture(gpu::gles2::Texture* texture);
+
 void RenderWidgetHostViewEfl::AcceleratedSurfaceBuffersSwapped(
   const GpuHostMsg_AcceleratedSurfaceBuffersSwapped_Params& params,
   int gpu_host_id) {
-#ifdef OS_TIZEN
-#if !defined(EWK_BRINGUP)
-  if (is_hw_accelerated_) {
-    next_pixmap_id_ = params.pixmap_id;
+
+  if (m_IsEvasGLInit) {
+    gpu::gles2::MailboxManager* manager =
+        GLSharedContextEfl::GetMailboxManager();
+
+    gpu::gles2::Texture* texture =
+        manager->ConsumeTexture(GL_TEXTURE_2D, params.mailbox);
+
+    texture_id_ = GetTextureIdFromTexture(texture);
     evas_object_image_pixels_dirty_set(content_image_, true);
-    surface_id_ = params.surface_id;
   }
-#endif
-#endif
 
   AcceleratedSurfaceMsg_BufferPresented_Params ack_params;
   ack_params.sync_point = 0;
@@ -958,8 +946,7 @@ gfx::Rect RenderWidgetHostViewEfl::GetBoundsInRootWindow() {
 
 gfx::GLSurfaceHandle RenderWidgetHostViewEfl::GetCompositingSurface() {
   if (is_hw_accelerated_) {
-    gfx::NativeViewId window_id = GetNativeViewId();
-    return gfx::GLSurfaceHandle(static_cast<gfx::PluginWindowHandle>(window_id), gfx::NATIVE_TRANSPORT);
+    return gfx::GLSurfaceHandle(gfx::kNullPluginWindow, gfx::TEXTURE_TRANSPORT);
   }
 }
 
@@ -985,12 +972,8 @@ void RenderWidgetHostViewEfl::HandleHide() {
 }
 
 void RenderWidgetHostViewEfl::HandleResize(int width, int height) {
-#if defined(OS_TIZEN_MOBILE)
-  if (is_hw_accelerated_)
-    UpdateScreenInfo(GetNativeView());
-#else
+// Have to use  UpdateScreenInfo(GetNativeView()); when real native surface is used.
   host_->WasResized();
-#endif
 }
 
 void RenderWidgetHostViewEfl::HandleFocusIn() {
@@ -1291,10 +1274,8 @@ void RenderWidgetHostViewEfl::OnDidChangeContentsSize(int width, int height) {
   web_view_->DidChangeContentsSize(width, height);
   host_->ScrollFocusedEditableNodeIntoRect(gfx::Rect(0, 0, 0, 0));
 
-#ifdef OS_TIZEN
   if (is_hw_accelerated_ && !m_IsEvasGLInit)
     Init_EvasGL(width, height);
-#endif
 }
 
 void RenderWidgetHostViewEfl::OnOrientationChangeEvent(int orientation) {

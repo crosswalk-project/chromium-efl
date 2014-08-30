@@ -17,6 +17,7 @@
 #include "content/utility/in_process_utility_thread.h"
 #include "content/browser/utility_process_host_impl.h"
 #include "content/browser/renderer_host/render_process_host_impl.h"
+#include "gpu/gpu_thread_override_efl.h"
 #include "ui/base/resource/resource_bundle.h"
 
 #include "command_line_efl.h"
@@ -90,8 +91,14 @@ void EwkGlobalData::Ensure() {
 	params.argc = CommandLineEfl::GetArgc();
 	params.argv = CommandLineEfl::GetArgv();
 
+  // Call to CommandLineEfl::GetDefaultPortParams() should be before content
+  // main runner initialization in order to pass command line parameters
+  // for current process that are used in content main runner initialization.
+  content::MainFunctionParams main_funtion_params =
+    CommandLineEfl::GetDefaultPortParams();
+
   instance_->content_main_runner_->Initialize(params);
-  instance_->browser_main_runner_->Initialize(CommandLineEfl::GetDefaultPortParams());
+  instance_->browser_main_runner_->Initialize(main_funtion_params);
 
   base::ThreadRestrictions::SetIOAllowed(true);
 
@@ -107,7 +114,7 @@ void EwkGlobalData::Ensure() {
     content::RenderProcessHostImpl::RegisterRendererMainThreadFactory(
         content::CreateInProcessRendererThread);
     GpuProcessHost::RegisterGpuMainThreadFactory(
-        content::CreateInProcessGpuThread);
+        CreateInProcessGpuThreadEfl);
   }
 
 #ifndef NDEBUG

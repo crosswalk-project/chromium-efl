@@ -29,6 +29,7 @@
 #include "content/public/browser/local_storage_usage_info.h"
 #include "content/public/browser/dom_storage_context.h"
 #include "browser/favicon/favicon_service.h"
+#include "gl/gl_shared_context_efl.h"
 #include "net/http/http_cache.h"
 #include "net/proxy/proxy_config_service_fixed.h"
 #include "net/proxy/proxy_service.h"
@@ -236,7 +237,18 @@ bool EWebContext::ShouldOverrideMimeForURL(
 }
 
 EWebContext::EWebContext()
-  : m_pixmap(0) {
+  : m_pixmap(0)
+  , initialized_(false) {
+
+}
+
+void EWebContext::Initialize(Evas_Object* object) {
+  if (initialized_)
+    return;
+
+  initialized_ = true;
+
+  GLSharedContextEfl::Initialize(object);
   EwkGlobalData::Ensure();
 
   browser_context_.reset(new BrowserContextEfl(this));

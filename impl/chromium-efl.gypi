@@ -74,6 +74,9 @@
       ['exclude', 'browser/renderer_host/render_widget_host_view_aura\\.cc$'],
       ['exclude', 'browser/web_contents/web_contents_view_aura\\.cc$'],
       ['exclude', 'clipboard/clipboard_aurax11\\.cc$'],
+      ['exclude', 'gl_context_egl\\.cc$'],
+      ['exclude', 'gl_context_glx\\.cc$'],
+      ['exclude', 'x11_types\\.cc$'],
     ],
     'conditions': [
        ['building_for_tizen==1', {

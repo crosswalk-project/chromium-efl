@@ -251,6 +251,8 @@ class RenderWidgetHostViewEfl
   void HandleKeyDownQueue();
   void SendCompositionKeyUpEvent(char c);
 
+  void PaintTextureToSurface(GLuint texture_id);
+
   RenderWidgetHostImpl* host_;
   EWebView* web_view_;
   IMContextEfl* im_context_;

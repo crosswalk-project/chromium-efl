@@ -20,9 +20,11 @@
       '<(chrome_src_dir)',
       '<(chrome_src_dir)/third_party/WebKit', # [M34] without this, build errors occur due to #include path changes in M34. for example, see WebFrame.h.
       '<(chrome_src_dir)/third_party/skia/include/core',
+      '<(chrome_src_dir)/third_party/mesa/src/include',
 
       '<(PRODUCT_DIR)/gen',
       '<(SHARED_INTERMEDIATE_DIR)',
+      '<(SHARED_INTERMEDIATE_DIR)/ui/gl/',
       '<(SHARED_INTERMEDIATE_DIR)/webkit/',
     ],
     'dependencies': [
@@ -230,6 +232,14 @@
       'ewk_global_data.cc',
       'file_chooser_controller_efl.cc',
       'file_chooser_controller_efl.h',
+      'gfx/x11_types_override.cc',
+      'gl/gl_context_egl_override.cc',
+      'gl/gl_context_glx_override.cc',
+      'gl/gl_current_context_efl.cc',
+      'gl/gl_shared_context_efl.cc',
+      'gl/gl_shared_context_efl.h',
+      'gpu/gpu_thread_override_efl.cc',
+      'gpu/gpu_thread_override_efl.h',
       'memory_purger.cc',
       'memory_purger.h',
       'memory_sampler.cc',

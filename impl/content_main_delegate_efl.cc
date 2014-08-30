@@ -26,6 +26,7 @@
 #include "browser/resource_dispatcher_host_delegate_efl.h"
 #include "command_line_efl.h"
 #include "content_browser_client_efl.h"
+#include "gpu/gpu_thread_override_efl.h"
 #include "paths_efl.h"
 
 namespace content {
@@ -57,7 +58,7 @@ void ContentMainDelegateEfl::PreSandboxStartup() {
       switches::kBrowserSubprocessPath, base::FilePath(SubProcessPath()));
 
   // needed for gpu thread
-  GpuProcessHost::RegisterGpuMainThreadFactory(CreateInProcessGpuThread);
+  GpuProcessHost::RegisterGpuMainThreadFactory(CreateInProcessGpuThreadEfl);
 }
 
 ContentBrowserClient* ContentMainDelegateEfl::CreateContentBrowserClient() {
