@@ -13,8 +13,16 @@ if [ "$1" == "desktop" -o  "$1" == "mobile" -o "$1" == "tv" ]; then
   OUTPUT_BASE_FOLDER=out.${1}.$(getHostArch)
   export CCACHE_CPP2=yes
   export CCACHE_SLOPPINESS=time_macros
-  export CCACHE_BASEDIR=${TOPDIR}/src
-  export CCACHE_DIR=${TOPDIR}/${OUTPUT_BASE_FOLDER}.ccache
+  export CCACHE_BASEDIR=${TOPDIR}
+
+  if [ "$USER" == "abuild" ]; then
+    #/.ccache directory in gbs sysroot is not removed by -C option
+    #unlike /var/tmp and /tmp directories
+    #so having /.ccache as out ccache dir will make possible to use
+    #ccache also with bot incremental and non-incremental builds
+    export CCACHE_DIR=/.ccache/${OUTPUT_BASE_FOLDER}
+  fi
+
   export CCACHE_COMPILERCHECK=content
   CCACHESIZE=$(ccache -s | grep max | grep -oE "[0-9]+" | head -1)
   if [ $CCACHESIZE == "1" ]; then
