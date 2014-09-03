@@ -466,7 +466,7 @@ void WebContentsDelegateEfl::OnGetContentSecurityPolicy(IPC::Message* reply_msg)
 }
 
 void WebContentsDelegateEfl::OnPrintedMetafileReceived(const DidPrintPagesParams& params) {
-#if !(defined(EWK_BRINGUP) && defined(OS_TIZEN_MOBILE))
+#if !(defined(EWK_BRINGUP) && defined(OS_TIZEN))
   base::SharedMemory shared_buf(params.metafile_data_handle, true);
   if (!shared_buf.Map(params.data_size)) {
      NOTREACHED() << "couldn't map";

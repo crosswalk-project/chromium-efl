@@ -300,7 +300,7 @@ void RenderViewObserverEfl::OnDoHitTest(int view_x, int view_y, tizen_webview::H
 
 void RenderViewObserverEfl::OnPrintToPdf(int width, int height, const base::FilePath& filename)
 {
-#if !(defined(EWK_BRINGUP) && defined(OS_TIZEN_MOBILE))
+#if !(defined(EWK_BRINGUP) && defined(OS_TIZEN))
   blink::WebView* web_view = render_view()->GetWebView();
   DCHECK(web_view);
   PrintWebViewHelperEfl print_helper(render_view(), filename);
