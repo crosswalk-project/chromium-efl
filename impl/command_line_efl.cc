@@ -42,6 +42,7 @@ content::MainFunctionParams CommandLineEfl::GetDefaultPortParams() {
 
   p_command_line->AppendSwitch(switches::kUseMobileUserAgent);
   p_command_line->AppendSwitch(switches::kEnableViewportMeta);
+
 #if defined(OS_TIZEN)
   p_command_line->AppendSwitch(switches::kEnableOverscrollNotifications);
   p_command_line->AppendSwitch(switches::kTouchEvents);
@@ -61,7 +62,6 @@ content::MainFunctionParams CommandLineEfl::GetDefaultPortParams() {
 #endif
 
   p_command_line->AppendSwitch(switches::kDisableDelegatedRenderer);
-  p_command_line->AppendSwitch(switches::kDisableImplSidePainting);
 
   //if we use software path we dont need to have next switches
 #if defined(OS_TIZEN)
@@ -78,7 +78,6 @@ content::MainFunctionParams CommandLineEfl::GetDefaultPortParams() {
   // TODO: remove this commit if it turn out the option is unnecessary
   //Disabling temporarily, as it causes browser crash ID:335 in regression
     //p_command_line->AppendSwitch(cc::switches::kEnableMapImage);
-    //p_command_line->AppendSwitch(cc::switches::kEnableImplSidePainting);
     p_command_line->AppendSwitch(switches::kEnableThreadedCompositing);
     p_command_line->AppendSwitch(switches::kIgnoreGpuBlacklist);
   }
