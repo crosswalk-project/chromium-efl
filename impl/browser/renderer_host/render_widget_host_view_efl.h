@@ -303,6 +303,7 @@ class RenderWidgetHostViewEfl
   GLuint texture_id_;
   int surface_id_;
   bool is_hw_accelerated_;
+  bool is_modifier_key_;
 
   typedef std::queue<int> KeyUpEventQueue;
   KeyUpEventQueue keyupev_queue_;

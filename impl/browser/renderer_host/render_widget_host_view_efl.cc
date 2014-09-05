@@ -93,7 +93,8 @@ RenderWidgetHostViewEfl::RenderWidgetHostViewEfl(RenderWidgetHost* widget, EWebV
     egl_image_(0),
     current_pixmap_id_(0),
     next_pixmap_id_(0),
-    surface_id_(0) {
+    surface_id_(0),
+    is_modifier_key_(false) {
 
 #if defined(OS_TIZEN)
 #if !defined(EWK_BRINGUP)
@@ -1117,6 +1118,20 @@ void RenderWidgetHostViewEfl::OnDidInputEventHandled(const blink::WebInputEvent*
 
   if (blink::WebInputEvent::isKeyboardEventType(input_event->type)) {
     if (input_event->type == blink::WebInputEvent::KeyDown) {
+
+      // Handling KeyDown event of modifier key(Shift for example)
+      if (input_event->modifiers && !is_modifier_key_) {
+        is_modifier_key_ = true;
+        return;
+      }
+      // Handling KeyDown event of key+modifier (Shift+a=A for example)
+      if (is_modifier_key_) {
+        HandleCommitQueue(processed);
+        HandlePreeditQueue(processed);
+        HandleKeyUpQueue();
+        HandleKeyDownQueue();
+        is_modifier_key_ = false;
+      }
 
       HandleCommitQueue(processed);
       HandlePreeditQueue(processed);
