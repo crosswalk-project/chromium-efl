@@ -1,0 +1,5 @@
+#! /bin/bash
+
+# common.gypi wants arm-linux-gnueabihf-gcc to set default settings.
+# Tizen doesn't support hard floating point so we redirect it.
+${CROSS_COMPILE}gcc $@

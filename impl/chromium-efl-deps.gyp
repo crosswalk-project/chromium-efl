@@ -153,7 +153,7 @@
           ['chromium_efl_tizen_version=="2.2.1"', {
             'direct_dependent_settings': {
               'include_dirs': [
-                '/usr/include/sensor',
+                '<(sysroot)/usr/include/sensor',
               ]
             }
           }],

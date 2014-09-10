@@ -185,6 +185,7 @@ export LD_RUN_PATH=%{_libdir}
 %endif
 
 %define OUTPUT_BASE_FOLDER out.%{OUTPUT_BUILD_PROFILE_TARGET}.%{EFL_TARGET}
+export GYP_GENERATOR_OUTPUT=$PWD/%{OUTPUT_BASE_FOLDER}
 
 #set build mode
 %if 0%{?_debug_mode}

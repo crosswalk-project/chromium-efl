@@ -81,7 +81,7 @@ setupDevice() {
 }
 
 get_arm_strip() {
-    if [ -n "$CROSS_COMPILE" -a -x "${CROSS_COMPILE}strip" ]; then
+    if [ -n "$CROSS_COMPILE" ] && type "${CROSS_COMPILE}strip" &> /dev/null; then
         echo "${CROSS_COMPILE}strip"
         return 0
     fi

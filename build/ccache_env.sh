@@ -13,7 +13,7 @@ if ! type ccache &> /dev/null; then
   return 0
 fi
 
-if [ "$1" == "desktop" -o  "$1" == "mobile" -o "$1" == "tv" ]; then
+if [ "$1" == "desktop" -o  "$1" == "mobile" -o "$1" == "tv" -o "$1" == "crosscompile" ]; then
   OUTPUT_BASE_FOLDER=out.${1}.$(getHostArch)
   export CCACHE_CPP2=yes
   export CCACHE_SLOPPINESS=time_macros
@@ -33,7 +33,7 @@ if [ "$1" == "desktop" -o  "$1" == "mobile" -o "$1" == "tv" ]; then
      ccache -M 10
   fi
 
-  if [ "$1" == "desktop" ]; then
+  if [ "$1" == "desktop" -o "$1" == "crosscompile" ]; then
     ccacheInPath=$(echo $PATH | grep -c /usr/lib/ccache)
     if [ "$ccacheInPath" == "0" ]; then
       export PATH=/usr/lib/ccache:$PATH

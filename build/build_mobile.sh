@@ -1,12 +1,11 @@
 #!/bin/bash
 
-export ICECC=no
-SCRIPTDIR=$(cd $(dirname $0); pwd -P)
-
 # source common functions and vars
-. `dirname ${BASH_SOURCE[0]}`/common.sh
+. `dirname $0`/common.sh
+trap '${SCRIPTDIR}/apply_patches.sh -r ${SCRIPTDIR}/patches;\
+      error_report $0 $LINENO' ERR SIGINT SIGTERM SIGQUIT
 
-${SCRIPTDIR}/apply_patches.sh
+${SCRIPTDIR}/apply_patches.sh ${SCRIPTDIR}/patches
 
 # "|| :" means "or always succeeding built-in command"
 PROFILE_NAME=$(echo "$@" | grep -Po "(?<=\-P\s)[^\s]*" || :)
@@ -27,11 +26,6 @@ CUSTOM_LIBC_DIR="custom_libc_dir /opt/usr/eglibc-2.18/lib"
 gbs $CONF_FLAG build $PROFILE_FLAG -A armv7l --incremental \
     --define "${CUSTOM_LIBC_DIR}" \
     --define "${TIZEN_VERSION}" "$@"
-GBS_RET=$?
 
-${SCRIPTDIR}/apply_patches.sh -r
-APPLY_PATCHES_RET=$?
+${SCRIPTDIR}/apply_patches.sh -r ${SCRIPTDIR}/patches
 
-[ "$GBS_RET" != "0" ] && exit $GBS_RET
-[ "$APPLY_PATCHES_RET" != "0" ] && exit $APPLY_PATCHES_RET
-exit 0
