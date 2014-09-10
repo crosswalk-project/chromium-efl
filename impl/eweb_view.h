@@ -215,9 +215,9 @@ class EWebView {
   Evas* GetEvas() const { return evas_object_evas_get(evas_object_); }
   Evas_Object* GetContentImageObject() const;
 
-  content::WebContentsDelegateEfl* web_contents_delegate() const
+  content::WebContents& web_contents() const
   {
-    return web_contents_delegate_.get();
+    return *web_contents_.get();
   }
 
   template<EWebViewCallbacks::CallbackType callbackType>
@@ -433,6 +433,7 @@ class EWebView {
   tizen_webview::WebView* public_webview_;
   tizen_webview::WebViewEvasEventHandler* evas_event_handler_;
   scoped_refptr<tizen_webview::WebContext> context_;
+  scoped_ptr<content::WebContents> web_contents_;
   scoped_ptr<content::WebContentsDelegateEfl> web_contents_delegate_;
   std::string pending_url_request_;
   scoped_ptr<Ewk_Settings> settings_;

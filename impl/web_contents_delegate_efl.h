@@ -38,9 +38,6 @@ class WebContentsDelegateEfl
   WebContentsDelegateEfl(EWebView*);
   ~WebContentsDelegateEfl();
 
-  // Reusing the given WebContents instead of creating a new one.
-  WebContentsDelegateEfl(EWebView*, WebContents*);
-
   virtual void NavigationStateChanged(const WebContents* source,
                                       InvalidateTypes changed_flags) OVERRIDE;
 
@@ -94,7 +91,7 @@ class WebContentsDelegateEfl
       CertificateRequestResultType* result);
 
   EWebView* web_view() const { return web_view_; }
-  WebContents* web_contents() const { return web_contents_; }
+  WebContents& web_contents() const { return web_contents_; }
 
   virtual void DidStartProvisionalLoadForFrame(RenderFrameHost* render_frame_host,
                                                const GURL& validated_url,
@@ -163,7 +160,7 @@ class WebContentsDelegateEfl
 
   EWebView* web_view_;
   bool is_fullscreen_;
-  WebContents* web_contents_;
+  WebContents& web_contents_;
 
   struct ContentSecurityPolicy {
     ContentSecurityPolicy(const std::string& p, tizen_webview::ContentSecurityPolicyType type)

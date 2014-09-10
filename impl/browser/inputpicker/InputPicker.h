@@ -25,6 +25,8 @@
 
 #include "tizen_webview/public/tw_input_type.h"
 
+class EWebView;
+
 namespace content {
 
 class WebContents;
@@ -33,7 +35,7 @@ class WebContentsDelegateEfl;
 
 class InputPicker {
   public:
-    InputPicker(WebContents* web_contents);
+    InputPicker(EWebView&);
     ~InputPicker();
 
     void show(tizen_webview::Input_Type, const char*);
@@ -75,10 +77,10 @@ class InputPicker {
 #endif
     static Eina_Bool removeDatetimePicker(void*);
 
-    WebContentsDelegateEfl* web_contents_delegate_;
-    Evas_Object* m_ewkView;
-    Layout* m_pickerLayout;
-    Eina_List* m_dataList;
+    EWebView& web_view_;
+    Evas_Object* ewk_view_;
+    Layout* picker_layout_;
+    Eina_List* data_list_;
 };
 
 } // namespace content

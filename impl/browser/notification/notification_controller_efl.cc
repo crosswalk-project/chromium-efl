@@ -81,7 +81,7 @@ void NotificationControllerEfl::SetPermissionForNotification(
   EWebView* wv = EWebView::FromEvasObject(notification->GetWebviewEvasObject());
   DCHECK(wv);
   RenderViewHost* render_view_host =
-      wv->web_contents_delegate()->web_contents()->GetRenderViewHost();
+      wv->web_contents().GetRenderViewHost();
 
 #warning "[M38] need proper impl. for desktop notification"
 //  if (render_view_host) {

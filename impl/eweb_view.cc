@@ -159,16 +159,12 @@ class WebViewBrowserMessageFilter: public content::BrowserMessageFilter {
   void OnReceivedHitTestData(int render_view, const _Ewk_Hit_Test& hit_test_data,
       const NodeAttributesMap& node_attributes) {
     DCHECK(BrowserThread::CurrentlyOn(BrowserThread::IO));
-    WebContents* contents = GetWebContents();
-    DCHECK(contents);
 
-    if (contents) {
-      RenderViewHost* render_view_host= contents->GetRenderViewHost();
-      DCHECK(render_view_host);
+    RenderViewHost* render_view_host= web_view_->web_contents().GetRenderViewHost();
+    CHECK(render_view_host);
 
-      if (render_view_host && render_view_host->GetRoutingID() == render_view)
-        web_view_->UpdateHitTestData(hit_test_data, node_attributes);
-    }
+    if (render_view_host && render_view_host->GetRoutingID() == render_view)
+      web_view_->UpdateHitTestData(hit_test_data, node_attributes);
   }
 
   void OnReceivedHitTestAsyncData(int render_view, const _Ewk_Hit_Test& hit_test_data,
@@ -187,8 +183,8 @@ class WebViewBrowserMessageFilter: public content::BrowserMessageFilter {
   }
 
   WebContents* GetWebContents() const {
-    if (web_view_ && web_view_->web_contents_delegate())
-      return web_view_->web_contents_delegate()->web_contents();
+    if (web_view_)
+      return &(web_view_->web_contents());
 
     return NULL;
   }
@@ -249,7 +245,7 @@ Evas_Object* EWebView::GetContentImageObject() const
 }
 
 RenderWidgetHostViewEfl* EWebView::rwhv() const {
-  return static_cast<RenderWidgetHostViewEfl*>(web_contents_delegate_->web_contents()->GetRenderWidgetHostView());
+  return static_cast<RenderWidgetHostViewEfl*>(web_contents_->GetRenderWidgetHostView());
 }
 
 void EWebView::set_renderer_crashed() {
@@ -297,23 +293,17 @@ void EWebView::Initialize() {
 #endif
 
   if (contents_for_new_window_) {
-    web_contents_delegate_.reset(new WebContentsDelegateEfl(this, contents_for_new_window_));
-
-    // Null it out as soon as possible. This way it does not cause harm if the embedder creates
-    // a new view in the "create,window" callback as long as the result of the callback is the
-    // first one that has been created.
+     web_contents_.reset(contents_for_new_window_);
+    // Null it out as soon as possible. This way it does not cause harm if the
+    // embedder creates a new view in the "create,window" callback as long as
+    // the result of the callback is the first one that has been created.
     contents_for_new_window_ = NULL;
   } else {
-    web_contents_delegate_.reset(new WebContentsDelegateEfl(this))  ;
+    WebContents::CreateParams params(context_->browser_context());
+    web_contents_.reset(WebContents::Create(params));
   }
-
-  // Make sure a RenderWidgetHostViewEfl is created and set up properly.
-  WebContentsImpl* web_contents =
-      static_cast<WebContentsImpl*>(web_contents_delegate_->web_contents());
-  WebContentsView* contents_view =
-      static_cast<WebContentsView*>((web_contents)->GetView());
-  contents_view->CreateViewForWidget(web_contents->GetRenderViewHost());
-  DCHECK(rwhv());
+  web_contents_delegate_.reset(new WebContentsDelegateEfl(this));
+  web_contents_->SetDelegate(web_contents_delegate_.get());
 
   // Activate Event handler
   evas_event_handler_->BindFocusEventHandlers();
@@ -397,33 +387,27 @@ void EWebView::CreateNewWindow(WebContents* new_contents) {
 void EWebView::SetURL(const char* url_string) {
   GURL url(url_string);
   NavigationController::LoadURLParams params(url);
-  WebContents* web_contents = web_contents_delegate_->web_contents();
-  web_contents->GetController().LoadURLWithParams(params);
+  web_contents_->GetController().LoadURLWithParams(params);
 }
 
 const char* EWebView::GetURL() const {
-  WebContents* web_contents = web_contents_delegate_->web_contents();
-  return web_contents->GetVisibleURL().possibly_invalid_spec().c_str();
+  return web_contents_->GetVisibleURL().possibly_invalid_spec().c_str();
 }
 
 void EWebView::Reload() {
-  WebContents* web_contents = web_contents_delegate_->web_contents();
-  web_contents->GetController().Reload(true);
+  web_contents_->GetController().Reload(true);
 }
 
 void EWebView::ReloadIgnoringCache() {
-  WebContents* web_contents = web_contents_delegate_->web_contents();
-  web_contents->GetController().ReloadIgnoringCache(true);
+  web_contents_->GetController().ReloadIgnoringCache(true);
 }
 
 Eina_Bool EWebView::CanGoBack() {
-  WebContents* web_contents = web_contents_delegate_->web_contents();
-  return web_contents->GetController().CanGoBack();
+  return web_contents_->GetController().CanGoBack();
 }
 
 Eina_Bool EWebView::CanGoForward() {
-  WebContents* web_contents = web_contents_delegate_->web_contents();
-  return web_contents->GetController().CanGoForward();
+  return web_contents_->GetController().CanGoForward();
 }
 
 Eina_Bool EWebView::HasFocus() const {
@@ -431,39 +415,32 @@ Eina_Bool EWebView::HasFocus() const {
 }
 
 Eina_Bool EWebView::GoBack() {
-  WebContents* web_contents = web_contents_delegate_->web_contents();
-  if (!web_contents->GetController().CanGoBack())
+  if (!web_contents_->GetController().CanGoBack())
     return EINA_FALSE;
 
-  web_contents->GetController().GoBack();
+  web_contents_->GetController().GoBack();
   return EINA_TRUE;
 }
 
 Eina_Bool EWebView::GoForward() {
-  WebContents* web_contents = web_contents_delegate_->web_contents();
-  if (!web_contents->GetController().CanGoForward())
+  if (!web_contents_->GetController().CanGoForward())
     return EINA_FALSE;
 
-  web_contents->GetController().GoForward();
+  web_contents_->GetController().GoForward();
   return EINA_TRUE;
 }
 
 void EWebView::Stop() {
-  WebContents* web_contents = web_contents_delegate_->web_contents();
-  if (web_contents->IsLoading())
-    web_contents->Stop();
+  if (web_contents_->IsLoading())
+    web_contents_->Stop();
 }
 
 void EWebView::Suspend() {
-  CHECK(web_contents_delegate_);
 
-  WebContents* contents = web_contents_delegate_->web_contents();
-  CHECK(contents);
-
-  RenderViewHost *rvh = contents->GetRenderViewHost();
-  CHECK(rvh);
-
+  CHECK(web_contents_);
+  RenderViewHost *rvh = web_contents_->GetRenderViewHost();
   content::ResourceDispatcherHost* rdh = content::ResourceDispatcherHost::Get();
+  CHECK(rvh);
   CHECK(rdh);
 
   content::BrowserThread::PostTask(
@@ -472,21 +449,16 @@ void EWebView::Suspend() {
       base::Unretained(rdh),
       rvh->GetProcess()->GetID(), rvh->GetRoutingID()));
 
-  RenderViewHost* render_view_host = web_contents_delegate()->web_contents()->GetRenderViewHost();
+  RenderViewHost* render_view_host = web_contents_->GetRenderViewHost();
   if (render_view_host)
     render_view_host->Send(new EwkViewMsg_SuspendScheduledTask(render_view_host->GetRoutingID()));
 }
 
 void EWebView::Resume() {
-  CHECK(web_contents_delegate_);
-
-  WebContents* contents = web_contents_delegate_->web_contents();
-  CHECK(contents);
-
-  RenderViewHost *rvh = contents->GetRenderViewHost();
-  CHECK(rvh);
-
+  CHECK(web_contents_);
+  RenderViewHost *rvh = web_contents_->GetRenderViewHost();
   content::ResourceDispatcherHost* rdh = content::ResourceDispatcherHost::Get();
+  CHECK(rvh);
   CHECK(rdh);
 
   content::BrowserThread::PostTask(
@@ -495,7 +467,7 @@ void EWebView::Resume() {
       base::Unretained(rdh),
       rvh->GetProcess()->GetID(), rvh->GetRoutingID()));
 
-  RenderViewHost* render_view_host = web_contents_delegate()->web_contents()->GetRenderViewHost();
+  RenderViewHost* render_view_host = web_contents_->GetRenderViewHost();
   if (render_view_host)
     render_view_host->Send(new EwkViewMsg_ResumeScheduledTasks(render_view_host->GetRoutingID()));
 }
@@ -513,8 +485,7 @@ void EWebView::SetTextZoomFactor(double text_zoom_factor) {
 
   text_zoom_factor_ = text_zoom_factor;
   double zoom_level = log(text_zoom_factor) / log(1.2);
-  WebContents* web_contents = web_contents_delegate_->web_contents();
-  content::HostZoomMap::SetZoomLevel(web_contents, zoom_level);
+  content::HostZoomMap::SetZoomLevel(web_contents_.get(), zoom_level);
 }
 
 void EWebView::ExecuteEditCommand(const char* command, const char* value) {
@@ -522,8 +493,7 @@ void EWebView::ExecuteEditCommand(const char* command, const char* value) {
 
   value = (value == NULL) ? "" : value;
 
-  WebContents* web_contents = web_contents_delegate_->web_contents();
-  RenderViewHostImpl* rvhi = static_cast<RenderViewHostImpl*>(web_contents->GetRenderViewHost());
+  RenderViewHostImpl* rvhi = static_cast<RenderViewHostImpl*>(web_contents_->GetRenderViewHost());
 
   rvhi->ExecuteEditCommand(command, value);
 
@@ -539,9 +509,8 @@ void EWebView::ExecuteEditCommand(const char* command, const char* value) {
 }
 
 void EWebView::SendOrientationChangeEventIfNeeded(int orientation) {
-  WebContents* web_contents = web_contents_delegate_->web_contents();
   RenderViewHostImpl* rvhi = static_cast<RenderViewHostImpl*>(
-                             web_contents->GetRenderViewHost());
+                             web_contents_->GetRenderViewHost());
 #warning "[M37] Fix screen orientation"
 #if 0
   //send new orientation value to RenderView Host to pass to renderer
@@ -567,11 +536,11 @@ void EWebView::SetOrientationLockCallback(tizen_webview::Orientation_Lock_Cb fun
 }
 
 void EWebView::Show() {
-  web_contents_delegate_->web_contents()->WasShown();
+  web_contents_->WasShown();
 }
 
 void EWebView::Hide() {
-  web_contents_delegate_->web_contents()->WasHidden();
+  web_contents_->WasHidden();
 }
 
 void EWebView::InvokeAuthCallback(LoginDelegateEfl* login_delegate,
@@ -769,14 +738,13 @@ bool EWebView::ExecuteJavaScript(const char* script, tizen_webview::View_Script_
   if (!script)
     return false;
 
-  if (!web_contents_delegate_)
+  if (!web_contents_delegate_)   // question, can I remove this check?
     return false;
 
-  WebContents* web_contents = web_contents_delegate_->web_contents();
-  if (!web_contents)
+  if (!web_contents_)
     return false;
 
-  RenderFrameHost* render_frame_host = web_contents->GetMainFrame();
+  RenderFrameHost* render_frame_host = web_contents_->GetMainFrame();
   if (!render_frame_host)
     return false;
 
@@ -795,13 +763,12 @@ bool EWebView::ExecuteJavaScript(const char* script, tizen_webview::View_Script_
 }
 
 bool EWebView::SetUserAgent(const char* userAgent) {
-  web_contents_delegate()->web_contents()->SetUserAgentOverride(std::string(userAgent));
-  const content::NavigationController& controller =
-      web_contents_delegate()->web_contents()->GetController();
+  web_contents_->SetUserAgentOverride(std::string(userAgent));
+  const content::NavigationController& controller = web_contents_->GetController();
   for (int i = 0; i < controller.GetEntryCount(); ++i)
     controller.GetEntryAtIndex(i)->SetIsOverridingUserAgent(true);
   overridden_user_agent_ = std::string(userAgent);
-  web_contents_delegate_->web_contents()->SetUserAgentOverride(userAgent);
+  web_contents_->SetUserAgentOverride(userAgent);
   return true;
 }
 
@@ -835,7 +802,7 @@ const char* EWebView::GetSelectedText() const {
 }
 
 Ewk_Settings* EWebView::GetSettings() {
-  RenderViewHost* render_view_host = web_contents_delegate_->web_contents()->GetRenderViewHost();
+  RenderViewHost* render_view_host = web_contents_->GetRenderViewHost();
   if (!render_view_host)
     return NULL;
 
@@ -846,7 +813,7 @@ Ewk_Settings* EWebView::GetSettings() {
 }
 
 void EWebView::UpdateWebKitPreferences() {
-  RenderViewHost* render_view_host = web_contents_delegate_->web_contents()->GetRenderViewHost();
+  RenderViewHost* render_view_host = web_contents_->GetRenderViewHost();
   if (!render_view_host)
     return;
 
@@ -891,8 +858,7 @@ void EWebView::LoadData(const char* data, size_t size, const char* mime_type, co
 
   data_params.load_type = NavigationController::LOAD_TYPE_DATA;
   data_params.should_replace_current_entry = false;
-  WebContents* web_contents = web_contents_delegate_->web_contents();
-  web_contents->GetController().LoadURLWithParams(data_params);
+  web_contents_->GetController().LoadURLWithParams(data_params);
 }
 
 void EWebView::ShowPopupMenu(const gfx::Rect& rect, blink::TextDirection textDirection, double pageScaleFactor, const std::vector<content::MenuItem>& items, int data, int selectedIndex, bool multiple) {
@@ -972,7 +938,7 @@ Eina_Bool EWebView::PopupMenuClose() {
   delete static_cast<Popup_Menu_Item*>(item);
 #endif
 
-  RenderViewHostImpl* render_view_host = static_cast<RenderViewHostImpl*>(web_contents_delegate_->web_contents()->GetRenderViewHost());
+  RenderViewHostImpl* render_view_host = static_cast<RenderViewHostImpl*>(web_contents_->GetRenderViewHost());
   if (!render_view_host)
     return false;
 
@@ -1003,7 +969,7 @@ Eina_Bool EWebView::PopupMenuUpdate(Eina_List* items, int selectedIndex) {
 
 Eina_Bool EWebView::DidSelectPopupMenuItem(int selectedindex) {
 #if defined(OS_TIZEN)
-  RenderViewHostImpl* render_view_host = static_cast<RenderViewHostImpl*>(web_contents_delegate_->web_contents()->GetRenderViewHost());
+  RenderViewHostImpl* render_view_host = static_cast<RenderViewHostImpl*>(web_contents_->GetRenderViewHost());
   if (!render_view_host)
     return false;
 
@@ -1025,7 +991,7 @@ Eina_Bool EWebView::DidSelectPopupMenuItem(int selectedindex) {
 
 Eina_Bool EWebView::DidMultipleSelectPopupMenuItem(std::vector<int>& selectedindex) {
 #if defined(OS_TIZEN)
-  RenderViewHostImpl* render_view_host = static_cast<RenderViewHostImpl*>(web_contents_delegate_->web_contents()->GetRenderViewHost());
+  RenderViewHostImpl* render_view_host = static_cast<RenderViewHostImpl*>(web_contents_->GetRenderViewHost());
   if (!render_view_host)
     return false;
 
@@ -1050,7 +1016,7 @@ void EWebView::ShowContextMenu(const content::ContextMenuParams& params, content
     convertedParams.y = convertedPoint.y();
   }
 
-  context_menu_.reset(new content::ContextMenuControllerEfl(GetPublicWebView(), type, web_contents_delegate()));
+  context_menu_.reset(new content::ContextMenuControllerEfl(GetPublicWebView(), type, *web_contents_.get()));
 
   if(!selection_controller_->IsShowingMagnifier()) {
     if(!context_menu_->PopulateAndShowContextMenu(convertedParams))
@@ -1076,11 +1042,11 @@ void EWebView::Find(const char* text, tizen_webview::Find_Options find_options) 
   web_find_options.matchCase = !(find_options & TW_FIND_OPTIONS_CASE_INSENSITIVE);
   web_find_options.findNext = find_next;
 
-  web_contents_delegate_->web_contents()->Find(current_find_request_id_, find_text, web_find_options);
+  web_contents_->Find(current_find_request_id_, find_text, web_find_options);
 }
 
 void EWebView::SetScale(double scale_factor, int x, int y) {
-  RenderViewHost* render_view_host = web_contents_delegate_->web_contents()->GetRenderViewHost();
+  RenderViewHost* render_view_host = web_contents_->GetRenderViewHost();
   render_view_host->Send(new EwkViewMsg_Scale(render_view_host->GetRoutingID(), scale_factor, x, y));
 }
 
@@ -1093,7 +1059,7 @@ void EWebView::GetScrollPosition(int* x, int* y) const {
 }
 
 void EWebView::SetScroll(int x, int y) {
-  RenderViewHost* render_view_host = web_contents_delegate()->web_contents()->GetRenderViewHost();
+  RenderViewHost* render_view_host = web_contents_->GetRenderViewHost();
   if (!render_view_host)
     return;
 
@@ -1101,7 +1067,7 @@ void EWebView::SetScroll(int x, int y) {
 }
 
 void EWebView::UseSettingsFont() {
-  RenderViewHost* render_view_host = web_contents_delegate()->web_contents()->GetRenderViewHost();
+  RenderViewHost* render_view_host = web_contents_->GetRenderViewHost();
   if (render_view_host)
     render_view_host->Send(new EwkViewMsg_UseSettingsFont(render_view_host->GetRoutingID()));
 }
@@ -1153,7 +1119,7 @@ void EWebView::MoveCaret(const gfx::Point& point) {
 void EWebView::QuerySelectionStyle() {
   Ewk_Settings* settings = GetSettings();
   if (settings->textStyleStateState()) {
-    RenderViewHost* render_view_host = web_contents_delegate_->web_contents()->GetRenderViewHost();
+    RenderViewHost* render_view_host = web_contents_->GetRenderViewHost();
     render_view_host->Send(new EwkViewMsg_GetSelectionStyle(render_view_host->GetRoutingID()));
   }
 }
@@ -1167,13 +1133,13 @@ void EWebView::OnQuerySelectionStyleReply(const SelectionStylePrams& params) {
 
 void EWebView::SelectClosestWord(const gfx::Point& touch_point) {
   float device_scale_factor = rwhv()->device_scale_factor();
-  RenderViewHost* render_view_host = web_contents_delegate_->web_contents()->GetRenderViewHost();
+  RenderViewHost* render_view_host = web_contents_->GetRenderViewHost();
   render_view_host->Send(new EwkViewMsg_SelectClosestWord(render_view_host->GetRoutingID(), touch_point.x() / device_scale_factor, touch_point.y() / device_scale_factor));
 }
 
 void EWebView::SelectLinkText(const gfx::Point& touch_point) {
   float device_scale_factor = rwhv()->device_scale_factor();
-  RenderViewHost* render_view_host = web_contents_delegate_->web_contents()->GetRenderViewHost();
+  RenderViewHost* render_view_host = web_contents_->GetRenderViewHost();
   render_view_host->Send(new ViewMsg_SelectLinkText(render_view_host->GetRoutingID(), gfx::Point(touch_point.x() / device_scale_factor, touch_point.y() / device_scale_factor)));
 }
 
@@ -1238,9 +1204,9 @@ Eina_Bool EWebView::AsyncRequestHitTestDataAt(int x, int y, tizen_webview::Hit_T
     message_filter_ = new WebViewBrowserMessageFilter(this);
   }
 
-  RenderViewHost* render_view_host = web_contents_delegate()->web_contents()->GetRenderViewHost();
+  RenderViewHost* render_view_host = web_contents_->GetRenderViewHost();
   CHECK(render_view_host);
-  content::RenderProcessHost* render_process_host = web_contents_delegate()->web_contents()->GetRenderProcessHost();
+  content::RenderProcessHost* render_process_host = web_contents_->GetRenderProcessHost();
   CHECK(render_process_host);
 
   render_view_host->Send(new EwkViewMsg_DoHitTestAsync(render_view_host->GetRoutingID(), view_x, view_y, mode, request_id));
@@ -1275,8 +1241,8 @@ tizen_webview::Hit_Test* EWebView::RequestHitTestDataAtBlinkCoords(int x, int y,
     message_filter_ = new WebViewBrowserMessageFilter(this);
   }
 
-  RenderViewHost* render_view_host = web_contents_delegate()->web_contents()->GetRenderViewHost();
-  content::RenderProcessHost* render_process_host = web_contents_delegate()->web_contents()->GetRenderProcessHost();
+  RenderViewHost* render_view_host = web_contents_->GetRenderViewHost();
+  content::RenderProcessHost* render_process_host = web_contents_->GetRenderProcessHost();
   DCHECK(render_view_host);
   DCHECK(render_process_host);
 
@@ -1311,21 +1277,18 @@ void EWebView::UpdateMagnifierScreen(const SkBitmap& bitmap) {
 }
 
 void EWebView::SetOverrideEncoding(const std::string& encoding) {
-  web_contents_delegate_->web_contents()->SetOverrideEncoding(encoding);
+  web_contents_->SetOverrideEncoding(encoding);
 }
 
 bool EWebView::GetLinkMagnifierEnabled() const {
-  WebContents* webContents = web_contents_delegate()->web_contents();
-  return webContents->GetMutableRendererPrefs()->tap_multiple_targets_strategy == TAP_MULTIPLE_TARGETS_STRATEGY_POPUP;
+  return web_contents_->GetMutableRendererPrefs()->tap_multiple_targets_strategy == TAP_MULTIPLE_TARGETS_STRATEGY_POPUP;
 }
 
 void EWebView::SetLinkMagnifierEnabled(bool enabled) {
-  WebContents* webContents = web_contents_delegate()->web_contents();
-
-  webContents->GetMutableRendererPrefs()->tap_multiple_targets_strategy =
+  web_contents_->GetMutableRendererPrefs()->tap_multiple_targets_strategy =
       enabled ? TAP_MULTIPLE_TARGETS_STRATEGY_POPUP
               : TAP_MULTIPLE_TARGETS_STRATEGY_NONE;
-  webContents->GetRenderViewHost()->SyncRendererPrefs();
+  web_contents_->GetRenderViewHost()->SyncRendererPrefs();
 }
 
 void EWebView::GetSnapShotForRect(gfx::Rect& rect) {
@@ -1371,8 +1334,7 @@ Evas_Object* EWebView::GetSnapshot(Eina_Rectangle rect) {
 }
 
 void EWebView::BackForwardListClear() {
-  content::NavigationController& controller =
-      web_contents_delegate()->web_contents()->GetController();
+  content::NavigationController& controller = web_contents_->GetController();
 
   int entry_count = controller.GetEntryCount();
   bool entry_removed = false;
@@ -1394,7 +1356,7 @@ void EWebView::InvokeBackForwardListChangedCallback() {
 }
 
 bool EWebView::WebAppCapableGet(tizen_webview::Web_App_Capable_Get_Callback callback, void *userData) {
-  RenderViewHost *renderViewHost = web_contents_delegate()->web_contents()->GetRenderViewHost();
+  RenderViewHost *renderViewHost = web_contents_->GetRenderViewHost();
   if (!renderViewHost) {
     return false;
   }
@@ -1404,7 +1366,7 @@ bool EWebView::WebAppCapableGet(tizen_webview::Web_App_Capable_Get_Callback call
 }
 
 bool EWebView::WebAppIconUrlGet(tizen_webview::Web_App_Icon_URL_Get_Callback callback, void *userData) {
-  RenderViewHost* renderViewHost = web_contents_delegate()->web_contents()->GetRenderViewHost();
+  RenderViewHost* renderViewHost = web_contents_->GetRenderViewHost();
   if (!renderViewHost) {
     return false;
   }
@@ -1414,7 +1376,7 @@ bool EWebView::WebAppIconUrlGet(tizen_webview::Web_App_Icon_URL_Get_Callback cal
 }
 
 bool EWebView::WebAppIconUrlsGet(tizen_webview::Web_App_Icon_URLs_Get_Callback callback, void *userData) {
-  RenderViewHost* renderViewHost = web_contents_delegate()->web_contents()->GetRenderViewHost();
+  RenderViewHost* renderViewHost = web_contents_->GetRenderViewHost();
   if (!renderViewHost) {
     return false;
   }
@@ -1457,7 +1419,7 @@ int EWebView::SetEwkViewPlainTextGetCallback(tizen_webview::View_Plain_Text_Get_
 }
 
 bool EWebView::PlainTextGet(tizen_webview::View_Plain_Text_Get_Callback callback, void* user_data) {
-  RenderViewHost* render_view_host = web_contents_delegate()->web_contents()->GetRenderViewHost();
+  RenderViewHost* render_view_host = web_contents_->GetRenderViewHost();
   if (!render_view_host)
     return false;
   int plain_text_get_callback_id = SetEwkViewPlainTextGetCallback(callback, user_data);
@@ -1471,7 +1433,7 @@ void EWebView::InvokePlainTextGetCallback(const std::string& content_text, int p
 }
 
 void EWebView::StopFinding() {
-  web_contents_delegate_->web_contents()->StopFinding(content::STOP_FIND_ACTION_CLEAR_SELECTION);
+  web_contents_->StopFinding(content::STOP_FIND_ACTION_CLEAR_SELECTION);
 }
 
 void EWebView::SetProgressValue(double progress) {
@@ -1483,12 +1445,12 @@ double EWebView::GetProgressValue() {
 }
 
 const char* EWebView::GetTitle() {
-  title_ = UTF16ToUTF8(web_contents_delegate_->web_contents()->GetTitle());
+  title_ = UTF16ToUTF8(web_contents_->GetTitle());
   return title_.c_str();
 }
 
 bool EWebView::SaveAsPdf(int width, int height, const std::string& filename) {
-  RenderViewHost* render_view_host = web_contents_delegate()->web_contents()->GetRenderViewHost();
+  RenderViewHost* render_view_host = web_contents_->GetRenderViewHost();
   if (!render_view_host)
     return false;
 
@@ -1497,7 +1459,7 @@ bool EWebView::SaveAsPdf(int width, int height, const std::string& filename) {
 }
 
 bool EWebView::GetMHTMLData(tizen_webview::View_MHTML_Data_Get_Callback callback, void* user_data) {
-  RenderViewHost* render_view_host = web_contents_delegate()->web_contents()->GetRenderViewHost();
+  RenderViewHost* render_view_host = web_contents_->GetRenderViewHost();
   if (!render_view_host)
     return false;
 
@@ -1518,12 +1480,11 @@ void MHTMLCallbackDetails::Run(Evas_Object* obj, const std::string& mhtml_conten
 }
 
 bool EWebView::IsFullscreen() {
-  WebContents* web_contents = web_contents_delegate_->web_contents();
-  return web_contents_delegate_->IsFullscreenForTabOrPending(web_contents);
+  return web_contents_delegate_->IsFullscreenForTabOrPending(web_contents_.get());
 }
 
 void EWebView::ExitFullscreen() {
-  RenderViewHost* rvh = web_contents_delegate_->web_contents()->GetRenderViewHost();
+  RenderViewHost* rvh = web_contents_->GetRenderViewHost();
   if (!rvh)
     return;
 
@@ -1539,7 +1500,7 @@ void EWebView::DidChangePageScaleFactor(double scale_factor) {
 }
 
 inline JavaScriptDialogManagerEfl* EWebView::GetJavaScriptDialogManagerEfl() {
-  return static_cast<JavaScriptDialogManagerEfl*>(web_contents_delegate()->GetJavaScriptDialogManager());
+  return static_cast<JavaScriptDialogManagerEfl*>(web_contents_delegate_->GetJavaScriptDialogManager());
 }
 
 void EWebView::SetJavaScriptAlertCallback(tizen_webview::View_JavaScript_Alert_Callback callback, void* user_data) {
@@ -1582,7 +1543,7 @@ void EWebView::DidChangePageScaleRange(double min_scale, double max_scale) {
 }
 
 void EWebView::SetDrawsTransparentBackground(bool enabled) {
-  RenderViewHost* render_view_host = web_contents_delegate()->web_contents()->GetRenderViewHost();
+  RenderViewHost* render_view_host = web_contents_->GetRenderViewHost();
   if (!render_view_host)
     return;
 
@@ -1592,8 +1553,7 @@ void EWebView::SetDrawsTransparentBackground(bool enabled) {
 void EWebView::GetSessionData(const char **data, unsigned *length) const {
   static const int MAX_SESSION_ENTRY_SIZE = std::numeric_limits<int>::max();
 
-  WebContents* contents = web_contents_delegate_->web_contents();
-  NavigationController &navigationController = contents->GetController();
+  NavigationController &navigationController = web_contents_->GetController();
   Pickle sessionPickle;
   const int itemCount = navigationController.GetEntryCount();
 
@@ -1635,8 +1595,7 @@ bool EWebView::RestoreFromSessionData(const char *data, unsigned length) {
 
   std::vector<NavigationEntry *> navigationEntries =
     sessions::SerializedNavigationEntry::ToNavigationEntries(serializedEntries, context()->browser_context());
-  WebContents* contents = web_contents_delegate_->web_contents();
-  NavigationController &navigationController = contents->GetController();
+  NavigationController &navigationController = web_contents_->GetController();
 
   if (currentEntry < 0)
     currentEntry = 0;
@@ -1651,13 +1610,13 @@ bool EWebView::RestoreFromSessionData(const char *data, unsigned length) {
 }
 
 void EWebView::SetBrowserFont() {
-  RenderViewHost* render_view_host = web_contents_delegate()->web_contents()->GetRenderViewHost();
+  RenderViewHost* render_view_host = web_contents_->GetRenderViewHost();
   if (render_view_host)
     render_view_host->Send(new EwkViewMsg_SetBrowserFont(render_view_host->GetRoutingID()));
 }
 
 void EWebView::ShowFileChooser(const content::FileChooserParams& params) {
-  RenderViewHost* render_view_host = web_contents_delegate()->web_contents()->GetRenderViewHost();
+  RenderViewHost* render_view_host = web_contents_->GetRenderViewHost();
   if (!render_view_host)
     return;
 #if defined(OS_TIZEN_MOBILE)
@@ -1689,7 +1648,7 @@ void EWebView::ShowContentsDetectedPopup(const char* message) {
 #endif
 
 void EWebView::RequestColorPicker(int r, int g, int b, int a) {
-  inputPicker_.reset(new InputPicker(web_contents_delegate()->web_contents()));
+  inputPicker_.reset(new InputPicker(*this));
   inputPicker_->showColorPicker(r, g, b, a);
 }
 
@@ -1698,12 +1657,12 @@ void EWebView::DismissColorPicker() {
 }
 
 bool EWebView::SetColorPickerColor(int r, int g, int b, int a) {
-  web_contents_delegate()->web_contents()->DidChooseColorInColorChooser(SkColorSetARGB(a, r, g, b));
+  web_contents_->DidChooseColorInColorChooser(SkColorSetARGB(a, r, g, b));
   return true;
 }
 
 void EWebView::InputPickerShow(tizen_webview::Input_Type inputType, const char* inputValue) {
-  inputPicker_.reset(new InputPicker(web_contents_delegate()->web_contents()));
+  inputPicker_.reset(new InputPicker(*this));
   inputPicker_->show(inputType, inputValue);
 }
 
@@ -1816,6 +1775,7 @@ void EWebView::cameraResultCb(service_h request,
 		              void* data)
 {
   EWebView* webview = static_cast<EWebView*>(data);
+  RenderViewHost* render_view_host = webview->web_contents_->GetRenderViewHost();
   if (result == SERVICE_RESULT_SUCCEEDED) {
     int ret = -1;
     char** filesarray;
@@ -1825,8 +1785,6 @@ void EWebView::cameraResultCb(service_h request,
     if (filesarray) {
       for(int i =0; i< number;i++) {
         std::vector<ui::SelectedFileInfo> files;
-        RenderViewHost* render_view_host = webview->web_contents_delegate()->
-          web_contents()->GetRenderViewHost();
         if (!render_view_host) {
           return;
         }
@@ -1843,8 +1801,6 @@ void EWebView::cameraResultCb(service_h request,
       }
     }
   } else {
-    RenderViewHost* render_view_host = webview->web_contents_delegate()->
-      web_contents()->GetRenderViewHost();
     std::vector<ui::SelectedFileInfo> files;
     if (render_view_host) {
       render_view_host->FilesSelectedInChooser(files,

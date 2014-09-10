@@ -58,46 +58,28 @@ void WritePdfDataToFile(printing::PdfMetafileSkia* metafile, const base::FilePat
 WebContentsDelegateEfl::WebContentsDelegateEfl(EWebView* view)
     : web_view_(view)
     , is_fullscreen_(false)
-    , web_contents_(NULL)
+    , web_contents_(view->web_contents())
     , document_created_(false)
     , should_open_new_window_(true)
     , dialog_manager_(NULL)
     , forward_backward_list_count_(0)
+    , WebContentsObserver(&view->web_contents())
     , weak_ptr_factory_(this) {
-  BrowserContext* browser_context = web_view_->context()->browser_context();
-  web_contents_ = WebContents::Create(WebContents::CreateParams(browser_context));
-  web_contents_->SetDelegate(this);
-  Observe(web_contents_);
-
 #ifdef TIZEN_AUTOFILL_SUPPORT
-  AutofillManagerDelegateEfl::CreateForWebContents(web_contents_);
+  AutofillManagerDelegateEfl::CreateForWebContents(&web_contents_);
   AutofillManagerDelegateEfl * autofill_manager =
-    AutofillManagerDelegateEfl::FromWebContents(web_contents_);
+    AutofillManagerDelegateEfl::FromWebContents(&web_contents_);
   autofill_manager->SetEWebView(view);
-  AutofillDriverImpl::CreateForWebContentsAndDelegate(web_contents_,
+  AutofillDriverImpl::CreateForWebContentsAndDelegate(&web_contents_,
     autofill_manager, EWebView::GetPlatformLocale(), AutofillManager::DISABLE_AUTOFILL_DOWNLOAD_MANAGER);
-  PasswordManagerClientEfl::CreateForWebContents(web_contents_);
+  PasswordManagerClientEfl::CreateForWebContents(&web_contents_);
 #endif
-}
-
-WebContentsDelegateEfl::WebContentsDelegateEfl(EWebView* view, WebContents* contents)
-  : WebContentsObserver(contents)
-  , web_view_(view)
-  , is_fullscreen_(false)
-  , web_contents_(contents)
-  , document_created_(false)
-  , should_open_new_window_(true)
-  , dialog_manager_(NULL)
-  , forward_backward_list_count_(0)
-  , weak_ptr_factory_(this) {
-  web_contents_->SetDelegate(this);
 }
 
 WebContentsDelegateEfl::~WebContentsDelegateEfl() {
   // It's important to delete web_contents_ before dialog_manager_
   // destructor of web contents uses dialog_manager_
 
-  delete web_contents_;
   delete dialog_manager_;
 }
 
@@ -263,7 +245,7 @@ void WebContentsDelegateEfl::DidCommitProvisionalLoadForFrame(RenderFrameHost* r
 
 void WebContentsDelegateEfl::DidNavigateAnyFrame(const LoadCommittedDetails& details, const FrameNavigateParams& params) {
   web_view_->SmartCallback<EWebViewCallbacks::ProvisionalLoadRedirect>().call();
-  static_cast<BrowserContextEfl*>(web_contents_->GetBrowserContext())->AddVisitedURLs(params.redirects);
+  static_cast<BrowserContextEfl*>(web_contents_.GetBrowserContext())->AddVisitedURLs(params.redirects);
 }
 
 void WebContentsDelegateEfl::DidFailProvisionalLoad(RenderFrameHost* render_frame_host,
@@ -293,7 +275,7 @@ void WebContentsDelegateEfl::DidFinishLoad(RenderFrameHost* render_frame_host,
   if (render_frame_host->GetParent())
     return;
 
-  NavigationEntry *entry = web_contents()->GetController().GetActiveEntry();
+  NavigationEntry *entry = web_contents_.GetController().GetActiveEntry();
   FaviconStatus &favicon = entry->GetFavicon();
 
   // http://107.108.218.239/bugzilla/show_bug.cgi?id=7883
@@ -305,7 +287,7 @@ void WebContentsDelegateEfl::DidFinishLoad(RenderFrameHost* render_frame_host,
   // download favicon if there is no such in database
   if (!fs.ExistsForFaviconURL(favicon.url)) {
     fprintf(stderr, "[DidFinishLoad] :: no favicon in database for URL: %s\n", favicon.url.spec().c_str());
-    favicon_downloader_.reset(new FaviconDownloader(web_contents(),
+    favicon_downloader_.reset(new FaviconDownloader(&web_contents_,
                                                    favicon.url,
                                                    base::Bind(&WebContentsDelegateEfl::DidDownloadFavicon,
                                                               weak_ptr_factory_.GetWeakPtr())));
@@ -327,7 +309,7 @@ void WebContentsDelegateEfl::DidUpdateFaviconURL(const std::vector<FaviconURL>& 
   for (unsigned int i = 0; i < candidates.size(); ++i) {
     FaviconURL favicon = candidates[i];
     if (favicon.icon_type == FaviconURL::FAVICON && !favicon.icon_url.is_empty()) {
-      NavigationEntry *entry = web_contents_->GetController().GetActiveEntry();
+      NavigationEntry *entry = web_contents_.GetController().GetActiveEntry();
       if (!entry)
         return;
       entry->GetFavicon().url = favicon.icon_url;
@@ -379,7 +361,7 @@ void WebContentsDelegateEfl::SetContentSecurityPolicy(const std::string& policy,
   // Not necessary for eflwebview bringup.
 #if !defined(EWK_BRINGUP)
   if (document_created_) {
-    RenderViewHost* rvh = web_contents_->GetRenderViewHost();
+    RenderViewHost* rvh = web_contents_.GetRenderViewHost();
     rvh->Send(new EwkViewMsg_SetCSP(rvh->GetRoutingID(), policy, header_type));
   } else {
     DCHECK(!pending_content_security_policy_.get());
@@ -486,7 +468,7 @@ void WebContentsDelegateEfl::OnPrintedMetafileReceived(const DidPrintPagesParams
 }
 
 void WebContentsDelegateEfl::NavigationEntryCommitted(const LoadCommittedDetails& load_details) {
-  int forward_backward_list_count = web_contents()->GetController().GetEntryCount();
+  int forward_backward_list_count = web_contents_.GetController().GetEntryCount();
   if (forward_backward_list_count != forward_backward_list_count_) {
     web_view_->InvokeBackForwardListChangedCallback();
     forward_backward_list_count_ = forward_backward_list_count;
@@ -526,7 +508,7 @@ content::ColorChooser* WebContentsDelegateEfl::OpenColorChooser(
     WebContents* web_contents,
     SkColor color,
     const std::vector<ColorSuggestion>& suggestions) {
-  ColorChooserEfl* color_chooser_efl = new ColorChooserEfl(web_contents);
+  ColorChooserEfl* color_chooser_efl = new ColorChooserEfl(*web_contents);
   web_view_->RequestColorPicker(SkColorGetR(color), SkColorGetG(color), SkColorGetB(color), SkColorGetA(color));
 
   return color_chooser_efl;
