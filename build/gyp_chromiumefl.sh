@@ -25,6 +25,13 @@ if [ ! -e ${TOPDIR}/src/build/util/LASTCHANGE.blink ]; then
   ${TOPDIR}/src/build/util/lastchange.py -s ${TOPDIR}/src/third_party/WebKit -o ${TOPDIR}/src/build/util/LASTCHANGE.blink
 fi
 
+ORIGINAL_GYP_DEFINES="$GYP_DEFINES"
+export GYP_DEFINES=$(echo "$GYP_DEFINES" | sed -e 's/component\s*=\s*shared_library//g')
+if [ "$ORIGINAL_GYP_DEFINES" != "$GYP_DEFINES" ]; then
+    echo "WARNING: component build is not supported."
+    echo "Removing component=shared_library from GYP_DEFINES."
+fi
+
 COMMON_GYP_PARAMETERS="--depth=${TOPDIR}/src
                       -I${TOPDIR}/impl/chromium-efl.gypi
                       --generator-output ${GYP_GENERATOR_OUTPUT}
