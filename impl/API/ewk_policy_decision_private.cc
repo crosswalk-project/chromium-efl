@@ -151,8 +151,8 @@ _Ewk_Policy_Decision::_Ewk_Policy_Decision(content::WebContentsDelegateEfl* view
 
   RenderFrameHost* rfh = NULL;
   // we can use main frame here
-  if (view && view->web_contents()) {
-    view->web_contents()->GetMainFrame();
+  if (view) {
+    view->web_contents().GetMainFrame();
   }
 
   if (url.has_password() && url.has_username())

@@ -186,12 +186,12 @@ class ContextMenuControllerEfl
   static void contextMenuCancelCallback(void* data, Evas_Object* obj, void* eventInfo);
   static void contextMenuItemSelectedCallback(void* data, Evas_Object* obj, void* eventInfo);
 
-  ContextMenuControllerEfl(tizen_webview::WebView* wv, ContextMenuType type, WebContentsDelegateEfl* wcd)
+  ContextMenuControllerEfl(tizen_webview::WebView* wv, ContextMenuType type, WebContents& web_contents)
     : webview_(wv),
       popup_(0),
       menu_items_(0),
       type_(type),
-      wcd_(wcd),
+      web_contents_(web_contents),
       weak_ptr_factory_(this) {
   }
 
@@ -228,7 +228,7 @@ class ContextMenuControllerEfl
   Eina_List* menu_items_;
   ContextMenuType type_;
   ContextMenuParams params_;
-  WebContentsDelegateEfl* wcd_;
+  WebContents& web_contents_;
   base::WeakPtrFactory<ContextMenuControllerEfl> weak_ptr_factory_;
 };
 

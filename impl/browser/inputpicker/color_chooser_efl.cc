@@ -23,23 +23,18 @@
 
 namespace content {
 
-ColorChooserEfl::ColorChooserEfl(WebContents* web_contents)
-    : web_contents_delegate_(0) {
-  SetWebContentsDelegateEfl(web_contents);
+ColorChooserEfl::ColorChooserEfl(WebContents& web_contents)
+    : web_contents_(web_contents) {
 }
 
 ColorChooserEfl::~ColorChooserEfl() {
 }
 
 void ColorChooserEfl::SetSelectedColor(SkColor color) {
-  web_contents_delegate_->web_contents()->DidChooseColorInColorChooser(color);
+  web_contents_.DidChooseColorInColorChooser(color);
 }
 
 void ColorChooserEfl::End() {
-  web_contents_delegate_->web_contents()->DidEndColorChooser();
-}
-
-void ColorChooserEfl::SetWebContentsDelegateEfl(WebContents* web_contents) {
-  web_contents_delegate_ = static_cast<WebContentsDelegateEfl*>(web_contents->GetDelegate());
+  web_contents_.DidEndColorChooser();
 }
 }

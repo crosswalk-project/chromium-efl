@@ -29,20 +29,18 @@ namespace content {
 
 class ColorChooser;
 class WebContents;
-class WebContentsDelegateEfl;
 
 class ColorChooserEfl : public ColorChooser {
  public:
-  ColorChooserEfl(WebContents* web_contents);
+  ColorChooserEfl(WebContents& web_contents);
   ~ColorChooserEfl();
 
   // ColorChooser implementation.
   virtual void SetSelectedColor(SkColor color);
   virtual void End();
-  void SetWebContentsDelegateEfl(WebContents* web_contents);
 
  private:
-  WebContentsDelegateEfl* web_contents_delegate_;
+  WebContents& web_contents_;
 };
 
 }

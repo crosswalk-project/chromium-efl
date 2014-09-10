@@ -342,11 +342,11 @@ void ContextMenuControllerEfl::OnDownloadUpdated(content::DownloadItem* download
 base::FilePath ContextMenuControllerEfl::DownloadFile(const GURL url,
                                                       const base::FilePath outputDir,
                                                       const DownloadUrlParameters::OnStartedCallback& callback = DownloadUrlParameters::OnStartedCallback()) {
-  const GURL referrer = wcd_->web_contents()->GetVisibleURL();
-  DownloadManager* dlm = BrowserContext::GetDownloadManager(wcd_->web_contents()->GetBrowserContext());
+  const GURL referrer = web_contents_.GetVisibleURL();
+  DownloadManager* dlm = BrowserContext::GetDownloadManager(web_contents_.GetBrowserContext());
 
   scoped_ptr<DownloadUrlParameters> dl_params(
-      DownloadUrlParameters::FromWebContents(wcd_->web_contents(), url));
+      DownloadUrlParameters::FromWebContents(&web_contents_, url));
   dl_params->set_post_id(-1);
   dl_params->set_referrer(
       content::Referrer(referrer, blink::WebReferrerPolicyAlways));
@@ -373,7 +373,7 @@ base::FilePath ContextMenuControllerEfl::DownloadFile(const GURL url,
 }
 
 bool ContextMenuControllerEfl::TriggerDownloadCb(const GURL url) {
-  BrowserContextEfl* browser_context = static_cast<BrowserContextEfl*>(wcd_->web_contents()->GetBrowserContext());
+  BrowserContextEfl* browser_context = static_cast<BrowserContextEfl*>(web_contents_.GetBrowserContext());
   if (browser_context) {
     EwkDidStartDownloadCallback* start_download_callback =
         browser_context->WebContext()->DidStartDownloadCallback();
@@ -391,8 +391,7 @@ void ContextMenuControllerEfl::OpenInNewTab(const GURL url) {
   if (!url.is_valid())
     return;
   NavigationController::LoadURLParams params(url);
-  WebContents* web_contents = wcd_->web_contents();
-  web_contents->GetController().LoadURLWithParams(params);
+  web_contents_.GetController().LoadURLWithParams(params);
 }
 
 void ContextMenuControllerEfl::MenuItemSelected(ContextMenuItemEfl *menu_item) {
