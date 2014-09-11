@@ -29,6 +29,7 @@ OPTIONS:
    --ccache      configure ccache installed in your system
    --skip-ninja  Skip ninja step
    --debug       build debug version of chromium-efl (in $GYP_GENERATOR_OUTPUT/Debug instead of default $GYP_GENERATOR_OUTPUT/Release)
+   -jN           set number of jobs, just like with make or ninja
 
 examples:
 $0 --skip-gyp
@@ -64,6 +65,10 @@ if echo "$@" | grep -cq '\-\-debug'; then
   BUILD_SUBDIRECTORY=Debug
 fi
 
+# Will be empty string if -j not specified or ill-formatted, otherwise -j and the number argument together.
+# \grep because folks often alias grep but we want the vanilla behavior.
+JOBS=$(echo "$@" | \grep -Eo '\-j\s*[1-9]([0-9]*)')
+
 set -e
 
 if [ "$SKIP_GYP" == "0" ]; then
@@ -79,5 +84,5 @@ if [ "$SKIP_NINJA" == "0" ]; then
   fi
   export LD_LIBRARY_PATH="${JHBUILD_DEPS}/${_LIBDIR}:$LD_LIBRARY_PATH"
   export PATH="${JHBUILD_DEPS}/bin:$PATH"
-  ninja -C ${GYP_GENERATOR_OUTPUT}/${BUILD_SUBDIRECTORY}
+  ninja -C ${GYP_GENERATOR_OUTPUT}/${BUILD_SUBDIRECTORY} ${JOBS}
 fi
