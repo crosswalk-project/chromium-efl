@@ -61,6 +61,8 @@ class RenderViewObserverEfl: public content::RenderViewObserver {
   void WillSubmitForm(blink::WebFrame* frame, const blink::WebFormElement& form);
   void OnSetBrowserFont();
   void CheckContentsSize();
+  void OnSuspendScheduledTasks();
+  void OnResumeScheduledTasks();
 
   blink::WebSize max_scroll_offset_;
   float cached_min_page_scale_factor_;
