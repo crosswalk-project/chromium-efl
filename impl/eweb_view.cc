@@ -471,6 +471,10 @@ void EWebView::Suspend() {
     base::Bind(&content::ResourceDispatcherHost::BlockRequestsForRoute,
       base::Unretained(rdh),
       rvh->GetProcess()->GetID(), rvh->GetRoutingID()));
+
+  RenderViewHost* render_view_host = web_contents_delegate()->web_contents()->GetRenderViewHost();
+  if (render_view_host)
+    render_view_host->Send(new EwkViewMsg_SuspendScheduledTask(render_view_host->GetRoutingID()));
 }
 
 void EWebView::Resume() {
@@ -490,6 +494,10 @@ void EWebView::Resume() {
     base::Bind(&content::ResourceDispatcherHost::ResumeBlockedRequestsForRoute,
       base::Unretained(rdh),
       rvh->GetProcess()->GetID(), rvh->GetRoutingID()));
+
+  RenderViewHost* render_view_host = web_contents_delegate()->web_contents()->GetRenderViewHost();
+  if (render_view_host)
+    render_view_host->Send(new EwkViewMsg_ResumeScheduledTasks(render_view_host->GetRoutingID()));
 }
 
 double EWebView::GetTextZoomFactor() const {

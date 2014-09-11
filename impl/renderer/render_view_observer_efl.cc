@@ -144,6 +144,9 @@ bool RenderViewObserverEfl::OnMessageReceived(const IPC::Message& message)
     IPC_MESSAGE_HANDLER(EwkViewMsg_WebAppCapableGet, OnWebAppCapableGet);
     IPC_MESSAGE_HANDLER(EwkViewMsg_SetDrawsTransparentBackground, OnSetDrawsTransparentBackground);
     IPC_MESSAGE_HANDLER(EwkViewMsg_SetBrowserFont, OnSetBrowserFont);
+    IPC_MESSAGE_HANDLER(EwkViewMsg_SuspendScheduledTask, OnSuspendScheduledTasks);
+    IPC_MESSAGE_HANDLER(EwkViewMsg_ResumeScheduledTasks, OnResumeScheduledTasks);
+
     IPC_MESSAGE_UNHANDLED(handled = false)
   IPC_END_MESSAGE_MAP()
   return handled;
@@ -544,4 +547,18 @@ void RenderViewObserverEfl::OnSetBrowserFont()
     view->setBrowserFont();
   }
 #endif
+}
+
+void RenderViewObserverEfl::OnSuspendScheduledTasks()
+{
+  blink::WebView* view = render_view()->GetWebView();
+  if (view)
+    view->suspendScheduledTasks();
+}
+
+void RenderViewObserverEfl::OnResumeScheduledTasks()
+{
+  blink::WebView* view = render_view()->GetWebView();
+  if (view)
+    view->resumeScheduledTasks();
 }
