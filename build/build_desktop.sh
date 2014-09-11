@@ -7,15 +7,7 @@ source ${SCRIPTDIR}/common.sh
 
 host_arch=$(getHostArch)
 
-GYP_GENERATOR_OUTPUT=${TOPDIR}/"out.${host_arch}"
-
-JHBUILD_DEPS="${GYP_GENERATOR_OUTPUT}/Dependencies/Root"
-
-if [ "${host_arch}" == "x64" ]; then
-  _LIBDIR=lib64
-elif [ "${host_arch}" == "ia32" ]; then
-  _LIBDIR=lib
-fi
+export GYP_GENERATOR_OUTPUT=${TOPDIR}/"out.${host_arch}"
 
 usage() {
 cat << EOF
@@ -61,6 +53,12 @@ if echo "$@" | grep -cq '\-\-ccache'; then
   USE_CCACHE=1
 fi
 
+JHBUILD_STAMPFILE="${GYP_GENERATOR_OUTPUT}/Dependencies/jhbuild.stamp"
+
+if echo "$@" | grep -cq '\-\-force-jhbuild'; then
+  rm -f $JHBUILD_STAMPFILE
+fi
+
 if echo "$@" | grep -cq '\-\-debug'; then
   BUILD_SUBDIRECTORY=Debug
 fi
@@ -70,6 +68,22 @@ fi
 JOBS=$(echo "$@" | \grep -Eo '\-j\s*[1-9]([0-9]*)')
 
 set -e
+
+JHBUILD_DEPS="${GYP_GENERATOR_OUTPUT}/Dependencies/Root"
+if [ "${host_arch}" == "x64" ]; then
+  _LIBDIR=lib64
+elif [ "${host_arch}" == "ia32" ]; then
+  _LIBDIR=lib
+fi
+export PKG_CONFIG_PATH="${JHBUILD_DEPS}/${_LIBDIR}/pkgconfig"
+
+if [ ! -f "$JHBUILD_STAMPFILE" ]; then
+  jhbuild --no-interact -f ${SCRIPTDIR}/jhbuild/jhbuildrc
+
+  if [ "$?" == "0" ]; then
+    echo "Yay! jhbuild done!" > $JHBUILD_STAMPFILE
+  fi
+fi
 
 if [ "$SKIP_GYP" == "0" ]; then
   ${TOPDIR}/build/gyp_chromiumefl.sh

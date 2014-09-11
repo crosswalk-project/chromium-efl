@@ -8,8 +8,7 @@ source ${SCRIPTDIR}/common.sh
 host_arch=$(getHostArch)
 target=desktop
 
-#need to be exported because it is used by jhbuild
-export GYP_GENERATOR_OUTPUT=${TOPDIR}/"out.${host_arch}"
+GYP_GENERATOR_OUTPUT=${TOPDIR}/"out.${host_arch}"
 
 if echo "$@" | grep -cq '\-\Dbuilding_for_tizen_mobile=1'; then
   GYP_GENERATOR_OUTPUT=${TOPDIR}/"out.mobile.${host_arch}"
@@ -18,18 +17,6 @@ fi
 if echo "$@" | grep -cq '\-\Dbuilding_for_tizen_tv=1'; then
   GYP_GENERATOR_OUTPUT=${TOPDIR}/"out.tv.${host_arch}"
   target=tv
-fi
-
-if [ "$target" == "desktop" ]; then
-  JHBUILD_DEPS="${GYP_GENERATOR_OUTPUT}/Dependencies/Root"
-
-  if [ "${host_arch}" == "x64" ]; then
-    _LIBDIR=lib64
-  elif [ "${host_arch}" == "ia32" ]; then
-    _LIBDIR=lib
-  fi
-
-  export PKG_CONFIG_PATH="${JHBUILD_DEPS}/${_LIBDIR}/pkgconfig"
 fi
 
 set -e
@@ -101,11 +88,6 @@ else
   #and replacing original files with correct ones according to $SYSTEM_DEPS
   $TOPDIR/src/build/linux/unbundle/replace_gyp_files.py $SYSTEM_DEPS
 
-fi
-
-
-if [ "$target" == "desktop" ]; then
-  jhbuild --no-interact -f ${SCRIPTDIR}/jhbuild/jhbuildrc
 fi
 
 set -x
