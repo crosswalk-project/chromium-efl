@@ -232,6 +232,7 @@
       'ewk_global_data.cc',
       'file_chooser_controller_efl.cc',
       'file_chooser_controller_efl.h',
+      'gfx/x11_event_source_efl.cc',
       'gfx/x11_types_override.cc',
       'gl/gl_context_egl_override.cc',
       'gl/gl_context_glx_override.cc',

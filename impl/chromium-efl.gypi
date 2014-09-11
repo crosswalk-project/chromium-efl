@@ -76,6 +76,8 @@
       ['exclude', 'clipboard/clipboard_aurax11\\.cc$'],
       ['exclude', 'gl_context_egl\\.cc$'],
       ['exclude', 'gl_context_glx\\.cc$'],
+      ['exclude', 'x11_event_source_glib\\.cc$'],
+      ['exclude', 'x11_event_source_libevent\\.cc$'],
       ['exclude', 'x11_types\\.cc$'],
     ],
     'conditions': [
