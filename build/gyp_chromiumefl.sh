@@ -46,9 +46,6 @@ COMMON_GYP_PARAMETERS="--depth=${TOPDIR}/src
                       -Duse_aura=1
                       "
 
-#reverting back origin files
-${SCRIPTDIR}/restore_gyp.sh
-
 if [ "$target" == "desktop" ]; then
   ADDITIONAL_GYP_PARAMETERS+="-Dbuilding_for_tizen=0
                              "
@@ -97,6 +94,7 @@ else
 
 fi
 
+set +e
 set -x
 ${TOPDIR}/build/gyp_chromiumefl \
                                  $COMMON_GYP_PARAMETERS \
@@ -104,3 +102,12 @@ ${TOPDIR}/build/gyp_chromiumefl \
                                  $ADDITIONAL_GYP_PARAMETERS \
                                  $@ \
                                  ${TOPDIR}/impl/chromium-efl.gyp
+
+ret=$?
+
+if [ "$target" != "desktop" ]; then
+  # Restore gyp files to their original states not to mess up the tree permanently.
+  $TOPDIR/src/build/linux/unbundle/replace_gyp_files.py --undo $SYSTEM_DEPS
+fi
+
+exit $ret
