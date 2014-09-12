@@ -7,7 +7,6 @@
     'edje_compiler%': 'edje_cc',
     'ewk_bringup%': 1,
   },
-
   'targets': [{
     'target_name': 'chromium-efl',
     'type': 'shared_library',
@@ -28,6 +27,8 @@
       '<(SHARED_INTERMEDIATE_DIR)/webkit/',
     ],
     'dependencies': [
+      'chromium-efl-deps.gyp:efl',
+      'chromium-efl-deps.gyp:gstreamer',
       '<(chrome_src_dir)/base/allocator/allocator.gyp:allocator',
       '<(chrome_src_dir)/content/content.gyp:content',
       '<(chrome_src_dir)/content/content.gyp:content_app_browser',
@@ -339,12 +340,6 @@
         ['_toolset=="target"', {
           'libraries': [ '<!($(echo ${CXX_target:-g++}) -print-libgcc-file-name)', ]
         }],
-        ['notifications==1', {
-          'sources': [
-            'browser/notification/notification_controller_efl.cc',
-            'browser/notification/notification_controller_efl.h',
-          ],
-        }],
       ],
     },
     'rules': [{
@@ -362,6 +357,9 @@
         ],
     }], # rules
     'conditions': [
+      ['building_for_tizen==1', {
+        'dependencies': [ 'chromium-efl-deps.gyp:tizen' ],
+      }],
       ['ewk_bringup==1', {
         'defines': [ 'EWK_BRINGUP=1' ],
       }],
@@ -371,6 +369,12 @@
           'renderer/print_pages_params.h',
           'renderer/print_web_view_helper_efl.cc',
           'renderer/print_web_view_helper_efl.h',
+        ],
+      }],
+      ['notifications==1', {
+        'sources': [
+          'browser/notification/notification_controller_efl.cc',
+          'browser/notification/notification_controller_efl.h',
         ],
       }],
     ],
