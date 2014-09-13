@@ -10,6 +10,7 @@
 #include "browser/navigation_policy_handler_efl.h"
 #include "browser/renderer_host/render_widget_host_view_efl.h"
 #include "browser/renderer_host/web_event_factory_efl.h"
+#include "common/content_client_efl.h"
 #include "common/render_messages_efl.h"
 #include "common/version_info.h"
 #include "components/sessions/serialized_navigation_entry.h"
@@ -792,18 +793,24 @@ bool EWebView::ExecuteJavaScript(const char* script, tizen_webview::View_Script_
 }
 
 bool EWebView::SetUserAgent(const char* userAgent) {
-  web_contents_->SetUserAgentOverride(std::string(userAgent));
-  const content::NavigationController& controller = web_contents_->GetController();
+  const content::NavigationController& controller =
+      web_contents_->GetController();
+  bool override = userAgent && strlen(userAgent);
   for (int i = 0; i < controller.GetEntryCount(); ++i)
-    controller.GetEntryAtIndex(i)->SetIsOverridingUserAgent(true);
-  overridden_user_agent_ = std::string(userAgent);
-  web_contents_->SetUserAgentOverride(userAgent);
+    controller.GetEntryAtIndex(i)->SetIsOverridingUserAgent(override);
+
+  if (override)
+    web_contents_->SetUserAgentOverride(userAgent);
+  else
+    web_contents_->SetUserAgentOverride(std::string());
+
   return true;
 }
 
 bool EWebView::SetUserAgentAppName(const char* application_name) {
   EflWebView::VersionInfo::GetInstance()->
-    SetProductName(std::string(application_name));
+    SetProductName(application_name ? application_name : "");
+
   return true;
 }
 
@@ -812,11 +819,9 @@ void EWebView::set_magnifier(bool status) {
 }
 
 const char* EWebView::GetUserAgent() const {
-  if (overridden_user_agent_.empty()) {
-    return (GetContentClient()->GetUserAgent()).c_str();
-  } else {
-    return overridden_user_agent_.c_str();
-  }
+  if (!web_contents_->GetUserAgentOverride().empty())
+    return web_contents_->GetUserAgentOverride().c_str();
+  return GetContentClient()->GetUserAgent().c_str();
 }
 
 const char* EWebView::GetUserAgentAppName() const {

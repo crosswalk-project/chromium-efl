@@ -36,6 +36,9 @@ class VersionInfo {
   // E.g. "Chrome/a.b.c.d"
   std::string ProductNameAndVersionForUserAgent() const;
 
+  // Default user agent
+  std::string DefaultUserAgent() const;
+
   // E.g. "Chromium" or "Google Chrome".
   std::string Name() const
   { return product_name_; }

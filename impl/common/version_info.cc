@@ -11,6 +11,10 @@
 #include "system_info.h"
 #endif
 #endif
+#include "base/command_line.h"
+#include "content/public/common/content_switches.h"
+#include "content/public/common/user_agent.h"
+
 #include "common/version_info_efl.h"
 
 namespace EflWebView {
@@ -37,7 +41,10 @@ VersionInfo::VersionInfo()
 }
 
 void VersionInfo::SetProductName(const std::string& name) {
-  product_name_ = name;
+  if(name.empty())
+    product_name_ = PRODUCT_NAME;
+  else
+    product_name_ = name;
 }
 
 std::string VersionInfo::LastChange() const {
@@ -111,6 +118,24 @@ std::string VersionInfo::ProductNameAndVersionForUserAgent() const {
          Name() +
          std::string("/") +
          Version();
+}
+
+std::string VersionInfo::DefaultUserAgent() const {
+  std::string product = ProductNameAndVersionForUserAgent();
+
+  if (CommandLine::ForCurrentProcess()->HasSwitch(
+      switches::kUseMobileUserAgent)) {
+    product += " Mobile";
+  }
+
+// FIXME : The hard-coded user agent for tizen tv
+#if defined(OS_TIZEN_TV)
+  return "Mozilla/5.0 (SmartHub; SMART-TV; U; Linux/SmartTV+2013; Maple2012) "
+    "AppleWebKit/535.20+ (KHTML, like Gecko) SmartTV Safari/535.20+";
+#else
+  return content::BuildUserAgentFromOSAndProduct(EflWebView::VersionInfo::GetInstance()->OSType(),
+                                                     product);
+#endif
 }
 
 } //namespace EflWebView

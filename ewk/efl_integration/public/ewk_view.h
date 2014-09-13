@@ -873,7 +873,8 @@ EAPI Eina_Bool ewk_view_application_name_for_user_agent_set(Evas_Object* o, cons
 *
 * @param o view object to get the application name
 *
-* @return @c application name
+* @return @c application name. The returned string @b should be freed by
+*         eina_stringshare_del() after use.
 */
 EAPI const char* ewk_view_application_name_for_user_agent_get(const Evas_Object* o);
 

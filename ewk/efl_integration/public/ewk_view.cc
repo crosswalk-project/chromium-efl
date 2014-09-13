@@ -355,10 +355,8 @@ Eina_Bool ewk_view_page_visibility_state_set(Evas_Object* ewkView, Ewk_Page_Visi
 Eina_Bool ewk_view_user_agent_set(Evas_Object* ewkView, const char* user_agent)
 {
   EWK_VIEW_IMPL_GET_OR_RETURN(ewkView, impl, false);
-  EINA_SAFETY_ON_NULL_RETURN_VAL(user_agent, false);
-  if (0 != strcmp(user_agent, "")) //check for empty string
-    return impl->SetUserAgent(user_agent);
-  return false;
+
+  return impl->SetUserAgent(user_agent);
 }
 
 const char* ewk_view_user_agent_get(const Evas_Object* ewkView)
@@ -369,17 +367,14 @@ const char* ewk_view_user_agent_get(const Evas_Object* ewkView)
 
 Eina_Bool ewk_view_application_name_for_user_agent_set(Evas_Object* ewkView, const char* application_name)
 {
-  EWK_VIEW_IMPL_GET_OR_RETURN(ewkView, impl, EINA_FALSE);
-  EINA_SAFETY_ON_NULL_RETURN_VAL(application_name, EINA_FALSE);
-  if (0 != strcmp(application_name, "")) //check for empty string
-    return impl->SetUserAgentAppName(application_name);
-  return EINA_FALSE;
+  EWK_VIEW_IMPL_GET_OR_RETURN(ewkView, impl, false);
+  return impl->SetUserAgentAppName(application_name);
 }
 
 const char* ewk_view_application_name_for_user_agent_get(const Evas_Object* ewkView)
 {
-  EWK_VIEW_IMPL_GET_OR_RETURN(ewkView, impl, NULL);
-  return impl->GetUserAgentAppName();
+  EWK_VIEW_IMPL_GET_OR_RETURN(ewkView, impl, 0);
+  return eina_stringshare_add(impl->GetUserAgentAppName());
 }
 
 Eina_Bool ewk_view_custom_header_add(const Evas_Object* ewkView, const char* name, const char* value)

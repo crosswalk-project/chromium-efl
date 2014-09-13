@@ -5,9 +5,6 @@
 #include "common/content_client_efl.h"
 
 #include "base/basictypes.h"
-#include "base/command_line.h"
-#include "content/public/common/content_switches.h"
-#include "content/public/common/user_agent.h"
 #include "common/version_info.h"
 #include "ipc/ipc_message.h"
 #include "ui/base/resource/resource_bundle.h"
@@ -18,25 +15,7 @@ std::string ContentClientEfl::GetProduct() const {
 }
 
 std::string ContentClientEfl::GetUserAgent() const {
-  std::string product = GetProduct();
-
-#if defined(OS_TIZEN)
-  product += " Mobile";
-#else
-  if (CommandLine::ForCurrentProcess()->HasSwitch(
-      switches::kUseMobileUserAgent)) {
-    product += " Mobile";
-  }
-#endif
-
-// FIXME : The hard-coded user agent for tizen tv
-#if defined(OS_TIZEN_TV)
-  return "Mozilla/5.0 (SmartHub; SMART-TV; U; Linux/SmartTV+2013; Maple2012) "
-    "AppleWebKit/535.20+ (KHTML, like Gecko) SmartTV Safari/535.20+";
-#else
-  return content::BuildUserAgentFromOSAndProduct(
-      EflWebView::VersionInfo::GetInstance()->OSType(), product);
-#endif
+  return EflWebView::VersionInfo::GetInstance()->DefaultUserAgent();
 }
 
 base::string16 ContentClientEfl::GetLocalizedString(int message_id) const {

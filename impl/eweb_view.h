@@ -441,7 +441,6 @@ class EWebView {
   bool touch_events_enabled_;
   bool mouse_events_enabled_;
   double text_zoom_factor_;
-  std::string overridden_user_agent_;
   mutable std::string selected_text_;
   scoped_ptr<_Ewk_Auth_Challenge> auth_challenge_;
   scoped_ptr<tizen_webview::PolicyDecision> policy_decision_;
