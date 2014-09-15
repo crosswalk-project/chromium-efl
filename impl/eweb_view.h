@@ -194,6 +194,7 @@ class WebApplicationCapableGetCallback {
   void *user_data_;
 };
 
+class AsyncHitTestRequest;
 class JavaScriptDialogManagerEfl;
 class WebViewBrowserMessageFilter;
 
@@ -317,7 +318,9 @@ class EWebView {
   void UseSettingsFont();
 
   tizen_webview::Hit_Test* RequestHitTestDataAt(int x, int y, tizen_webview::Hit_Test_Mode mode);
+  Eina_Bool AsyncRequestHitTestDataAt(int x, int y, tizen_webview::Hit_Test_Mode mode, tizen_webview::View_Hit_Test_Request_Callback, void* user_data);
   tizen_webview::Hit_Test* RequestHitTestDataAtBlinkCoords(int x, int y, tizen_webview::Hit_Test_Mode mode);
+  void DispatchAsyncHitTestData(const _Ewk_Hit_Test& hit_test_data, const NodeAttributesMap& node_attributes, int64_t request_id);
   void UpdateHitTestData(const _Ewk_Hit_Test& hit_test_data, const NodeAttributesMap& node_attributes);
 
   int current_find_request_id() const { return current_find_request_id_; }
@@ -491,6 +494,8 @@ class EWebView {
   content::FileChooserParams::Mode filechooser_mode_;
 #endif
   bool is_initialized_;
+
+  std::map<int64_t, AsyncHitTestRequest*> m_pendingAsyncHitTests;
 
 private:
   // only tizen_webview::WebView can create and delete this

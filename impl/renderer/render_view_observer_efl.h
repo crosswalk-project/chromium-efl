@@ -52,6 +52,8 @@ class RenderViewObserverEfl: public content::RenderViewObserver {
   void OnGetSelectionStyle();
   void OnSelectClosestWord(int x, int y);
   void OnDoHitTest(int x, int y, tizen_webview::Hit_Test_Mode mode);
+  void OnDoHitTestAsync(int view_x, int view_y, tizen_webview::Hit_Test_Mode mode, int64_t request_id);
+  bool DoHitTest(int view_x, int view_y, tizen_webview::Hit_Test_Mode mode, _Ewk_Hit_Test* hit_test_result, NodeAttributesMap* attributes);
   void OnPrintToPdf(int width, int height, const base::FilePath& filename);
   void OnGetMHTMLData(int callback_id);
   void OnSetDrawsTransparentBackground(bool enabled);

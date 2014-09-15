@@ -64,9 +64,7 @@ Ewk_Hit_Test_Mode from(tw::Hit_Test_Mode);
 tw::Hit_Test_Result_Context to(Ewk_Hit_Test_Result_Context);
 Ewk_Hit_Test_Result_Context from(tw::Hit_Test_Result_Context);
 
-#if !defined(EWK_BRINGUP)
 tw::View_Hit_Test_Request_Callback to(Ewk_View_Hit_Test_Request_Callback);
-#endif
 
 tw::Policy_Decision_Type to(Ewk_Policy_Decision_Type);
 Ewk_Policy_Decision_Type from(tw::Policy_Decision_Type);

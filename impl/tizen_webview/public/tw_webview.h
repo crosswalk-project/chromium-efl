@@ -139,6 +139,7 @@ class WebView {
   void SetTouchEventsEnabled(bool enabled);
   void HandleTouchEvents(Touch_Event_Type type, const Eina_List *points, const Evas_Modifier *modifiers);
   Hit_Test* RequestHitTestDataAt(int x, int y, Hit_Test_Mode mode);
+  Eina_Bool AsyncRequestHitTestDataAt(int x, int y, tizen_webview::Hit_Test_Mode mode, tizen_webview::View_Hit_Test_Request_Callback, void* user_data);
 
   // ---- Selection
   void QuerySelectionStyle();
