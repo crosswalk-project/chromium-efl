@@ -6,7 +6,7 @@
       <label name="chromium-efl::db"/>
     </provide>
     <permit>
-      <smack permit="com.samsung.app-tray" type="rwx" />
+      <smack permit="com.samsung.menu-screen" type="rwx" />
       <smack permit="e17" type="rwx" />
       <smack permit="system::use_internet" type="w" />
     </permit>
@@ -33,15 +33,27 @@
       <smack request="sound_server" type="rw" />
       <smack request="chromium-efl::db" type="rwxat" />
       <smack request="ui-gadget::client" type="rwx" />
-      <smack request="deviced:gadget" type="rw" />
+      <smack request="deviced::haptic" type="rw" />
+
+      <smack request="pkgmgr::db" type="rw" />
+      <smack request="system::vconf_inhouse" type="rwl" />
+      <smack request="system::vconf_system" type="rwl" />
+      <smack request="system::vconf_setting" type="r" />
+      <smack request="system::vconf_misc" type="rl" />
+      <smack request="system::vconf_multimedia" type="rl" />
+      <smack request="sys-assert::core" type="wx" />
+      <smack request="pkgmgr-server" type="r" />
+      <smack request="efreet" type="rx" />
+      <smack request="_" type="rwx" />
+      <smack request="device::sys_logging" type="w" />
     </request>
   </define>
   <request>
     <domain name="_"/>
   </request>
   <assign>
-    <filesystem path="/usr/lib/org.tizen.chromium-efl/efl_webprocess" label="chromium-efl" exec_label="chromium-efl"/>
-    <filesystem path="/opt/usr/apps/org.tizen.chromium-efl/data/db/" label="chromium-efl::db" exec_label="chromium-efl"/>
+    <filesystem path="/usr/lib/chromium-efl/efl_webprocess" label="chromium-efl" exec_label="none"/>
+    <filesystem path="/opt/usr/apps/chromium-efl/data/db/" label="chromium-efl::db" exec_label="none"/>
     <filesystem path="/usr/lib/libchromium-ewk.so" label="_" />
     <filesystem path="/usr/share/icons/mini-browser.png" label="_" />
     <filesystem path="/usr/bin/efl_webview_app" label="chromium-efl" exec_label="chromium-efl"/>

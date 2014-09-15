@@ -7,7 +7,7 @@
 %define _debug_mode 1
 %endif
 
-Name: org.tizen.chromium-efl
+Name: chromium-efl
 Summary: Chromium EFL
 # Set by by scripts/update-chromium-version.sh
 %define ChromiumVersion 39.2171.0
@@ -254,7 +254,7 @@ install -m 0644 "%{OUTPUT_FOLDER}"/pkgconfig/*.pc    "%{buildroot}"%{_libdir}/pk
 install -m 0644 ewk/efl_integration/public/*.h                  "%{buildroot}"%{_includedir}/chromium-ewk/
 
 install -d "%{buildroot}"%{_datadir}/packages
-install -m 0644 ewk/efl_webview_app/org.tizen.chromium-efl.xml "%{buildroot}"%{_datadir}/packages
+install -m 0644 ewk/efl_webview_app/chromium-efl.xml "%{buildroot}"%{_datadir}/packages
 
 install -d "%{buildroot}"%{_datadir}/icons
 install -m 0644 ewk/efl_webview_app/mini-browser.png "%{buildroot}"%{_datadir}/icons
@@ -322,7 +322,7 @@ fi
 %{CHROMIUM_DATA_DIR}/themes/*.edj
 %{_bindir}/efl_webview_app
 %{_bindir}/mini_browser
-%{_datadir}/packages/org.tizen.chromium-efl.xml
+%{_datadir}/packages/chromium-efl.xml
 %{_datadir}/icons/mini-browser.png
 
 %files devel
@@ -339,7 +339,7 @@ fi
 %if 0%{?build_ewk_unittests}
 %files ewktest
 %defattr(-,root,root,-)
-%manifest ./packaging/org.tizen.chromium-ewktest.manifest
+%manifest ./packaging/chromium-ewktest.manifest
 /opt/usr/utc_exec/*
 /opt/usr/resources/*
 %endif
