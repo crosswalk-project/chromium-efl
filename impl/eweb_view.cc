@@ -138,10 +138,18 @@ class WebViewBrowserMessageFilter: public content::BrowserMessageFilter {
       web_contents->GetRenderProcessHost()->AddFilter(this);
   }
 
-  bool OnMessageReceived(const IPC::Message& message) {
+  virtual void OverrideThreadForMessage(const IPC::Message& message, BrowserThread::ID* thread) OVERRIDE
+  {
+    if (message.type() == EwkViewHostMsg_HitTestAsyncReply::ID)
+      *thread = BrowserThread::UI;
+  }
+
+  virtual bool OnMessageReceived(const IPC::Message& message) OVERRIDE
+  {
     bool handled = true;
     IPC_BEGIN_MESSAGE_MAP(WebViewBrowserMessageFilter, message)
       IPC_MESSAGE_HANDLER(EwkViewHostMsg_HitTestReply, OnReceivedHitTestData)
+      IPC_MESSAGE_HANDLER(EwkViewHostMsg_HitTestAsyncReply, OnReceivedHitTestAsyncData)
       IPC_MESSAGE_UNHANDLED(handled = false)
     IPC_END_MESSAGE_MAP()
     return handled;
@@ -163,6 +171,21 @@ class WebViewBrowserMessageFilter: public content::BrowserMessageFilter {
     }
   }
 
+  void OnReceivedHitTestAsyncData(int render_view, const _Ewk_Hit_Test& hit_test_data,
+                                  const NodeAttributesMap& node_attributes, int64_t request_id)
+  {
+    DCHECK(BrowserThread::CurrentlyOn(BrowserThread::UI));
+    WebContents* contents = GetWebContents();
+    CHECK(contents);
+
+    RenderViewHost* render_view_host= contents->GetRenderViewHost();
+    CHECK(render_view_host);
+
+    if (render_view_host->GetRoutingID() == render_view) {
+      web_view_->DispatchAsyncHitTestData(hit_test_data, node_attributes, request_id);
+    }
+  }
+
   WebContents* GetWebContents() const {
     if (web_view_ && web_view_->web_contents_delegate())
       return web_view_->web_contents_delegate()->web_contents();
@@ -172,6 +195,31 @@ class WebViewBrowserMessageFilter: public content::BrowserMessageFilter {
 
 private:
   EWebView* web_view_;
+};
+
+class AsyncHitTestRequest
+{
+ public:
+  AsyncHitTestRequest(int x, int y, tizen_webview::Hit_Test_Mode mode, tizen_webview::View_Hit_Test_Request_Callback callback, void* user_data)
+    : m_x(x)
+    , m_y(y)
+    , m_mode(mode)
+    , m_callback(callback)
+    , m_user_data(user_data)
+  { }
+
+  void Run(tizen_webview::Hit_Test *hit_test, Evas_Object* web_view)
+  {
+    DCHECK(m_callback);
+    m_callback(web_view, m_x, m_y, m_mode, hit_test, m_user_data);
+  }
+
+ private:
+  int m_x;
+  int m_y;
+  tizen_webview::Hit_Test_Mode m_mode;
+  tizen_webview::View_Hit_Test_Request_Callback m_callback;
+  void* m_user_data;
 };
 
 WebContents* EWebView::contents_for_new_window_ = NULL;
@@ -1159,6 +1207,53 @@ tizen_webview::Hit_Test* EWebView::RequestHitTestDataAt(int x, int y, tizen_webv
   y /= rwhv()->device_scale_factor();
 
   return RequestHitTestDataAtBlinkCoords(x, y, mode);
+}
+
+Eina_Bool EWebView::AsyncRequestHitTestDataAt(int x, int y, tizen_webview::Hit_Test_Mode mode, tizen_webview::View_Hit_Test_Request_Callback callback, void* user_data)
+{
+  static int64_t request_id = 1;
+  DCHECK(BrowserThread::CurrentlyOn(BrowserThread::UI));
+  // TODO: this calculations should be moved outside and reused everywhere it's required
+  Evas_Coord tmpX, tmpY;
+  evas_object_geometry_get(evas_object_, &tmpX, &tmpY, NULL, NULL);
+
+  int view_x = x - tmpX;
+  int view_y = y - tmpY;
+  view_x /= rwhv()->device_scale_factor();
+  view_y /= rwhv()->device_scale_factor();
+
+  // WebViewBrowserMessageFilter requires RenderProcessHost to be already created.
+  // In EWebView constructor we have no guarantee that related RenderProcessHost is already created
+  // We do not destroy message_filter_ manualy as it is managed by RenderProcessHost after setting it as filter
+  // TODO: this pointer should be set to NULL when WebProcess crash/quits
+  if (!message_filter_) {
+    message_filter_ = new WebViewBrowserMessageFilter(this);
+  }
+
+  RenderViewHost* render_view_host = web_contents_delegate()->web_contents()->GetRenderViewHost();
+  CHECK(render_view_host);
+  content::RenderProcessHost* render_process_host = web_contents_delegate()->web_contents()->GetRenderProcessHost();
+  CHECK(render_process_host);
+
+  render_view_host->Send(new EwkViewMsg_DoHitTestAsync(render_view_host->GetRoutingID(), view_x, view_y, mode, request_id));
+  m_pendingAsyncHitTests[request_id] = new AsyncHitTestRequest(x, y, mode, callback, user_data);
+  ++request_id;
+  return EINA_TRUE;
+}
+
+void EWebView::DispatchAsyncHitTestData(const _Ewk_Hit_Test& hit_test_data, const NodeAttributesMap& node_attributes, int64_t request_id)
+{
+  DCHECK(BrowserThread::CurrentlyOn(BrowserThread::UI));
+
+  std::map<int64_t, AsyncHitTestRequest*>::iterator it = m_pendingAsyncHitTests.find(request_id);
+  if (it == m_pendingAsyncHitTests.end())
+      return;
+
+  tizen_webview::Hit_Test data(hit_test_data);
+  data.impl->nodeData.PopulateNodeAtributes(node_attributes);
+  it->second->Run(&data, evas_object_);
+  delete it->second;
+  m_pendingAsyncHitTests.erase(it);
 }
 
 tizen_webview::Hit_Test* EWebView::RequestHitTestDataAtBlinkCoords(int x, int y, tizen_webview::Hit_Test_Mode mode) {

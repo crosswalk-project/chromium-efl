@@ -158,6 +158,12 @@ IPC_MESSAGE_ROUTED3(EwkViewMsg_DoHitTest,
                     int, /* vertical position */
                     tizen_webview::Hit_Test_Mode /* mode */)
 
+IPC_MESSAGE_ROUTED4(EwkViewMsg_DoHitTestAsync,
+                    int, /* horizontal position */
+                    int, /* vertical position */
+                    tizen_webview::Hit_Test_Mode, /* mode */
+                    int64_t /* request id */)
+
 IPC_MESSAGE_ROUTED3(EwkViewMsg_PrintToPdf,
                     int, /* width */
                     int, /* height */
@@ -214,6 +220,12 @@ IPC_MESSAGE_CONTROL3(EwkViewHostMsg_HitTestReply,
                     int, /* render_view_id */
                     _Ewk_Hit_Test, /* Ewk Hit test data without node map */
                     NodeAttributesMap /* node attributes */)
+
+IPC_MESSAGE_CONTROL4(EwkViewHostMsg_HitTestAsyncReply,
+                    int, /* render_view_id */
+                    _Ewk_Hit_Test, /* Ewk Hit test data without node map */
+                    NodeAttributesMap, /* node attributes */
+                    int64_t /* request id */)
 
 IPC_MESSAGE_ROUTED1(EwkViewMsg_GetMHTMLData,
                     int /* callback id */)

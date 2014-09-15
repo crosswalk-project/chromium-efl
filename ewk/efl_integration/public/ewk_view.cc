@@ -630,11 +630,7 @@ Ewk_Hit_Test* ewk_view_hit_test_new(Evas_Object* ewkView, int x, int y, int hit_
 Eina_Bool ewk_view_hit_test_request(Evas_Object* o, int x, int y, int hit_test_mode, Ewk_View_Hit_Test_Request_Callback callback, void* user_data)
 {
   EWK_VIEW_IMPL_GET_OR_RETURN(o, impl, EINA_FALSE);
-#if !defined(EWK_BRINGUP)
   return impl->AsyncRequestHitTestDataAt(x, y, chromium_glue::to(static_cast<Ewk_Hit_Test_Mode>(hit_test_mode)), chromium_glue::to(callback), user_data);
-#else
-  return EINA_FALSE;
-#endif
 }
 
 #if !defined(EWK_BRINGUP)

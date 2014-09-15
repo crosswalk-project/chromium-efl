@@ -136,6 +136,7 @@ bool RenderViewObserverEfl::OnMessageReceived(const IPC::Message& message)
     IPC_MESSAGE_HANDLER(EwkViewMsg_GetSelectionStyle, OnGetSelectionStyle);
     IPC_MESSAGE_HANDLER(EwkViewMsg_SelectClosestWord, OnSelectClosestWord);
     IPC_MESSAGE_HANDLER(EwkViewMsg_DoHitTest, OnDoHitTest)
+    IPC_MESSAGE_HANDLER(EwkViewMsg_DoHitTestAsync, OnDoHitTestAsync)
     IPC_MESSAGE_HANDLER(EwkViewMsg_PrintToPdf, OnPrintToPdf)
     IPC_MESSAGE_HANDLER(EwkViewMsg_GetMHTMLData, OnGetMHTMLData);
     IPC_MESSAGE_HANDLER(EwkViewMsg_WebAppIconUrlGet, OnWebAppIconUrlGet);
@@ -281,21 +282,43 @@ void RenderViewObserverEfl::OnSelectClosestWord(int x, int y)
 
 void RenderViewObserverEfl::OnDoHitTest(int view_x, int view_y, tizen_webview::Hit_Test_Mode mode)
 {
+  _Ewk_Hit_Test hit_test_result;
+  NodeAttributesMap attributes;
+
+  if (DoHitTest(view_x, view_y, mode, &hit_test_result, &attributes)) {
+    Send(new EwkViewHostMsg_HitTestReply(routing_id(), hit_test_result, attributes));
+  }
+}
+
+void RenderViewObserverEfl::OnDoHitTestAsync(int view_x, int view_y, tizen_webview::Hit_Test_Mode mode, int64_t request_id)
+{
+  _Ewk_Hit_Test hit_test_result;
+  NodeAttributesMap attributes;
+
+  if (DoHitTest(view_x, view_y, mode, &hit_test_result, &attributes)) {
+    Send(new EwkViewHostMsg_HitTestAsyncReply(routing_id(), hit_test_result, attributes, request_id));
+  }
+}
+
+bool RenderViewObserverEfl::DoHitTest(int view_x, int view_y, tizen_webview::Hit_Test_Mode mode, _Ewk_Hit_Test* hit_test_result, NodeAttributesMap* attributes)
+{
+  DCHECK(hit_test_result);
+  DCHECK(attributes);
+
   if (!render_view() || !render_view()->GetWebView())
-    return;
+    return false;
 
   const blink::WebHitTestResult web_hit_test_result =
       render_view()->GetWebView()->hitTestResultAt(
           blink::WebPoint(view_x, view_y));
-  _Ewk_Hit_Test ewk_hit_test_result;
-  ewk_hit_test_result.mode = mode;
 
-  PopulateEwkHitTestData(web_hit_test_result, &ewk_hit_test_result);
-  NodeAttributesMap attributes;
-  if (ewk_hit_test_result.mode & TW_HIT_TEST_MODE_NODE_DATA)
-    PopulateNodeAttributesMapFromHitTest(web_hit_test_result, &attributes);
+  hit_test_result->mode = mode;
 
-  Send(new EwkViewHostMsg_HitTestReply(routing_id(), ewk_hit_test_result, attributes));
+  PopulateEwkHitTestData(web_hit_test_result, hit_test_result);
+  if (hit_test_result->mode & TW_HIT_TEST_MODE_NODE_DATA)
+    PopulateNodeAttributesMapFromHitTest(web_hit_test_result, attributes);
+
+  return true;
 }
 
 void RenderViewObserverEfl::OnPrintToPdf(int width, int height, const base::FilePath& filename)

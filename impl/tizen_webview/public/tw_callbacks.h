@@ -8,7 +8,7 @@
 #include <Evas.h>
 
 namespace tizen_webview {
-
+class Hit_Test;
 class Security_Origin;
 
 // from ewk_context.h
@@ -92,6 +92,7 @@ typedef Eina_Bool (*View_JavaScript_Prompt_Callback)(Evas_Object* o, const char*
 //typedef Eina_Bool (*View_Exceeded_Database_Quota_Callback)(Evas_Object* o, Security_Origin* origin, const char* database_name, unsigned long long expectedQuota, void* user_data);
 //typedef Eina_Bool (*View_Exceeded_Local_File_System_Quota_Callback)(Evas_Object* o, Security_Origin* origin, long long currentQuota, void* user_data);
 typedef Eina_Bool (*Orientation_Lock_Cb)(Evas_Object* o, Eina_Bool need_lock, int orientation, void* user_data);
+typedef void (*View_Hit_Test_Request_Callback)(Evas_Object* o, int x, int y, int hit_test_mode, Hit_Test* hit_test, void* user_data);
 } // namespace tizen_webview
 
 #endif  // TIZEN_WEBVIEW_PUBLIC_TW_CALLBACKS_H_

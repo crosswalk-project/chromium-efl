@@ -311,6 +311,11 @@ void WebView::HandleTouchEvents(Touch_Event_Type type, const Eina_List *points, 
 Hit_Test* WebView::RequestHitTestDataAt(int x, int y, Hit_Test_Mode mode) {
   return impl_->RequestHitTestDataAt(x, y, mode);
 }
+
+Eina_Bool WebView::AsyncRequestHitTestDataAt(int x, int y, tizen_webview::Hit_Test_Mode mode, tizen_webview::View_Hit_Test_Request_Callback callback, void* user_data)
+{
+  return impl_->AsyncRequestHitTestDataAt(x, y, mode, callback, user_data);
+}
 //
 //void WebView::UpdateHitTestData(const Hit_Test& hit_test_data, const NodeAttributesMap& node_attributes) {
 //  return impl_->UpdateHitTestData(hit_test_data, node_attributes);

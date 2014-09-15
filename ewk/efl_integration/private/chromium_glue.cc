@@ -167,12 +167,10 @@ Ewk_Hit_Test_Mode from(tw::Hit_Test_Mode val)
   return static_cast<Ewk_Hit_Test_Mode>(res);
 }
 
-#if !defined(EWK_BRINGUP)
 tw::View_Hit_Test_Request_Callback to(Ewk_View_Hit_Test_Request_Callback callback)
 {
   return reinterpret_cast<tw::View_Hit_Test_Request_Callback>(callback);
 }
-#endif
 
 tw::Policy_Decision_Type to(Ewk_Policy_Decision_Type val)
 {
