@@ -43,7 +43,6 @@
 #include "browser/renderer_host/browsing_data_remover_efl.h"
 #include "browser/vibration/vibration_provider_client.h"
 #include "common/render_messages_efl.h"
-#include "memory_sampler.h"
 
 #include "tizen_webview/public/tw_security_origin.h"
 #include "tizen_webview/public/tw_wrt.h"
@@ -493,9 +492,9 @@ Evas_Object *EWebContext::AddFaviconObject(const char* uri, Evas* canvas) const 
 }
 
 void EWebContext::StartMemorySampler(double timerInterval) const {
-  WebMemorySampler::shared()->start(timerInterval);
+  LOG(INFO)<<"Memory Sampler deprecated";
 }
 
 void EWebContext::StopMemorySampler() const {
-  WebMemorySampler::shared()->stop();
+  LOG(INFO)<<"Memory Sampler deprecated";
 }

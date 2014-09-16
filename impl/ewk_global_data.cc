@@ -24,7 +24,6 @@
 #include "content_main_delegate_efl.h"
 #include "message_pump_for_ui_efl.h"
 #include "screen_efl.h"
-#include "memory_sampler.h"
 
 #ifdef OS_TIZEN_MOBILE
 #include <dlfcn.h>
@@ -60,7 +59,6 @@ EwkGlobalData::~EwkGlobalData() {
     // We need to pretend that message loop was stopped so chromium unwinds correctly
     MessageLoop *loop = MessageLoop::current();
     loop->QuitNow();
-    WebMemorySampler::shared()->stop();
     // browser_main_runner must be deleted first as it depends on content_main_runner
     delete browser_main_runner_;
     delete content_main_runner_;

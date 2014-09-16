@@ -143,9 +143,6 @@
       'browser/password_manager/password_store_factory.h',
       'browser/policy_response_delegate_efl.cc',
       'browser/policy_response_delegate_efl.h',
-      # [M37] backing store support removed from chromium. Efl implementations should probably also be removed
-      #'browser/renderer_host/backing_store_efl.cc',
-      #'browser/renderer_host/backing_store_efl.h',
       'browser/renderer_host/browsing_data_remover_efl.cc',
       'browser/renderer_host/browsing_data_remover_efl.h',
       'browser/renderer_host/im_context_efl.cc',
@@ -244,8 +241,6 @@
       'gpu/gpu_thread_override_efl.h',
       'memory_purger.cc',
       'memory_purger.h',
-      'memory_sampler.cc',
-      'memory_sampler.h',
       'message_pump_for_ui_efl.cc',
       'message_pump_for_ui_efl.h',
       'navigation_policy_params.h',
