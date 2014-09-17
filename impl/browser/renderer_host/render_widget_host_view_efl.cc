@@ -1211,7 +1211,7 @@ void RenderWidgetHostViewEfl::HandleGesture(ui::GestureEvent* event) {
 #ifdef OS_TIZEN
   FilterInputMotion(gesture);
   if (gesture.type != blink::WebInputEvent::Undefined)
-    host_->ForwardGestureEvent(gesture);
+    host_->ForwardGestureEventWithLatencyInfo(gesture, *event->latency());
 #endif
 
   event->SetHandled();
@@ -1231,6 +1231,13 @@ void UpdateWebTouchEventAfterDispatch(blink::WebTouchEvent* event,
 }
 
 void RenderWidgetHostViewEfl::HandleTouchEvent(ui::TouchEvent* event) {
+  // TODO(b.kelemen): move touch handling to RWHV completely. Spreading it
+  // through EWebView and RWHV just makes it harder to understand.
+  if (!ui::GestureRecognizer::Get()->ProcessTouchEventPreDispatch(*event, eweb_view())) {
+    event->StopPropagation();
+    return;
+  }
+
   // Update the touch event first.
   blink::WebTouchPoint* point =
     content::UpdateWebTouchEventFromUIEvent(*event, &touch_event_);
@@ -1244,17 +1251,27 @@ void RenderWidgetHostViewEfl::HandleTouchEvent(ui::TouchEvent* event) {
     event->StopPropagation();
   }
 
+  bool forwarded = false;
   if (point) {
     if (host_->ShouldForwardTouchEvent()) {
+      forwarded = true;
       host_->ForwardTouchEventWithLatencyInfo(touch_event_, *event->latency());
-    } else {
-      // In case there was no touch event hander in the page we still want to feed the
-      // event into GestureMapper to emulate mouse input. Without this the event would
-      // be simply lost.
-      TouchEventWithLatencyInfo eventWithLatencyInfo(touch_event_, *event->latency());
-      ProcessAckedTouchEvent(eventWithLatencyInfo, INPUT_EVENT_ACK_STATE_NOT_CONSUMED);
     }
     UpdateWebTouchEventAfterDispatch(&touch_event_, point);
+  }
+
+  // If we forward it to the renderer than either blink handles it or we will
+  // have a second round with it in ProcessAckedTouchEvent.
+  if (forwarded)
+    return;
+
+  scoped_ptr<ui::GestureRecognizer::Gestures> gestures(
+        ui::GestureRecognizer::Get()->ProcessTouchEventPostDispatch(*event, ui::ER_UNHANDLED, eweb_view()));
+  if (!gestures)
+    return;
+  for (size_t j = 0; j < gestures->size(); ++j) {
+    ui::GestureEvent* event = gestures->get().at(j);
+    HandleGesture(event);
   }
 }
 

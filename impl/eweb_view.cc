@@ -579,12 +579,8 @@ void EWebView::ProcessAckedTouchEvent(const TouchEventWithLatencyInfo& touch,
       ui::ER_HANDLED : ui::ER_UNHANDLED;
   for (ScopedVector<ui::TouchEvent>::const_iterator iter = events.begin(),
       end = events.end(); iter != end; ++iter)  {
-    if (!ui::GestureRecognizer::Get()->ProcessTouchEventPreDispatch(
-        *(*iter), this)) {
-      continue;
-    }    
     scoped_ptr<ui::GestureRecognizer::Gestures> gestures(
-        gesture_recognizer_->ProcessTouchEventPostDispatch(*(*iter), result, this));
+        gesture_recognizer_->ProcessTouchEventOnAsyncAck(**iter, result, this));
     if (gestures) {
       for (size_t j = 0; j < gestures->size(); ++j) {
         ui::GestureEvent* event = gestures->get().at(j);
