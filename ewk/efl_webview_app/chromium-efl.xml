@@ -4,7 +4,7 @@
     <author href="www.samsung.com" email="sns.park@samsung.com">SWC</author>
     <description> mini browser application based on chromium-efl </description>
     <ui-application appid="org.tizen.mini-browser" exec="/usr/bin/mini_browser" nodisplay="false" multiple="false" type="capp" taskmanage="true">
-        <icon>/usr/share/icons/mini-browser.png</icon>
+        <icon>/opt/share/icons/mini-browser.png</icon>
         <label>Chromium-efl MiniBrowser</label>
         <label xml:lang="en-us">Chromium-efl MiniBrowser</label>
     </ui-application>
