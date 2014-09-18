@@ -253,11 +253,11 @@ install -m 0755 "%{OUTPUT_FOLDER}"/mini_browser      "%{buildroot}"%{_bindir}
 install -m 0644 "%{OUTPUT_FOLDER}"/pkgconfig/*.pc    "%{buildroot}"%{_libdir}/pkgconfig/
 install -m 0644 ewk/efl_integration/public/*.h                  "%{buildroot}"%{_includedir}/chromium-ewk/
 
-install -d "%{buildroot}"%{_datadir}/packages
-install -m 0644 ewk/efl_webview_app/chromium-efl.xml "%{buildroot}"%{_datadir}/packages
+install -d "%{buildroot}"/opt/share/packages
+install -m 0644 ewk/efl_webview_app/chromium-efl.xml "%{buildroot}"/opt/share/packages
 
-install -d "%{buildroot}"%{_datadir}/icons
-install -m 0644 ewk/efl_webview_app/mini-browser.png "%{buildroot}"%{_datadir}/icons
+install -d "%{buildroot}"/opt/share/icons
+install -m 0644 ewk/efl_webview_app/mini-browser.png "%{buildroot}"/opt/share/icons
 
 %if 0%{?_enable_unittests}
 install -d "%{INSTALL_ROOT}%{CHROMIUM_UNITTESTS_DIR}"
@@ -322,8 +322,8 @@ fi
 %{CHROMIUM_DATA_DIR}/themes/*.edj
 %{_bindir}/efl_webview_app
 %{_bindir}/mini_browser
-%{_datadir}/packages/chromium-efl.xml
-%{_datadir}/icons/mini-browser.png
+/opt/share/packages/chromium-efl.xml
+/opt/share/icons/mini-browser.png
 
 %files devel
 %defattr(-,root,root,-)

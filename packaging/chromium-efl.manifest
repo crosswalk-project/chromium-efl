@@ -55,7 +55,7 @@
     <filesystem path="/usr/lib/chromium-efl/efl_webprocess" label="chromium-efl" exec_label="none"/>
     <filesystem path="/opt/usr/apps/chromium-efl/data/db/" label="chromium-efl::db" exec_label="none"/>
     <filesystem path="/usr/lib/libchromium-ewk.so" label="_" />
-    <filesystem path="/usr/share/icons/mini-browser.png" label="_" />
+    <filesystem path="/opt/share/icons/mini-browser.png" label="_" />
     <filesystem path="/usr/bin/efl_webview_app" label="chromium-efl" exec_label="chromium-efl"/>
     <filesystem path="/usr/bin/mini_browser" label="chromium-efl" exec_label="chromium-efl"/>
   </assign>
