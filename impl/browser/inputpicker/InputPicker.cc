@@ -869,9 +869,7 @@ void InputPicker::ewk_datetime_popup(const char* inputValue, bool local) {
 
 Eina_Bool InputPicker::removeDatetimePicker(void* data) {
   InputPicker* inputPicker = static_cast<InputPicker*>(data);
-#if !defined(EWK_BRINGUP)
   inputPicker->web_view_.web_contents().DidCancelDialog();
-#endif
 
   if (!inputPicker->picker_layout_)
     return ECORE_CALLBACK_CANCEL;
@@ -966,9 +964,7 @@ void InputPicker::_date_popup_response_cb(void* data,  Evas_Object* obj, void* e
   char dateStr[20] = { 0, };
   strftime(dateStr, 20, "%F" , &currentTime);
 
-#if !defined(EWK_BRINGUP)
   inputPicker->web_view_.web_contents().DidReplaceDateTime(std::string(dateStr));
-#endif
 }
 
 void InputPicker::_week_popup_response_cb(void* data,  Evas_Object* obj, void* event_info) {
@@ -983,9 +979,7 @@ void InputPicker::_week_popup_response_cb(void* data,  Evas_Object* obj, void* e
   char dateStr[20] = { 0, };
   strftime(dateStr, 20, "%G-W%V", &currentTime);
 
-#if !defined(EWK_BRINGUP)
-  inputPicker->web_view_->web_contents().DidReplaceDateTime(std::string(dateStr));
-#endif
+  inputPicker->web_view_.web_contents().DidReplaceDateTime(std::string(dateStr));
 }
 
 void InputPicker::_time_popup_response_cb(void* data,  Evas_Object* obj, void* event_info) {
@@ -1000,9 +994,7 @@ void InputPicker::_time_popup_response_cb(void* data,  Evas_Object* obj, void* e
   char dateStr[20] = { 0, };
   strftime(dateStr, 20, "%R", &currentTime);
 
-#if !defined(EWK_BRINGUP)
   inputPicker->web_view_.web_contents().DidReplaceDateTime(std::string(dateStr));
-#endif
 }
 
 void InputPicker::_month_popup_response_cb(void* data,  Evas_Object* obj, void* event_info) {
@@ -1017,9 +1009,7 @@ void InputPicker::_month_popup_response_cb(void* data,  Evas_Object* obj, void* 
   char dateStr[20] = { 0, };
   strftime(dateStr, 20, "%Y-%m", &currentTime);
 
-#if !defined(EWK_BRINGUP)
   inputPicker->web_view_.web_contents().DidReplaceDateTime(std::string(dateStr));
-#endif
 }
 
 void InputPicker::_datetime_popup_response_cb(void* data,  Evas_Object* obj, void* event_info) {
@@ -1037,9 +1027,7 @@ void InputPicker::_datetime_popup_response_cb(void* data,  Evas_Object* obj, voi
   else
     strftime(dateStr, 50, "%FT%RZ", &currentTime);
 
-#if !defined(EWK_BRINGUP)
   inputPicker->web_view_.web_contents().DidReplaceDateTime(std::string(dateStr));
-#endif
   inputPicker->web_view_.ExecuteEditCommand("Unselect", 0);
 
   inputPicker->deletePopupLayout();
