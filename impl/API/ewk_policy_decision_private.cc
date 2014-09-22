@@ -225,9 +225,9 @@ void _Ewk_Policy_Decision::Suspend() {
 
 void _Ewk_Policy_Decision::InitializeOnUIThread() {
   DCHECK(type_ == _Ewk_Policy_Decision::POLICY_RESPONSE);
-  DCHECK(policy_response_delegate_);
+  DCHECK(policy_response_delegate_.get());
 
-  if (policy_response_delegate_) {
+  if (policy_response_delegate_.get()) {
     RenderFrameHost *host = RenderFrameHost::FromID(policy_response_delegate_->GetRenderProcessId(), policy_response_delegate_->GetRenderFrameId());
 
     // Download request has no render frame id, they're detached. We override it with main frame from render view id

@@ -21,6 +21,7 @@
 #define EWEB_CONTEXT_H
 
 #include "API/ewk_cookie_manager_private.h"
+#include "base/memory/scoped_ptr.h"
 #include "browser/renderer_host/web_cache_manager_efl.h"
 #include "tizen_webview/public/tw_cache_model.h"
 #include "tizen_webview/public/tw_callbacks.h"

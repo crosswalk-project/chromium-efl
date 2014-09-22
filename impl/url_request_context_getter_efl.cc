@@ -59,16 +59,16 @@ URLRequestContextGetterEfl::URLRequestContextGetterEfl(
     EWebContext& web_context,
     bool ignore_certificate_errors,
     const base::FilePath& base_path,
-    base::MessageLoop* io_loop,
-    base::MessageLoop* file_loop,
+    const scoped_refptr<base::SingleThreadTaskRunner>& io_task_runner,
+    const scoped_refptr<base::SingleThreadTaskRunner>& file_task_runner,
     ProtocolHandlerMap* protocol_handlers,
     URLRequestInterceptorScopedVector request_interceptors,
     net::NetLog* net_log)
     : web_context_(web_context),
       ignore_certificate_errors_(ignore_certificate_errors),
       base_path_(base_path),
-      io_loop_(io_loop),
-      file_loop_(file_loop),
+      io_task_runner_(io_task_runner),
+      file_task_runner_(file_task_runner),
       request_interceptors_(request_interceptors.Pass()),
       net_log_(net_log) {
   // Must first be created on the UI thread.
@@ -79,7 +79,7 @@ URLRequestContextGetterEfl::URLRequestContextGetterEfl(
 
   proxy_config_service_.reset(
       net::ProxyService::CreateSystemProxyConfigService(
-          io_loop_->message_loop_proxy().get(), file_loop_));
+          io_task_runner, file_task_runner));
 }
 
 URLRequestContextGetterEfl::~URLRequestContextGetterEfl() {
@@ -288,7 +288,7 @@ void URLRequestContextGetterEfl::CreateSQLitePersistentCookieStore(
   // longer referenced.
   scoped_refptr<net::CookieMonster> cookie_monster =
       new net::CookieMonster(persistent_store.get(), NULL);
-  storage_->set_cookie_store(cookie_monster);
+  storage_->set_cookie_store(cookie_monster.get());
 
   if (persistent_store.get() && persist_session_cookies)
     cookie_monster->SetPersistSessionCookies(true);

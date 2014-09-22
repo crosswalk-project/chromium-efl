@@ -107,7 +107,7 @@ void CookieManager::DeleteCookiesOnIOThread(const std::string& url,
                                               const std::string& cookie_name) {
   DCHECK(BrowserThread::CurrentlyOn(BrowserThread::IO));
 
-  if (!request_context_getter_)
+  if (!request_context_getter_.get())
     return;
 
   scoped_refptr<net::CookieMonster> cookie_monster =
@@ -158,7 +158,7 @@ void CookieManager::GetHostNamesWithCookiesAsync(AsyncHostnamesGetCb callback, v
 
 void CookieManager::FetchCookiesOnIOThread() {
   DCHECK(BrowserThread::CurrentlyOn(BrowserThread::IO));
-  if (!request_context_getter_) {
+  if (!request_context_getter_.get()) {
     OnFetchComplete(net::CookieList());
     return;
   }
@@ -195,7 +195,7 @@ void CookieManager::SetStoragePathOnIOThread(const std::string& path,
                                              bool file_storage_type) {  
   DCHECK(BrowserThread::CurrentlyOn(BrowserThread::IO));
   base::FilePath storage_path(path);
-  if (request_context_getter_)
+  if (request_context_getter_.get())
     request_context_getter_->SetCookieStoragePath(storage_path, persist_session_cookies);
 }
 
@@ -278,7 +278,7 @@ void CookieManager::GetCookieValueOnIOThread(const GURL& host,
   net::CookieOptions options;
   options.set_include_httponly();
 
-  if (!request_context_getter_) {
+  if (!request_context_getter_.get()) {
     DCHECK(completion);
     completion->Signal();
     return;

@@ -124,10 +124,10 @@ void OnOriginsWithApplicationCacheObtained(tizen_webview::Web_Application_Cache_
 void OnTemporaryUsageAndQuotaObtained(
     tizen_webview::Web_Application_Cache_Usage_For_Origin_Get_Callback callback,
     void* user_data,
-    quota::QuotaStatusCode status_code,
+    storage::QuotaStatusCode status_code,
     int64 usage,
     int64 quota) {
-  if (status_code != quota::kQuotaStatusOk) {
+  if (status_code != storage::kQuotaStatusOk) {
     LOG(ERROR) << "Error in retrieving usage information";
     // We still trigger callback.
     usage = 0;
@@ -157,8 +157,8 @@ void GetWebDBOriginsOnDBThread(tizen_webview::Web_Database_Origins_Get_Callback 
                                void* user_data,
                                content::StoragePartition* partition) {
   DCHECK(BrowserThread::CurrentlyOn(BrowserThread::DB));
-  webkit_database::DatabaseQuotaClient client(base::MessageLoopProxy::current().get(), partition->GetDatabaseTracker());
-  client.GetOriginsForType(quota::kStorageTypeTemporary,
+  storage::DatabaseQuotaClient client(base::MessageLoopProxy::current().get(), partition->GetDatabaseTracker());
+  client.GetOriginsForType(storage::kStorageTypeTemporary,
                            base::Bind(&OnGetWebDBOrigins, callback, user_data));
 }
 
@@ -182,9 +182,9 @@ void GetFileSystemOriginsOnFILEThread(tizen_webview::Web_Database_Origins_Get_Ca
                                     void* user_data,
                                     content::StoragePartition* partition) {
   DCHECK(BrowserThread::CurrentlyOn(BrowserThread::FILE));
-  scoped_ptr<fileapi::FileSystemQuotaClient> client( new fileapi::FileSystemQuotaClient(partition->GetFileSystemContext(), false));
+  scoped_ptr<storage::FileSystemQuotaClient> client( new storage::FileSystemQuotaClient(partition->GetFileSystemContext(), false));
 
-  client->GetOriginsForType(quota::kStorageTypeTemporary,
+  client->GetOriginsForType(storage::kStorageTypeTemporary,
                             base::Bind(&OnGetFileSystemOrigins, callback, user_data));
 }
 
@@ -393,7 +393,7 @@ void EWebContext::GetAllOriginsWithApplicationCache(tizen_webview::Web_Applicati
   // As per comments on AppCacheService,
   // there is only one instance of AppCacheService per profile.(i.e. context in our case).
   // So, we don't need to iterate over all StoragePartitions.
-  partition->GetAppCacheService()->GetAllAppCacheInfo(collection,
+  partition->GetAppCacheService()->GetAllAppCacheInfo(collection.get(),
       base::Bind(&OnOriginsWithApplicationCacheObtained, callback, user_data, collection));
 }
 
@@ -407,10 +407,10 @@ void EWebContext::GetApplicationCacheUsage(
   BrowserThread::PostTask(
       BrowserThread::IO,
       FROM_HERE,
-      base::Bind(&quota::QuotaManager::GetUsageAndQuota,
+      base::Bind(&storage::QuotaManager::GetUsageAndQuota,
                  partition->GetQuotaManager(),
                  GetGURL(url),
-                 quota::kStorageTypeTemporary,
+                 storage::kStorageTypeTemporary,
                  base::Bind(&OnTemporaryUsageAndQuotaObtained, callback, user_data)));
 }
 

@@ -49,8 +49,6 @@ void ResourceDispatcherHostDelegateEfl::RequestBeginning(
     ResourceContext* resource_context,
     AppCacheService* appcache_service,
     ResourceType resource_type,
-    int child_id,
-    int route_id,
     ScopedVector<ResourceThrottle>* throttles) {
   BrowserContextEfl::ResourceContextEfl *resource_context_efl =
       static_cast<BrowserContextEfl::ResourceContextEfl*>(resource_context);

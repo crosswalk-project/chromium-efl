@@ -26,7 +26,6 @@ class ResourceDispatcherHostDelegateEfl
       ResourceContext* resource_context,
       AppCacheService* appcache_service,
       ResourceType resource_type,
-      int child_id, int route_id,
       ScopedVector<ResourceThrottle>* throttles) OVERRIDE;
 
   // Create login delegate.

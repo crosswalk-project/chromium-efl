@@ -69,6 +69,7 @@ class RenderWidgetHostViewEfl
   virtual RenderWidgetHost* GetRenderWidgetHost() const OVERRIDE;
   virtual void SetSize(const gfx::Size&) OVERRIDE;
   virtual void SetBounds(const gfx::Rect&) OVERRIDE;
+  virtual gfx::Vector2dF GetLastScrollOffset() const OVERRIDE;
   virtual gfx::NativeView GetNativeView() const OVERRIDE;
   virtual gfx::NativeViewId GetNativeViewId() const OVERRIDE;
   virtual gfx::NativeViewAccessible GetNativeViewAccessible() OVERRIDE;
@@ -100,7 +101,6 @@ class RenderWidgetHostViewEfl
   virtual void SetTooltipText(const base::string16&) OVERRIDE;
   virtual void SelectionChanged(const base::string16&, size_t, const gfx::Range&) OVERRIDE;
   virtual void SelectionBoundsChanged(const ViewHostMsg_SelectionBounds_Params&) OVERRIDE;
-  virtual void ScrollOffsetChanged() OVERRIDE;
   virtual void CopyFromCompositingSurface(
     const gfx::Rect&,
     const gfx::Size& /* dst_size */,
@@ -310,6 +310,9 @@ class RenderWidgetHostViewEfl
 
   typedef std::queue<NativeWebKeyboardEvent*> KeyDownEventQueue;
   KeyDownEventQueue keydownev_queue_;
+
+  // The last scroll offset of the view.
+  gfx::Vector2dF last_scroll_offset_;
 
   DISALLOW_COPY_AND_ASSIGN(RenderWidgetHostViewEfl);
 };

@@ -48,7 +48,6 @@
 #include "selection_controller_efl.h"
 #include "web_contents_delegate_efl.h"
 #include "ui/events/gestures/gesture_types.h"
-#include "ui/events/gestures/gesture_sequence.h"
 #include "context_menu_controller_efl.h"
 #include "file_chooser_controller_efl.h"
 #include "ui/gfx/point.h"
@@ -198,8 +197,7 @@ class WebViewBrowserMessageFilter;
 
 class EWebView
     : public ui::GestureConsumer
-    , public ui::GestureEventHelper
-    , public ui::GestureSequenceDelegate {
+    , public ui::GestureEventHelper {
  public:
 
   static EWebView* FromEvasObject(Evas_Object* eo);
@@ -212,7 +210,7 @@ class EWebView
 
   tizen_webview::WebView* GetPublicWebView();
   tizen_webview::WebViewEvasEventHandler* GetEvasEventHandler() { return evas_event_handler_; }
-  tizen_webview::WebContext* context() const { return context_; }
+  tizen_webview::WebContext* context() const { return context_.get(); }
   Evas_Object* evas_object() const { return evas_object_; }
   Evas* GetEvas() const { return evas_object_evas_get(evas_object_); }
   Evas_Object* GetContentImageObject() const;
@@ -422,9 +420,6 @@ class EWebView
   virtual bool CanDispatchToConsumer(ui::GestureConsumer* consumer) OVERRIDE;
   virtual void DispatchCancelTouchEvent(ui::TouchEvent* event) OVERRIDE;
   virtual void DispatchGestureEvent(ui::GestureEvent*) OVERRIDE;
-
-  // GestureSequenceDelegate overrides
-  virtual void DispatchPostponedGestureEvent(ui::GestureEvent* event) OVERRIDE;
 
 #if defined(OS_TIZEN_MOBILE)
   bool LaunchCamera(base::string16 mimetype);

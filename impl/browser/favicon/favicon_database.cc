@@ -106,7 +106,7 @@ void FaviconDatabase::SetFaviconURLForPageURL(const GURL &iconUrl, const GURL &p
   if (old.is_empty()) {
     // |old| is empty when it was just inserted by operator []
     // so we just assign new value to it and return
-    Command *cmd = new InsertFaviconURLCommand(d, pageUrl, iconUrl);
+    Command *cmd = new InsertFaviconURLCommand(d.get(), pageUrl, iconUrl);
     cmd->execute();
     d->commands.push(cmd);
     ScheduleSync();
@@ -115,11 +115,11 @@ void FaviconDatabase::SetFaviconURLForPageURL(const GURL &iconUrl, const GURL &p
 
   // |old| is not empty, so we have to remove it and its bitmap
   // from 'favicon url to bitmap'
-  Command *cmd = new RemoveBitmapCommand(d, iconUrl);
+  Command *cmd = new RemoveBitmapCommand(d.get(), iconUrl);
   cmd->execute();
   d->commands.push(cmd);
   // and update it in 'page url to favicon url'
-  cmd = new UpdateFaviconURLCommand(d, pageUrl, iconUrl);
+  cmd = new UpdateFaviconURLCommand(d.get(), pageUrl, iconUrl);
   cmd->execute();
   d->commands.push(cmd);
 
@@ -132,13 +132,13 @@ void FaviconDatabase::SetBitmapForFaviconURL(const SkBitmap &bitmap, const GURL 
     return;
   }
   if (d->faviconUrlToBitmap.find(iconUrl) != d->faviconUrlToBitmap.end()) {
-    Command *cmd = new UpdateBitmapCommand(d, iconUrl, bitmap);
+    Command *cmd = new UpdateBitmapCommand(d.get(), iconUrl, bitmap);
     cmd->execute();
     d->commands.push(cmd);
     ScheduleSync();
     return;
   }
-  Command *cmd = new InsertBitmapCommand(d, iconUrl, bitmap);
+  Command *cmd = new InsertBitmapCommand(d.get(), iconUrl, bitmap);
   cmd->execute();
   d->commands.push(cmd);
 
@@ -160,7 +160,7 @@ bool FaviconDatabase::ExistsForFaviconURL(const GURL &iconUrl) const {
 }
 
 void FaviconDatabase::Clear() {
-  Command *cmd = new ClearDatabaseCommand(d);
+  Command *cmd = new ClearDatabaseCommand(d.get());
   cmd->execute();
   d->commands.push(cmd);
 
@@ -213,11 +213,11 @@ bool FaviconDatabase::IsDatabaseInitialized() {
 }
 
 bool FaviconDatabase::InitDatabase() {
-  InitDatabaseCommand initCmd(d);
+  InitDatabaseCommand initCmd(d.get());
   return initCmd.execute();
 }
 
 bool FaviconDatabase::LoadDatabase() {
-  LoadDatabaseCommand loadCmd(d);
+  LoadDatabaseCommand loadCmd(d.get());
   return loadCmd.execute();
 }

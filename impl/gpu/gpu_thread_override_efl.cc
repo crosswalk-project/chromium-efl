@@ -54,8 +54,8 @@ struct GpuChildThreadEfl : public content::GpuChildThread {
 
   void OnInitialize() {
     GpuChildThread::OnInitialize();
-    DCHECK(!gpu_channel_manager_->share_group_);
-    DCHECK(!gpu_channel_manager_->mailbox_manager_);
+    DCHECK(!gpu_channel_manager_->share_group_.get());
+    DCHECK(!gpu_channel_manager_->mailbox_manager_.get());
     gpu_channel_manager_->share_group_ =
         GLSharedContextEfl::GetShareGroup();
     gpu_channel_manager_->mailbox_manager_ =

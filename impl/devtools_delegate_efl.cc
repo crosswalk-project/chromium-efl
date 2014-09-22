@@ -20,7 +20,7 @@
 #include "content/shell/browser/shell.h"
 #include "grit/shell_resources.h"
 #include "grit/devtools_resources.h"
-#include "net/socket/tcp_listen_socket.h"
+#include "net/socket/tcp_server_socket.h"
 #include "ui/base/resource/resource_bundle.h"
 #include "base/logging.h"
 #include <stdlib.h>
@@ -34,8 +34,30 @@ using content::WebContents;
 namespace {
 
 const char kTargetTypePage[] = "page";
+const char kTargetTypeServiceWorker[] = "service_worker";
+const char kTargetTypeOther[] = "other";
 
-net::StreamListenSocketFactory* CreateSocketFactory(int& port) {
+// Copy of internal class implementation from
+// content/shell/browser/shell_devtools_delegate.cc
+class TCPServerSocketFactory
+    : public content::DevToolsHttpHandler::ServerSocketFactory {
+ public:
+  TCPServerSocketFactory(const std::string& address, int port, int backlog)
+      : content::DevToolsHttpHandler::ServerSocketFactory(
+            address, port, backlog) {}
+
+ private:
+  // content::DevToolsHttpHandler::ServerSocketFactory.
+  virtual scoped_ptr<net::ServerSocket> Create() const OVERRIDE {
+    return scoped_ptr<net::ServerSocket>(
+        new net::TCPServerSocket(NULL, net::NetLog::Source()));
+  }
+
+  DISALLOW_COPY_AND_ASSIGN(TCPServerSocketFactory);
+};
+
+scoped_ptr<content::DevToolsHttpHandler::ServerSocketFactory>
+CreateSocketFactory(int& port) {
   if (!port) {
     const CommandLine* const command_line = CommandLine::ForCurrentProcess();
     // See if the user specified a port on the command line (useful for
@@ -56,20 +78,33 @@ net::StreamListenSocketFactory* CreateSocketFactory(int& port) {
       port = random() % (65535 - 40000) + 40000;
     }
   }
-  return new net::TCPListenSocketFactory("0.0.0.0", port);
+  return scoped_ptr<content::DevToolsHttpHandler::ServerSocketFactory>(
+      new TCPServerSocketFactory("0.0.0.0", port, 1));
 }
 
 class Target : public content::DevToolsTarget {
  public:
 
-  explicit Target(WebContents* web_contents);
+  explicit Target(scoped_refptr<DevToolsAgentHost> agent_host);
 
-  virtual std::string GetId() const OVERRIDE { return id_; }
+  virtual std::string GetId() const OVERRIDE { return agent_host_->GetId(); }
   virtual std::string GetParentId() const OVERRIDE { return std::string(); }
-  virtual std::string GetType() const OVERRIDE { return "kTargetTypePage"; }
-  virtual std::string GetTitle() const OVERRIDE { return title_; }
+  virtual std::string GetType() const OVERRIDE {
+    switch (agent_host_->GetType()) {
+      case DevToolsAgentHost::TYPE_WEB_CONTENTS:
+        return kTargetTypePage;
+      case DevToolsAgentHost::TYPE_SERVICE_WORKER:
+        return kTargetTypeServiceWorker;
+      default:
+        break;
+    }
+    return kTargetTypeOther;
+  }
+  virtual std::string GetTitle() const OVERRIDE {
+    return agent_host_->GetTitle();
+  }
   virtual std::string GetDescription() const OVERRIDE { return std::string(); }
-  virtual GURL GetURL() const OVERRIDE { return url_; }
+  virtual GURL GetURL() const OVERRIDE { return agent_host_->GetURL(); }
   virtual GURL GetFaviconURL() const OVERRIDE { return favicon_url_; }
   virtual base::TimeTicks GetLastActivityTime() const OVERRIDE {
     return last_activity_time_;
@@ -93,16 +128,15 @@ class Target : public content::DevToolsTarget {
   base::TimeTicks last_activity_time_;
 };
 
-Target::Target(WebContents* web_contents) {
-  agent_host_ =
-      DevToolsAgentHost::GetOrCreateFor(web_contents);
-  id_ = agent_host_->GetId();
-  title_ = base::UTF16ToUTF8(web_contents->GetTitle());
-  url_ = web_contents->GetURL();
-  content::NavigationController& controller = web_contents->GetController();
-  content::NavigationEntry* entry = controller.GetActiveEntry();
-  if (entry != NULL && entry->GetURL().is_valid())
-    favicon_url_ = entry->GetFavicon().url;
+Target::Target(scoped_refptr<content::DevToolsAgentHost> agent_host)
+    : agent_host_(agent_host) {
+  if (WebContents* web_contents = agent_host_->GetWebContents()) {
+    last_activity_time_ = web_contents->GetLastActiveTime();
+    content::NavigationController& controller = web_contents->GetController();
+    content::NavigationEntry* entry = controller.GetActiveEntry();
+    if (entry != NULL && entry->GetURL().is_valid())
+      favicon_url_ = entry->GetFavicon().url;
+  }
 }
 
 bool Target::Activate() const {
@@ -164,10 +198,9 @@ scoped_ptr<DevToolsTarget> DevToolsDelegateEfl::CreateNewTarget(const GURL& url)
 
 void DevToolsDelegateEfl::EnumerateTargets(TargetCallback callback) {
   TargetList targets;
-  std::vector<WebContents*> wc_list =
-      DevToolsAgentHost::GetInspectableWebContents();
-  for (std::vector<WebContents*>::iterator it = wc_list.begin();
-      it != wc_list.end();
+  DevToolsAgentHost::List agents = DevToolsAgentHost::GetOrCreateAll();
+  for (DevToolsAgentHost::List::iterator it = agents.begin();
+      it != agents.end();
       ++it) {
 
     targets.push_back(new Target(*it));

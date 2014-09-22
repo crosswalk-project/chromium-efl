@@ -43,6 +43,7 @@
          'sources/': [
            ['exclude', 'browser/device_sensors/data_fetcher_shared_memory_default.cc$'],
          ],
+         'cflags_cc': [ '-std=gnu++0x', '-fpermissive' ],
       }, {
         'sources/': [
           ['exclude', 'browser/device_sensors/data_fetcher_impl_tizen\\.(cc|h)$'],

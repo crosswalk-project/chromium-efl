@@ -595,6 +595,7 @@ bool EWebView::CanDispatchToConsumer(ui::GestureConsumer* consumer)
   return true;
 }
 
+/* FIXME: Figure out wher this code should be placed.
 void EWebView::DispatchPostponedGestureEvent(ui::GestureEvent* event) {
   Ewk_Settings* settings = GetSettings();
   LOG(INFO) << "DispatchPostponedGestureEvent :: " << event->details().type();
@@ -663,6 +664,7 @@ void EWebView::DispatchPostponedGestureEvent(ui::GestureEvent* event) {
   //Once added build with proper apps to be removed
   rwhv()->HandleFocusIn();
 }
+*/
 
 void EWebView::DispatchCancelTouchEvent(ui::TouchEvent* event) {
   NOTIMPLEMENTED();
@@ -1063,7 +1065,7 @@ void EWebView::SetScale(double scale_factor, int x, int y) {
 void EWebView::GetScrollPosition(int* x, int* y) const {
   DCHECK(x);
   DCHECK(y);
-  const gfx::Vector2d scroll_position = rwhv()->host()->GetLastScrollOffset();
+  const gfx::Vector2dF scroll_position = rwhv()->GetLastScrollOffset();
   *x = scroll_position.x();
   *y = scroll_position.y();
 }
@@ -1806,8 +1808,9 @@ bool EWebView::LaunchCamera(base::string16 mimetype)
 
 void EWebView::UrlRequestSet(const char* url, std::string method, Eina_Hash* headers, const char* body) {
   net::URLRequestContext context;
-  net::URLRequest request(GURL(url), net::DEFAULT_PRIORITY, NULL, &context);
-  request.set_method(method);
+  scoped_ptr<net::URLRequest> request(context.CreateRequest(
+      GURL(url), net::DEFAULT_PRIORITY, NULL, NULL));
+  request->set_method(method);
 
   if (headers) {
     net::HttpRequestHeaders* header;
@@ -1818,15 +1821,15 @@ void EWebView::UrlRequestSet(const char* url, std::string method, Eina_Hash* hea
       const char* name = static_cast<const char*>(t->key);
       const char* value = static_cast<const char*>(t->data);
       header->SetHeader(base::StringPiece(name), base::StringPiece(value));
-      request.SetExtraRequestHeaders(*header);
+      request->SetExtraRequestHeaders(*header);
     }
     eina_iterator_free(it);
   }
 
   if (body) {
     std::string str = body;
-    request.EnableChunkedUpload();
-    request.AppendChunkToUpload(str.c_str(), str.length(), true);
+    request->EnableChunkedUpload();
+    request->AppendChunkToUpload(str.c_str(), str.length(), true);
   }
 }
 

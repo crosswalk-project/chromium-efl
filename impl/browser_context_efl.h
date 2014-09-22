@@ -76,7 +76,7 @@ class BrowserContextEfl
   virtual BrowserPluginGuestManager* GetGuestManager() OVERRIDE
   { return 0; }
 
-  virtual quota::SpecialStoragePolicy* GetSpecialStoragePolicy() OVERRIDE
+  virtual storage::SpecialStoragePolicy* GetSpecialStoragePolicy() OVERRIDE
   { return 0; }
 
   virtual PushMessagingService* GetPushMessagingService() OVERRIDE
@@ -100,8 +100,6 @@ class BrowserContextEfl
 
     virtual net::HostResolver* GetHostResolver() OVERRIDE;
     virtual net::URLRequestContext* GetRequestContext() OVERRIDE;
-    virtual bool AllowMicAccess(const GURL& origin) OVERRIDE;
-    virtual bool AllowCameraAccess(const GURL& origin) OVERRIDE;
     void set_url_request_context_getter(URLRequestContextGetterEfl* getter);
     BrowserContextEfl* getBrowserContext() { return browser_context_; };
 

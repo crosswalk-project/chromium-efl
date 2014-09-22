@@ -28,12 +28,11 @@ namespace content {
 
 class URLRequestContextGetterEfl : public net::URLRequestContextGetter {
  public:
-  URLRequestContextGetterEfl(
-      EWebContext& web_context,
+  URLRequestContextGetterEfl(EWebContext& web_context,
       bool ignore_certificate_errors,
       const base::FilePath& base_path,
-      base::MessageLoop* io_loop,
-      base::MessageLoop* file_loop,
+      const scoped_refptr<base::SingleThreadTaskRunner> &io_task_runner,
+      const scoped_refptr<base::SingleThreadTaskRunner> &file_task_runner,
       ProtocolHandlerMap* protocol_handlers,
       URLRequestInterceptorScopedVector request_interceptors,
       net::NetLog* net_log);
@@ -63,8 +62,8 @@ class URLRequestContextGetterEfl : public net::URLRequestContextGetter {
   EWebContext& web_context_;
   bool ignore_certificate_errors_;
   base::FilePath base_path_;
-  base::MessageLoop* io_loop_;
-  base::MessageLoop* file_loop_;
+  const scoped_refptr<base::SingleThreadTaskRunner>& io_task_runner_;
+  const scoped_refptr<base::SingleThreadTaskRunner>& file_task_runner_;
   net::NetLog* net_log_;
 
   base::FilePath cookie_store_path_;

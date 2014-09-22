@@ -45,15 +45,6 @@ class WebContentsViewEfl
   virtual gfx::Rect GetViewBounds() const OVERRIDE;
 
   // content::RenderViewHostDelegateView implementation.
-  virtual void ShowPopupMenu(const gfx::Rect& bounds,
-                             int item_height,
-                             double item_font_size,
-                             int selected_item,
-                             const std::vector<MenuItem>& items,
-                             bool right_aligned,
-                             bool allow_multiple_selection,
-                             int advanced_ime_options = 0) OVERRIDE;
-
   virtual void ShowContextMenu(RenderFrameHost* render_frame_host, const ContextMenuParams& params) OVERRIDE;
 
   void UpdateDragDest(RenderViewHost* host);

@@ -56,11 +56,11 @@ BrowsingDataRemoverEfl* BrowsingDataRemoverEfl::CreateForRange(content::BrowserC
 int BrowsingDataRemoverEfl::GenerateQuotaClientMask(int remove_mask) {
   int quota_client_mask = 0;
   if (remove_mask & BrowsingDataRemoverEfl::REMOVE_FILE_SYSTEMS)
-    quota_client_mask |= quota::QuotaClient::kFileSystem;
+    quota_client_mask |= storage::QuotaClient::kFileSystem;
   if (remove_mask & BrowsingDataRemoverEfl::REMOVE_WEBSQL)
-    quota_client_mask |= quota::QuotaClient::kDatabase;
+    quota_client_mask |= storage::QuotaClient::kDatabase;
   if (remove_mask & BrowsingDataRemoverEfl::REMOVE_INDEXEDDB)
-    quota_client_mask |= quota::QuotaClient::kIndexedDatabase;
+    quota_client_mask |= storage::QuotaClient::kIndexedDatabase;
 
   return quota_client_mask;
 }
@@ -252,7 +252,7 @@ void BrowsingDataRemoverEfl::RemoveImpl(int remove_mask,
       //if origin is empty delete all app cache (actual deletion in OnGotOriginsWithApplicationCache)
       Application_Cache_Origins_Get_Callback cb = NULL;
       scoped_refptr<content::AppCacheInfoCollection> collection(new content::AppCacheInfoCollection());
-      app_cache_service_->GetAllAppCacheInfo(collection, base::Bind(&OnGotOriginsWithApplicationCache,
+      app_cache_service_->GetAllAppCacheInfo(collection.get(), base::Bind(&OnGotOriginsWithApplicationCache,
                                                                     cb, this, collection));
     }
   }
@@ -309,7 +309,7 @@ void BrowsingDataRemoverEfl::ClearQuotaManagedDataOnIOThread() {
   if (delete_begin_ == base::Time()) {
     ++quota_managed_storage_types_to_delete_count_;
     quota_manager_->GetOriginsModifiedSince(
-      quota::kStorageTypePersistent, delete_begin_,
+      storage::kStorageTypePersistent, delete_begin_,
       base::Bind(&BrowsingDataRemoverEfl::OnGotQuotaManagedOrigins,
                  base::Unretained(this)));
   }
@@ -317,20 +317,20 @@ void BrowsingDataRemoverEfl::ClearQuotaManagedDataOnIOThread() {
   // Do the same for temporary quota.
   ++quota_managed_storage_types_to_delete_count_;
   quota_manager_->GetOriginsModifiedSince(
-    quota::kStorageTypeTemporary, delete_begin_,
+    storage::kStorageTypeTemporary, delete_begin_,
     base::Bind(&BrowsingDataRemoverEfl::OnGotQuotaManagedOrigins,
                base::Unretained(this)));
 
   // Do the same for syncable quota.
   ++quota_managed_storage_types_to_delete_count_;
   quota_manager_->GetOriginsModifiedSince(
-    quota::kStorageTypeSyncable, delete_begin_,
+    storage::kStorageTypeSyncable, delete_begin_,
     base::Bind(&BrowsingDataRemoverEfl::OnGotQuotaManagedOrigins,
                base::Unretained(this)));
 }
 
 void BrowsingDataRemoverEfl::OnGotQuotaManagedOrigins(
-  const std::set<GURL>& origins, quota::StorageType type) {
+  const std::set<GURL>& origins, storage::StorageType type) {
   DCHECK_GT(quota_managed_storage_types_to_delete_count_, 0);
 
   // Walk through the origins passed in, delete quota of |type| from each that
@@ -355,11 +355,11 @@ void BrowsingDataRemoverEfl::OnGotQuotaManagedOrigins(
 
 void BrowsingDataRemoverEfl::OnQuotaManagedOriginDeletion(
   const GURL& origin,
-  quota::StorageType type,
-  quota::QuotaStatusCode status) {
+  storage::StorageType type,
+  storage::QuotaStatusCode status) {
   DCHECK_GT(quota_managed_origins_to_delete_count_, 0);
 
-  if (status != quota::kQuotaStatusOk)
+  if (status != storage::kQuotaStatusOk)
     DLOG(ERROR) << "Couldn't remove data of type " << type << " for origin "
                 << origin << ". Status: " << status;
 

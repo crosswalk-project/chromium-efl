@@ -43,7 +43,7 @@ class StoragePartition;
 namespace disk_cache {
 class Backend;
 }
-namespace quota {
+namespace storage {
 class QuotaManager;
 }
 class BrowsingDataRemoverEfl {
@@ -92,11 +92,11 @@ class BrowsingDataRemoverEfl {
 
   // Callback to respond to QuotaManager::GetOriginsModifiedSince, which is the
   // core of 'ClearQuotaManagedDataOnIOThread'.
-  void OnGotQuotaManagedOrigins(const std::set<GURL>&, quota::StorageType);
+  void OnGotQuotaManagedOrigins(const std::set<GURL>&, storage::StorageType);
 
   // Callback responding to deletion of a single quota managed origin's
   // persistent data
-  void OnQuotaManagedOriginDeletion(const GURL&, quota::StorageType, quota::QuotaStatusCode);
+  void OnQuotaManagedOriginDeletion(const GURL&, storage::StorageType, storage::QuotaStatusCode);
 
   // Called to check whether all temporary and persistent origin data that
   // should be deleted has been deleted. If everything's good to go, invokes
@@ -116,7 +116,7 @@ class BrowsingDataRemoverEfl {
 
   // The QuotaManager is owned by the profile; we can use a raw pointer here,
   // and rely on the profile to destroy the object whenever it's reasonable.
-  quota::QuotaManager* quota_manager_;
+  storage::QuotaManager* quota_manager_;
 
   // The DOMStorageContext is owned by the profile; we'll store a raw pointer.
   content::DOMStorageContext* dom_storage_context_;

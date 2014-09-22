@@ -55,14 +55,6 @@ net::URLRequestContext* BrowserContextEfl::ResourceContextEfl::GetRequestContext
   return getter_->GetURLRequestContext();
 }
 
-bool BrowserContextEfl::ResourceContextEfl::AllowMicAccess(const GURL& origin) {
-  return false;
-}
-
-bool BrowserContextEfl::ResourceContextEfl::AllowCameraAccess(const GURL& origin) {
-  return false;
-}
-
 void BrowserContextEfl::ResourceContextEfl::set_url_request_context_getter(
     URLRequestContextGetterEfl* getter) {
   getter_ = getter;
@@ -118,8 +110,8 @@ net::URLRequestContextGetter* BrowserContextEfl::CreateRequestContext(
       *web_context_,
       false,
       GetPath(),
-      BrowserThread::UnsafeGetMessageLoopForThread(BrowserThread::IO),
-      BrowserThread::UnsafeGetMessageLoopForThread(BrowserThread::FILE),
+      BrowserThread::GetMessageLoopProxyForThread(BrowserThread::IO),
+      BrowserThread::GetMessageLoopProxyForThread(BrowserThread::FILE),
       protocol_handlers,
       request_interceptors.Pass(),
       NULL);
@@ -141,7 +133,7 @@ void BrowserContextEfl::ReadCertificateAndAdd(base::FilePath* file_path) {
   base::ReadFileToString(*file_path, &cert_contents);
   scoped_refptr<net::X509Certificate> cert(net::X509Certificate::CreateFromBytes(
       cert_contents.c_str(), cert_contents.size()));
-  if (!cert) {
+  if (!cert.get()) {
     DLOG(ERROR) << "User certificate could not be parsed.";
     return;
   }

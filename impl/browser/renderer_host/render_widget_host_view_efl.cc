@@ -407,6 +407,13 @@ void RenderWidgetHostViewEfl::SetBounds(const gfx::Rect& rect) {
   NOTIMPLEMENTED();
 }
 
+gfx::Vector2dF RenderWidgetHostViewEfl::GetLastScrollOffset() const {
+  // FIXME: Aura RWHV sets last_scroll_offset_ in OnSwapCompositorFrame()
+  // Other ways to get scroll offset are already removed.
+  // We need to switch to the ui::Compositor ASAP!
+  return last_scroll_offset_;
+}
+
 gfx::NativeView RenderWidgetHostViewEfl::GetNativeView() const {
   // With aura this is expected to return an aura::Window*.
   // We don't have that so make sure nobody calls this.
@@ -616,10 +623,6 @@ void RenderWidgetHostViewEfl::SelectionBoundsChanged(
     controller->UpdateSelectionDataAndShow(guest_params.anchor_rect, guest_params.focus_rect, guest_params.is_anchor_first);
 }
 
-void RenderWidgetHostViewEfl::ScrollOffsetChanged() {
-  NOTIMPLEMENTED();
-}
-
 void RenderWidgetHostViewEfl::DidStopFlinging() {
 #ifdef TIZEN_EDGE_EFFECT
   web_view_->edgeEffect()->hide();
@@ -723,7 +726,7 @@ void RenderWidgetHostViewEfl::CopyFromCompositingSurfaceFinishedForVideo(
   if (release_callback) {
     // A release callback means the texture came from the compositor, so there
     // should be no |subscriber_texture|.
-    DCHECK(!subscriber_texture);
+    DCHECK(!subscriber_texture.get());
     release_callback->Run(sync_point, false);
   }
   ReturnSubscriberTexture(rwhvefl, subscriber_texture, sync_point);

@@ -102,7 +102,8 @@ void ContentBrowserClientEfl::AllowCertificateError(
     int render_process_id, int render_frame_id, int cert_error,
     const net::SSLInfo& ssl_info, const GURL& request_url,
     ResourceType resource_type, bool overridable,
-    bool strict_enforcement, const base::Callback<void(bool)>& callback,
+    bool strict_enforcement, bool expired_previous_decision,
+    const base::Callback<void(bool)>& callback,
     CertificateRequestResultType* result) {
 
   WebContents* web_contents = WebContentsFromFrameID(render_process_id, render_frame_id);

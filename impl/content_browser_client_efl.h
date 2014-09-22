@@ -68,6 +68,7 @@ class ContentBrowserClientEfl: public ContentBrowserClient {
                                      ResourceType resource_type,
                                      bool overridable,
                                      bool strict_enforcement,
+                                     bool expired_previous_decision,
                                      const base::Callback<void(bool)>& callback,
                                      CertificateRequestResultType* result) OVERRIDE;
 

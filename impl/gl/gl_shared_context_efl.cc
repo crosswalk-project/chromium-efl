@@ -105,7 +105,7 @@ void GLSharedContextEfl::Initialize(Evas_Object* object) {
 
 // static
 gfx::GLContext* GLSharedContextEfl::GetInstance() {
-  return GLSharedContextEflPrivate::instance();
+  return GLSharedContextEflPrivate::instance().get();
 }
 
 // static
