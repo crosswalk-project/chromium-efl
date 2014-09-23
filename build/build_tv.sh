@@ -7,11 +7,14 @@ SCRIPTDIR=$(cd $(dirname $0); pwd -P)
 
 ${SCRIPTDIR}/apply_patches.sh
 
-GBS_CONF=$HOME/.gbs.conf
-if [ ! -f $GBS_CONF  ]; then
-    GBS_CONF=${SCRIPTDIR}/gbs.conf
+TIZEN_VERSION="chromium_efl_tizen_version 2.2.1"
+
+if [ ! -f "$HOME/.gbs.conf" ]; then
+    CONF_FLAG="--conf ${SCRIPTDIR}/gbs.conf"
+    PROFILE_FLAG="-P tizentv_product"
 fi
 
-gbs --conf $GBS_CONF build -P tizentv_product -A armv7l --incremental "$@"
+gbs $CONF_FLAG build $PROFILE_FLAG -A armv7l --incremental \
+    --define "${TIZEN_VERSION}" "$@"
 
 ${SCRIPTDIR}/apply_patches.sh -r

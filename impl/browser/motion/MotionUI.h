@@ -22,7 +22,12 @@
 
 #include <Ecore.h>
 #include <Ecore_Evas.h>
-#include <sensor.h>
+#ifndef TIZEN_LEGACY_V_2_2_1
+#include <sensor/sensor.h>
+#else
+#include <sensors.h>
+#endif
+
 
 class MotionUI {
  public:

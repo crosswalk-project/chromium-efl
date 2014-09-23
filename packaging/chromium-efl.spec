@@ -161,15 +161,18 @@ export LD_RUN_PATH=%{_libdir}
 #set build mode
 %if 0%{?_debug_mode}
   %global OUTPUT_FOLDER %{OUTPUT_BASE_FOLDER}/Debug
-  # Building the RPM in the GBS chroot fails with errors such as
-  #   /usr/lib/gcc/i586-tizen-linux/4.7/../../../../i586-tizen-linux/bin/ld:
-  #       failed to set dynamic section sizes: Memory exhausted
-  # For now, work around it by passing a GNU ld-specific flag that optimizes the
-  # linker for memory usage.
-  export LDFLAGS="${LDFLAGS} -Wl,--no-keep-memory"
 %else
   %global OUTPUT_FOLDER %{OUTPUT_BASE_FOLDER}/Release
 %endif
+
+# Building the RPM in the GBS chroot fails with errors such as
+#   /usr/lib/gcc/i586-tizen-linux/4.7/../../../../i586-tizen-linux/bin/ld:
+#       failed to set dynamic section sizes: Memory exhausted
+# For now, work around it by passing a GNU ld-specific flag that optimizes the
+# linker for memory usage. See bugs:
+#   - http://107.108.218.239/bugzilla/show_bug.cgi?id=6457
+#   - http://107.108.218.239/bugzilla/show_bug.cgi?id=6629
+export LDFLAGS="${LDFLAGS} -Wl,--no-keep-memory"
 
 if type ccache &> /dev/null; then
   source build/ccache_env.sh %{OUTPUT_BUILD_PROFILE_TARGET}
@@ -184,6 +187,9 @@ fi
   -Dedje_dir="%{CHROMIUM_DATA_DIR}"/themes \
 %if 0%{?_remove_webcore_debug_symbols:1}
   -Dremove_webcore_debug_symbols=1 \
+%endif
+%if 0%{?chromium_efl_tizen_version:1}
+  -Dchromium_efl_tizen_version=%{chromium_efl_tizen_version} \
 %endif
   -Dwebdb_dir="%{CHROMIUM_WEBDB_DIR}"/data/db \
   -Dbuilding_for_tizen_"%{OUTPUT_BUILD_PROFILE_TARGET}"=1

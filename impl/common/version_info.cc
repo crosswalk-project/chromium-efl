@@ -15,10 +15,12 @@
 #include "common/version_info.h"
 
 #if defined(OS_TIZEN)
-#include "system_info.h"
+#ifndef TIZEN_LEGACY_V_2_2_1
 #include "system_info_internal.h"
+#else
+#include "system_info.h"
 #endif
-
+#endif
 #include "common/version_info_efl.h"
 
 namespace EflWebView {
