@@ -4,10 +4,10 @@ pushd `dirname ${BASH_SOURCE[0]}` > /dev/null
 SCRIPTDIR=`pwd -L`
 popd > /dev/null
 
-PROJECT_ROOT_PATH="${SCRIPTDIR}/.."
+export TOPDIR="${SCRIPTDIR}/.."
 if [[ -z "${CHROME_SRC}" ]]; then
   # If $CHROME_SRC was not set, assume src subfolder in project directory is CHROME_SRC.
-  export CHROME_SRC="${PROJECT_ROOT_PATH}/src"
+  export CHROME_SRC="${TOPDIR}/src"
 fi
 
 function applyPatch {

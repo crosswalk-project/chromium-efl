@@ -5,7 +5,6 @@
     'edje_dir%': '/usr/share/chromium-efl/themes/',
     'webdb_dir%': '/usr/share/chromium-efl/db/',
     'edje_compiler%': 'edje_cc',
-    'ewk_bringup%': 1,
   },
   'targets': [{
     'target_name': 'chromium-efl',

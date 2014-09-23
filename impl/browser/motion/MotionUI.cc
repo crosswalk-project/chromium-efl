@@ -17,6 +17,9 @@
  * Boston, MA 02110-1301, USA.
  */
 
+// FIXME: need to adapt this code to sensor API changes in Tizen 2.3.
+#if !defined(EWK_BRINGUP)
+
 #include "MotionUI.h"
 #include "wkext_motion.h"
 #include "base/logging.h"
@@ -236,3 +239,5 @@ double MotionUI::syncScale(double scale, bool isTiltMode) {
 
   return m_syncScale;
 }
+
+#endif // EWK_BRINGUP
