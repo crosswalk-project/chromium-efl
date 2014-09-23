@@ -20,7 +20,11 @@
 #ifndef DATA_FETCHER_IMPL_TIZEN_H_
 #define DATA_FETCHER_IMPL_TIZEN_H_
 
-#include <sensor.h>
+#ifndef TIZEN_LEGACY_V_2_2_1
+#include <sensor/sensor.h>
+#else
+#include <sensors.h>
+#endif
 
 #include "base/memory/scoped_ptr.h"
 #include "base/synchronization/lock.h"

@@ -7,6 +7,7 @@
         'clang': 0,
       }],
     ],
+   'chromium_efl_tizen_version%': '2.3',
   },
   'target_defaults': {
     'defines': [
@@ -40,6 +41,18 @@
          # Force define this flag for the whole chromium on gbs gcc 4.5.3.
          # Non-arm builds will ingore it in any case.
          '__ARM_PCS',
+         ],
+        'conditions': [
+           ['chromium_efl_tizen_version=="2.3"', {
+             'defines': [
+               'TIZEN_V_2_3=1',
+             ],
+           }],
+           ['chromium_efl_tizen_version=="2.2.1"', {
+             'defines': [
+               'TIZEN_LEGACY_V_2_2_1=1',
+             ],
+           }],
          ],
          'sources/': [
            ['exclude', 'browser/device_sensors/data_fetcher_shared_memory_default.cc$'],
