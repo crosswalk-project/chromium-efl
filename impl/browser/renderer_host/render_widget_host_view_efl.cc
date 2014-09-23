@@ -314,9 +314,6 @@ void RenderWidgetHostViewEfl::set_eweb_view(EWebView* view) {
 bool RenderWidgetHostViewEfl::OnMessageReceived(const IPC::Message& message) {
   bool handled = true;
   IPC_BEGIN_MESSAGE_MAP(RenderWidgetHostViewEfl, message)
-#if !defined(EWK_BRINGUP)
-    IPC_MESSAGE_HANDLER(ViewHostMsg_DidFirstVisuallyNonEmptyLayout, OnDidFirstVisuallyNonEmptyLayout)
-#endif
     IPC_MESSAGE_HANDLER(EwkHostMsg_PlainTextGetContents, OnPlainTextGetContents)
     IPC_MESSAGE_HANDLER(EwkHostMsg_WebAppIconUrlGet, OnWebAppIconUrlGet)
     IPC_MESSAGE_HANDLER(EwkHostMsg_WebAppIconUrlsGet, OnWebAppIconUrlsGet)
@@ -345,10 +342,6 @@ bool RenderWidgetHostViewEfl::OnMessageReceived(const IPC::Message& message) {
 
 bool RenderWidgetHostViewEfl::Send(IPC::Message* message) {
   return host_->Send(message);
-}
-
-void RenderWidgetHostViewEfl::OnDidFirstVisuallyNonEmptyLayout() {
-  web_view_->SmartCallback<EWebViewCallbacks::LoadNonEmptyLayoutFinished>().call();
 }
 
 void RenderWidgetHostViewEfl::OnSelectionTextStyleState(const SelectionStylePrams& params) {

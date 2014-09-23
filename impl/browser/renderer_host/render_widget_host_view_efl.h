@@ -158,7 +158,6 @@ class RenderWidgetHostViewEfl
   // IPC::Sender implementation:
   virtual bool Send(IPC::Message*) OVERRIDE;
 
-  void OnDidFirstVisuallyNonEmptyLayout();
   void OnSelectionTextStyleState(const SelectionStylePrams& params);
   void OnDidChangeMaxScrollOffset(int maxScrollX, int maxScrollY);
 
