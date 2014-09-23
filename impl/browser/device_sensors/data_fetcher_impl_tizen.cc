@@ -30,21 +30,28 @@ DataFetcherImplTizen::DataFetcherImplTizen()
       has_last_motion_data_(false),
       last_motion_timestamp_(0),
       is_orientation_buffer_ready_(false) {
+  // FIXME: sensor API's changed in Tizen 2.3, we have to adapt.
+#if !defined(EWK_BRINGUP)
   sensor_create(&handle_);
   sensor_orientation_set_cb(handle_, kInertialSensorIntervalMillis,
       DataFetcherImplTizen::onOrientationChanged, this);
   sensor_accelerometer_set_cb(handle_, kInertialSensorIntervalMillis,
       DataFetcherImplTizen::onAccelerationChanged, this);
+#endif
 }
 
 DataFetcherImplTizen::~DataFetcherImplTizen() {
+#if !defined(EWK_BRINGUP)
   sensor_destroy(handle_);
+#endif
 }
 
 DataFetcherImplTizen* DataFetcherImplTizen::GetInstance() {
   return Singleton<DataFetcherImplTizen,
                    LeakySingletonTraits<DataFetcherImplTizen> >::get();
 }
+
+#if !defined(EWK_BRINGUP)
 
 bool DataFetcherImplTizen::StartFetchingDeviceMotionData(
     DeviceMotionHardwareBuffer* buffer) {
@@ -218,5 +225,16 @@ void DataFetcherImplTizen::SetOrientationBufferReadyStatus(bool ready) {
   device_orientation_buffer_->seqlock.WriteEnd();
   is_orientation_buffer_ready_ = ready;
 }
+
+#else
+
+bool DataFetcherImplTizen::StartFetchingDeviceMotionData(DeviceMotionHardwareBuffer* buffer) { return false; }
+void DataFetcherImplTizen::StopFetchingDeviceMotionData() {}
+bool DataFetcherImplTizen::StartFetchingDeviceOrientationData(DeviceOrientationHardwareBuffer* buffer) { return false; }
+void DataFetcherImplTizen::StopFetchingDeviceOrientationData() {}
+bool DataFetcherImplTizen::Start(ConsumerType) {}
+void DataFetcherImplTizen::Stop(ConsumerType) {}
+
+#endif // EWK_BRINGUP
 
 } // namespace content

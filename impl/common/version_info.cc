@@ -16,6 +16,7 @@
 
 #if defined(OS_TIZEN)
 #include "system_info.h"
+#include "system_info_internal.h"
 #endif
 
 #include "common/version_info_efl.h"

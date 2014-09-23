@@ -5,7 +5,13 @@ SCRIPTDIR=$(cd $(dirname $0); pwd -P)
 # source common functions and vars
 . `dirname ${BASH_SOURCE[0]}`/common.sh
 
-# copy patched files (for GCC 4.5)
-. ${SCRIPTDIR}/copy_patched_files.sh
+${SCRIPTDIR}/apply_patches.sh
 
-gbs build -A armv7l --incremental "$@"
+if [ ! -f "$HOME/.gbs.conf" ]; then
+    CONF_FLAG="--conf ${SCRIPTDIR}/gbs.conf"
+    PROFILE_FLAG="-P tizenmb_v2.3"
+fi
+
+gbs $CONF_FLAG build $PROFILE_FLAG -A armv7l --incremental "$@"
+
+${SCRIPTDIR}/apply_patches.sh -r

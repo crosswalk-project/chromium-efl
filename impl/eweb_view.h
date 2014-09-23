@@ -21,7 +21,10 @@
 #define EWEB_VIEW_H
 
 #if defined(OS_TIZEN_MOBILE)
-#include <appfw/app_service.h>
+#if !defined(EWK_BRINGUP)
+// FIXME: appfw/app_service.h is no more in Tizen 2.3, figure out what to include instead.
+#include <appcore-agent/service_app.h>
+#endif
 #include <vector>
 #endif
 
@@ -411,7 +414,7 @@ class EWebView
   bool HandleTouchEvent(ui::TouchEvent* event);
 
  private:
-#if defined(OS_TIZEN_MOBILE)
+#if defined(OS_TIZEN_MOBILE) && !defined(EWK_BRINGUP)
   static void cameraResultCb(service_h request, service_h reply,
     service_result_e result, void* data);
 #endif
@@ -421,7 +424,7 @@ class EWebView
   virtual void DispatchCancelTouchEvent(ui::TouchEvent* event) OVERRIDE;
   virtual void DispatchGestureEvent(ui::GestureEvent*) OVERRIDE;
 
-#if defined(OS_TIZEN_MOBILE)
+#if defined(OS_TIZEN_MOBILE) && !defined(EWK_BRINGUP)
   bool LaunchCamera(base::string16 mimetype);
 #endif
   content::RenderWidgetHostViewEfl* rwhv() const;

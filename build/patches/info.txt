@@ -1,0 +1,4 @@
+webrtc.diff
+    double slash (//) in include path leads to rpm error, fixed by patch
+    See: http://107.108.218.239/bugzilla/show_bug.cgi?id=6458
+    TODO(b.kelemen): upstream

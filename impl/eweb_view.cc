@@ -1740,7 +1740,7 @@ bool EWebView::StopInspectorServer() {
   return true;
 }
 
-#if defined(OS_TIZEN_MOBILE)
+#if defined(OS_TIZEN_MOBILE) && !defined(EWK_BRINGUP)
 void EWebView::cameraResultCb(service_h request,
                               service_h reply,
                               service_result_e result,

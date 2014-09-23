@@ -22,7 +22,7 @@
 
 #include <Ecore.h>
 #include <Ecore_Evas.h>
-#include <sensors.h>
+#include <sensor.h>
 
 class MotionUI {
  public:

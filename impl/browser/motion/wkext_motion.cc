@@ -23,6 +23,7 @@
 #include "MotionUI.h"
 #include "base/logging.h"
 
+#if !defined(EWK_BRINGUP)
 void wkext_motion_tilt_enable_set(Evas_Object* view, int enable, unsigned int sensitivity) {
   LOG(ERROR)<<"wkext_motion_tilt_enable_set";
   MotionUI::motionUI().setTiltToZoom(view, enable, sensitivity);
@@ -55,3 +56,12 @@ double wkext_motion_tilt_scale_sync(double scale, Wkext_Motion_Type type) {
 
   return MotionUI::motionUI().syncScale(scale, isTiltMode);
 }
+#else
+void wkext_motion_tilt_enable_set(Evas_Object* view, int enable, unsigned int sensitivity) {}
+void wkext_motion_tilt_start(Evas_Object* view, const Evas_Coord_Point* position) {}
+void wkext_motion_tilt_stop() {}
+int wkext_motion_tilt_is_running() { return EINA_FALSE; }
+void wkext_motion_tilt_position_update(Evas_Coord_Point* position) {}
+void wkext_motion_tilt_scale_initialize(double scale) {}
+double wkext_motion_tilt_scale_sync(double scale, Wkext_Motion_Type type) { return 0.; }
+#endif
