@@ -450,6 +450,7 @@ void WebContentsDelegateEfl::OnWrtPluginSyncMessage(const tizen_webview::WrtIpcM
 }
 
 void WebContentsDelegateEfl::DidFirstVisuallyNonEmptyPaint() {
+  web_view_->SmartCallback<EWebViewCallbacks::LoadNonEmptyLayoutFinished>().call();
   web_view_->SmartCallback<EWebViewCallbacks::FrameRendered>().call(0);
 }
 
