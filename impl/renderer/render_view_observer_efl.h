@@ -2,6 +2,7 @@
 #define RENDER_VIEW_OBSERVER_EFL_H_
 
 #include <string>
+#include "base/timer/timer.h"
 #include "content/public/renderer/render_view_observer.h"
 #include "renderer/print_web_view_helper_efl.h"
 #include "content/public/renderer/render_view_observer.h"
@@ -32,9 +33,6 @@ class RenderViewObserverEfl: public content::RenderViewObserver {
   void DidChangeScrollOffset(blink::WebLocalFrame* frame) OVERRIDE;
   bool OnMessageReceived(const IPC::Message& message) OVERRIDE;
   virtual void DidCreateDocumentElement(blink::WebLocalFrame* frame) OVERRIDE;
-#if !defined(EWK_BRINGUP)
-  virtual void DidChangeContentsSize(blink::WebFrame* frame, const blink::WebSize& size) OVERRIDE;
-#endif
   virtual void OrientationChangeEvent() OVERRIDE;
 #if !defined(EWK_BRINGUP)
   virtual void DidChangePageScaleFactor() OVERRIDE;
@@ -62,10 +60,13 @@ class RenderViewObserverEfl: public content::RenderViewObserver {
   void OnWebAppCapableGet(int callback_id);
   void WillSubmitForm(blink::WebFrame* frame, const blink::WebFormElement& form);
   void OnSetBrowserFont();
+  void CheckContentsSize();
 
   blink::WebSize max_scroll_offset_;
   float cached_min_page_scale_factor_;
   float cached_max_page_scale_factor_;
+  gfx::Size last_sent_contents_size_;
+  base::OneShotTimer<RenderViewObserverEfl> check_contents_size_timer_;
 };
 
 #endif /* RENDER_VIEW_OBSERVER_EFL_H_ */

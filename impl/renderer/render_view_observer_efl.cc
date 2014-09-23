@@ -215,15 +215,6 @@ void RenderViewObserverEfl::OnPlainTextGet(int plain_text_get_callback_id)
   Send(new EwkHostMsg_PlainTextGetContents(render_view()->GetRoutingID(), content.utf8(), plain_text_get_callback_id));
 }
 
-#if !defined(EWK_BRINGUP)
-void RenderViewObserverEfl::DidChangeContentsSize(blink::WebFrame* frame, const blink::WebSize& size)
-{
-  Send(new EwkHostMsg_DidChangeContentsSize(render_view()->GetRoutingID(),
-                                            size.width,
-                                            size.height));
-}
-#endif
-
 void RenderViewObserverEfl::DidChangeScrollOffset(blink::WebLocalFrame* frame)
 {
   if (!frame || (render_view()->GetWebView()->mainFrame() != frame))
@@ -373,6 +364,38 @@ void RenderViewObserverEfl::DidUpdateLayout()
   cached_max_page_scale_factor_ = max_scale;
   cached_min_page_scale_factor_ = min_scale;
   Send(new EwkHostMsg_DidChangePageScaleRange(render_view()->GetRoutingID(), min_scale, max_scale));
+
+  // Check if the timer is already running
+  if (check_contents_size_timer_.IsRunning())
+    return;
+
+  check_contents_size_timer_.Start(FROM_HERE,
+                                   base::TimeDelta::FromMilliseconds(0), this,
+                                   &RenderViewObserverEfl::CheckContentsSize);
+}
+
+void RenderViewObserverEfl::CheckContentsSize()
+{
+  blink::WebView* view = render_view()->GetWebView();
+  if (!view || !view->mainFrame())
+    return;
+
+  gfx::Size contents_size = view->mainFrame()->contentsSize();
+
+  // Fall back to contentsPreferredMinimumSize if the mainFrame is reporting a
+  // 0x0 size (this happens during initial load).
+  if (contents_size.IsEmpty()) {
+    contents_size = render_view()->GetWebView()->contentsPreferredMinimumSize();
+  }
+
+  if (contents_size == last_sent_contents_size_)
+    return;
+
+  last_sent_contents_size_ = contents_size;
+  const blink::WebSize size = static_cast<blink::WebSize>(contents_size);
+  Send(new EwkHostMsg_DidChangeContentsSize(render_view()->GetRoutingID(),
+                                            size.width,
+                                            size.height));
 }
 
 void RenderViewObserverEfl::OnSetDrawsTransparentBackground(bool draws_transparent_background)
