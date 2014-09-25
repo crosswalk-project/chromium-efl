@@ -318,14 +318,15 @@ static ui::EventType EvasTouchEventTypeToUI(Evas_Touch_Point_State evas_touch) {
       return ui::ET_TOUCH_RELEASED;
     case EVAS_TOUCH_POINT_CANCEL:
       return ui::ET_TOUCH_CANCELLED;
-    case EVAS_TOUCH_POINT_STILL: // No equivalent in chromium M35+
+    case EVAS_TOUCH_POINT_STILL:
+      // Not handled by chromium, should not be passed here.
     default:
+      NOTREACHED();
       return ui::ET_UNKNOWN;
   }
-
 }
 
-ui::TouchEvent WebEventFactoryEfl::toUITouchEvent(tizen_webview::Touch_Point* p, Evas_Object* web_view, float scale_factor) {
+ui::TouchEvent WebEventFactoryEfl::toUITouchEvent(const tizen_webview::Touch_Point* p, Evas_Object* web_view, float scale_factor) {
   int x = p->x, y = p->y;
 
   TranslateEvasCoordToWebKitCoord(web_view, x, y);
