@@ -564,7 +564,12 @@ void EWebView::HandleTouchEvents(tizen_webview::Touch_Event_Type type, const Ein
   const Eina_List* l;
   void* data;
   EINA_LIST_FOREACH(points, l, data) {
-    ui::TouchEvent touch_event = WebEventFactoryEfl::toUITouchEvent(static_cast<tizen_webview::Touch_Point*>(data), evas_object(), rwhv()->device_scale_factor());
+    const tizen_webview::Touch_Point* point = reinterpret_cast<tizen_webview::Touch_Point*>(data);
+    if (point->state == EVAS_TOUCH_POINT_STILL) {
+      // Chromium doesn't expect (and doesn't like) these events.
+      continue;
+    }
+    ui::TouchEvent touch_event = WebEventFactoryEfl::toUITouchEvent(point, evas_object(), rwhv()->device_scale_factor());
     rwhv()->HandleTouchEvent(&touch_event);
   }
 }
