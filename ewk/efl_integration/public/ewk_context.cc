@@ -378,7 +378,7 @@ void ewk_context_form_password_data_list_free(Ewk_Context* ewkContext, Eina_List
   LOG_EWK_API_MOCKUP();
 }
 
-void ewk_context_form_candidate_data_clear(Ewk_Context* context)
+void ewk_context_form_candidate_data_delete_all(Ewk_Context* context)
 {
   EINA_SAFETY_ON_NULL_RETURN(context);
   context->ClearCandidateData();

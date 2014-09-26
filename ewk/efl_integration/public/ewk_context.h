@@ -715,7 +715,7 @@ EAPI void ewk_context_form_password_data_list_free(Ewk_Context* context, Eina_Li
  * @param context context object
  *
  */
-EAPI void ewk_context_form_candidate_data_clear(Ewk_Context* context);
+EAPI void ewk_context_form_candidate_data_delete_all(Ewk_Context* context);
 
 /**
  * Gets a list of all existing profiles
