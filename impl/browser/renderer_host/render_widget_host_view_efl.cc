@@ -41,12 +41,13 @@
 #include "third_party/WebKit/public/web/WebInputEvent.h"
 #include "third_party/WebKit/public/platform/WebScreenInfo.h"
 #include "third_party/WebKit/public/web/WebTouchPoint.h"
-#include "ui/events/gestures/gesture_recognizer.h"
 #include "ui/gfx/display.h"
 #include "ui/gfx/rect.h"
 #include "ui/gfx/screen.h"
 #include "ui/views/widget/desktop_aura/desktop_screen.h"
 #include "ui/events/event_utils.h"
+#include "ui/events/gestures/gesture_types.h"
+#include "ui/events/gestures/gesture_recognizer.h"
 #include "browser/motion/wkext_motion.h"
 #include "content/common/input_messages.h"
 #include "common/webcursor_efl.h"
@@ -90,6 +91,7 @@ RenderWidgetHostViewEfl::RenderWidgetHostViewEfl(RenderWidgetHost* widget, EWebV
     device_scale_factor_(1.0f),
     is_loading_(false),
     m_magnifier(false),
+    gesture_recognizer_(ui::GestureRecognizer::Create()),
     egl_image_(0),
     current_pixmap_id_(0),
     next_pixmap_id_(0),
@@ -117,6 +119,8 @@ RenderWidgetHostViewEfl::RenderWidgetHostViewEfl(RenderWidgetHost* widget, EWebV
     supported_scale_factors.push_back(ui::SCALE_FACTOR_200P);
     ui::SetSupportedScaleFactors(supported_scale_factors);
   }
+
+  gesture_recognizer_->AddGestureEventHelper(this);
 }
 
 RenderWidgetHostViewEfl::~RenderWidgetHostViewEfl() {
@@ -630,6 +634,16 @@ void RenderWidgetHostViewEfl::DidStopFlinging() {
   // Unhide Selection UI when scrolling with fling gesture
   if (GetSelectionController() && GetSelectionController()->GetScrollStatus())
     GetSelectionController()->SetScrollStatus(false);
+}
+
+bool RenderWidgetHostViewEfl::CanDispatchToConsumer(ui::GestureConsumer* consumer) {
+  return this == consumer;
+}
+
+void RenderWidgetHostViewEfl::DispatchCancelTouchEvent(ui::TouchEvent* event) {
+}
+
+void RenderWidgetHostViewEfl::DispatchGestureEvent(ui::GestureEvent*) {
 }
 
 #ifdef OS_TIZEN
@@ -1234,9 +1248,7 @@ void UpdateWebTouchEventAfterDispatch(blink::WebTouchEvent* event,
 }
 
 void RenderWidgetHostViewEfl::HandleTouchEvent(ui::TouchEvent* event) {
-  // TODO(b.kelemen): move touch handling to RWHV completely. Spreading it
-  // through EWebView and RWHV just makes it harder to understand.
-  if (!ui::GestureRecognizer::Get()->ProcessTouchEventPreDispatch(*event, eweb_view())) {
+  if (!gesture_recognizer_->ProcessTouchEventPreDispatch(*event, this)) {
     event->StopPropagation();
     return;
   }
@@ -1269,7 +1281,7 @@ void RenderWidgetHostViewEfl::HandleTouchEvent(ui::TouchEvent* event) {
     return;
 
   scoped_ptr<ui::GestureRecognizer::Gestures> gestures(
-        ui::GestureRecognizer::Get()->ProcessTouchEventPostDispatch(*event, ui::ER_UNHANDLED, eweb_view()));
+        gesture_recognizer_->ProcessTouchEventPostDispatch(*event, ui::ER_UNHANDLED, this));
   if (!gestures)
     return;
   for (size_t j = 0; j < gestures->size(); ++j) {
@@ -1278,10 +1290,26 @@ void RenderWidgetHostViewEfl::HandleTouchEvent(ui::TouchEvent* event) {
   }
 }
 
-void RenderWidgetHostViewEfl::ProcessAckedTouchEvent(const TouchEventWithLatencyInfo& touch,
+void RenderWidgetHostViewEfl::ProcessAckedTouchEvent(
+    const TouchEventWithLatencyInfo& touch,
     InputEventAckState ack_result) {
-  DCHECK(eweb_view());
-  eweb_view()->ProcessAckedTouchEvent(touch, ack_result);
+  ScopedVector<ui::TouchEvent> events;
+  if (!MakeUITouchEventsFromWebTouchEvents(touch, &events, LOCAL_COORDINATES))
+    return;
+
+  ui::EventResult result = (ack_result == INPUT_EVENT_ACK_STATE_CONSUMED) ?
+      ui::ER_HANDLED : ui::ER_UNHANDLED;
+  for (ScopedVector<ui::TouchEvent>::const_iterator iter = events.begin(),
+      end = events.end(); iter != end; ++iter)  {
+    scoped_ptr<ui::GestureRecognizer::Gestures> gestures(
+        gesture_recognizer_->ProcessTouchEventOnAsyncAck(**iter, result, this));
+    if (gestures) {
+      for (size_t j = 0; j < gestures->size(); ++j) {
+        ui::GestureEvent* event = gestures->get().at(j);
+        HandleGesture(event);
+      }
+    }
+  }
 }
 
 void RenderWidgetHostViewEfl::OnPlainTextGetContents(const std::string& content_text, int plain_text_get_callback_id) {

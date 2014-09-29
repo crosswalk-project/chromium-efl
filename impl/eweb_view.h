@@ -50,7 +50,6 @@
 #include "eweb_view_callbacks.h"
 #include "selection_controller_efl.h"
 #include "web_contents_delegate_efl.h"
-#include "ui/events/gestures/gesture_types.h"
 #include "context_menu_controller_efl.h"
 #include "file_chooser_controller_efl.h"
 #include "ui/gfx/point.h"
@@ -198,11 +197,8 @@ class WebApplicationCapableGetCallback {
 class JavaScriptDialogManagerEfl;
 class WebViewBrowserMessageFilter;
 
-class EWebView
-    : public ui::GestureConsumer
-    , public ui::GestureEventHelper {
+class EWebView {
  public:
-
   static EWebView* FromEvasObject(Evas_Object* eo);
 
   // initialize data members and activate event handlers.
@@ -363,8 +359,6 @@ class EWebView
   void SetDrawsTransparentBackground(bool enabled);
   void GetSessionData(const char **data, unsigned *length) const;
   bool RestoreFromSessionData(const char *data, unsigned length);
-  void ProcessAckedTouchEvent(const content::TouchEventWithLatencyInfo& touch,
-                              content::InputEventAckState ack_result);
   void ShowFileChooser(const content::FileChooserParams&);
   void DidChangeContentsArea(int width, int height);
   void SetBrowserFont();
@@ -419,11 +413,6 @@ class EWebView
     service_result_e result, void* data);
 #endif
 
-  // GestureEventHelper overrides
-  virtual bool CanDispatchToConsumer(ui::GestureConsumer* consumer) OVERRIDE;
-  virtual void DispatchCancelTouchEvent(ui::TouchEvent* event) OVERRIDE;
-  virtual void DispatchGestureEvent(ui::GestureEvent*) OVERRIDE;
-
 #if defined(OS_TIZEN_MOBILE) && !defined(EWK_BRINGUP)
   bool LaunchCamera(base::string16 mimetype);
 #endif
@@ -448,7 +437,6 @@ class EWebView
   Evas_Object* evas_object_;
   bool touch_events_enabled_;
   bool mouse_events_enabled_;
-  scoped_ptr<ui::GestureRecognizer> gesture_recognizer_;
   double text_zoom_factor_;
   std::string overridden_user_agent_;
   mutable std::string selected_text_;

@@ -52,7 +52,6 @@
 #include "skia/ext/platform_canvas.h"
 #include "third_party/WebKit/public/web/WebFindOptions.h"
 #include "ui/events/event_switches.h"
-#include "ui/events/gestures/gesture_recognizer.h"
 #include "browser/motion/wkext_motion.h"
 #include "ui/base/l10n/l10n_util.h"
 #include "devtools_delegate_efl.h"
@@ -241,7 +240,6 @@ void EWebView::Initialize() {
   }
 
   evas_event_handler_ = new tizen_webview::WebViewEvasEventHandler(public_webview_);
-  gesture_recognizer_.reset(ui::GestureRecognizer::Create());
   selection_controller_.reset(new content::SelectionControllerEfl(this));
 #ifdef TIZEN_EDGE_EFFECT
   edge_effect_ = EdgeEffect::create(evas_object_);
@@ -268,8 +266,6 @@ void EWebView::Initialize() {
       static_cast<WebContentsView*>((web_contents)->GetView());
   contents_view->CreateViewForWidget(web_contents->GetRenderViewHost());
   DCHECK(rwhv());
-
-  gesture_recognizer_->AddGestureEventHelper(this);
 
   // Activate Event handler
   evas_event_handler_->BindFocusEventHandlers();
@@ -574,32 +570,6 @@ void EWebView::HandleTouchEvents(tizen_webview::Touch_Event_Type type, const Ein
   }
 }
 
-void EWebView::ProcessAckedTouchEvent(const TouchEventWithLatencyInfo& touch,
-                                      InputEventAckState ack_result) {
-  ScopedVector<ui::TouchEvent> events;
-  if (!MakeUITouchEventsFromWebTouchEvents(touch, &events, LOCAL_COORDINATES))
-    return;
-
-  ui::EventResult result = (ack_result == INPUT_EVENT_ACK_STATE_CONSUMED) ?
-      ui::ER_HANDLED : ui::ER_UNHANDLED;
-  for (ScopedVector<ui::TouchEvent>::const_iterator iter = events.begin(),
-      end = events.end(); iter != end; ++iter)  {
-    scoped_ptr<ui::GestureRecognizer::Gestures> gestures(
-        gesture_recognizer_->ProcessTouchEventOnAsyncAck(**iter, result, this));
-    if (gestures) {
-      for (size_t j = 0; j < gestures->size(); ++j) {
-        ui::GestureEvent* event = gestures->get().at(j);
-        rwhv()->HandleGesture(event);
-      }
-    }
-  }
-}
-
-bool EWebView::CanDispatchToConsumer(ui::GestureConsumer* consumer)
-{
-  return true;
-}
-
 /* FIXME: Figure out wher this code should be placed.
 void EWebView::DispatchPostponedGestureEvent(ui::GestureEvent* event) {
   Ewk_Settings* settings = GetSettings();
@@ -670,15 +640,6 @@ void EWebView::DispatchPostponedGestureEvent(ui::GestureEvent* event) {
   rwhv()->HandleFocusIn();
 }
 */
-
-void EWebView::DispatchCancelTouchEvent(ui::TouchEvent* event) {
-  NOTIMPLEMENTED();
-  rwhv()->HandleTouchEvent(event);
-}
-
-void EWebView::DispatchGestureEvent(ui::GestureEvent*) {
-  NOTIMPLEMENTED();
-}
 
 bool EWebView::TouchEventsEnabled() const {
   return touch_events_enabled_;
