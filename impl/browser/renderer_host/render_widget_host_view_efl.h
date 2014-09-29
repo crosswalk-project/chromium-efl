@@ -57,12 +57,14 @@ class ReadbackYUVInterface;
 // RenderWidgetHostView class hierarchy described in render_widget_host_view.h.
 class RenderWidgetHostViewEfl
   : public RenderWidgetHostViewBase,
+    public ui::GestureConsumer,
+    public ui::GestureEventHelper,
     public base::SupportsWeakPtr<RenderWidgetHostViewEfl>,
     public IPC::Sender {
  public:
-  // RenderWidgetHostViewBase implementation.
   explicit RenderWidgetHostViewEfl(RenderWidgetHost*, EWebView*);
 
+  // RenderWidgetHostViewBase implementation.
   virtual void InitAsChild(gfx::NativeView) OVERRIDE;
   virtual void InitAsPopup(content::RenderWidgetHostView*, const gfx::Rect&) OVERRIDE;
   virtual void InitAsFullscreen(content::RenderWidgetHostView*) OVERRIDE;
@@ -147,6 +149,11 @@ class RenderWidgetHostViewEfl
   virtual bool OnMessageReceived(const IPC::Message&) OVERRIDE;
   virtual void ProcessAckedTouchEvent(const TouchEventWithLatencyInfo&, InputEventAckState) OVERRIDE;
   virtual void DidStopFlinging() OVERRIDE;
+
+  // ui::GestureEventHelper implementation.
+  virtual bool CanDispatchToConsumer(ui::GestureConsumer* consumer) OVERRIDE;
+  virtual void DispatchCancelTouchEvent(ui::TouchEvent* event) OVERRIDE;
+  virtual void DispatchGestureEvent(ui::GestureEvent*) OVERRIDE;
 
   // IPC::Sender implementation:
   virtual bool Send(IPC::Message*) OVERRIDE;
@@ -284,6 +291,10 @@ class RenderWidgetHostViewEfl
   // touch-point is added from an ET_TOUCH_PRESSED event, and a touch-point is
   // removed from the list on an ET_TOUCH_RELEASED event.
   blink::WebTouchEvent touch_event_;
+
+  // The gesture recognizer for this view.
+  // In Aura GestureRecognizer is global. Should we follow that?
+  scoped_ptr<ui::GestureRecognizer> gesture_recognizer_;
 
   int current_orientation_;
 
