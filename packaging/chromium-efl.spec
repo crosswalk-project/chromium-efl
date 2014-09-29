@@ -75,7 +75,6 @@ BuildRequires: pkgconfig(libexif)
 BuildRequires: pkgconfig(nspr)
 BuildRequires: pkgconfig(zlib)
 %if %{!?TIZEN_PROFILE_TV:1}%{?TIZEN_PROFILE_TV:0}
-BuildRequires: pkgconfig(ewebkit2-ext)
 BuildRequires: bzip2-devel
 BuildRequires: pkgconfig(vpx)
 BuildRequires: pkgconfig(efl-assist)

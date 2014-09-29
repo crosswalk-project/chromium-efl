@@ -125,7 +125,6 @@
               ],
               'cflags': [
                 '<!@(<(pkg-config) --cflags efl-assist)',
-                '<!@(<(pkg-config) --cflags ewebkit2-ext)',
               ],
             },
             'link_settings': {
@@ -134,7 +133,6 @@
               ],
               'libraries': [
                 '<!@(<(pkg-config) --libs-only-l efl-assist)',
-                '<!@(<(pkg-config) --libs-only-l ewebkit2-ext)',
               ],
             },
           }],
