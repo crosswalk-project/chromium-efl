@@ -94,6 +94,7 @@ typedef Eina_Bool (*View_JavaScript_Prompt_Callback)(Evas_Object* o, const char*
 //typedef Eina_Bool (*View_Exceeded_Local_File_System_Quota_Callback)(Evas_Object* o, Security_Origin* origin, long long currentQuota, void* user_data);
 typedef Eina_Bool (*Orientation_Lock_Cb)(Evas_Object* o, Eina_Bool need_lock, int orientation, void* user_data);
 typedef void (*View_Hit_Test_Request_Callback)(Evas_Object* o, int x, int y, int hit_test_mode, Hit_Test* hit_test, void* user_data);
+typedef Eina_Bool (*View_Geolocation_Permission_Callback)(Evas_Object* view, void* geolocation_permission_context, void* user_data);
 } // namespace tizen_webview
 
 #endif  // TIZEN_WEBVIEW_PUBLIC_TW_CALLBACKS_H_

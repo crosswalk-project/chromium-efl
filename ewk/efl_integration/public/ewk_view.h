@@ -110,6 +110,7 @@
 #include "ewk_page_group.h"
 #include "ewk_window_features.h"
 #include "ewk_quota_permission_request.h"
+#include "ewk_geolocation.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -699,6 +700,9 @@ EAPI void ewk_view_intercept_request_callback_set (Evas_Object *o, Ewk_View_Inte
 typedef Eina_Bool (*Ewk_View_Unfocus_Allow_Callback)(Evas_Object* o, Ewk_Unfocus_Direction direction, void* user_data);
 EAPI void ewk_view_unfocus_allow_callback_set (Evas_Object *o, Ewk_View_Unfocus_Allow_Callback callback, void* user_data);
 //#endif
+
+typedef Eina_Bool (*Ewk_View_Geolocation_Permission_Callback)(Evas_Object* ewk_view, Ewk_Geolocation_Permission_Request* geolocation_permission_request, void* user_data);
+EAPI void ewk_view_geolocation_permission_callback_set(Evas_Object* ewk_view, Ewk_View_Geolocation_Permission_Callback callback, void* user_data);
 
 EAPI Eina_Bool ewk_view_mode_set(Evas_Object* ewkView, Ewk_View_Mode view_mode);
 

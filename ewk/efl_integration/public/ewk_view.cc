@@ -919,6 +919,13 @@ void ewk_view_unfocus_allow_callback_set(Evas_Object* ewkView, Ewk_View_Unfocus_
   LOG_EWK_API_MOCKUP();
 }
 
+void ewk_view_geolocation_permission_callback_set(Evas_Object* ewk_view, Ewk_View_Geolocation_Permission_Callback callback, void* user_data)
+{
+  EWK_VIEW_IMPL_GET_OR_RETURN(ewk_view, impl);
+  impl->SetViewGeolocationPermissionCallback(
+      reinterpret_cast<tizen_webview::View_Geolocation_Permission_Callback>(callback), user_data);
+}
+
 void ewk_view_use_settings_font(Evas_Object* ewkView)
 {
   EWK_VIEW_IMPL_GET_OR_RETURN(ewkView, impl);

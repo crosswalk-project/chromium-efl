@@ -203,8 +203,28 @@ class AsyncHitTestRequest
   void* m_user_data;
 };
 
-WebContents* EWebView::contents_for_new_window_ = NULL;
+class WebViewGeolocationPermissionCallback {
+ public:
+  WebViewGeolocationPermissionCallback(tizen_webview::View_Geolocation_Permission_Callback cb, void* data)
+    : callback(cb)
+    , user_data(data) { }
 
+  Eina_Bool Run(Evas_Object* webview, void* request, Eina_Bool* callback_result) {
+    CHECK(callback_result);
+    if (callback) {
+      Eina_Bool result = callback(webview, request, user_data);
+      *callback_result = result;
+      return true;
+    }
+    return false;
+  }
+
+ private:
+  tizen_webview::View_Geolocation_Permission_Callback callback;
+  void* user_data;
+};
+
+WebContents* EWebView::contents_for_new_window_ = NULL;
 int EWebView::find_request_id_counter_ = 0;
 
 EWebView* EWebView::FromEvasObject(Evas_Object* eo) {
@@ -292,6 +312,8 @@ void EWebView::Initialize() {
   // Activate Event handler
   evas_event_handler_->BindFocusEventHandlers();
   evas_event_handler_->BindKeyEventHandlers();
+
+  geolocation_permission_cb_.reset(new WebViewGeolocationPermissionCallback(NULL, NULL));
 
 #if defined(OS_TIZEN)
   bool enable = GetTiltZoomEnabled();
@@ -1445,6 +1467,14 @@ void EWebView::InvokePlainTextGetCallback(const std::string& content_text, int p
   EwkViewPlainTextGetCallback* view_plain_text_callback_invoke_ptr = plain_text_get_callback_map_.Lookup(plain_text_get_callback_id);
   view_plain_text_callback_invoke_ptr->TriggerCallback(evas_object(), content_text);
   plain_text_get_callback_map_.Remove(plain_text_get_callback_id);
+}
+
+void EWebView::SetViewGeolocationPermissionCallback(tizen_webview::View_Geolocation_Permission_Callback callback, void* user_data) {
+  geolocation_permission_cb_.reset(new WebViewGeolocationPermissionCallback(callback, user_data));
+}
+
+bool EWebView::InvokeViewGeolocationPermissionCallback(void* permission_context, Eina_Bool* callback_result) {
+  return geolocation_permission_cb_->Run(evas_object_, permission_context, callback_result);
 }
 
 void EWebView::StopFinding() {
