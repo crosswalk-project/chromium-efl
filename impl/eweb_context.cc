@@ -33,9 +33,9 @@
 #include "net/http/http_cache.h"
 #include "net/proxy/proxy_config_service_fixed.h"
 #include "net/proxy/proxy_service.h"
-#include "webkit/browser/database/database_quota_client.h"
-#include "webkit/browser/fileapi/file_system_quota_client.h"
-#include "webkit/browser/quota/quota_manager.h"
+#include "storage/browser/database/database_quota_client.h"
+#include "storage/browser/fileapi/file_system_quota_client.h"
+#include "storage/browser/quota/quota_manager.h"
 
 #include "browser_context_efl.h"
 #include "ewk_global_data.h"

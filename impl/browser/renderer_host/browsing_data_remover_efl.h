@@ -27,8 +27,8 @@
 #include "base/time/time.h"
 #include "content/public/browser/notification_observer.h"
 #include "content/public/browser/notification_registrar.h"
+#include "storage/common/quota/quota_types.h"
 #include "url/gurl.h"
-#include "webkit/common/quota/quota_types.h"
 
 namespace net {
 class URLRequestContextGetter;
