@@ -33,6 +33,7 @@
 #define ewk_auth_request_h
 
 #include <Eina.h>
+#include "ewk_export.h"
 
 #ifdef __cplusplus
 extern "C" {

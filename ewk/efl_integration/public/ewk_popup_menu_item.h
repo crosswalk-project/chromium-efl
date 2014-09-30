@@ -32,6 +32,7 @@
 #define ewk_popup_menu_item_h
 
 #include <Eina.h>
+#include "ewk_export.h"
 #include "ewk_view.h"
 
 #ifdef __cplusplus

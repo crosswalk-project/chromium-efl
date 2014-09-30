@@ -21,7 +21,6 @@
 #define ewk_policy_decision_h
 
 #include <Eina.h>
-
 #include "ewk_export.h"
 #include "ewk_frame.h"
 

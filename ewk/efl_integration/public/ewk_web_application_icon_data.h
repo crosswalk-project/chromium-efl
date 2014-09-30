@@ -21,6 +21,7 @@
 #define ewk_web_application_icon_data_h
 
 #include <Eina.h>
+#include "ewk_export.h"
 
 #ifdef __cplusplus
 extern "C" {

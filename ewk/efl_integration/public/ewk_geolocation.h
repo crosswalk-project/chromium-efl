@@ -21,6 +21,7 @@
 #define ewk_geolocation_h
 
 #include <Eina.h>
+#include "ewk_export.h"
 #include "ewk_security_origin.h"
 
 #ifdef __cplusplus

@@ -21,6 +21,7 @@
 #define ewk_user_media_h
 
 #include <Eina.h>
+#include "ewk_export.h"
 
 #ifdef __cplusplus
 extern "C" {
