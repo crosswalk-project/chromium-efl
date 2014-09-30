@@ -24,19 +24,14 @@
 # undef EAPI
 #endif
 
-#if defined(WIN32)
-#if defined(EFLWEBVIEW_IMPLEMENTATION)
-#define EAPI __declspec(dllexport)
+#ifdef __GNUC__
+# if __GNUC__ >= 4
+#  define EAPI __attribute__ ((visibility("default")))
+# else
+#  define EAPI
+# endif
 #else
-#define EAPI __declspec(dllimport)
-#endif  // defined(CONTENT_IMPLEMENTATION)
-
-#else // defined(WIN32)
-#if defined(EFLWEBVIEW_IMPLEMENTATION)
-#define EAPI __attribute__((visibility("default")))
-#else
-#define EAPI
-#endif
+# define EAPI
 #endif
 
-#endif  // CONTENT_COMMON_CONTENT_EXPORT_H_
+#endif  // EWK_EXPORT_H

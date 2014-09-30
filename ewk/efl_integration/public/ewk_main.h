@@ -28,7 +28,6 @@
 #define ewk_main_h
 
 #include <Eina.h>
-
 #include "ewk_export.h"
 
 #ifdef __cplusplus

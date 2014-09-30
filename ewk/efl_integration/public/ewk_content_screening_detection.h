@@ -22,6 +22,7 @@
 
 #include <Eina.h>
 #include "ewk_error.h"
+#include "ewk_export.h"
 
 #ifdef __cplusplus
 extern "C" {

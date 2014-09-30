@@ -33,6 +33,7 @@
 #define ewk_favicon_database_h
 
 #include <Evas.h>
+#include "ewk_export.h"
 
 #ifdef __cplusplus
 extern "C" {

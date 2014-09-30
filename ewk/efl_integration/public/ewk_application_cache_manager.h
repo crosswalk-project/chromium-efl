@@ -32,6 +32,7 @@
 #define ewk_application_cache_manager_h
 
 #include <Eina.h>
+#include "ewk_export.h"
 
 #ifdef __cplusplus
 extern "C" {

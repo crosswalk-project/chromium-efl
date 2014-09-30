@@ -27,6 +27,7 @@
 
 #include <Eina.h>
 #include <Evas.h>
+#include "ewk_export.h"
 
 #ifdef __cplusplus
 extern "C" {

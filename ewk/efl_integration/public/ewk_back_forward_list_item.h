@@ -33,6 +33,7 @@
 #define ewk_back_forward_list_item_h
 
 #include <Eina.h>
+#include "ewk_export.h"
 
 #ifdef __cplusplus
 extern "C" {
