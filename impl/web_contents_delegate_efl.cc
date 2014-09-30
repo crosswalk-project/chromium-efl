@@ -49,7 +49,9 @@ namespace content {
 void WritePdfDataToFile(printing::PdfMetafileSkia* metafile, const base::FilePath& filename) {
   DCHECK(BrowserThread::CurrentlyOn(BrowserThread::FILE));
   DCHECK(metafile);
-  metafile->SaveTo(filename);
+  base::File file(filename, base::File::FLAG_CREATE_ALWAYS | base::File::FLAG_WRITE);
+  metafile->SaveTo(&file);
+  file.Close();
   delete metafile;
 }
 
@@ -255,7 +257,7 @@ void WebContentsDelegateEfl::DidStartProvisionalLoadForFrame(RenderFrameHost* re
 
 void WebContentsDelegateEfl::DidCommitProvisionalLoadForFrame(RenderFrameHost* render_frame_host,
                                                               const GURL& url,
-                                                              PageTransition transition_type) {
+                                                              ui::PageTransition transition_type) {
   web_view_->SmartCallback<EWebViewCallbacks::LoadCommitted>().call();
 }
 

@@ -214,7 +214,7 @@ bool PrintWebViewHelperEfl::PrintPageInternal(
   // can't be a stack object.
   skia::RefPtr<skia::VectorCanvas> canvas =
       skia::AdoptRef(new skia::VectorCanvas(device));
-  printing::MetafileSkiaWrapper::SetMetafileOnCanvas(*canvas, metafile);
+  printing::MetafileSkiaWrapper::SetMetafileOnCanvas(*canvas, static_cast<printing::PdfMetafileSkia*>(metafile));
   skia::SetIsDraftMode(*canvas, true);
 
   frame->printPage(params.page_number, canvas.get());

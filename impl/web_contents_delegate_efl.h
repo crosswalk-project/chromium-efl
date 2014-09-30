@@ -103,7 +103,7 @@ class WebContentsDelegateEfl
 
   virtual void DidCommitProvisionalLoadForFrame(RenderFrameHost* render_frame_host,
                                                 const GURL& url,
-                                                PageTransition transition_type) OVERRIDE;
+                                                ui::PageTransition transition_type) OVERRIDE;
 
   virtual void DidNavigateAnyFrame(const LoadCommittedDetails& details, const FrameNavigateParams& params) OVERRIDE;
   void OnAuthRequired(net::URLRequest* request,
