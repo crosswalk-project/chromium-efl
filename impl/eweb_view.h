@@ -186,6 +186,7 @@ class WebApplicationCapableGetCallback {
 class AsyncHitTestRequest;
 class JavaScriptDialogManagerEfl;
 class WebViewBrowserMessageFilter;
+class WebViewGeolocationPermissionCallback;
 
 class EWebView {
  public:
@@ -317,6 +318,8 @@ class EWebView {
   bool PlainTextGet(tizen_webview::View_Plain_Text_Get_Callback callback, void* user_data);
   void InvokePlainTextGetCallback(const std::string& content_text, int plain_text_get_callback_id);
   int SetEwkViewPlainTextGetCallback(tizen_webview::View_Plain_Text_Get_Callback callback, void* user_data);
+  void SetViewGeolocationPermissionCallback(tizen_webview::View_Geolocation_Permission_Callback callback, void* user_data);
+  bool InvokeViewGeolocationPermissionCallback(void* geolocation_permission_request_context, Eina_Bool* result);
   void DidChangeContentsSize(int width, int height);
   const Eina_Rectangle GetContentsSize() const;
   void GetScrollSize(int* w, int* h);
@@ -471,6 +474,7 @@ class EWebView {
   double min_page_scale_factor_;
   double max_page_scale_factor_;
   scoped_ptr<OrientationLockCallback> orientation_lock_callback_;
+  scoped_ptr<WebViewGeolocationPermissionCallback> geolocation_permission_cb_;
   scoped_ptr<content::InputPicker> inputPicker_;
   IDMap<WebApplicationIconUrlGetCallback, IDMapOwnPointer> web_app_icon_url_get_callback_map_;
   IDMap<WebApplicationIconUrlsGetCallback, IDMapOwnPointer> web_app_icon_urls_get_callback_map_;

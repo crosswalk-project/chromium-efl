@@ -25,6 +25,7 @@ typedef struct _Ewk_Geolocation_Permission_Request Ewk_Geolocation_Permission_Re
 EAPI const Ewk_Security_Origin *ewk_geolocation_permission_request_origin_get(const Ewk_Geolocation_Permission_Request *request);
 
 /**
+ * Deprecated
  * Request to allow / deny the geolocation permission request
  *
  * @param request permission request to allow or deny permission
@@ -33,6 +34,16 @@ EAPI const Ewk_Security_Origin *ewk_geolocation_permission_request_origin_get(co
  * @return @c EINA_TRUE on success or @c EINA_FALSE otherwise
  */
 EAPI Eina_Bool ewk_geolocation_permission_request_set(Ewk_Geolocation_Permission_Request *request, Eina_Bool allow);
+
+/**
+ * Request to allow / deny the geolocation permission request
+ *
+ * @param request permission request to allow or deny permission
+ * @param allow allow or deny permission for geolocation
+ *
+ * @return @c EINA_TRUE on success or @c EINA_FALSE otherwise
+ */
+EAPI Eina_Bool ewk_geolocation_permission_reply(Ewk_Geolocation_Permission_Request* permissionRequest, Eina_Bool allow);
 
 /**
  * Suspend the operation for permission request.

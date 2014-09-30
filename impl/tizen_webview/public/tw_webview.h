@@ -113,6 +113,8 @@ class WebView {
   void StopFinding();
   void SetContentSecurityPolicy(const char* policy, ContentSecurityPolicyType type);
 
+  void SetViewGeolocationPermissionCallback(View_Geolocation_Permission_Callback callback, void* user_data);
+
   // ---- View
   // > View Visibility
   void Show();

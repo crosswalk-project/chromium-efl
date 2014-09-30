@@ -229,6 +229,10 @@ void WebView::SetContentSecurityPolicy(const char* policy, ContentSecurityPolicy
   return impl_->SetContentSecurityPolicy(policy, type);
 }
 
+void WebView::SetViewGeolocationPermissionCallback(View_Geolocation_Permission_Callback callback, void* user_data) {
+  impl_->SetViewGeolocationPermissionCallback(callback, user_data);
+}
+
 void WebView::Show() {
   return impl_->Show();
 }
