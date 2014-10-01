@@ -88,12 +88,7 @@
           }],
         ],
       }],
-      ['ewk_bringup==1', {
-        'defines!': [
-          'TIZEN_CONTENTS_DETECTION=1',
-          'TIZEN_ENABLE_CAPI_SUPPORT=1',
-        ],
-      }]
+
     ],
   },
 }

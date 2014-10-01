@@ -33,6 +33,7 @@
       <smack request="sound_server" type="rw" />
       <smack request="chromium-efl::db" type="rwxat" />
       <smack request="ui-gadget::client" type="rwx" />
+      <smack request="deviced:gadget" type="rw" />
     </request>
   </define>
   <request>
@@ -41,5 +42,9 @@
   <assign>
     <filesystem path="/usr/lib/org.tizen.chromium-efl/efl_webprocess" label="chromium-efl" exec_label="chromium-efl"/>
     <filesystem path="/opt/usr/apps/org.tizen.chromium-efl/data/db/" label="chromium-efl::db" exec_label="chromium-efl"/>
+    <filesystem path="/usr/lib/libchromium-ewk.so" label="_" />
+    <filesystem path="/usr/share/icons/mini-browser.png" label="_" />
+    <filesystem path="/usr/bin/efl_webview_app" label="chromium-efl" exec_label="chromium-efl"/>
+    <filesystem path="/usr/bin/mini_browser" label="chromium-efl" exec_label="chromium-efl"/>
   </assign>
 </manifest>

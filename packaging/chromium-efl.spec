@@ -90,6 +90,10 @@ BuildRequires: pkgconfig(libdri2)
 BuildRequires: pkgconfig(libtbm)
 BuildRequires: pkgconfig(x11)
 BuildRequires: pkgconfig(feedback)
+BuildRequires: pkgconfig(appcore-efl)
+BuildRequires: pkgconfig(dlog)
+BuildRequires: pkgconfig(ecore-imf)
+BuildRequires: pkgconfig(scim)
 
 %description
 Browser Engine based on Chromium EFL (Shared Library)
@@ -108,6 +112,15 @@ Group: Development/Libraries
 Requires: %{name} = %{version}-%{release}
 %description unittests
 Chromium unite tests
+%endif
+
+%if 0%{?build_ewk_unittests}
+%package ewktest
+Summary: Chromium EWK unittests
+Group: Development/UnitTests
+Requires: %{name} = %{version}-%{release}
+%description ewktest
+Chromium EFL unit test utilities
 %endif
 
 # Directory for internal chromium executable components
@@ -194,7 +207,11 @@ fi
   -Dbuilding_for_tizen_"%{OUTPUT_BUILD_PROFILE_TARGET}"=1
 %endif
 
-build/prebuild/ninja %{_smp_mflags} -C"%{OUTPUT_FOLDER}"
+build/prebuild/ninja %{_smp_mflags} -C"%{OUTPUT_FOLDER}" \
+%if 0%{?build_ewk_unittests}
+  ewk_unittests \
+%endif
+  chromium-efl efl_webprocess chromium-ewk efl_webview_app mini_browser
 
 %if 0%{?_enable_unittests}
 ninja %{_smp_mflags} -C"%{OUTPUT_FOLDER}" angle_unittests env_chromium_unittests cacheinvalidation_unittests \
@@ -207,22 +224,37 @@ ninja %{_smp_mflags} -C"%{OUTPUT_FOLDER}" angle_unittests env_chromium_unittests
 # gpu_unittests compositor_unittests media_unittests
 %endif
 
+#XXX icudtl.dat is not copied by gyp. Do that manually
+cp src/third_party/icu/android/icudtl.dat "%{OUTPUT_FOLDER}"
+
 %install
 install -d "%{buildroot}"%{_sysconfdir}/smack/accesses2.d
+install -d "%{buildroot}"%{_bindir}
 install -d "%{buildroot}"%{_libdir}/pkgconfig
-install -d "%{buildroot}"%{_includedir}/v8
+install -d "%{buildroot}"%{_includedir}/chromium-ewk
 install -d "%{buildroot}%{CHROMIUM_EXE_DIR}"
 install -d "%{buildroot}%{CHROMIUM_DATA_DIR}"/themes
 
 install -m 0755 "%{OUTPUT_FOLDER}"/lib/libchromium-efl.so    "%{buildroot}"%{_libdir}
+install -m 0755 "%{OUTPUT_FOLDER}"/lib/libchromium-ewk.so    "%{buildroot}"%{_libdir}
 
 install -m 0755 "%{OUTPUT_FOLDER}"/libffmpegsumo.so  "%{buildroot}%{CHROMIUM_EXE_DIR}"
 install -m 0755 "%{OUTPUT_FOLDER}"/efl_webprocess    "%{buildroot}%{CHROMIUM_EXE_DIR}"
+install -m 0755 "%{OUTPUT_FOLDER}"/icudtl.dat    "%{buildroot}%{CHROMIUM_EXE_DIR}"
 install -m 0755 "%{OUTPUT_FOLDER}"/content_shell.pak "%{buildroot}%{CHROMIUM_EXE_DIR}"
 install -m 0644 "%{OUTPUT_FOLDER}"/resources/*.edj   "%{buildroot}%{CHROMIUM_DATA_DIR}"/themes
 
+install -m 0755 "%{OUTPUT_FOLDER}"/efl_webview_app   "%{buildroot}"%{_bindir}
+install -m 0755 "%{OUTPUT_FOLDER}"/mini_browser      "%{buildroot}"%{_bindir}
+
 install -m 0644 "%{OUTPUT_FOLDER}"/pkgconfig/*.pc    "%{buildroot}"%{_libdir}/pkgconfig/
-install -m 0644 src/v8/include/*.h                   "%{buildroot}"%{_includedir}/v8/
+install -m 0644 ewk/efl_integration/public/*.h                  "%{buildroot}"%{_includedir}/chromium-ewk/
+
+install -d "%{buildroot}"%{_datadir}/packages
+install -m 0644 ewk/efl_webview_app/org.tizen.chromium-efl.xml "%{buildroot}"%{_datadir}/packages
+
+install -d "%{buildroot}"%{_datadir}/icons
+install -m 0644 ewk/efl_webview_app/mini-browser.png "%{buildroot}"%{_datadir}/icons
 
 %if 0%{?_enable_unittests}
 install -d "%{INSTALL_ROOT}%{CHROMIUM_UNITTESTS_DIR}"
@@ -230,6 +262,15 @@ for test in "%{OUTPUT_FOLDER}/*_unittests"; do
   install -m 0755 ${test} "%{INSTALL_ROOT}%{CHROMIUM_UNITTESTS_DIR}"
 done
 %endif
+
+%if 0%{?build_ewk_unittests}
+mkdir -p %{buildroot}/opt/usr/resources/
+mkdir -p %{buildroot}/opt/usr/utc_exec/
+cp -r ewk/unittest/resources/* %{buildroot}/opt/usr/resources/
+install -m 0644 "%{OUTPUT_FOLDER}"/ewk_unittests %{buildroot}/opt/usr/utc_exec/
+install -m 0755 ewk/utc_gtest_run.sh %{buildroot}/opt/usr/utc_exec/
+%endif
+
 
 %post
 # apply smack rule
@@ -270,18 +311,32 @@ fi
 %manifest packaging/%{name}.manifest
 %defattr(-,root,root,-)
 %{_libdir}/libchromium-efl.so
+%{_libdir}/libchromium-ewk.so
 %{CHROMIUM_EXE_DIR}/efl_webprocess
 %{CHROMIUM_EXE_DIR}/libffmpegsumo.so
+%{CHROMIUM_EXE_DIR}/icudtl.dat
 %{CHROMIUM_EXE_DIR}/content_shell.pak
 %{CHROMIUM_DATA_DIR}/themes/*.edj
+%{_bindir}/efl_webview_app
+%{_bindir}/mini_browser
+%{_datadir}/packages/org.tizen.chromium-efl.xml
+%{_datadir}/icons/mini-browser.png
 
 %files devel
 %defattr(-,root,root,-)
-%{_includedir}/v8/*
+%{_includedir}/chromium-ewk/*.h
 %{_libdir}/pkgconfig/*.pc
 
 %if 0%{?_enable_unittests}
 %files unittests
 %defattr(-,root,root,-)
 %{CHROMIUM_UNITTESTS_DIR}/*
+%endif
+
+%if 0%{?build_ewk_unittests}
+%files ewktest
+%defattr(-,root,root,-)
+%manifest ./packaging/org.tizen.chromium-ewktest.manifest
+/opt/usr/utc_exec/*
+/opt/usr/resources/*
 %endif

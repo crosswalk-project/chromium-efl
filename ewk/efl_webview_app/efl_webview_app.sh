@@ -20,8 +20,8 @@ if echo $SCRIPTDIR | grep -q "Debug/efl_webview_app"; then
   BUILD_MODE=Debug
 fi
 
-CHROMIUM_EFL_LIBDIR=$(cd $SCRIPTDIR/../../../chromium/${OUT_DIR}/$BUILD_MODE/lib; pwd -P)
-CHROMIUM_EFL_DEPENDENCIES_LIBDIR=$(cd $SCRIPTDIR/../../../chromium/$OUT_DIR/Dependencies/Root/$_LIBDIR; pwd -P)
+CHROMIUM_EFL_LIBDIR=$(cd $SCRIPTDIR/lib; pwd -P)
+CHROMIUM_EFL_DEPENDENCIES_LIBDIR=$(cd $SCRIPTDIR/../Dependencies/Root/$_LIBDIR; pwd -P)
 
 export LD_LIBRARY_PATH=$CHROMIUM_EFL_DEPENDENCIES_LIBDIR:$CHROMIUM_EFL_LIBDIR:${LD_LIBRARY_PATH}
 echo "LD_LIBRARY_PATH=${LD_LIBRARY_PATH}"

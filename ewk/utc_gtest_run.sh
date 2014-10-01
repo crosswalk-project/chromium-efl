@@ -33,30 +33,28 @@ mkdir $UTC_RESULT_DIR
 mkdir $UTC_LOG_DIR
 
 ## Run Unit Test for All
-UTC_FILTER=utc_blink
-for utc_exec in `ls $UTC_EXEC_PATH | grep $UTC_FILTER`; do
-  echo ====shell script==== ::: start test ::: $utc_exec
-  cp $UTC_EXEC_PATH/$utc_exec $UTC_ROOT
-  # some TCs need to get focus on webview, lockscreen is blocking focus
-  killall -s QUIT lockscreen
-  $UTC_ROOT/$utc_exec --gtest_output="xml:$UTC_RESULT_DIR/$utc_exec.xml" # | tee $UTC_LOG_DIR/$utc_exec.log
-  rm $UTC_ROOT/$utc_exec
+utc_exec=ewk_unittests
+echo ====shell script==== ::: start test ::: $utc_exec
+cp $UTC_EXEC_PATH/$utc_exec $UTC_ROOT
+# some TCs need to get focus on webview, lockscreen is blocking focus
+killall -s QUIT lockscreen
+$UTC_ROOT/$utc_exec --gtest_output="xml:$UTC_RESULT_DIR/$utc_exec.xml" # | tee $UTC_LOG_DIR/$utc_exec.log
+rm $UTC_ROOT/$utc_exec
 
-  if [ ! -f "$UTC_RESULT_DIR/$utc_exec.xml" ]; then
-    test_name=${utc_exec%"_func"}
-    ## Generate fake xml file that tells about possible segfault.
-    echo "<?xml version=\"1.0\" encoding=\"UTF-8\"?>" >> $UTC_RESULT_DIR/$utc_exec.xml
-    echo "<testsuites tests=\"1\" failures=\"1\" disabled=\"0\" errors=\"0\" time=\"0.1\" name=\"Launch\">" >> $UTC_RESULT_DIR/$utc_exec.xml
-    echo "  <testsuite name=\"$test_name\" tests=\"1\" failures=\"1\" disabled=\"0\" errors=\"0\" time=\"0.1\">" >> $UTC_RESULT_DIR/$utc_exec.xml
-    echo "    <testcase name=\"LaunchTC\" status=\"run\" time=\"0.1\" classname=\"$test_name\">" >> $UTC_RESULT_DIR/$utc_exec.xml
-    echo "      <failure message=\"SIGSEGV\" type=\"\"></failure>" >> $UTC_RESULT_DIR/$utc_exec.xml
-    echo "    </testcase>" >> $UTC_RESULT_DIR/$utc_exec.xml
-    echo "  </testsuite>" >> $UTC_RESULT_DIR/$utc_exec.xml
-    echo "</testsuites>" >> $UTC_RESULT_DIR/$utc_exec.xml
-  fi
+if [ ! -f "$UTC_RESULT_DIR/$utc_exec.xml" ]; then
+  test_name=${utc_exec%"_func"}
+  ## Generate fake xml file that tells about possible segfault.
+  echo "<?xml version=\"1.0\" encoding=\"UTF-8\"?>" >> $UTC_RESULT_DIR/$utc_exec.xml
+  echo "<testsuites tests=\"1\" failures=\"1\" disabled=\"0\" errors=\"0\" time=\"0.1\" name=\"Launch\">" >> $UTC_RESULT_DIR/$utc_exec.xml
+  echo "  <testsuite name=\"$test_name\" tests=\"1\" failures=\"1\" disabled=\"0\" errors=\"0\" time=\"0.1\">" >> $UTC_RESULT_DIR/$utc_exec.xml
+  echo "    <testcase name=\"LaunchTC\" status=\"run\" time=\"0.1\" classname=\"$test_name\">" >> $UTC_RESULT_DIR/$utc_exec.xml
+  echo "      <failure message=\"SIGSEGV\" type=\"\"></failure>" >> $UTC_RESULT_DIR/$utc_exec.xml
+  echo "    </testcase>" >> $UTC_RESULT_DIR/$utc_exec.xml
+  echo "  </testsuite>" >> $UTC_RESULT_DIR/$utc_exec.xml
+  echo "</testsuites>" >> $UTC_RESULT_DIR/$utc_exec.xml
+fi
 
-  echo ====shell script==== :::  end test  ::: $utc_exec
-done
+echo ====shell script==== :::  end test  ::: $utc_exec
 
 ## Set testsuites initial values
 _testAPIs=0

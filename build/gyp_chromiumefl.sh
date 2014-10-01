@@ -102,7 +102,7 @@ ${TOPDIR}/build/gyp_chromiumefl \
                                  $SYSTEM_DEPS \
                                  $ADDITIONAL_GYP_PARAMETERS \
                                  $@ \
-                                 ${TOPDIR}/impl/chromium-efl.gyp
+                                 ${TOPDIR}/ewk/chromium-ewk.gyp
 
 ret=$?
 
