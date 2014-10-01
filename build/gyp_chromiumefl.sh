@@ -60,6 +60,7 @@ else
                               -Dhost_arch=$host_arch
                               -Denable_printing=0
                               -Duse_kerberos=0
+                              -Duse_gconf=0
                              "
 
   if [ "${GBS_ARCH}" == "arm" ]; then
