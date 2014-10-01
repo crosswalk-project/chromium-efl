@@ -17,7 +17,11 @@
 #include <string.h>
 
 #if defined(OS_TIZEN_MOBILE)
+#ifndef TIZEN_LEGACY_V_2_2_1
+#include <device/haptic.h>
+#else
 #include <haptic/haptic.h>
+#endif
 #endif
 
 #include "public/ewk_context.h"
@@ -1356,8 +1360,13 @@ Eina_Bool __vibration_timeout_cb(void *data)
 {
   s_haptic_timer_id = NULL;
   if (s_haptic_handle) {
+#ifndef TIZEN_LEGACY_V_2_2_1
+    device_haptic_stop(s_haptic_handle, s_haptic_effect);
+    device_haptic_close(s_haptic_handle);
+#else
     haptic_stop_effect(s_haptic_handle, s_haptic_effect);
     haptic_close(s_haptic_handle);
+#endif
     s_haptic_handle = NULL;
   }
 
@@ -1377,17 +1386,31 @@ void __vibration_on_cb(uint64_t vibration_time, void *data)
   }
 
   if (s_haptic_handle) {
+#ifndef TIZEN_LEGACY_V_2_2_1
+    device_haptic_stop(s_haptic_handle, s_haptic_effect);
+    device_haptic_close(s_haptic_handle);
+#else
     haptic_stop_effect(s_haptic_handle, s_haptic_effect);
     haptic_close(s_haptic_handle);
+#endif
     s_haptic_handle = NULL;
   }
 
+#ifndef TIZEN_LEGACY_V_2_2_1
+  if (device_haptic_open(0, &s_haptic_handle) != DEVICE_ERROR_NONE) {
+    printf("[%s][%d][%s] ERROR: __vibration_on_cb:device_haptic_open failed\n", __FUNCTION__, __LINE__, "vibration");
+#else
   if (haptic_open(HAPTIC_DEVICE_0, &s_haptic_handle) != HAPTIC_ERROR_NONE) {
     printf("[%s][%d][%s] ERROR: __vibration_on_cb:haptic_open failed\n", __FUNCTION__, __LINE__, "vibration");
+#endif
     return;
   }
 
+#ifndef TIZEN_LEGACY_V_2_2_1
+  device_haptic_vibrate(s_haptic_handle, duration, 100, &s_haptic_effect);
+#else
   haptic_vibrate_monotone(s_haptic_handle, duration, &s_haptic_effect);
+#endif
   double in = (double)((double)(duration) / (double)(1000));
   printf("[%s][%d][%s] __vibration_on_cb:duration=%f\n", __FUNCTION__, __LINE__, "vibration", in);
 
@@ -1405,8 +1428,13 @@ void __vibration_off_cb(void *data)
   }
 
   if (s_haptic_handle) {
+#ifndef TIZEN_LEGACY_V_2_2_1
+    device_haptic_stop(s_haptic_handle, s_haptic_effect);
+    device_haptic_close(s_haptic_handle);
+#else
     haptic_stop_effect(s_haptic_handle, s_haptic_effect);
     haptic_close(s_haptic_handle);
+#endif
     s_haptic_handle = NULL;
   }
 }

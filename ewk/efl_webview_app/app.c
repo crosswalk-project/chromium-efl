@@ -21,7 +21,11 @@
 #include <Elementary.h>
 
 #if defined(OS_TIZEN_MOBILE)
+#ifndef TIZEN_LEGACY_V_2_2_1
+#include <device/haptic.h>
+#else
 #include <haptic/haptic.h>
+#endif
 #endif
 
 #include <unistd.h>
@@ -1208,8 +1212,13 @@ Eina_Bool __vibration_timeout_cb(void *data)
 {
   g_haptic_timer_id = NULL;
   if (g_haptic_handle) {
+#ifndef TIZEN_LEGACY_V_2_2_1
+    device_haptic_stop(g_haptic_handle, g_haptic_effect);
+    device_haptic_close(g_haptic_handle);
+#else
     haptic_stop_effect(g_haptic_handle, g_haptic_effect);
     haptic_close(g_haptic_handle);
+#endif
     g_haptic_handle = NULL;
   }
 
@@ -1229,17 +1238,31 @@ void __vibration_on_cb(uint64_t vibration_time, void *data)
     }
 
     if (g_haptic_handle) {
+#ifndef TIZEN_LEGACY_V_2_2_1
+      device_haptic_stop(g_haptic_handle, g_haptic_effect);
+      device_haptic_close(g_haptic_handle);
+#else
       haptic_stop_effect(g_haptic_handle, g_haptic_effect);
       haptic_close(g_haptic_handle);
+#endif
       g_haptic_handle = NULL;
     }
 
+#ifndef TIZEN_LEGACY_V_2_2_1
+    if (device_haptic_open(0, &g_haptic_handle) != DEVICE_ERROR_NONE) {
+      printf("__vibration_on_cb:device_haptic_open failed");
+#else
     if (haptic_open(HAPTIC_DEVICE_0, &g_haptic_handle) != HAPTIC_ERROR_NONE) {
       printf("__vibration_on_cb:haptic_open failed");
+#endif
       return;
     }
 
+#ifndef TIZEN_LEGACY_V_2_2_1
+    device_haptic_vibrate(g_haptic_handle, duration, 100, &g_haptic_effect);
+#else
     haptic_vibrate_monotone(g_haptic_handle, duration, &g_haptic_effect);
+#endif
     double in = (double)((double)(duration) / (double)(1000));
     printf("__vibration_on_cb:duration=%f", in);
 
@@ -1257,8 +1280,13 @@ void __vibration_off_cb(void *data)
     }
 
     if (g_haptic_handle) {
+#ifndef TIZEN_LEGACY_V_2_2_1
+      device_haptic_stop(g_haptic_handle, g_haptic_effect);
+      device_haptic_close(g_haptic_handle);
+#else
       haptic_stop_effect(g_haptic_handle, g_haptic_effect);
       haptic_close(g_haptic_handle);
+#endif
       g_haptic_handle = NULL;
     }
   #endif
