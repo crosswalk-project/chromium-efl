@@ -345,6 +345,23 @@
     }],
     ['ewk_bringup==1', {
       'defines': [ 'EWK_BRINGUP=1' ],
+      'sources!': [
+        'utc_blink_ewk_history_back_list_length_get_func.cpp',
+        'utc_blink_ewk_history_forward_list_length_get.cpp',
+        'utc_blink_ewk_history_free_func.cpp',
+        'utc_blink_ewk_history_item_title_get_func.cpp',
+        'utc_blink_ewk_history_item_uri_get_func.cpp',
+        'utc_blink_ewk_history_nth_item_get.cpp',
+        'utc_blink_ewk_quota_permission_request_is_persistent_get_func.cpp',
+        'utc_blink_ewk_quota_permission_request_origin_host_get_func.cpp',
+        'utc_blink_ewk_quota_permission_request_origin_port_get_func.cpp',
+        'utc_blink_ewk_quota_permission_request_origin_protocol_get_func.cpp',
+        'utc_blink_ewk_quota_permission_request_quota_get_func.cpp',
+        'utc_blink_ewk_view_history_get_func.cpp',
+        'utc_blink_ewk_view_quota_permission_request_callback_set_func.cpp',
+        'utc_blink_ewk_view_quota_permission_request_cancel_func.cpp',
+        'utc_blink_ewk_view_quota_permission_request_reply_func.cpp',
+      ],
     }]
    ],
 
