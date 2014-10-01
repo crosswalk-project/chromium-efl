@@ -1,0 +1,158 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<Manifest xmlns="http://schemas.tizen.org/2012/12/manifest">
+    <Id>kmcele1k1p</Id>
+    <Version>34.1847.76.35</Version>
+    <Type>C++App</Type>
+    <Descriptions>
+        <Description Locale="eng-PH"/>
+        <Description Locale="zho-SG"/>
+        <Description Locale="kat-GE"/>
+        <Description Locale="est-EE"/>
+        <Description Locale="ukr-UA"/>
+        <Description Locale="srp-RS"/>
+        <Description Locale="hrv-HR"/>
+        <Description Locale="isl-IS"/>
+        <Description Locale="ell-GR"/>
+        <Description Locale="glg-ES"/>
+        <Description Locale="lit-LT"/>
+        <Description Locale="aze-AZ"/>
+        <Description Locale="eng-US"/>
+        <Description Locale="mkd-MK"/>
+        <Description Locale="zho-HK"/>
+        <Description Locale="hye-AM"/>
+        <Description Locale="hun-HU"/>
+        <Description Locale="slk-SK"/>
+        <Description Locale="ces-CZ"/>
+        <Description Locale="fin-FI"/>
+        <Description Locale="ara-AE"/>
+        <Description Locale="ita-IT"/>
+        <Description Locale="eus-ES"/>
+        <Description Locale="tur-TR"/>
+        <Description Locale="rus-RU"/>
+        <Description Locale="cat-ES"/>
+        <Description Locale="kaz-KZ"/>
+        <Description Locale="deu-DE"/>
+        <Description Locale="zho-CN"/>
+        <Description Locale="por-PT"/>
+        <Description Locale="slv-SI"/>
+        <Description Locale="fra-FR"/>
+        <Description Locale="ron-RO"/>
+        <Description Locale="hin-IN"/>
+        <Description Locale="fra-CA"/>
+        <Description Locale="spa-ES"/>
+        <Description Locale="nld-NL"/>
+        <Description Locale="dan-DK"/>
+        <Description Locale="por-BR"/>
+        <Description Locale="bul-BG"/>
+        <Description Locale="zho-TW"/>
+        <Description Locale="jpn-JP"/>
+        <Description Locale="swe-SE"/>
+        <Description Locale="kor-KR"/>
+        <Description Locale="spa-MX"/>
+        <Description Locale="nob-NO"/>
+        <Description Locale="uzb-UZ"/>
+        <Description Locale="pol-PL"/>
+        <Description Locale="gle-IE"/>
+        <Description Locale="eng-GB"/>
+        <Description Locale="lav-LV"/>
+    </Descriptions>
+    <Url/>
+    <Requirements>
+        <Feature Name="http://tizen.org/feature/platform.core.cpu.arch">x86</Feature>
+        <Feature Name="http://tizen.org/feature/platform.core.fpu.arch">vfpv3</Feature>
+    </Requirements>
+    <Apps>
+        <ApiVersion>2.0</ApiVersion>
+        <Privileges>
+            <Privilege>http://tizen.org/privilege/web.privacy</Privilege>
+            <Privilege>http://tizen.org/privilege/web.service</Privilege>
+            <Privilege>http://tizen.org/privilege/alarm</Privilege>
+            <Privilege>http://tizen.org/privilege/application.launch</Privilege>
+            <Privilege>http://tizen.org/privilege/power</Privilege>
+            <Privilege>http://tizen.org/privilege/appmanager.launch</Privilege>
+            <Privilege>http://tizen.org/privilege/content.write</Privilege>
+        </Privileges>
+        <UiApp HwAcceleration="On" Main="True" MenuIconVisible="True" Name="content_shell">
+            <UiScalability BaseScreenSize="Normal" CoordinateSystem="Logical" LogicalCoordinate="720"/>
+            <UiTheme SystemTheme="White"/>
+            <DisplayNames>
+                <DisplayName Locale="eng-PH">Internet</DisplayName>
+                <DisplayName Locale="zho-SG">网络</DisplayName>
+                <DisplayName Locale="kat-GE">ინტერნეტი</DisplayName>
+                <DisplayName Locale="est-EE">Internet</DisplayName>
+                <DisplayName Locale="ukr-UA">Браузер</DisplayName>
+                <DisplayName Locale="srp-RS">Internet</DisplayName>
+                <DisplayName Locale="hrv-HR">Internet</DisplayName>
+                <DisplayName Locale="isl-IS">Internetið</DisplayName>
+                <DisplayName Locale="ell-GR">Internet</DisplayName>
+                <DisplayName Locale="glg-ES">Internet</DisplayName>
+                <DisplayName Locale="lit-LT">Internetas</DisplayName>
+                <DisplayName Locale="aze-AZ">Internet</DisplayName>
+                <DisplayName Locale="eng-US">Internet</DisplayName>
+                <DisplayName Locale="mkd-MK">Интернет</DisplayName>
+                <DisplayName Locale="zho-HK">瀏覽器</DisplayName>
+                <DisplayName Locale="slk-SK">Internet</DisplayName>
+                <DisplayName Locale="hun-HU">Internet</DisplayName>
+                <DisplayName Locale="hye-AM">Ինտերնետ</DisplayName>
+                <DisplayName Locale="ces-CZ">Internet</DisplayName>
+                <DisplayName Locale="fin-FI">Internet</DisplayName>
+                <DisplayName Locale="ara-AE">الإنترنت</DisplayName>
+                <DisplayName Locale="eus-ES">Internet</DisplayName>
+                <DisplayName Locale="ita-IT">Internet</DisplayName>
+                <DisplayName Locale="tur-TR">İnternet</DisplayName>
+                <DisplayName Locale="rus-RU">Интернет</DisplayName>
+                <DisplayName Locale="cat-ES">Internet</DisplayName>
+                <DisplayName Locale="kaz-KZ">Шолушы</DisplayName>
+                <DisplayName Locale="deu-DE">Internet</DisplayName>
+                <DisplayName Locale="zho-CN">互联网</DisplayName>
+                <DisplayName Locale="por-PT">Internet</DisplayName>
+                <DisplayName Locale="slv-SI">Internet</DisplayName>
+                <DisplayName Locale="fra-FR">Internet</DisplayName>
+                <DisplayName Locale="ron-RO">Internet</DisplayName>
+                <DisplayName Locale="hin-IN">इंटरनेट</DisplayName>
+                <DisplayName Locale="fra-CA">Internet</DisplayName>
+                <DisplayName Locale="spa-ES">Internet</DisplayName>
+                <DisplayName Locale="nld-NL">Internet</DisplayName>
+                <DisplayName Locale="dan-DK">Internet</DisplayName>
+                <DisplayName Locale="por-BR">Internet</DisplayName>
+                <DisplayName Locale="bul-BG">Интернет</DisplayName>
+                <DisplayName Locale="zho-TW">網際網路</DisplayName>
+                <DisplayName Locale="jpn-JP">インターネット</DisplayName>
+                <DisplayName Locale="swe-SE">Internet</DisplayName>
+                <DisplayName Locale="kor-KR">인터넷</DisplayName>
+                <DisplayName Locale="spa-MX">Internet</DisplayName>
+                <DisplayName Locale="nob-NO">Internett</DisplayName>
+                <DisplayName Locale="uzb-UZ">Internet</DisplayName>
+                <DisplayName Locale="pol-PL">Internet</DisplayName>
+                <DisplayName Locale="gle-IE">an tIdirlíon</DisplayName>
+                <DisplayName Locale="lav-LV">Internets</DisplayName>
+                <DisplayName Locale="eng-GB">Internet</DisplayName>
+            </DisplayNames>
+            <Icons>
+                <Icon Section="MainMenu" Type="Xhigh">mini-browser.png</Icon>
+            </Icons>
+            <AppControls>
+                <AppControl>
+                    <Operation>http://tizen.org/appcontrol/operation/view</Operation>
+                    <Uri>file</Uri>
+                    <Uri>http</Uri>
+                    <Uri>https</Uri>
+                    <Uri>javascript</Uri>
+                </AppControl>
+                <AppControl>
+                    <MimeType>application/xml</MimeType>
+                    <MimeType>image/svg+xml</MimeType>
+                    <MimeType>text/html</MimeType>
+                    <Operation>http://tizen.org/appcontrol/operation/view</Operation>
+                </AppControl>
+            </AppControls>
+            <LaunchConditions/>
+            <Notifications>
+                <Notification Name="Ticker">On</Notification>
+                <Notification Name="Sound">On</Notification>
+                <Notification Name="Contents">Off</Notification>
+                <Notification Name="Badge">On</Notification>
+            </Notifications>
+        </UiApp>
+    </Apps>
+</Manifest>

@@ -20,6 +20,7 @@ OPTIONS:
    --skip-gyp    Skip restore_gyp, jhbuild and gyp_chromium steps
    --ccache      configure ccache installed in your system
    --skip-ninja  Skip ninja step
+   --build-ewk-unittests  build ewk unittests
    --debug       build debug version of chromium-efl (in $GYP_GENERATOR_OUTPUT/Debug instead of default $GYP_GENERATOR_OUTPUT/Release)
    -jN           set number of jobs, just like with make or ninja
 
@@ -51,6 +52,10 @@ fi
 
 if echo "$@" | grep -cq '\-\-ccache'; then
   USE_CCACHE=1
+fi
+
+if echo "$@" | grep -cq '\-\-build_ewk_unittests'; then
+  BUILD_EWK_UNITTESTS=1
 fi
 
 JHBUILD_STAMPFILE="${GYP_GENERATOR_OUTPUT}/Dependencies/jhbuild.stamp"
@@ -98,5 +103,11 @@ if [ "$SKIP_NINJA" == "0" ]; then
   fi
   export LD_LIBRARY_PATH="${JHBUILD_DEPS}/${_LIBDIR}:$LD_LIBRARY_PATH"
   export PATH="${JHBUILD_DEPS}/bin:$PATH"
-  ninja -C ${GYP_GENERATOR_OUTPUT}/${BUILD_SUBDIRECTORY} ${JOBS}
+
+  TARGETS="chromium-efl efl_webprocess chromium-ewk efl_webview_app"
+  if [ "$BUILD_EWK_UNITTESTS" == "1" ]; then
+    TARGETS = "$TARGETS ewk_unittests"
+  fi
+
+  ninja -C ${GYP_GENERATOR_OUTPUT}/${BUILD_SUBDIRECTORY} ${JOBS} ${TARGETS}
 fi

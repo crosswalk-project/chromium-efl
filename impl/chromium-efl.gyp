@@ -334,6 +334,8 @@
         ['_toolset=="target"', {
           'libraries': [ '<!($(echo ${CXX_target:-g++}) -print-libgcc-file-name)', ]
         }],
+        ['ewk_bringup==1', {
+        }]
       ],
     },
     'rules': [{
@@ -356,6 +358,7 @@
       }],
       ['ewk_bringup==1', {
         'defines': [ 'EWK_BRINGUP=1' ],
+        'defines!': [ 'TIZEN_CONTENTS_DETECTION=1' ],
       }],
       ['enable_printing==0', {
         'sources!': [
