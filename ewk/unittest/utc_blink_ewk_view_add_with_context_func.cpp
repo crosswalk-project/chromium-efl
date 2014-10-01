@@ -35,7 +35,9 @@ protected:
     utc_message("[[ TET_MSG ]]:: ============ Startup ============ ");
 
     /* 2. Initialization of the EFL (and other) libraries */
+#if !GLIB_CHECK_VERSION(2, 36, 0)
     g_type_init();
+#endif
     elm_init(0, NULL);
   }
 

@@ -33,7 +33,9 @@ protected:
   void SetUp()
   {
     /* 2. Initialization of the EFL (and other) libraries */
+#if !GLIB_CHECK_VERSION(2, 36, 0)
     g_type_init();
+#endif
     ewk_init();
     elm_init(0, NULL);
 
