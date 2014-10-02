@@ -148,32 +148,89 @@ static const char* vertexShaderSourceSimple =
   "}                            \n";
 
 static const char* fragmentShaderSourceSimple =
+#if defined(OS_TIZEN)
   "precision mediump float;                            \n"
+#endif
   "varying vec2 v_texCoord;                            \n"
   "uniform sampler2D s_texture;                        \n"
   "void main() {                                       \n"
   "  gl_FragColor = texture2D( s_texture, v_texCoord );\n"
   "}                                                   \n";
 
+#if defined(NDEBUG)
+#define GL_CHECK_HELPER(code, msg) \
+  ((code), false)
+#else
+static GLenum s_gl_err;
+#define GL_CHECK_HELPER(code, msg) \
+  (((code), ((s_gl_err = evas_gl_api_->glGetError()) == GL_NO_ERROR)) ? false : \
+      ((LOG(ERROR) << "GL Error: " << s_gl_err << "    " << msg), true))
+#endif
+
+#define GL_CHECK(code) GL_CHECK_HELPER(code, "")
+#define GL_CHECK_STATUS(msg) GL_CHECK_HELPER(1, msg)
+
+static void GLCheckProgramHelper(Evas_GL_API* api, GLuint program,
+                                 const char* file, int line) {
+  GLint status;
+  api->glGetProgramiv(program, GL_LINK_STATUS, &status);
+  if (!status) {
+    const GLsizei buf_length = 2048;
+    scoped_ptr<GLchar[]> log(new GLchar[buf_length]);
+    GLsizei length = 0;
+    api->glGetProgramInfoLog(program, buf_length, &length, log.get());
+    LOG(ERROR) << "GL program link failed in: " << file << ":" << line
+               << ": " << log.get();
+  }
+}
+
+#define GLCheckProgram(api, program) \
+    GLCheckProgramHelper(api, program, __FILE__, __LINE__)
+
+static void GLCheckShaderHelper(
+    Evas_GL_API* api, GLuint shader, const char* file, int line) {
+  GLint status;
+  api->glGetShaderiv(shader, GL_COMPILE_STATUS, &status);
+  if (!status) {
+    const GLsizei buf_length = 2048;
+    scoped_ptr<GLchar[]> log(new GLchar[buf_length]);
+    GLsizei length = 0;
+    api->glGetShaderInfoLog(shader, buf_length, &length, log.get());
+    LOG(ERROR) << "GL shader compile failed in " << file << ":" << line
+               << ": " << log.get();
+  }
+}
+
+#define GLCheckShader(api, shader) \
+    GLCheckShaderHelper((api), (shader), __FILE__, __LINE__)
+
 void RenderWidgetHostViewEfl::initializeProgram() {
   evas_gl_make_current(evas_gl_, evas_gl_surface_, evas_gl_context_);
+
+  GL_CHECK_STATUS("GL Error before program initialization");
+
   const char* vertexShaderSourceProgram = vertexShaderSourceSimple;
   const char* fragmentShaderSourceProgram = fragmentShaderSourceSimple;
   GLuint vertexShader = evas_gl_api_->glCreateShader(GL_VERTEX_SHADER);
+  GL_CHECK_STATUS("vertex shader");
   GLuint fragmentShader = evas_gl_api_->glCreateShader(GL_FRAGMENT_SHADER);
+  GL_CHECK_STATUS("fragment shader");
 
-  evas_gl_api_->glShaderSource(vertexShader, 1, &vertexShaderSourceProgram, 0);
-  evas_gl_api_->glShaderSource(fragmentShader, 1, &fragmentShaderSourceProgram, 0);
-  program_id_ = evas_gl_api_->glCreateProgram();
-  evas_gl_api_->glCompileShader(vertexShader);
-  evas_gl_api_->glCompileShader(fragmentShader);
-  evas_gl_api_->glAttachShader(program_id_, vertexShader);
-  evas_gl_api_->glAttachShader(program_id_, fragmentShader);
-  evas_gl_api_->glLinkProgram(program_id_);
+  GL_CHECK(evas_gl_api_->glShaderSource(vertexShader, 1, &vertexShaderSourceProgram, 0));
+  GL_CHECK(evas_gl_api_->glShaderSource(fragmentShader, 1, &fragmentShaderSourceProgram, 0));
+  GL_CHECK(program_id_ = evas_gl_api_->glCreateProgram());
+  GL_CHECK(evas_gl_api_->glCompileShader(vertexShader));
+  GLCheckShader(evas_gl_api_, vertexShader);
+  GL_CHECK(evas_gl_api_->glCompileShader(fragmentShader));
+  GLCheckShader(evas_gl_api_, fragmentShader);
+  GL_CHECK(evas_gl_api_->glAttachShader(program_id_, vertexShader));
+  GL_CHECK(evas_gl_api_->glAttachShader(program_id_, fragmentShader));
+  GL_CHECK(evas_gl_api_->glLinkProgram(program_id_));
+  GLCheckProgram(evas_gl_api_, program_id_);
 
-  position_attrib_ = evas_gl_api_->glGetAttribLocation(program_id_, "a_position");
-  texcoord_attrib_ = evas_gl_api_->glGetAttribLocation(program_id_, "a_texCoord");
-  source_texture_location_ = evas_gl_api_->glGetUniformLocation (program_id_, "s_texture" );
+  GL_CHECK(position_attrib_ = evas_gl_api_->glGetAttribLocation(program_id_, "a_position"));
+  GL_CHECK(texcoord_attrib_ = evas_gl_api_->glGetAttribLocation(program_id_, "a_texCoord"));
+  GL_CHECK(source_texture_location_ = evas_gl_api_->glGetUniformLocation (program_id_, "s_texture" ));
 }
 
 void RenderWidgetHostViewEfl::PaintTextureToSurface(GLuint texture_id) {
@@ -182,11 +239,13 @@ void RenderWidgetHostViewEfl::PaintTextureToSurface(GLuint texture_id) {
 
   evas_gl_make_current(evas_gl_, evas_gl_surface_, evas_gl_context_);
 
+  GL_CHECK_STATUS("GL error before texture paint.");
+
   gfx::Rect bounds = GetViewBoundsInPix();
-  gl_api->glViewport(0, 0, bounds.width(), bounds.height());
-  gl_api->glClearColor(1.0, 1.0, 1.0, 1.0);
-  gl_api->glClear(GL_COLOR_BUFFER_BIT);
-  gl_api->glUseProgram(program_id_);
+  GL_CHECK(gl_api->glViewport(0, 0, bounds.width(), bounds.height()));
+  GL_CHECK(gl_api->glClearColor(1.0, 1.0, 1.0, 1.0));
+  GL_CHECK(gl_api->glClear(GL_COLOR_BUFFER_BIT));
+  GL_CHECK(gl_api->glUseProgram(program_id_));
 
   const GLfloat* vertex_attributes;
 
@@ -223,18 +282,19 @@ void RenderWidgetHostViewEfl::PaintTextureToSurface(GLuint texture_id) {
 
   const GLushort indices[] = {0, 1, 2, 0, 2, 3};
 
-  gl_api->glVertexAttribPointer(position_attrib_, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(GLfloat), vertex_attributes);
-  gl_api->glVertexAttribPointer(texcoord_attrib_, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(GLfloat), &vertex_attributes[3]);
+  GL_CHECK(gl_api->glVertexAttribPointer(position_attrib_, 3, GL_FLOAT,
+      GL_FALSE, 5 * sizeof(GLfloat), vertex_attributes));
+  GL_CHECK(gl_api->glVertexAttribPointer(texcoord_attrib_, 2, GL_FLOAT,
+      GL_FALSE, 5 * sizeof(GLfloat), &vertex_attributes[3]));
 
-  gl_api->glEnableVertexAttribArray(position_attrib_);
-  gl_api->glEnableVertexAttribArray(texcoord_attrib_);
-  gl_api->glActiveTexture(GL_TEXTURE0);
-  gl_api->glBindTexture(GL_TEXTURE_2D, texture_id);
-  gl_api->glUniform1i(source_texture_location_, 0);
-  gl_api->glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_SHORT, indices);
+  GL_CHECK(gl_api->glEnableVertexAttribArray(position_attrib_));
+  GL_CHECK(gl_api->glEnableVertexAttribArray(texcoord_attrib_));
+  GL_CHECK(gl_api->glActiveTexture(GL_TEXTURE0));
+  GL_CHECK(gl_api->glBindTexture(GL_TEXTURE_2D, texture_id));
+  GL_CHECK(gl_api->glUniform1i(source_texture_location_, 0));
+  GL_CHECK(gl_api->glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_SHORT, indices));
 
-  gl_api->glBindTexture(GL_TEXTURE_2D, 0);
-  gl_api->glFlush();
+  GL_CHECK(gl_api->glBindTexture(GL_TEXTURE_2D, 0));
   evas_gl_make_current(evas_gl_, 0, 0);
 }
 
