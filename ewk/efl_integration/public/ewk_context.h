@@ -676,12 +676,12 @@ struct Ewk_Password_Data {
 };
 
 /**
- * Clear password data
+ * Deletes whole password data from DB
  *
  * @param context context object
  *
  */
-EAPI void ewk_context_form_password_data_clear(Ewk_Context* context);
+EAPI void ewk_context_form_password_data_delete_all(Ewk_Context* context);
 
 /**
  * Deletes password data from DB for given URL
