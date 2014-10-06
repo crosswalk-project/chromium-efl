@@ -39,6 +39,7 @@ class ClipboardHelperEfl {
   void CloseClipboardWindow();
   bool IsClipboardWindowOpened();
   bool getSelectedCbhmItem(Ecore_X_Atom* pDataType);
+  void UpdateClipboardWindowState(Ecore_X_Event_Window_Property* ev);
   static void connectClipboardWindow();
 
  private:
@@ -55,6 +56,8 @@ class ClipboardHelperEfl {
 
   Ecore_Event_Handler* m_selectionClearHandler;
   Ecore_Event_Handler* m_selectionNotifyHandler;
+  Ecore_Event_Handler* property_change_handler_;
+  bool clipboard_window_opened_;
 };
 
 #endif /* CLIPBOARD_HELPER_EFL_H_ */

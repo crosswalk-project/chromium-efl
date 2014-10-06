@@ -55,6 +55,7 @@
 #include "ui/events/gestures/gesture_recognizer.h"
 #include "browser/motion/wkext_motion.h"
 #include "content/common/input_messages.h"
+#include "components/clipboard/clipboard_helper_efl.h"
 #include "common/webcursor_efl.h"
 #include <assert.h>
 #include <Ecore.h>
@@ -715,6 +716,10 @@ void RenderWidgetHostViewEfl::FocusedNodeChanged(bool is_editable_node) {
       controller->SetCaretSelectionStatus(false);
       controller->HideHandleAndContextMenu();
     }
+    if (im_context_ && im_context_->IsShow() &&
+      ClipboardHelperEfl::GetInstance()->IsClipboardWindowOpened()) {
+      ClipboardHelperEfl::GetInstance()->CloseClipboardWindow();
+    }
   }
 }
 
@@ -1134,6 +1139,9 @@ void RenderWidgetHostViewEfl::HandleFocusOut() {
 
   if (im_context_)
     im_context_->OnFocusOut();
+
+  if (ClipboardHelperEfl::GetInstance()->IsClipboardWindowOpened())
+      ClipboardHelperEfl::GetInstance()->CloseClipboardWindow();
 
   host_->SetActive(false);
   host_->LostCapture();

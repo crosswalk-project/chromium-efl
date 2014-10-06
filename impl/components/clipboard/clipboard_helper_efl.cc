@@ -80,6 +80,16 @@ struct AtomData
 AtomData atomList[ATOM_MAX];
 ClipData clipList[CLIP_TYPE_MAX];
 
+Eina_Bool propertyChangeCallback(void* data, int type, void* event) {
+  ClipboardHelperEfl *clipboardHelper = static_cast<ClipboardHelperEfl*>(data);
+  Ecore_X_Event_Window_Property *ev = (Ecore_X_Event_Window_Property*) event;
+
+  if (ev->atom == ECORE_X_ATOM_E_ILLUME_CLIPBOARD_STATE)
+    clipboardHelper->UpdateClipboardWindowState(ev);
+
+  return EINA_TRUE;
+}
+
 const char kCbhmMessageHide[] = "cbhm_hide";
 const char kCbhmMessageSetItem[] = "SET_ITEM";
 const char kCbhmMessageShow0[] = "show0";
@@ -108,6 +118,8 @@ ClipboardHelperEfl* ClipboardHelperEfl::GetInstance() {
 ClipboardHelperEfl::ClipboardHelperEfl() {
   m_selectionClearHandler = 0;
   m_selectionNotifyHandler = 0;
+  property_change_handler_ = 0;
+  clipboard_window_opened_ = false;
 }
 
 void ClipboardHelperEfl::SetData(const std::string& data, ClipboardDataType type) {
@@ -596,6 +608,12 @@ void ClipboardHelperEfl::clearClipboardHandler() {
     ecore_event_handler_del(m_selectionNotifyHandler);
     m_selectionNotifyHandler = 0;
   }
+
+  if (property_change_handler_) {
+    ecore_event_handler_del(property_change_handler_);
+    property_change_handler_ = 0;
+  }
+  clipboard_window_opened_ = false;
 }
 
 bool ClipboardHelperEfl::getSelectedCbhmItem(Ecore_X_Atom* pDataType) {
@@ -620,6 +638,8 @@ bool ClipboardHelperEfl::getSelectedCbhmItem(Ecore_X_Atom* pDataType) {
 void ClipboardHelperEfl::OpenClipboardWindow(EWebView* view, bool richly_editable) {
   clearClipboardHandler();
   initializeAtomList();
+  property_change_handler_ = ecore_event_handler_add(
+      ECORE_X_EVENT_WINDOW_PROPERTY, propertyChangeCallback, this);
   m_selectionClearHandler = ecore_event_handler_add(ECORE_X_EVENT_SELECTION_CLEAR, clearClip, view);
   m_selectionNotifyHandler = ecore_event_handler_add(ECORE_X_EVENT_SELECTION_NOTIFY, notifyClip, view);
 
@@ -636,6 +656,19 @@ void ClipboardHelperEfl::connectClipboardWindow() {
   ecore_x_selection_secondary_set(ecore_x_window_focus_get(), "",1);
 }
 
+bool ClipboardHelperEfl::IsClipboardWindowOpened() {
+  return clipboard_window_opened_;
+}
+
 void ClipboardHelperEfl::CloseClipboardWindow() {
   SendCbhmMessage(kCbhmMessageHide);
+}
+
+void ClipboardHelperEfl::UpdateClipboardWindowState(Ecore_X_Event_Window_Property* ev) {
+  Ecore_X_Illume_Clipboard_State state = ecore_x_e_illume_clipboard_state_get(ev->win);
+
+  if (state == ECORE_X_ILLUME_CLIPBOARD_STATE_OFF)
+    clearClipboardHandler();
+  else if (state == ECORE_X_ILLUME_CLIPBOARD_STATE_ON)
+    clipboard_window_opened_ = true;
 }
