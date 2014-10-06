@@ -93,7 +93,7 @@
         'utc_blink_ewk_context_form_autofill_profile_utils.cpp',
         'utc_blink_ewk_context_form_autofill_profile_utils.h',
         'utc_blink_ewk_context_form_candidate_data_delete_all_func.cpp',
-        'utc_blink_ewk_context_form_password_data_clear_func.cpp',
+        'utc_blink_ewk_context_form_password_data_delete_all_func.cpp',
         'utc_blink_ewk_context_icon_database_icon_object_add_func.cpp',
         'utc_blink_ewk_context_icon_database_path_set_func.cpp',
         'utc_blink_ewk_context_local_file_system_all_delete_func.cpp',

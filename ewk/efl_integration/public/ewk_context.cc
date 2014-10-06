@@ -356,7 +356,7 @@ void ewk_context_memory_saving_mode_set(Ewk_Context* context, Eina_Bool mode)
   return;
 }
 
-void ewk_context_form_password_data_clear(Ewk_Context* context)
+void ewk_context_form_password_data_delete_all(Ewk_Context* context)
 {
   EINA_SAFETY_ON_NULL_RETURN(context);
   context->ClearPasswordData();
