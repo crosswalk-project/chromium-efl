@@ -7,7 +7,7 @@
 
 #include <Ecore.h>
 #include <Ecore_Evas.h>
-#ifndef TIZEN_LEGACY_V_2_2_1
+#if !defined(TIZEN_LEGACY_V_2_2_1)
 #include <sensor/sensor.h>
 #else
 #include <sensors.h>
@@ -31,7 +31,11 @@ class MotionUI {
 
  private:
   static Eina_Bool initializeSensor(void*);
+#if !defined(TIZEN_LEGACY_V_2_2_1)
+  static void tiltCallback(sensor_h sensor, sensor_event_s *event, void*);
+#else
   static void tiltCallback(unsigned long long, int, int, void*);
+#endif
   MotionUI();
 
   void startSensor();

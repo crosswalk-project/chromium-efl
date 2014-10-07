@@ -19,6 +19,63 @@ static void item_selected_cb(void *data, Evas_Object *obj, void *event_info) {
 
   controller->closePopup();
 
+#if !defined(TIZEN_LEGACY_V_2_2_1)
+  app_control_h svcHandle = 0;
+  if (app_control_create(&svcHandle) < 0 || !svcHandle) {
+    LOG(ERROR) << __PRETTY_FUNCTION__ << " : " << "could not create service.";
+    return;
+  }
+
+  if (controller->popupContentType() == PopupControllerEfl::PHONE) {
+    if (info == "Call") {
+      app_control_set_operation(svcHandle, app_control_OPERATION_DIAL);
+      app_control_set_uri(svcHandle, controller->fullContent().c_str());
+    }
+    else if (info == "Send message") {
+      app_control_set_operation(svcHandle, app_control_OPERATION_COMPOSE);
+      app_control_add_extra_data(svcHandle,
+          "http://tizen.org/appcontrol/data/messagetype", "sms");
+      app_control_add_extra_data(svcHandle,
+          app_control_DATA_TO, controller->content().c_str());
+      app_control_add_extra_data(svcHandle,
+          "http://tizen.org/appcontrol/data/return_result", "false");
+      app_control_set_app_id(svcHandle, "msg-composer-efl");
+    } else if (info == "Add to contacts") {
+      app_control_set_operation(svcHandle,
+          "http://tizen.org/appcontrol/operation/social/add");
+      app_control_add_extra_data(svcHandle,
+          "http://tizen.org/appcontrol/data/social/item_type", "contact");
+      app_control_add_extra_data(svcHandle,
+          "http://tizen.org/appcontrol/data/social/phone",
+          controller->content().c_str());
+      app_control_set_app_id(svcHandle, "contacts-details-efl");
+    }
+  } else if (controller->popupContentType() == PopupControllerEfl::EMAIL) {
+    if (info == "Send email") {
+      app_control_set_operation(svcHandle, app_control_OPERATION_COMPOSE);
+      app_control_add_extra_data(svcHandle,
+          app_control_DATA_TO, controller->content().c_str());
+      app_control_set_app_id(svcHandle, "email-composer-efl");
+    } else if (info == "Add to contacts") {
+      app_control_set_operation(svcHandle,
+          "http://tizen.org/appcontrol/operation/social/add");
+      app_control_add_extra_data(svcHandle,
+          "http://tizen.org/appcontrol/data/social/item_type", "contact");
+      app_control_add_extra_data(svcHandle,
+          "http://tizen.org/appcontrol/data/social/email",
+          controller->content().c_str());
+      app_control_set_app_id(svcHandle, "contacts-details-efl");
+    }
+  }
+
+  int ret = app_control_send_launch_request(svcHandle, 0, 0);
+  if (ret != app_control_ERROR_NONE) {
+    LOG(ERROR) << __PRETTY_FUNCTION__ << " : " << "could not launch application.";
+    app_control_destroy(svcHandle);
+    return;
+  }
+  app_control_destroy(svcHandle);
+#else
   service_h svcHandle = 0;
   if (service_create(&svcHandle) < 0 || !svcHandle) {
     LOG(ERROR) << __PRETTY_FUNCTION__ << " : " << "could not create service.";
@@ -61,6 +118,7 @@ static void item_selected_cb(void *data, Evas_Object *obj, void *event_info) {
     return;
   }
   service_destroy(svcHandle);
+#endif
 }
 
 static void copy_cb(void *data, Evas_Object *obj, void *event_info) {

@@ -2,9 +2,6 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-// FIXME: need to adapt this code to sensor API changes in Tizen 2.3.
-#if !defined(EWK_BRINGUP)
-
 #include "MotionUI.h"
 #include "wkext_motion.h"
 #include "base/logging.h"
@@ -38,24 +35,43 @@ MotionUI::~MotionUI() {
   stopSensor();
 }
 
+#if !defined(TIZEN_LEGACY_V_2_2_1)
+static sensor_listener_h listener_;
+#endif
+
 Eina_Bool MotionUI::initializeSensor(void*) {
   MotionUI& motionUI(MotionUI::motionUI());
 
+#if !defined(TIZEN_LEGACY_V_2_2_1)
+  sensor_get_default_sensor(SENSOR_GRAVITY, &motionUI.m_sensorHandle);
+
+  if (sensor_create_listener(motionUI.m_sensorHandle, &listener_) == SENSOR_ERROR_NONE) {
+    if (sensor_listener_set_event_cb(listener_, 100, tiltCallback, 0) == SENSOR_ERROR_NONE) {
+      int retSensorStart = sensor_listener_start(listener_);
+#else
   if (sensor_create(&motionUI.m_sensorHandle) == SENSOR_ERROR_NONE) {
     if (sensor_motion_tilt_set_cb(motionUI.m_sensorHandle, tiltCallback, 0) == SENSOR_ERROR_NONE) {
       int retSensorStart = sensor_start(motionUI.m_sensorHandle, SENSOR_MOTION_TILT);
+#endif
       if (retSensorStart == SENSOR_ERROR_NONE || retSensorStart == SENSOR_ERROR_NOT_SUPPORTED) {
           motionUI.m_sensorTimer = 0;
           return ECORE_CALLBACK_CANCEL;
       }
     }
   } else {
+#if !defined(TIZEN_LEGACY_V_2_2_1)
     motionUI.m_sensorHandle = 0;
+#endif
     return ECORE_CALLBACK_RENEW;
   }
 
+#if !defined(TIZEN_LEGACY_V_2_2_1)
+  sensor_listener_stop(listener_);
+  sensor_destroy_listener(listener_);
+#else
   sensor_destroy(motionUI.m_sensorHandle);
   motionUI.m_sensorHandle = 0;
+#endif
 
   return ECORE_CALLBACK_RENEW;
 }
@@ -74,12 +90,20 @@ void MotionUI::stopSensor() {
     m_sensorTimer = 0;
   }
 
+#if !defined(TIZEN_LEGACY_V_2_2_1)
+  if (!listener_)
+#else
   if (!m_sensorHandle)
+#endif
     return;
 
+#if !defined(TIZEN_LEGACY_V_2_2_1)
+  sensor_destroy_listener(listener_);
+#else
   sensor_destroy(m_sensorHandle);
 
   m_sensorHandle = 0;
+#endif
 }
 
 void MotionUI::setTiltToZoom(Evas_Object* view, bool enable, unsigned int sensitivity) {
@@ -93,15 +117,28 @@ void MotionUI::setTiltToZoom(Evas_Object* view, bool enable, unsigned int sensit
     eina_hash_del(m_tiltViewHash, &view, NULL);
 
     if (!eina_hash_population(m_tiltViewHash))
+#if !defined(TIZEN_LEGACY_V_2_2_1)
+      sensor_listener_unset_event_cb(listener_);
+#else
       sensor_motion_tilt_unset_cb(m_sensorHandle);
+#endif
   }
 }
 
+#if !defined(TIZEN_LEGACY_V_2_2_1)
+void MotionUI::tiltCallback(sensor_h sensor, sensor_event_s *event, void*) {
+#else
 void MotionUI::tiltCallback(unsigned long long, int x, int y, void*) {
+#endif
   MotionUI& motionUI(MotionUI::motionUI());
 
   if (!motionUI.m_ewkView)
     return;
+
+#if !defined(TIZEN_LEGACY_V_2_2_1)
+  int x = event->values[0];
+  int y = event->values[1];
+#endif
 
   Ecore_Evas* ee = ecore_evas_ecore_evas_get(evas_object_evas_get(motionUI.m_ewkView));
   int angle;
@@ -148,7 +185,11 @@ void MotionUI::initializeTiltToZoom(Evas_Object* view, const Evas_Coord_Point* p
   m_isTiltToZoomStarted = false;
   m_tiltAngle = 0;
 
+#if !defined(TIZEN_LEGACY_V_2_2_1)
+  if (sensor_listener_set_event_cb(listener_, 100, tiltCallback, 0))
+#else
   if (sensor_motion_tilt_set_cb(m_sensorHandle, tiltCallback, 0))
+#endif
     startSensor();
 }
 
@@ -156,7 +197,11 @@ void MotionUI::stopTiltToZoom() {
   if (!m_ewkView)
     return;
 
+#if !defined(TIZEN_LEGACY_V_2_2_1)
+  sensor_listener_unset_event_cb(listener_);
+#else
   sensor_motion_tilt_unset_cb(m_sensorHandle);
+#endif
 
   stopSensor();
   m_ewkView = 0;
@@ -224,5 +269,3 @@ double MotionUI::syncScale(double scale, bool isTiltMode) {
 
   return m_syncScale;
 }
-
-#endif // EWK_BRINGUP

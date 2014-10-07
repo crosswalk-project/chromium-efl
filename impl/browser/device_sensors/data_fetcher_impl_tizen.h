@@ -5,7 +5,7 @@
 #ifndef DATA_FETCHER_IMPL_TIZEN_H_
 #define DATA_FETCHER_IMPL_TIZEN_H_
 
-#ifndef TIZEN_LEGACY_V_2_2_1
+#if !defined(TIZEN_LEGACY_V_2_2_1)
 #include <sensor/sensor.h>
 #else
 #include <sensors.h>
@@ -39,12 +39,17 @@ class DataFetcherImplTizen {
  protected:
   DataFetcherImplTizen();
   virtual ~DataFetcherImplTizen();
+#if !defined(TIZEN_LEGACY_V_2_2_1)
+  static void onOrientationChanged(sensor_h sensor, sensor_event_s *event, void* userData);
+  static void onAccelerationChanged(sensor_h sensor, sensor_event_s *event, void* userData);
+#else
   static void onOrientationChanged(unsigned long long timestamp,
                                    sensor_data_accuracy_e, float azimuth,
                                    float pitch, float roll, void* userData);
   static void onAccelerationChanged(unsigned long long timestamp,
                                     sensor_data_accuracy_e, float x, float y,
                                     float z, void* userData);
+#endif
 
  private:
   friend struct DefaultSingletonTraits<DataFetcherImplTizen>;
@@ -61,7 +66,9 @@ class DataFetcherImplTizen {
   base::Lock motion_buffer_lock_;
   base::Lock orientation_buffer_lock_;
 
+#if defined(TIZEN_LEGACY_V_2_2_1)
   sensor_h handle_;
+#endif
 
   DISALLOW_COPY_AND_ASSIGN(DataFetcherImplTizen);
 };
