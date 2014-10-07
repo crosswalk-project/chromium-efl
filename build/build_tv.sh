@@ -7,11 +7,17 @@ SCRIPTDIR=$(cd $(dirname $0); pwd -P)
 
 ${SCRIPTDIR}/apply_patches.sh
 
+PROFILE_NAME=$(echo "$@" | grep -Po "(?<=\-P\s)[^\s]*")
+
+if [ "$PROFILE_NAME" == "" ]; then
+  PROFILE_NAME=tztv_v2.2.1_prehawk
+  PROFILE_FLAG="-P $PROFILE_NAME"
+fi
+
 TIZEN_VERSION="chromium_efl_tizen_version 2.2.1"
 
-if [ ! -f "$HOME/.gbs.conf" ]; then
-    CONF_FLAG="--conf ${SCRIPTDIR}/gbs.conf"
-    PROFILE_FLAG="-P tizentv_product"
+if [ "$USE_GLOBAL_GBS_CONF" == "" ]; then
+  CONF_FLAG="--conf ${SCRIPTDIR}/gbs.conf"
 fi
 
 gbs $CONF_FLAG build $PROFILE_FLAG -A armv7l --incremental \
