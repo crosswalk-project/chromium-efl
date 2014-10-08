@@ -148,9 +148,7 @@ static const char* vertexShaderSourceSimple =
   "}                            \n";
 
 static const char* fragmentShaderSourceSimple =
-#if defined(OS_TIZEN)
   "precision mediump float;                            \n"
-#endif
   "varying vec2 v_texCoord;                            \n"
   "uniform sampler2D s_texture;                        \n"
   "void main() {                                       \n"

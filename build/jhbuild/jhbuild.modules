@@ -55,7 +55,7 @@
   </autotools>
 
   <autotools id="evas" autogen-sh="configure"
-             autogenargs="--enable-gl-xlib --disable-wayland-shm --disable-wayland-egl">
+             autogenargs="--enable-gl-xlib --enable-fb --enable-gl-flavor-gles --enable-gles-variety-sgx --disable-wayland-shm --disable-wayland-egl">
     <branch module="releases/evas-1.7.5.tar.bz2" version="1.7.5"
             repo="download.enlightenment.org"
             hash="sha256:70b350a970b2086787622845896f3e54de278fe698b8069796fd752e70427374"

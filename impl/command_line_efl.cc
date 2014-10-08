@@ -43,11 +43,13 @@ content::MainFunctionParams CommandLineEfl::GetDefaultPortParams() {
   p_command_line->AppendSwitch(switches::kUseMobileUserAgent);
   p_command_line->AppendSwitch(switches::kEnableViewportMeta);
 
+  p_command_line->AppendSwitchASCII(switches::kUseGL, gfx::kGLImplementationEGLName);
+  p_command_line->AppendSwitch(switches::kDisableDelegatedRenderer);
+
 #if defined(OS_TIZEN)
   p_command_line->AppendSwitch(switches::kEnableOverscrollNotifications);
   p_command_line->AppendSwitch(switches::kTouchEvents);
   p_command_line->AppendSwitch(switches::kEnablePinch);
-  p_command_line->AppendSwitchASCII(switches::kUseGL, gfx::kGLImplementationEGLName);
 #if !defined(EWK_BRINGUP)
   p_command_line->AppendSwitch(switches::kEnableGestureTapHighlight);
 #endif
@@ -57,30 +59,20 @@ content::MainFunctionParams CommandLineEfl::GetDefaultPortParams() {
   // FIXME(Kapil) Will be removed after permission handling implementation.
   p_command_line->AppendSwitch(switches::kDisableWebSecurity);
 #else
-  p_command_line->AppendSwitchASCII(switches::kUseGL, gfx::kGLImplementationDesktopName);
-  p_command_line->AppendSwitch(switches::kDisableDelegatedRenderer);
+  p_command_line->AppendSwitch(switches::kIgnoreGpuBlacklist);
 #endif
 
-  p_command_line->AppendSwitch(switches::kDisableDelegatedRenderer);
-
-  //if we use software path we dont need to have next switches
-#if defined(OS_TIZEN)
-#if !defined(EWK_BRINGUP)
-  if (!p_command_line->HasSwitch(switches::kUseSWRenderingPath))
-#endif
-#endif
-  {
 #warning "[M37] Investigae removed command line switches, are they still needed, do they have a replacement?"
-    //p_command_line->AppendSwitch(switches::kForceCompositingMode);
   // [M37] Note: The commit "Temporarily disable zero copy as it causes browser crash during regression"
   // is to deprecate kEnableMapImage option.
   // But it was already deprecated during fixing M37 build as no command line option with such name (see above comment)
   // TODO: remove this commit if it turn out the option is unnecessary
   //Disabling temporarily, as it causes browser crash ID:335 in regression
-    //p_command_line->AppendSwitch(cc::switches::kEnableMapImage);
-    p_command_line->AppendSwitch(switches::kEnableThreadedCompositing);
-    p_command_line->AppendSwitch(switches::kIgnoreGpuBlacklist);
-  }
+  //p_command_line->AppendSwitch(cc::switches::kEnableMapImage);
+
+  // Threaded compositing breaks touch events. Seems to be a linux specific issue
+  // (see: http://code.google.com/p/chromium/issues/detail?id=271791)
+  //p_command_line->AppendSwitch(switches::kEnableThreadedCompositing);
 
 #warning "[M37] Investigae removed command line switches, are they still needed, do they have a replacement?"
   //p_command_line->AppendSwitch(switches::kAllowWebUICompositing);
