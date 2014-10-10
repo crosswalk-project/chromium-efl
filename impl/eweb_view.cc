@@ -1881,19 +1881,21 @@ void EWebView::UrlRequestSet(const char* url, std::string method, Eina_Hash* hea
       GURL(url), net::DEFAULT_PRIORITY, NULL, NULL));
   request->set_method(method);
 
+  net::HttpRequestHeaders extra_headers;
   if (headers) {
-    net::HttpRequestHeaders* header;
     Eina_Iterator* it = eina_hash_iterator_tuple_new(headers);
     void* data;
     while (eina_iterator_next(it, &data)) {
       Eina_Hash_Tuple* t = static_cast<Eina_Hash_Tuple*>(data);
       const char* name = static_cast<const char*>(t->key);
       const char* value = static_cast<const char*>(t->data);
-      header->SetHeader(base::StringPiece(name), base::StringPiece(value));
-      request->SetExtraRequestHeaders(*header);
+      extra_headers.SetHeader(base::StringPiece(name), base::StringPiece(value));
+
     }
     eina_iterator_free(it);
   }
+
+  request->SetExtraRequestHeaders(extra_headers);
 
   if (body) {
     std::string str = body;
