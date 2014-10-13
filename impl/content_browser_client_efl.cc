@@ -23,6 +23,7 @@
 #include "browser_main_parts_efl.h"
 #include "browser_context_efl.h"
 #include "web_contents_delegate_efl.h"
+#include "devtools_manager_delegate_efl.h"
 #include "browser/web_contents/web_contents_view_efl.h"
 #include "browser/geolocation/access_token_store_efl.h"
 #include "browser/renderer_host/render_message_filter_efl.h"
@@ -261,6 +262,10 @@ void ContentBrowserClientEfl::RenderProcessWillLaunch(
   host->AddFilter(new RenderMessageFilterEfl(host->GetID()));
   host->AddFilter(new VibrationMessageFilter());
   host->AddFilter(new editing::EditorClientObserver(host->GetID()));
+}
+
+content::DevToolsManagerDelegate* ContentBrowserClientEfl::GetDevToolsManagerDelegate() {
+  return new DevToolsManagerDelegateEfl();
 }
 
 }

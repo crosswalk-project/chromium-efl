@@ -10,7 +10,7 @@
 Name: org.tizen.chromium-efl
 Summary: Chromium EFL
 # Set by by scripts/update-chromium-version.sh
-%define ChromiumVersion 39.2166.0
+%define ChromiumVersion 39.2171.0
 %define Week 34
 Version: %{ChromiumVersion}.%{Week}
 Release: 1

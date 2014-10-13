@@ -102,6 +102,8 @@ class ContentBrowserClientEfl: public ContentBrowserClient {
 
   virtual void RenderProcessWillLaunch(content::RenderProcessHost* host) OVERRIDE;
 
+  content::DevToolsManagerDelegate* GetDevToolsManagerDelegate() OVERRIDE;
+
  private:
   scoped_ptr<ResourceDispatcherHostDelegateEfl> resource_disp_host_del_efl_;
   EWebContext* web_context_;

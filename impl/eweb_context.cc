@@ -20,7 +20,6 @@
 #include "eweb_context.h"
 
 #include "base/synchronization/waitable_event.h"
-#include "content/common/plugin_list.h"
 #include "content/public/browser/appcache_service.h"
 #include "content/public/browser/browser_context.h"
 #include "content/public/browser/browser_thread.h"
@@ -36,6 +35,10 @@
 #include "storage/browser/database/database_quota_client.h"
 #include "storage/browser/fileapi/file_system_quota_client.h"
 #include "storage/browser/quota/quota_manager.h"
+
+#if defined(ENABLE_PLUGINS)
+#include "content/common/plugin_list.h"
+#endif
 
 #include "browser_context_efl.h"
 #include "ewk_global_data.h"
@@ -330,7 +333,9 @@ const HTTPCustomHeadersEflMap& EWebContext::GetHTTPCustomHeadersEflMap() const {
 }
 
 void EWebContext::AddExtraPluginDir(const char *path) {
+#if defined(ENABLE_PLUGINS)
   content::PluginList::Singleton()->AddExtraPluginDir(base::FilePath(path));
+#endif
 }
 
 void EWebContext::SetCertificate(const char* certificate_file) {

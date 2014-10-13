@@ -685,6 +685,10 @@ void RenderWidgetHostViewEfl::DidStopFlinging() {
     GetSelectionController()->SetScrollStatus(false);
 }
 
+void RenderWidgetHostViewEfl::ShowDisambiguationPopup(const gfx::Rect& rect_pixels, const SkBitmap& zoomed_bitmap) {
+  NOTIMPLEMENTED();
+}
+
 bool RenderWidgetHostViewEfl::CanDispatchToConsumer(ui::GestureConsumer* consumer) {
   return this == consumer;
 }

@@ -150,6 +150,11 @@ class RenderWidgetHostViewEfl
   virtual void ProcessAckedTouchEvent(const TouchEventWithLatencyInfo&, InputEventAckState) OVERRIDE;
   virtual void DidStopFlinging() OVERRIDE;
 
+#if defined(TOOLKIT_VIEWS) || defined(USE_AURA)
+  virtual void ShowDisambiguationPopup(const gfx::Rect& rect_pixels,
+                                       const SkBitmap& zoomed_bitmap) OVERRIDE;
+#endif
+
   // ui::GestureEventHelper implementation.
   virtual bool CanDispatchToConsumer(ui::GestureConsumer* consumer) OVERRIDE;
   virtual void DispatchCancelTouchEvent(ui::TouchEvent* event) OVERRIDE;

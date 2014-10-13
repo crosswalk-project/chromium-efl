@@ -10,10 +10,6 @@
 #include "content/public/browser/devtools_agent_host.h"
 #include "content/public/browser/devtools_http_handler.h"
 #include "content/public/browser/devtools_target.h"
-#include "content/public/browser/favicon_status.h"
-#include "content/public/browser/navigation_entry.h"
-#include "content/public/browser/render_view_host.h"
-#include "content/public/browser/web_contents.h"
 #include "content/public/common/content_switches.h"
 #include "content/public/common/url_constants.h"
 #include "content/public/common/user_agent.h"
@@ -27,15 +23,7 @@
 #include <time.h>
 #include <unistd.h>
 
-using content::DevToolsAgentHost;
-using content::RenderViewHost;
-using content::WebContents;
-
 namespace {
-
-const char kTargetTypePage[] = "page";
-const char kTargetTypeServiceWorker[] = "service_worker";
-const char kTargetTypeOther[] = "other";
 
 // Copy of internal class implementation from
 // content/shell/browser/shell_devtools_delegate.cc
@@ -82,79 +70,6 @@ CreateSocketFactory(int& port) {
       new TCPServerSocketFactory("0.0.0.0", port, 1));
 }
 
-class Target : public content::DevToolsTarget {
- public:
-
-  explicit Target(scoped_refptr<DevToolsAgentHost> agent_host);
-
-  virtual std::string GetId() const OVERRIDE { return agent_host_->GetId(); }
-  virtual std::string GetParentId() const OVERRIDE { return std::string(); }
-  virtual std::string GetType() const OVERRIDE {
-    switch (agent_host_->GetType()) {
-      case DevToolsAgentHost::TYPE_WEB_CONTENTS:
-        return kTargetTypePage;
-      case DevToolsAgentHost::TYPE_SERVICE_WORKER:
-        return kTargetTypeServiceWorker;
-      default:
-        break;
-    }
-    return kTargetTypeOther;
-  }
-  virtual std::string GetTitle() const OVERRIDE {
-    return agent_host_->GetTitle();
-  }
-  virtual std::string GetDescription() const OVERRIDE { return std::string(); }
-  virtual GURL GetURL() const OVERRIDE { return agent_host_->GetURL(); }
-  virtual GURL GetFaviconURL() const OVERRIDE { return favicon_url_; }
-  virtual base::TimeTicks GetLastActivityTime() const OVERRIDE {
-    return last_activity_time_;
-  }
-  virtual bool IsAttached() const OVERRIDE {
-    return agent_host_->IsAttached();
-  }
-  virtual scoped_refptr<DevToolsAgentHost> GetAgentHost() const OVERRIDE {
-    return agent_host_;
-  }
-  virtual bool Activate() const OVERRIDE;
-  virtual bool Close() const OVERRIDE;
-
- private:
-
-  scoped_refptr<DevToolsAgentHost> agent_host_;
-  std::string id_;
-  std::string title_;
-  GURL url_;
-  GURL favicon_url_;
-  base::TimeTicks last_activity_time_;
-};
-
-Target::Target(scoped_refptr<content::DevToolsAgentHost> agent_host)
-    : agent_host_(agent_host) {
-  if (WebContents* web_contents = agent_host_->GetWebContents()) {
-    last_activity_time_ = web_contents->GetLastActiveTime();
-    content::NavigationController& controller = web_contents->GetController();
-    content::NavigationEntry* entry = controller.GetActiveEntry();
-    if (entry != NULL && entry->GetURL().is_valid())
-      favicon_url_ = entry->GetFavicon().url;
-  }
-}
-
-bool Target::Activate() const {
-  WebContents* web_contents = agent_host_->GetWebContents();
-  if (!web_contents)
-    return false;
-  web_contents->GetDelegate()->ActivateContents(web_contents);
-  return true;
-}
-
-bool Target::Close() const {
-  WebContents* web_contents = agent_host_->GetWebContents();
-  if (!web_contents)
-    return false;
-  web_contents->GetRenderViewHost()->ClosePage();
-  return true;
-}
-
 }  // namespace
 
 namespace content {
@@ -186,26 +101,6 @@ bool DevToolsDelegateEfl::BundlesFrontendResources() {
 
 base::FilePath DevToolsDelegateEfl::GetDebugFrontendDir() {
   return base::FilePath();
-}
-
-std::string DevToolsDelegateEfl::GetPageThumbnailData(const GURL& url) {
-  return std::string();
-}
-
-scoped_ptr<DevToolsTarget> DevToolsDelegateEfl::CreateNewTarget(const GURL& url) {
-  return scoped_ptr<DevToolsTarget>();
-}
-
-void DevToolsDelegateEfl::EnumerateTargets(TargetCallback callback) {
-  TargetList targets;
-  DevToolsAgentHost::List agents = DevToolsAgentHost::GetOrCreateAll();
-  for (DevToolsAgentHost::List::iterator it = agents.begin();
-      it != agents.end();
-      ++it) {
-
-    targets.push_back(new Target(*it));
-  }
-  callback.Run(targets);
 }
 
 scoped_ptr<net::StreamListenSocket> DevToolsDelegateEfl::CreateSocketForTethering(
