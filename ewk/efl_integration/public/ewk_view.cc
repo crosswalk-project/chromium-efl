@@ -67,16 +67,11 @@ Evas_Object* ewk_view_add_with_session_data(Evas* canvas, const char* data, unsi
 {
   EINA_SAFETY_ON_NULL_RETURN_VAL(canvas, NULL);
 
-  if (!length)
-    return NULL;
-
-  EINA_SAFETY_ON_NULL_RETURN_VAL(data, NULL);
-
   Evas_Object* ret = ewk_view_add(canvas);
 
   WebView *webView = GetWebViewFromEvasObject(ret);
 
-  if (!webView)
+  if (!webView || !data || !length)
     return ret;
 
   if (webView->RestoreFromSessionData(data, length))
