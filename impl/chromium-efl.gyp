@@ -230,6 +230,8 @@
       'cookie_manager.h',
       'devtools_delegate_efl.cc',
       'devtools_delegate_efl.h',
+      'devtools_manager_delegate_efl.cc',
+      'devtools_manager_delegate_efl.h',
       'eweb_context.cc',
       'eweb_context.h',
       'eweb_view.cc',
