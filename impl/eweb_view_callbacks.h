@@ -126,6 +126,12 @@ enum CallbackType {
   WrtPluginsMessage,
   IconReceived,
   FormSubmit,
+  OverflowScrollOff,
+  OverflowScrollOn,
+  TouchmoveHandled,
+  WebloginCheckboxClicked,
+  WebloginCheckboxResume,
+  WebloginReady,
 #if defined(OS_TIZEN_TV)
   NewWindowNavigationPolicyDecision,
 #endif // OS_TIZEN_TV
@@ -284,6 +290,12 @@ DECLARE_EWK_VIEW_CALLBACK(WebProcessCrashed, "webprocess,crashed", bool*);
 DECLARE_EWK_VIEW_CALLBACK(ConsoleMessage, "console,message", _Ewk_Console_Message*);
 DECLARE_EWK_VIEW_CALLBACK(WrtPluginsMessage, "wrt,message", tizen_webview::WrtIpcMessageData*);
 DECLARE_EWK_VIEW_CALLBACK(IconReceived, "icon,received", void);
+DECLARE_EWK_VIEW_CALLBACK(OverflowScrollOff, "overflow,scroll,off", void);
+DECLARE_EWK_VIEW_CALLBACK(OverflowScrollOn, "overflow,scroll,on", void);
+DECLARE_EWK_VIEW_CALLBACK(TouchmoveHandled, "touchmove,handled", bool);
+DECLARE_EWK_VIEW_CALLBACK(WebloginCheckboxClicked, "weblogin,checkbox,clicked", void);
+DECLARE_EWK_VIEW_CALLBACK(WebloginCheckboxResume, "weblogin,checkbox,resume", void);
+DECLARE_EWK_VIEW_CALLBACK(WebloginReady, "weblogin,ready" , void);
 #if defined(OS_TIZEN_TV)
 DECLARE_EWK_VIEW_CALLBACK(NewWindowNavigationPolicyDecision, "policy,decision,new,window", Ewk_Navigation_Policy_Decision*);
 #endif // OS_TIZEN_TV
