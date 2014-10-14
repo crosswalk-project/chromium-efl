@@ -232,7 +232,6 @@
       'gfx/x11_event_source_efl.cc',
       'gfx/x11_types_override.cc',
       'gl/gl_context_egl_override.cc',
-      'gl/gl_context_glx_override.cc',
       'gl/gl_current_context_efl.cc',
       'gl/gl_shared_context_efl.cc',
       'gl/gl_shared_context_efl.h',
