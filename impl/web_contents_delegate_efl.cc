@@ -43,6 +43,7 @@ using autofill::AutofillManagerDelegateEfl;
 
 using base::string16;
 using namespace tizen_webview;
+using namespace ui;
 
 namespace content {
 
@@ -81,6 +82,42 @@ WebContentsDelegateEfl::~WebContentsDelegateEfl() {
   // destructor of web contents uses dialog_manager_
 
   delete dialog_manager_;
+}
+
+WebContents* WebContentsDelegateEfl::OpenURLFromTab(
+  WebContents* source,
+  const content::OpenURLParams& params) {
+
+  const GURL& url = params.url;
+  WindowOpenDisposition disposition = params.disposition;
+
+  if (!source || (disposition != CURRENT_TAB &&
+                  disposition != NEW_FOREGROUND_TAB &&
+                  disposition != NEW_BACKGROUND_TAB &&
+                  disposition != OFF_THE_RECORD)) {
+    NOTIMPLEMENTED();
+    return NULL;
+  }
+
+  if (disposition == NEW_FOREGROUND_TAB ||
+      disposition == NEW_BACKGROUND_TAB ||
+      disposition == OFF_THE_RECORD) {
+    Evas_Object* new_object = NULL;
+    web_view_->SmartCallback<EWebViewCallbacks::CreateNewWindow>().call(&new_object);
+
+    if (!new_object)
+      return NULL;
+
+    EWebView* wv = EWebView::FromEvasObject(new_object);
+    DCHECK(wv);
+    wv->SetURL(url.spec().c_str());
+    return NULL;
+  }
+
+  ui::PageTransition transition(ui::PageTransitionFromInt(params.transition));
+  source->GetController().LoadURL(url, params.referrer, transition,
+                                  std::string());
+  return source;
 }
 
 void WebContentsDelegateEfl::NavigationStateChanged(

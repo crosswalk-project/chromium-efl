@@ -39,6 +39,8 @@
 // TODO: remove this header dependency
 #include "selection_controller_efl.h"
 
+#include "content/browser/frame_host/navigator.h"
+
 using tizen_webview::WebView;
 using tizen_webview::SelectionController;
 
@@ -384,11 +386,15 @@ bool ContextMenuControllerEfl::TriggerDownloadCb(const GURL url) {
 }
 
 void ContextMenuControllerEfl::OpenInNewTab(const GURL url) {
-  WindowOpenDisposition disposition = NEW_FOREGROUND_TAB;
   if (!url.is_valid())
     return;
   NavigationController::LoadURLParams params(url);
-  web_contents_.GetController().LoadURLWithParams(params);
+  const GURL referrer = web_contents_.GetVisibleURL();
+  WebContentsImpl& wc = static_cast<WebContentsImpl&>(web_contents_);
+  wc.GetFrameTree()->root()->navigator()->RequestOpenURL(
+      wc.GetFrameTree()->root()->current_frame_host(), referrer,
+      Referrer(), NEW_FOREGROUND_TAB,
+      false, false);
 }
 
 void ContextMenuControllerEfl::MenuItemSelected(ContextMenuItemEfl *menu_item) {

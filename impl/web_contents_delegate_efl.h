@@ -38,6 +38,8 @@ class WebContentsDelegateEfl
   WebContentsDelegateEfl(EWebView*);
   ~WebContentsDelegateEfl();
 
+  virtual WebContents* OpenURLFromTab(WebContents* source,
+      const content::OpenURLParams& params) OVERRIDE;
   virtual void NavigationStateChanged(const WebContents* source,
                                       InvalidateTypes changed_flags) OVERRIDE;
 
