@@ -139,6 +139,15 @@
               ],
             },
           }],
+          # FIXME_youngsoo: This should be removed when TV upgrades
+          # to Tizen 2.3 or higher.
+          ['chromium_efl_tizen_version=="2.2.1"', {
+            'direct_dependent_settings': {
+              'include_dirs': [
+                '/usr/include/sensor',
+              ]
+            }
+          }],
         ],
       },
       ],
