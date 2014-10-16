@@ -103,7 +103,10 @@ IPC_STRUCT_TRAITS_BEGIN(_Ewk_Hit_Test)
   IPC_STRUCT_TRAITS_MEMBER(isEditable)
   IPC_STRUCT_TRAITS_MEMBER(mode)
   IPC_STRUCT_TRAITS_MEMBER(nodeData)
+// XXX: find a better way to prevent the crash when copying SkBitmap
+#if !defined(EWK_BRINGUP)
   IPC_STRUCT_TRAITS_MEMBER(imageData)
+#endif
 IPC_STRUCT_TRAITS_END()
 
 IPC_STRUCT_TRAITS_BEGIN(DidPrintPagesParams)
