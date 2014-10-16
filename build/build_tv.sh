@@ -23,5 +23,11 @@ fi
 gbs $CONF_FLAG build $PROFILE_FLAG -A armv7l --incremental \
     --extra-packs python-base-x86-arm,python-x86-arm,python-xml-x86-arm \
     --define "${TIZEN_VERSION}" "$@"
+GBS_RET=$?
 
 ${SCRIPTDIR}/apply_patches.sh -r
+APPLY_PATCHES_RET=$?
+
+[ "$GBS_RET" != "0" ] && exit $GBS_RET
+[ "$APPLY_PATCHES_RET" != "0" ] && exit $APPLY_PATCHES_RET
+exit 0
