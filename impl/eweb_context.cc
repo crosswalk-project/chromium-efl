@@ -464,6 +464,12 @@ bool EWebContext::SetFaviconDatabasePath(const char* path) {
   return fs.SetDatabasePath(path);
 }
 
+#if defined(OS_TIZEN_TV)
+FaviconDatabase* EWebContext::GetFaviconDatabase() {
+  return FaviconService::GetFaviconDatabase();
+}
+#endif
+
 Evas_Object *EWebContext::AddFaviconObject(const char* uri, Evas* canvas) const {
   if (uri == NULL || canvas == NULL) {
     return NULL;

@@ -2,7 +2,7 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-#if defined(OS_TIZEN_TV) && !defined(EWK_BRINGUP)
+#if defined(OS_TIZEN_TV)
 
 #ifndef ewk_favicon_database_private_h
 #define ewk_favicon_database_private_h
@@ -15,6 +15,12 @@
 
 struct EwkFaviconDatabase {
  public:
+  static EwkFaviconDatabase *Instance()
+  {
+    static EwkFaviconDatabase database;
+    return &database;
+  }
+
   EwkFaviconDatabase()
   :favicon_database(NULL)
   {

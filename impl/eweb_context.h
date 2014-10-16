@@ -20,6 +20,9 @@ class WrtIpcMessageData;
 typedef std::map<std::string, std::string> HTTPCustomHeadersEflMap;
 
 class CookieManager;
+#if defined(OS_TIZEN_TV)
+class FaviconDatabase;
+#endif
 
 namespace content {
 class BrowserContextEfl;
@@ -97,6 +100,9 @@ class EWebContext {
   void ClearCandidateData();
   void ClearPasswordData();
   void Initialize(Evas_Object* object);
+#if defined(OS_TIZEN_TV)
+  FaviconDatabase* GetFaviconDatabase();
+#endif
 
  private:
   EWebContext();

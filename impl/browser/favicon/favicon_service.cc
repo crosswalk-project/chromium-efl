@@ -70,3 +70,9 @@ void FaviconService::Clear() {
   CHECK_OPEN;
   m_database->Clear();
 }
+
+#if defined(OS_TIZEN_TV)
+FaviconDatabase* FaviconService::GetFaviconDatabase() {
+  return FaviconDatabase::Instance();
+}
+#endif
