@@ -531,11 +531,11 @@ Ewk_Application_Cache_Manager* ewk_context_application_cache_manager_get(const E
 
 Ewk_Favicon_Database* ewk_context_favicon_database_get(const Ewk_Context* ewkContext)
 {
-#if defined(OS_TIZEN_TV) && !defined(EWK_BRINGUP)
+#if defined(OS_TIZEN_TV)
   EINA_SAFETY_ON_NULL_RETURN_VAL(ewkContext, 0);
-  Ewk_Favicon_Database favicon_database;
-  favicon_database.InitEwkFaviconDatabase(ewkContext);
-  return (&favicon_database);
+  Ewk_Favicon_Database *favicon_database = Ewk_Favicon_Database::Instance();
+  favicon_database->InitEwkFaviconDatabase(ewkContext);
+  return favicon_database;
 #else
   LOG_EWK_API_MOCKUP("Only for Tizen TV Browser");
   return NULL;

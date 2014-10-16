@@ -31,6 +31,9 @@ class FaviconService {
   bool ExistsForPageURL(const GURL &pageUrl) const;
   bool ExistsForFaviconURL(const GURL &iconUrl) const;
   void Clear();
+#if defined(OS_TIZEN_TV)
+  static FaviconDatabase* GetFaviconDatabase();
+#endif
 
  private:
   FaviconDatabase *m_database;

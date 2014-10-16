@@ -174,6 +174,12 @@ bool WebContext::SetFaviconDatabasePath(const char *path) {
   return impl->SetFaviconDatabasePath(path);
 }
 
+#if defined(OS_TIZEN_TV)
+FaviconDatabase* WebContext::GetFaviconDatabase() {
+  return impl->GetFaviconDatabase();
+}
+#endif
+
 Evas_Object * WebContext::AddFaviconObject(const char *uri, Evas *canvas) const {
   return impl->AddFaviconObject(uri, canvas);
 }

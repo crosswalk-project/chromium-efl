@@ -16,6 +16,9 @@
 class CookieManager;
 class Ewk_Cookie_Manager;
 class EWebContext;
+#if defined(OS_TIZEN_TV)
+class FaviconDatabase;
+#endif
 //struct Ewk_IPC_Wrt_Message_Data;
 
 namespace content {
@@ -118,6 +121,9 @@ struct WebContext : public tizen_webview::RefCounted<WebContext> {
 
   // Note: Do not use outside chromium
   EWebContext* GetImpl() { return impl; }
+#if defined(OS_TIZEN_TV)
+  FaviconDatabase* GetFaviconDatabase();
+#endif
 
  private:
   EWebContext* impl;
