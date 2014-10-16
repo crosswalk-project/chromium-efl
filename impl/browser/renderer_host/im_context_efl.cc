@@ -65,12 +65,14 @@ IMContextEfl* IMContextEfl::Create(RenderWidgetHostViewEfl* view) {
 IMContextEfl::IMContextEfl(RenderWidgetHostViewEfl* view, Ecore_IMF_Context* context)
     : view_(view),
       context_(context),
-      focused_(false),
-      enabled_(false),
-      panel_was_ever_shown_(false),
+      is_focused_(false),
+      is_ime_panel_visible_(false),
       is_in_form_tag_(false),
+      current_mode_(ui::TEXT_INPUT_MODE_DEFAULT),
+      current_type_(ui::TEXT_INPUT_TYPE_NONE),
+      can_compose_inline_(false),
       is_handling_keydown_(false),
-      input_type_(ui::TEXT_INPUT_TYPE_NONE) {
+      is_ime_ctx_reset_(false) {
   IM_CTX_LOG;
   InitializeIMFContext(context_);
 }
@@ -90,22 +92,8 @@ void IMContextEfl::InitializeIMFContext(Ecore_IMF_Context* context) {
   ecore_imf_context_retrieve_surrounding_callback_set(context, &IMFRetrieveSurroundingCallback, this);
 }
 
-void IMContextEfl::ResetIMFContext() {
-  ecore_imf_context_focus_out(context_);
-  ecore_imf_context_input_panel_hide(context_);
-  ecore_imf_context_del(context_);
-  context_ = CreateIMFContext(view_->evas());
-  InitializeIMFContext(context_);
-}
-
 IMContextEfl::~IMContextEfl() {
   ecore_imf_context_del(context_);
-}
-
-void IMContextEfl::Reset() {
-  ClearQueues();
-  view_->ClearQueues();
-  ecore_imf_context_reset(context_);
 }
 
 void IMContextEfl::HandleKeyDownEvent(const Evas_Event_Key_Down* event, bool* wasFiltered) {
@@ -126,61 +114,15 @@ void IMContextEfl::HandleKeyUpEvent(const Evas_Event_Key_Up* event, bool* wasFil
 #endif
 }
 
-void IMContextEfl::UpdateInputMethodState(ui::TextInputType input_type,
-                                          bool can_compose_inline,
-                                          ui::TextInputMode input_mode,
-                                          bool is_user_action) {
-  IM_CTX_LOG << "textinputtype=" << input_type;
+void IMContextEfl::UpdateInputMethodType(ui::TextInputType type,
+                                         ui::TextInputMode mode,
+                                         bool can_compose_inline) {
+  IM_CTX_LOG;
 
-  input_type_ = input_type;
-  bool enabled = input_type != ui::TEXT_INPUT_TYPE_NONE;
-
-  enabled_ = enabled;
-  ClearQueues();
-  view_->ClearQueues();
-  ecore_imf_context_reset(context_);
-
-  // This can only be called when having focus since we disable IME messages in OnFocusOut.
-  DCHECK(focused_);
-
-  if (enabled)
-    ShowPanel(input_type, input_mode, is_user_action);
-  else
-    HidePanel();
-
-  // FIXME: viewport should be adjusted
-
-  if (enabled) {
-    // If the focused element supports inline rendering of composition text,
-    // we receive and send related events to it. Otherwise, the events related
-    // to the updates of composition text are directed to the candidate window.
-    ecore_imf_context_use_preedit_set(context_, can_compose_inline);
-  }
-}
-
-void IMContextEfl::UpdateInputMethodState(ui::TextInputType input_type) {
-  IM_CTX_LOG << "textinputtype=" << input_type;
-
-  input_type_ = input_type;
-  bool enabled = input_type != ui::TEXT_INPUT_TYPE_NONE;
-  enabled_ = enabled;
-  ClearQueues();
-  view_->ClearQueues();
-
-  bool is_showing = ecore_imf_context_input_panel_state_get(context_) ==
-                    ECORE_IMF_INPUT_PANEL_STATE_SHOW;
-  if (enabled_) {
-    if (!is_showing) {
-      ecore_imf_context_focus_in(context_);
-      ecore_imf_context_input_panel_show(context_);
-    }
-  } else
-    HidePanel();
-}
-
-void IMContextEfl::ShowPanel(ui::TextInputType input_type, ui::TextInputMode input_mode, bool is_user_action) {
-  if (!is_user_action && !view_->eweb_view()->GetSettings()->useKeyPadWithoutUserAction())
+  if (current_type_ == type && current_mode_ == mode &&
+      can_compose_inline_ == can_compose_inline) {
     return;
+  }
 
   Ecore_IMF_Input_Panel_Layout layout;
   Ecore_IMF_Input_Panel_Return_Key_Type return_key_type = ECORE_IMF_INPUT_PANEL_RETURN_KEY_TYPE_DEFAULT;
@@ -190,7 +132,7 @@ void IMContextEfl::ShowPanel(ui::TextInputType input_type, ui::TextInputMode inp
   if (is_in_form_tag_)
     return_key_type = ECORE_IMF_INPUT_PANEL_RETURN_KEY_TYPE_GO;
 
-  switch (input_type) {
+  switch (type) {
     case ui::TEXT_INPUT_TYPE_TEXT:
       layout = ECORE_IMF_INPUT_PANEL_LAYOUT_NORMAL;
       if (!is_in_form_tag_)
@@ -242,36 +184,61 @@ void IMContextEfl::ShowPanel(ui::TextInputType input_type, ui::TextInputMode inp
       return;
   }
 
-  Ecore_IMF_Input_Mode mode;
-  switch (input_mode) {
+  Ecore_IMF_Input_Mode imf_mode;
+  switch (mode) {
     case ui::TEXT_INPUT_MODE_NUMERIC:
-      mode = ECORE_IMF_INPUT_MODE_NUMERIC;
+      imf_mode = ECORE_IMF_INPUT_MODE_NUMERIC;
     default:
-      mode = ECORE_IMF_INPUT_MODE_ALPHA;
+      imf_mode = ECORE_IMF_INPUT_MODE_ALPHA;
   }
 
-  if (panel_was_ever_shown_)
-    ResetIMFContext();
-
-  panel_was_ever_shown_ = true;
-
   ecore_imf_context_input_panel_layout_set(context_, layout);
-  ecore_imf_context_input_mode_set(context_, mode);
+  ecore_imf_context_input_mode_set(context_, imf_mode);
   ecore_imf_context_input_panel_return_key_type_set(context_, return_key_type);
   ecore_imf_context_autocapital_type_set(context_, cap_type);
   ecore_imf_context_prediction_allow_set(context_, allow_prediction);
 
+  // If the focused element supports inline rendering of composition text,
+  // we receive and send related events to it. Otherwise, the events related
+  // to the updates of composition text are directed to the candidate window.
+  ecore_imf_context_use_preedit_set(context_, can_compose_inline);
+
+  current_type_ = type;
+  current_mode_ = mode;
+  can_compose_inline_ = can_compose_inline;
+}
+
+void IMContextEfl::UpdateInputMethodState(ui::TextInputType type,
+                                          bool can_compose_inline,
+                                          bool show_if_needed) {
+  if (current_type_ != type || can_compose_inline_ != can_compose_inline) {
+    UpdateInputMethodType(type, ui::TEXT_INPUT_MODE_DEFAULT, can_compose_inline);
+  }
+
+  IM_CTX_LOG;
+
+  bool show = type != ui::TEXT_INPUT_TYPE_NONE;
+  if (show && !is_ime_panel_visible_ && show_if_needed) {
+    ShowPanel();
+  } else if (!show && is_ime_panel_visible_) {
+    HidePanel();
+  }
+}
+
+void IMContextEfl::ShowPanel() {
+  IM_CTX_LOG;
   ecore_imf_context_focus_in(context_);
   ecore_imf_context_input_panel_show(context_);
 }
 
 void IMContextEfl::HidePanel() {
+  IM_CTX_LOG;
   ecore_imf_context_focus_out(context_);
   ecore_imf_context_input_panel_hide(context_);
 }
 
 void IMContextEfl::UpdateCaretBounds(const gfx::Rect& caret_bounds) {
-  if (enabled_) {
+  if (is_ime_panel_visible_) {
     int x = caret_bounds.x();
     int y = caret_bounds.y();
     int w = caret_bounds.width();
@@ -283,50 +250,55 @@ void IMContextEfl::UpdateCaretBounds(const gfx::Rect& caret_bounds) {
 void IMContextEfl::OnFocusIn() {
   CancelComposition();
 
-  if (focused_)
+  if (is_focused_)
     return;
 
   IM_CTX_LOG;
-  focused_ = true;
+  is_focused_ = true;
 
-  if (enabled_) {
-    ecore_imf_context_focus_in(context_);
-    ecore_imf_context_input_panel_show(context_);
-  }
+  ecore_imf_context_focus_in(context_);
 
   // Enables RenderWidget's IME related events, so that we can be notified
   // when WebKit wants to enable or disable IME.
-  if (view_->GetRenderWidgetHost())
-    RenderWidgetHostImpl::From(view_->GetRenderWidgetHost())->SetInputMethodActive(true);
+  RenderWidgetHostImpl *rwhi = GetRenderWidgetHostImpl();
+  if (rwhi)
+    rwhi->SetInputMethodActive(true);
 }
 
 void IMContextEfl::OnFocusOut() {
-  if (!focused_)
+  if (!is_focused_)
     return;
 
   IM_CTX_LOG;
-  focused_ = false;
+  is_focused_ = false;
 
-  // XXX Gtk calls ConfirmComposition here.
-  // Consider whether we need it to avoid data loss.
+  CancelComposition();
 
-  ClearQueues();
-  view_->ClearQueues();
-
-  ecore_imf_context_reset(context_);
   ecore_imf_context_focus_out(context_);
-  ecore_imf_context_input_panel_hide(context_);
 
   // Disable RenderWidget's IME related events to save bandwidth.
-  if (view_->GetRenderWidgetHost())
-    RenderWidgetHostImpl::From(view_->GetRenderWidgetHost())->SetInputMethodActive(false);
+  RenderWidgetHostImpl *rwhi = GetRenderWidgetHostImpl();
+  if (rwhi)
+    rwhi->SetInputMethodActive(false);
+}
+
+void IMContextEfl::ResetIMFContext() {
+  is_ime_ctx_reset_ = true;
+  ecore_imf_context_reset(context_);
+  is_ime_ctx_reset_ = false;
 }
 
 void IMContextEfl::CancelComposition() {
   IM_CTX_LOG;
   ClearQueues();
   view_->ClearQueues();
-  ecore_imf_context_reset(context_);
+
+  ResetIMFContext();
+  if (composition_.text.length() > 0) {
+    base::string16 empty;
+    view_->ConfirmComposition(empty);
+    composition_.Clear();
+  }
 }
 
 void IMContextEfl::ConfirmComposition() {
@@ -336,11 +308,7 @@ void IMContextEfl::ConfirmComposition() {
 
 void IMContextEfl::SetIsInFormTag(bool is_in_form_tag) {
   is_in_form_tag_ = is_in_form_tag;
-  if (!context_)
-    return;
-
-  if (ecore_imf_context_input_panel_state_get(context_) ==
-      ECORE_IMF_INPUT_PANEL_STATE_HIDE)
+  if (!context_ || !is_ime_panel_visible_)
     return;
 
   if (ecore_imf_context_input_panel_return_key_type_get(context_) ==
@@ -349,10 +317,10 @@ void IMContextEfl::SetIsInFormTag(bool is_in_form_tag) {
 
   if (is_in_form_tag_)
     ecore_imf_context_input_panel_return_key_type_set(context_,
-      ECORE_IMF_INPUT_PANEL_RETURN_KEY_TYPE_GO);
+    ECORE_IMF_INPUT_PANEL_RETURN_KEY_TYPE_GO);
   else {
-    if (input_type_ == ui::TEXT_INPUT_TYPE_TEXT ||
-        input_type_ == ui::TEXT_INPUT_TYPE_NUMBER)
+    if (current_type_ == ui::TEXT_INPUT_TYPE_TEXT ||
+        current_type_ == ui::TEXT_INPUT_TYPE_NUMBER)
       ecore_imf_context_input_panel_return_key_type_set(context_,
       ECORE_IMF_INPUT_PANEL_RETURN_KEY_TYPE_DONE);
     else
@@ -362,42 +330,35 @@ void IMContextEfl::SetIsInFormTag(bool is_in_form_tag) {
 }
 
 void IMContextEfl::OnCommit(void* event_info) {
+  if (is_ime_ctx_reset_) {
+    return;
+  }
+
 #if USE_IM_COMPOSITING
   IM_CTX_LOG;
   composition_.Clear();
 
   char* text = static_cast<char*>(event_info);
-  base::string16 text16;
-  base::UTF8ToUTF16(text, strlen(text), &text16);
 
+  base::string16 text16 = base::UTF8ToUTF16(text);
   // Only add commit to queue, till we dont know if key event
   // should be handled. It can be default prevented for exactly.
   commit_queue_.push(text16);
 
   // sending fake key event if hardware key is not handled as it is
   // in Webkit.
-  SendFakeCompositionKeyEvent(text);
+  SendFakeCompositionKeyEvent(text16);
 #endif
 }
 
-void IMContextEfl::SendFakeCompositionKeyEvent(char * buf) {
+void IMContextEfl::SendFakeCompositionKeyEvent(const base::string16& buf) {
   if (is_handling_keydown_)
     return;
 
-  if (!buf)
+  if (!buf.length())
     return;
 
-  UChar32 ch = 0;
-  if (strlen(buf)) {
-    ch = buf[strlen(buf) - 1];
-  }
-
-  std::string str;
-
-  if (u_isspace(ch))
-    str = "space";
-  else
-    str.append(1, ch);
+  std::string str = base::UTF16ToUTF8(buf.substr(buf.length() -1));
 
   Evas_Event_Key_Down downEvent;
   memset(&downEvent, 0, sizeof(Evas_Event_Key_Down));
@@ -417,6 +378,9 @@ void IMContextEfl::SendFakeCompositionKeyEvent(char * buf) {
 }
 
 void IMContextEfl::OnPreeditChanged(void* data, Ecore_IMF_Context* context, void* event_info) {
+  if (is_ime_ctx_reset_)
+    return;
+
 #if USE_IM_COMPOSITING
   composition_.Clear();
 
@@ -426,16 +390,26 @@ void IMContextEfl::OnPreeditChanged(void* data, Ecore_IMF_Context* context, void
   if (!buffer)
       return;
 
-  SendFakeCompositionKeyEvent(buffer);
+  // Add empty commit to stop processing commits.
+  commit_queue_.push(base::string16());
+
+  base::string16 text16 = base::UTF8ToUTF16(buffer);
+  if (!text16.empty())
+    SendFakeCompositionKeyEvent(text16);
   composition_.Clear();
-  composition_.text = base::UTF8ToUTF16(buffer);
+  composition_.text = text16;
 
   composition_.underlines.push_back(ui::CompositionUnderline(0, composition_.text.length(), SK_ColorBLACK, false));
   composition_.selection = gfx::Range(composition_.text.length());
 
   // Only add preedit to queue, till we dont know if key event
   // should be handled. It can be default prevented for exactly.
-  preedit_queue_.push(composition_);
+  if (!text16.empty())
+    preedit_queue_.push(composition_);
+  else {
+    view_->SetComposition(composition_);
+    ResetIMFContext();
+  }
 
   free(buffer);
 
@@ -446,10 +420,17 @@ void IMContextEfl::OnPreeditChanged(void* data, Ecore_IMF_Context* context, void
 // Tizen-WebKit-efl using all of them.
 
 void IMContextEfl::OnInputPanelStateChanged(int state) {
-  if (state == ECORE_IMF_INPUT_PANEL_STATE_SHOW)
+  if (state == ECORE_IMF_INPUT_PANEL_STATE_SHOW) {
+    IM_CTX_LOG << ": show";
+    is_ime_panel_visible_ = true;
     view_->eweb_view()->SmartCallback<EWebViewCallbacks::IMEInputPanelShow>().call();
-  else
+  } else if (state == ECORE_IMF_INPUT_PANEL_STATE_HIDE) {
+    IM_CTX_LOG << ": hide";
+    is_ime_panel_visible_ = false;
     view_->eweb_view()->SmartCallback<EWebViewCallbacks::IMEInputPanelHide>().call();
+  }
+
+  // ignore ECORE_IMF_INPUT_PANEL_WILL_SHOW value
 }
 
 void IMContextEfl::OnInputPanelGeometryChanged() {
@@ -477,16 +458,17 @@ bool IMContextEfl::OnRetrieveSurrounding(char** text, int* offset) {
 void IMContextEfl::OnDeleteSurrounding(void* event_info) {
 }
 
-void IMContextEfl::OnCandidateInputPanelLanguageChanged(Ecore_IMF_Context* /*context*/, int /*value*/) {
-  if (!view_->GetRenderWidgetHost() || composition_.text.length() == 0)
+void IMContextEfl::OnCandidateInputPanelLanguageChanged(Ecore_IMF_Context*, int) {
+  RenderWidgetHostImpl *rwhi = GetRenderWidgetHostImpl();
+
+  if (!rwhi || composition_.text.length() == 0)
     return;
-  Reset();
-  RenderWidgetHostImpl::From(view_->GetRenderWidgetHost())->ImeConfirmComposition(composition_.text, gfx::Range::InvalidRange(), false);
-  composition_.Clear();
+
+  CancelComposition();
 }
 
 bool IMContextEfl::IsShow() {
-  return (context_ && focused_ && ecore_imf_context_input_panel_state_get(context_) != ECORE_IMF_INPUT_PANEL_STATE_HIDE);
+  return context_ && is_focused_ && is_ime_panel_visible_;
 }
 
 void IMContextEfl::ClearQueues() {
@@ -497,6 +479,60 @@ void IMContextEfl::ClearQueues() {
   while (!preedit_queue_.empty()) {
     preedit_queue_.pop();
   }
+}
+
+void IMContextEfl::IMFCommitCallback(
+    void* data, Ecore_IMF_Context*, void* event_info) {
+  static_cast<IMContextEfl*>(data)->OnCommit(event_info);
+}
+
+void IMContextEfl::IMFPreeditChangedCallback(
+    void* data, Ecore_IMF_Context* context, void* event_info) {
+  static_cast<IMContextEfl*>(data)->
+      OnPreeditChanged(data, context, event_info);
+}
+
+void IMContextEfl::IMFInputPanelStateChangedCallback(
+    void* data, Ecore_IMF_Context*, int state) {
+  static_cast<IMContextEfl*>(data)->OnInputPanelStateChanged(state);
+}
+
+void IMContextEfl::IMFInputPanelGeometryChangedCallback(
+    void* data, Ecore_IMF_Context*, int state) {
+  static_cast<IMContextEfl*>(data)->OnInputPanelGeometryChanged();
+}
+
+void IMContextEfl::IMFCandidatePanelStateChangedCallback(
+    void* data, Ecore_IMF_Context*, int state) {
+  static_cast<IMContextEfl*>(data)->OnCandidateInputPanelStateChanged(state);
+}
+
+void IMContextEfl::IMFCandidatePanelGeometryChangedCallback(
+    void* data, Ecore_IMF_Context*, int state) {
+  static_cast<IMContextEfl*>(data)->OnCandidateInputPanelGeometryChanged();
+}
+
+Eina_Bool IMContextEfl::IMFRetrieveSurroundingCallback(
+    void* data, Ecore_IMF_Context*, char** text, int* offset) {
+  return static_cast<IMContextEfl*>(data)->OnRetrieveSurrounding(text, offset);
+}
+
+void IMContextEfl::IMFDeleteSurroundingCallback(
+    void* data, Ecore_IMF_Context*, void* event_info) {
+  static_cast<IMContextEfl*>(data)->OnDeleteSurrounding(event_info);
+}
+
+void IMContextEfl::IMFCandidatePanelLanguageChangedCallback(
+    void* data, Ecore_IMF_Context* context, int value) {
+  static_cast<IMContextEfl*>(data)->
+      OnCandidateInputPanelLanguageChanged(context, value);
+}
+
+RenderWidgetHostImpl* IMContextEfl::GetRenderWidgetHostImpl() const {
+  RenderWidgetHost *rwh = view_->GetRenderWidgetHost();
+  if (!rwh)
+    return NULL;
+  return RenderWidgetHostImpl::From(rwh);
 }
 
 } // namespace content

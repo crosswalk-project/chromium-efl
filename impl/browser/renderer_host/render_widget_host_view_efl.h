@@ -22,6 +22,7 @@
 #include "content/browser/compositor/image_transport_factory.h"
 #include "content/browser/compositor/owned_mailbox.h"
 #include "gpu/command_buffer/common/mailbox.h"
+#include "ui/base/ime/composition_text.h"
 #include "ui/base/ime/text_input_client.h"
 #include "eweb_view.h"
 #include "browser/renderer_host/im_context_efl.h"
@@ -172,7 +173,7 @@ class RenderWidgetHostViewEfl
 #ifdef OS_TIZEN
   void FilterInputMotion(const blink::WebGestureEvent& gesture_event);
   void makePinchZoom(void* eventInfo);
-  void OnDidInputEventHandled(const blink::WebInputEvent* input_event, bool processed);
+  void OnDidHandleKeyEvent(const blink::WebInputEvent* input_event, bool processed);
   void GetSnapshotForRect(gfx::Rect& rect);
   void SetRectSnapshot(const SkBitmap& bitmap);
 #endif
@@ -226,6 +227,9 @@ class RenderWidgetHostViewEfl
 
   // This function sets CSS "view-mode" media feature value.
   void SetViewMode(tizen_webview::View_Mode view_mode);
+
+  void SetComposition(const ui::CompositionText& composition_text);
+  void ConfirmComposition(base::string16& text);
 
  protected:
   friend class RenderWidgetHostView;

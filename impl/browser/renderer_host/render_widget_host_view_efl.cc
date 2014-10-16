@@ -393,13 +393,9 @@ bool RenderWidgetHostViewEfl::OnMessageReceived(const IPC::Message& message) {
     IPC_MESSAGE_HANDLER(EwkHostMsg_DidChangePageScaleFactor, OnDidChangePageScaleFactor)
     IPC_MESSAGE_HANDLER(EwkHostMsg_DidChangePageScaleRange, OnDidChangePageScaleRange)
     IPC_MESSAGE_HANDLER(ViewHostMsg_TextInputStateChanged, OnTextInputStateChanged)
-#if !defined(EWK_BRINGUP)
     IPC_MESSAGE_HANDLER(ViewHostMsg_TextInputInFormStateChanged, OnTextInputInFormStateChanged)
-#endif
 #if defined(OS_TIZEN)
-#if !defined(EWK_BRINGUP)
-    IPC_MESSAGE_HANDLER(InputHostMsg_DidInputEventHandled, OnDidInputEventHandled)
-#endif
+    IPC_MESSAGE_HANDLER(InputHostMsg_DidHandleKeyEvent, OnDidHandleKeyEvent)
 #endif
     IPC_MESSAGE_UNHANDLED(handled = false)
   IPC_END_MESSAGE_MAP()
@@ -617,7 +613,8 @@ void RenderWidgetHostViewEfl::OnTextInputStateChanged(
     return;
 
   if (im_context_) {
-    im_context_->UpdateInputMethodState(params.type);
+    im_context_->UpdateInputMethodState(params.type, params.can_compose_inline,
+                                        params.show_ime_if_needed);
     web_view_->QuerySelectionStyle();
 
     // Obsolete TextInputTypeChanged was doing it in similar code block
@@ -1058,9 +1055,6 @@ void RenderWidgetHostViewEfl::HandleEvasEvent(const Evas_Event_Mouse_Down* event
 }
 
 void RenderWidgetHostViewEfl::HandleEvasEvent(const Evas_Event_Mouse_Up* event) {
-  if (im_context_)
-    im_context_->Reset();
-
   host_->ForwardMouseEvent(WebEventFactoryEfl::toWebMouseEvent(web_view_->GetEvas(), web_view_->evas_object(), event, device_scale_factor_));
 }
 
@@ -1103,6 +1097,9 @@ void RenderWidgetHostViewEfl::HandleEvasEvent(const Evas_Event_Key_Down* event) 
   }
 
   if (im_context_) {
+    if (!strcmp(event->key, "Return")) {
+      im_context_->CancelComposition();
+    }
     im_context_->HandleKeyDownEvent(event, &wasFiltered);
     NativeWebKeyboardEvent n_event = WebEventFactoryEfl::toWebKeyboardEvent(evas_, event);
 
@@ -1140,7 +1137,7 @@ void RenderWidgetHostViewEfl::HandleEvasEvent(const Evas_Event_Key_Up* event) {
     im_context_->HandleKeyUpEvent(event, &wasFiltered);
 
   if (!im_context_)
-      host_->ForwardKeyboardEvent(WebEventFactoryEfl::toWebKeyboardEvent(evas_, event));
+    host_->ForwardKeyboardEvent(WebEventFactoryEfl::toWebKeyboardEvent(evas_, event));
 }
 
 #ifdef OS_TIZEN
@@ -1165,36 +1162,31 @@ void RenderWidgetHostViewEfl::makePinchZoom(void* eventInfo) {
 #endif
 }
 
-void RenderWidgetHostViewEfl::OnDidInputEventHandled(const blink::WebInputEvent* input_event, bool processed) {
-#if !defined(EWK_BRINGUP)
+void RenderWidgetHostViewEfl::OnDidHandleKeyEvent(const blink::WebInputEvent* input_event, bool processed) {
   if (!im_context_)
     return;
 
-  if (blink::WebInputEvent::isKeyboardEventType(input_event->type)) {
-    if (input_event->type == blink::WebInputEvent::KeyDown) {
+  if (input_event->type == blink::WebInputEvent::KeyDown) {
+    // Handling KeyDown event of modifier key(Shift for example)
+    if (input_event->modifiers && !is_modifier_key_) {
+      is_modifier_key_ = true;
+      return;
+    }
 
-      // Handling KeyDown event of modifier key(Shift for example)
-      if (input_event->modifiers && !is_modifier_key_) {
-        is_modifier_key_ = true;
-        return;
-      }
-      // Handling KeyDown event of key+modifier (Shift+a=A for example)
-      if (is_modifier_key_) {
-        HandleCommitQueue(processed);
-        HandlePreeditQueue(processed);
-        HandleKeyUpQueue();
-        HandleKeyDownQueue();
-        is_modifier_key_ = false;
-      }
-
+    // Handling KeyDown event of key+modifier (Shift+a=A for example)
+    if (is_modifier_key_) {
       HandleCommitQueue(processed);
       HandlePreeditQueue(processed);
-
       HandleKeyUpQueue();
       HandleKeyDownQueue();
+      is_modifier_key_ = false;
     }
+
+    HandleCommitQueue(processed);
+    HandlePreeditQueue(processed);
+    HandleKeyUpQueue();
+    HandleKeyDownQueue();
   }
-#endif
 }
 #endif
 
@@ -1424,6 +1416,16 @@ SelectionControllerEfl* RenderWidgetHostViewEfl::GetSelectionController() {
   return web_view_->GetSelectionController();
 }
 
+void RenderWidgetHostViewEfl::SetComposition(const ui::CompositionText& composition_text) {
+  const std::vector<blink::WebCompositionUnderline>& underlines =
+      reinterpret_cast<const std::vector<blink::WebCompositionUnderline>&>(
+      composition_text.underlines);
+
+  host_->ImeSetComposition(
+      composition_text.text, underlines, composition_text.selection.start(),
+      composition_text.selection.end());
+}
+
 void RenderWidgetHostViewEfl::ClearQueues() {
   while (!keyupev_queue_.empty()) {
     keyupev_queue_.pop();
@@ -1435,19 +1437,24 @@ void RenderWidgetHostViewEfl::ClearQueues() {
   }
 }
 
+void RenderWidgetHostViewEfl::ConfirmComposition(base::string16& text) {
+  host_->ImeConfirmComposition(text, gfx::Range::InvalidRange(), false);
+}
+
 void RenderWidgetHostViewEfl::HandleCommitQueue(bool processed) {
   if (!im_context_)
     return;
 
-  if (!processed) {
-    if (!im_context_->GetCommitQueue().empty()) {
-      base::string16 text16 = im_context_->GetCommitQueue().front();
-      host_->ImeConfirmComposition(text16, gfx::Range::InvalidRange(), false);
-      im_context_->CommitQueuePop();
-    }
-  } else {
-    if (!im_context_->GetCommitQueue().empty())
-      im_context_->CommitQueuePop();
+  while (!im_context_->GetCommitQueue().empty()) {
+    const bool isEmpty = im_context_->GetCommitQueue().front().empty();
+
+    if (!processed && !isEmpty)
+      ConfirmComposition(im_context_->GetCommitQueue().front());
+
+    im_context_->CommitQueuePop();
+
+    if (isEmpty)
+      break;
   }
 }
 
@@ -1455,22 +1462,11 @@ void RenderWidgetHostViewEfl::HandlePreeditQueue(bool processed) {
   if (!im_context_)
     return;
 
-  if (!processed) {
-    if (!im_context_->GetPreeditQueue().empty()) {
-      ui::CompositionText composition_ = im_context_->GetPreeditQueue().front();
+  if (!im_context_->GetPreeditQueue().empty()) {
+    if (!processed)
+      SetComposition(im_context_->GetPreeditQueue().front());
 
-      const std::vector<blink::WebCompositionUnderline>& underlines =
-      reinterpret_cast<const std::vector<blink::WebCompositionUnderline>&>(
-      composition_.underlines);
-
-      host_->ImeSetComposition(
-      composition_.text, underlines, composition_.selection.start(),
-      composition_.selection.end());
-      im_context_->PreeditQueuePop();
-    }
-  } else {
-    if (!im_context_->GetPreeditQueue().empty())
-      im_context_->PreeditQueuePop();
+    im_context_->PreeditQueuePop();
   }
 }
 

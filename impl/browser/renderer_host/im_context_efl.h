@@ -14,10 +14,6 @@
 
 #include <Evas.h>
 
-namespace gfx {
-class Rect;
-}
-
 typedef std::queue<base::string16> CommitQueue;
 typedef std::queue<ui::CompositionText> PreeditQueue;
 
@@ -34,55 +30,52 @@ class IMContextEfl {
 
   ~IMContextEfl();
 
-  void Reset();
   void HandleKeyDownEvent(const Evas_Event_Key_Down* event, bool* wasFiltered);
   void HandleKeyUpEvent(const Evas_Event_Key_Up* event, bool* wasFiltered);
 
-  void UpdateInputMethodState(ui::TextInputType type, bool can_compose_inline, ui::TextInputMode input_mode,
-                              bool is_user_action = false);
-  void UpdateInputMethodState(ui::TextInputType type);
+  void UpdateInputMethodType(ui::TextInputType, ui::TextInputMode,
+                             bool can_compose_inline);
+  void UpdateInputMethodState(ui::TextInputType, bool can_compose_inline,
+                              bool show_if_needed);
   void UpdateCaretBounds(const gfx::Rect& caret_bounds);
 
   void OnFocusIn();
   void OnFocusOut();
 
+  void ShowPanel();
+  void HidePanel();
+
+  void ResetIMFContext();
   void CancelComposition();
   void ConfirmComposition();
   void SetIsInFormTag(bool is_in_form_tag);
   bool IsShow();
   gfx::Rect GetIMERect() const { return ime_rect_; }
+  void SetIMERect(const gfx::Rect& rect) { ime_rect_ = rect; }
   CommitQueue GetCommitQueue() { return commit_queue_; }
   PreeditQueue GetPreeditQueue() { return preedit_queue_; }
   void CommitQueuePop() { commit_queue_.pop(); }
   void PreeditQueuePop() { preedit_queue_.pop(); }
   void ClearQueues();
 
-  void SendFakeCompositionKeyEvent(char * buf);
+  void SendFakeCompositionKeyEvent(const base::string16& buf);
 
  private:
   IMContextEfl(RenderWidgetHostViewEfl*, Ecore_IMF_Context*);
 
   void InitializeIMFContext(Ecore_IMF_Context*);
-  void ResetIMFContext();
-
-  void ShowPanel(ui::TextInputType, ui::TextInputMode, bool is_user_action = false);
-  void HidePanel();
-
-  void SetIMERect(const gfx::Rect& rect) { ime_rect_ = rect; }
 
   // callbacks
-  static void IMFCommitCallback(void* data, Ecore_IMF_Context*, void* event_info) { reinterpret_cast<IMContextEfl*>(data)->OnCommit(event_info); }
-  static void IMFPreeditChangedCallback(void* data, Ecore_IMF_Context* context, void* event_info) { reinterpret_cast<IMContextEfl*>(data)->OnPreeditChanged(data, context, event_info); }
+  static void IMFCommitCallback(void* data, Ecore_IMF_Context*, void* event_info);
+  static void IMFPreeditChangedCallback(void* data, Ecore_IMF_Context* context, void* event_info);
+  static void IMFInputPanelStateChangedCallback(void* data, Ecore_IMF_Context*, int state);
+  static void IMFInputPanelGeometryChangedCallback(void* data, Ecore_IMF_Context*, int state);
+  static void IMFCandidatePanelStateChangedCallback(void* data, Ecore_IMF_Context*, int state);
+  static void IMFCandidatePanelGeometryChangedCallback(void* data, Ecore_IMF_Context*, int state);
+  static Eina_Bool IMFRetrieveSurroundingCallback(void* data, Ecore_IMF_Context*, char** text, int* offset);
+  static void IMFDeleteSurroundingCallback(void* data, Ecore_IMF_Context*, void* event_info);
+  static void IMFCandidatePanelLanguageChangedCallback(void* data, Ecore_IMF_Context* context, int value);
 
-  static void IMFInputPanelStateChangedCallback(void* data, Ecore_IMF_Context*, int state) { reinterpret_cast<IMContextEfl*>(data)->OnInputPanelStateChanged(state); }
-  static void IMFInputPanelGeometryChangedCallback(void* data, Ecore_IMF_Context*, int state) { reinterpret_cast<IMContextEfl*>(data)->OnInputPanelGeometryChanged(); }
-
-  static void IMFCandidatePanelStateChangedCallback(void* data, Ecore_IMF_Context*, int state) { reinterpret_cast<IMContextEfl*>(data)->OnCandidateInputPanelStateChanged(state); }
-  static void IMFCandidatePanelGeometryChangedCallback(void* data, Ecore_IMF_Context*, int state) { reinterpret_cast<IMContextEfl*>(data)->OnCandidateInputPanelGeometryChanged(); }
-
-  static Eina_Bool IMFRetrieveSurroundingCallback(void* data, Ecore_IMF_Context*, char** text, int* offset) { return reinterpret_cast<IMContextEfl*>(data)->OnRetrieveSurrounding(text, offset); }
-  static void IMFDeleteSurroundingCallback(void* data, Ecore_IMF_Context*, void* event_info) { reinterpret_cast<IMContextEfl*>(data)->OnDeleteSurrounding(event_info); }
-  static void IMFCandidatePanelLanguageChangedCallback(void* data, Ecore_IMF_Context* context, int value) { reinterpret_cast<IMContextEfl*>(data)->OnCandidateInputPanelLanguageChanged(context, value); }
   // callback handlers
   void OnCommit(void* event_info);
   void OnPreeditChanged(void* data, Ecore_IMF_Context* context, void* event_info);
@@ -97,24 +90,25 @@ class IMContextEfl {
   void OnDeleteSurrounding(void* event_info);
   void OnCandidateInputPanelLanguageChanged(Ecore_IMF_Context* context, int value);
 
+  RenderWidgetHostImpl* GetRenderWidgetHostImpl() const;
+
   RenderWidgetHostViewEfl* view_;
 
   Ecore_IMF_Context* context_;
 
-  // Whether or not the accociated widget is focused.
-  bool focused_;
+  // Whether or not the associated widget is focused.
+  bool is_focused_;
 
-  // Whether or not the IME is enabled.
-  bool enabled_;
-
-  // Whether ShowPanel was ever called.
-  // At the first time when we show the input panel we can use the initial context which we create
-  // in order to check that input method is supported on the platform. Later on we need to reset context
-  // before showing the panel to be able to switch between different layouts.
-  bool panel_was_ever_shown_;
+  // Is software keyboard currently visible
+  bool is_ime_panel_visible_;
 
   // Whether or not is in form tag.
   bool is_in_form_tag_;
+
+  // The current soft keyboard mode and layout
+  ui::TextInputMode current_mode_;
+  ui::TextInputType current_type_;
+  bool can_compose_inline_;
 
   ui::CompositionText composition_;
 
@@ -124,7 +118,7 @@ class IMContextEfl {
   PreeditQueue preedit_queue_;
 
   bool is_handling_keydown_;
-  ui::TextInputType input_type_;
+  bool is_ime_ctx_reset_;
 };
 
 } // namespace content
