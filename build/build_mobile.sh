@@ -22,5 +22,11 @@ fi
 
 gbs $CONF_FLAG build $PROFILE_FLAG -A armv7l --incremental \
     --define "${TIZEN_VERSION}" "$@"
+GBS_RET=$?
 
 ${SCRIPTDIR}/apply_patches.sh -r
+APPLY_PATCHES_RET=$?
+
+[ "$GBS_RET" != "0" ] && exit $GBS_RET
+[ "$APPLY_PATCHES_RET" != "0" ] && exit $APPLY_PATCHES_RET
+exit 0
