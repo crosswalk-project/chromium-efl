@@ -89,6 +89,7 @@ struct WebContext : public tizen_webview::RefCounted<WebContext> {
       void* user_data);
   void WebStorageDelete();
   void WebStorageDelete(const URL& origin);
+  void ClearCandidateData();
 
   // File System
   void GetAllOriginsWithFileSystem(

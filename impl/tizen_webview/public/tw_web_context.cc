@@ -193,4 +193,8 @@ void WebContext::SetMimeOverrideCallback(Mime_Override_Callback callback) {
   EWebContext::SetMimeOverrideCallback(callback);
 }
 
+void WebContext::ClearCandidateData() {
+  impl->ClearCandidateData();
+}
+
 } // namespace tizen_webview

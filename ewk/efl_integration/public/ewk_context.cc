@@ -399,11 +399,7 @@ void ewk_context_form_password_data_list_free(Ewk_Context* ewkContext, Eina_List
 void ewk_context_form_candidate_data_clear(Ewk_Context* context)
 {
   EINA_SAFETY_ON_NULL_RETURN(context);
-#if !defined(EWK_BRINGUP)
   context->ClearCandidateData();
-#else
-  LOG_EWK_API_MOCKUP();
-#endif
 }
 
 Eina_List* ewk_context_form_autofill_profile_get_all(Ewk_Context* context)
