@@ -43,20 +43,13 @@ using content::WebContents;
 LoginDelegateEfl::LoginDelegateEfl(net::AuthChallengeInfo* auth_info, net::URLRequest* request)
     : auth_info_(auth_info),
       request_(request),
-      render_process_id_(0),
-      render_view_id_(0) {
-  // [M34] due to api change, we can only get render frame not render view from given request. 
-	// [NeedCheck] sns.park : not sure whether below code is a right way  
-	//             to get the render view id from given render frame id. 
-  int render_frame_id = -1;
-  if (!ResourceRequestInfo::GetRenderFrameForRequest(request, &render_process_id_, &render_frame_id)) {
-    // TODO: what now?
-    return;
-  }
+      render_process_id_(-1),
+      render_frame_id_(-1) {
+  bool result = ResourceRequestInfo::GetRenderFrameForRequest(request, &render_process_id_, &render_frame_id_);
 
-  WebContents* web_contents =  web_contents_utils::WebContentsFromFrameID(render_process_id_, render_frame_id);
-  assert(web_contents);
-	render_view_id_ = web_contents->GetRoutingID();
+  DCHECK(result);
+  DCHECK(render_process_id_ != -1);
+  DCHECK(render_frame_id_ != -1);
 
   BrowserThread::PostTask(BrowserThread::UI, FROM_HERE,
       base::Bind(&LoginDelegateEfl::HandleHttpAuthRequestOnUIThread, this));
@@ -80,8 +73,7 @@ void LoginDelegateEfl::Cancel() {
 
 void LoginDelegateEfl::HandleHttpAuthRequestOnUIThread() {
   DCHECK(BrowserThread::CurrentlyOn(BrowserThread::UI));
-
-  WebContents* web_contents = web_contents_utils::WebContentsFromViewID(render_process_id_, render_view_id_);
+  WebContents* web_contents = web_contents_utils::WebContentsFromFrameID(render_process_id_, render_frame_id_);
   if (!web_contents) {
     Cancel();
     return;
