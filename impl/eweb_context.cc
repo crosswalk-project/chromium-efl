@@ -20,6 +20,7 @@
 #include "eweb_context.h"
 
 #include "base/synchronization/waitable_event.h"
+#include "components/autofill/content/browser/content_autofill_driver.h"
 #include "content/public/browser/appcache_service.h"
 #include "content/public/browser/browser_context.h"
 #include "content/public/browser/browser_thread.h"
@@ -28,6 +29,7 @@
 #include "content/public/browser/local_storage_usage_info.h"
 #include "content/public/browser/dom_storage_context.h"
 #include "browser/favicon/favicon_service.h"
+#include "browser/webdata/web_data_service_factory.h"
 #include "gl/gl_shared_context_efl.h"
 #include "net/http/http_cache.h"
 #include "net/proxy/proxy_config_service_fixed.h"
@@ -494,4 +496,19 @@ Evas_Object *EWebContext::AddFaviconObject(const char* uri, Evas* canvas) const 
   bitmap.copyPixelsTo(evas_object_image_data_get(favicon, EINA_TRUE), bitmap.getSize());
 
   return favicon;
+}
+
+void EWebContext::ClearCandidateData() {
+#ifdef TIZEN_AUTOFILL_SUPPORT
+  WebDataServiceFactory* webDataServiceInstance = WebDataServiceFactory::GetInstance();
+  scoped_refptr<autofill::AutofillWebDataService> autofillWebDataService = webDataServiceInstance->GetAutofillWebDataForProfile();
+  if(autofillWebDataService) {
+    //RemoveFormElementsAddedBetween will schedule task on proper thread, it is done in WebDatabaseService::ScheduleDBTask
+    autofillWebDataService->RemoveFormElementsAddedBetween(base::Time(), base::Time::Max());
+  } else {
+    DLOG(WARNING) << "AutofillWebDataService is NULL";
+  }
+#else
+  DLOG(WARNING) << "TIZEN_AUTOFILL_SUPPORT is not enabled";
+#endif
 }

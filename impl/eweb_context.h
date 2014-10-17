@@ -109,6 +109,7 @@ class EWebContext {
   void SetPixmap(int pixmap) { m_pixmap = pixmap; }
   int Pixmap() const { return m_pixmap; }
 
+  void ClearCandidateData();
   void Initialize(Evas_Object* object);
 
  private:
