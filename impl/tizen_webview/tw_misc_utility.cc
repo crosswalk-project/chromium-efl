@@ -9,15 +9,13 @@
 namespace tizen_webview {
 
 GURL GetGURL(const URL& url) {
-  const char* host = url.getHost();
-  if (host && host[0] == '\0') {
-    GURL result("");
-    return result;
-  }
   std::ostringstream ss;
   ss << url.getProtocol() << "://" << url.getHost();
   if (!url.isPortUnspecified())
     ss << ":" << url.getPort();
+  if (!ss.str().compare("://")) {
+    return GURL("");
+  }
   GURL result(ss.str());
   assert(result.is_valid());
   return result;
