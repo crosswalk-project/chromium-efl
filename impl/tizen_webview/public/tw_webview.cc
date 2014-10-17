@@ -90,7 +90,7 @@ const char* WebView::GetUserAgent() const {
 }
 
 bool WebView::SetUserAgentAppName(const char* application_name) {
-  return impl_->SetUserAgent(application_name);
+  return impl_->SetUserAgentAppName(application_name);
 }
 
 const char* WebView::GetUserAgentAppName() const {
