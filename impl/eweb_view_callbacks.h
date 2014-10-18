@@ -217,14 +217,10 @@ DECLARE_EWK_VIEW_CALLBACK(NewFormSubmissionRequest, "form,submission,request", E
 DECLARE_EWK_VIEW_CALLBACK(FaviconChanged, "favicon,changed", void);
 DECLARE_EWK_VIEW_CALLBACK(LoadError, "load,error", Ewk_Error*);
 DECLARE_EWK_VIEW_CALLBACK(ProvisionalLoadFailed, "load,provisional,failed", Ewk_Error*);
-DECLARE_EWK_VIEW_CALLBACK(MenuBarVisible, "menubar,visible", bool*);
 DECLARE_EWK_VIEW_CALLBACK(NavigationPolicyDecision, "policy,decision,navigation", Ewk_Navigation_Policy_Decision*);
-DECLARE_EWK_VIEW_CALLBACK(StatusBarVisible, "statusbar,visible", bool*);
 DECLARE_EWK_VIEW_CALLBACK(TextFound, "text,found", unsigned*);
-DECLARE_EWK_VIEW_CALLBACK(ToolbarVisible, "toolbar,visible", bool*);
 DECLARE_EWK_VIEW_CALLBACK(TooltipTextUnset, "tooltip,text,unset", void);
 DECLARE_EWK_VIEW_CALLBACK(Vibrate, "vibrate", uint32_t*);
-DECLARE_EWK_VIEW_CALLBACK(WindowResizable, "window,resizable", bool*);
 */
 
 // Note: type 'void' means that no arguments are expected.
@@ -299,6 +295,12 @@ DECLARE_EWK_VIEW_CALLBACK(WebloginReady, "weblogin,ready" , void);
 #if defined(OS_TIZEN_TV)
 DECLARE_EWK_VIEW_CALLBACK(NewWindowNavigationPolicyDecision, "policy,decision,new,window", Ewk_Navigation_Policy_Decision*);
 #endif // OS_TIZEN_TV
+
+DECLARE_EWK_VIEW_CALLBACK(MenuBarVisible, "menubar,visible", bool*);
+DECLARE_EWK_VIEW_CALLBACK(StatusBarVisible, "statusbar,visible", bool*);
+DECLARE_EWK_VIEW_CALLBACK(ToolbarVisible, "toolbar,visible", bool*);
+DECLARE_EWK_VIEW_CALLBACK(WindowResizable, "window,resizable", bool*);
+
 }
 
 #endif

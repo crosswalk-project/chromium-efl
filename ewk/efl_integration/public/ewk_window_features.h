@@ -31,7 +31,6 @@
 #ifndef ewk_window_features_h
 #define ewk_window_features_h
 
-#if !defined(EWK_BRINGUP)
 
 #include <Eina.h>
 #include <Evas.h>
@@ -49,7 +48,7 @@ extern "C" {
  //EwkObject is removed or deprecated
 //typedef struct EwkObject Ewk_Window_Features;
 
-typedef struct _EWK_Window_Features Ewk_Window_Features;
+typedef struct _Ewk_Window_Features Ewk_Window_Features;
 
 /**
 * Queries the toolbar visibility of the window feature.
@@ -132,5 +131,4 @@ EAPI void ewk_window_features_geometry_get(const Ewk_Window_Features *window_fea
 }
 #endif
 
-#endif // EWK_BRINGUP
 #endif // ewk_window_features_h
