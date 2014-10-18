@@ -87,6 +87,7 @@
       'API/ewk_user_media_private.h',
       'API/ewk_web_application_icon_data_private.h',
       'API/ewk_web_application_icon_data_private.cc',
+      'API/ewk_window_features_private.h',
       'EdgeEffect.cpp',
       'EdgeEffect.h',
       'browser/autofill/autofill_manager_delegate_efl.cc',
