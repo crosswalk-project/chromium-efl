@@ -603,9 +603,9 @@ Eina_Bool ewk_settings_detect_contents_automatically_get(const Ewk_Settings* set
 
 void ewk_settings_cache_builder_enabled_set(Ewk_Settings *settings, Eina_Bool enabled)
 {
-#if defined(OS_TIZEN_TV) && !defined(EWK_BRINGUP)
+#if defined(OS_TIZEN_TV)
   EINA_SAFETY_ON_NULL_RETURN(settings);
-  settings->setCacheBuilder(enabled);
+  settings->setCacheBuilderEnabled(enabled);
 #else
   LOG_EWK_API_MOCKUP("Only for Tizen TV Browser");
 #endif
@@ -632,15 +632,10 @@ const char* ewk_settings_default_text_encoding_name_get(Ewk_Settings* settings)
 
 Eina_Bool ewk_settings_default_text_encoding_name_set(Ewk_Settings* settings, const char* encoding)
 {
-#if defined(OS_TIZEN_TV) && !defined(EWK_BRINGUP)
   EINA_SAFETY_ON_NULL_RETURN_VAL(settings, false);
   EINA_SAFETY_ON_NULL_RETURN_VAL(encoding, false);
   settings->setDefaultTextEncoding(encoding);
   return true;
-#else
-  LOG_EWK_API_MOCKUP("Only for Tizen TV Browser");
-  return false;
-#endif
 }
 
 #if defined(OS_TIZEN_TV)

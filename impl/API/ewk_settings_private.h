@@ -34,9 +34,14 @@ class Ewk_Settings {
         , m_autoFitting(false)
         , m_linkEffectEnabled(true)
         , m_evas_object(evas_object)
+#if defined(OS_TIZEN_TV)
+        , m_cacheBuilderEnabled(false)
+#endif
     { }
 
-    const char* defaultTextEncoding() const { return m_defaultTextEncoding; }
+    const char* defaultTextEncoding() const {
+        return m_preferences.default_encoding.c_str();
+    }
     void setDefaultTextEncoding(const char*);
     bool autofillPasswordForm() const { return m_autofillPasswordForm; }
     void setAutofillPasswordForm(bool enable) { m_autofillPasswordForm = enable; }
@@ -77,10 +82,12 @@ class Ewk_Settings {
     Evas_Object* getEvasObject() { return m_evas_object; }
     content::WebPreferences& getPreferences() { return m_preferences; }
     const content::WebPreferences& getPreferences() const { return m_preferences; }
+#if defined(OS_TIZEN_TV)
+    void setCacheBuilderEnabled(bool enable) { m_cacheBuilderEnabled = enable; }
+#endif
 
   private:
     content::WebPreferences m_preferences;
-    Eina_Stringshare* m_defaultTextEncoding;
     bool m_autofillPasswordForm;
     bool m_formCandidateData;
     bool m_autofillProfileForm;
@@ -99,6 +106,9 @@ class Ewk_Settings {
     bool m_linkEffectEnabled;
     bool m_detectContentsAutomatically;
     Evas_Object* m_evas_object;
+#if defined(OS_TIZEN_TV)
+    bool m_cacheBuilderEnabled;
+#endif
 };
 
 #endif // ewk_settings_private_h
