@@ -45,6 +45,8 @@ enum AutofillSavePassword {
 
 AutofillPopupViewEfl::AutofillPopupViewEfl(EWebView* view)
   : webview_(view)
+  , autofill_popup_(NULL)
+  , autofill_list_(NULL)
   , password_popup_(NULL)
   , form_manager_(NULL) {
   Evas_Object* widgetWin_ = elm_object_top_widget_get(elm_object_parent_widget_get(view->evas_object()));

@@ -13,7 +13,10 @@ class RenderViewHost;
 
 class FileChooserControllerEfl {
  public:
-  FileChooserControllerEfl() { parseParams(); }
+  FileChooserControllerEfl() : render_view_host_(NULL), params_(NULL) {
+    parseParams();
+  }
+
   FileChooserControllerEfl(RenderViewHost* render_view_host,
                            const content::FileChooserParams* params)
       : render_view_host_(render_view_host), params_(params) {

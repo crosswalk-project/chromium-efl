@@ -27,7 +27,10 @@ PasswordGenerationManager::PasswordGenerationManager(
     : web_contents_(contents),
       observer_(NULL),
       client_(client),
-      driver_(client->GetDriver()) {}
+      driver_(NULL) {
+  if (client)
+    driver_ = client->GetDriver();
+}
 
 PasswordGenerationManager::~PasswordGenerationManager() {}
 

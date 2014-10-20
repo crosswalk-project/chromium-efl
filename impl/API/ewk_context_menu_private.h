@@ -26,10 +26,12 @@
 // Wrapper for context_menu_controller items
 struct _Ewk_Context_Menu {
   Eina_List* menu_list_;
+  _Ewk_Context_Menu() : menu_list_(NULL) {}
 };
 
 struct _Ewk_Context_Menu_Item {
   content::ContextMenuItemEfl* menu_item_;
+  _Ewk_Context_Menu_Item() : menu_item_(NULL) {}
 };
 
 #endif // ewk_context_menu_private_h

@@ -25,9 +25,9 @@ WebContentsView* CreateWebContentsView(
 
 WebContentsViewEfl::WebContentsViewEfl(WebContents* contents,
     WebContentsViewDelegate* delegate)
-    : delegate_(delegate),
-      web_contents_(contents) {
-}
+    : delegate_(delegate)
+    , drag_dest_delegate_(NULL)
+    , web_contents_(contents) {}
 
 ////////////////////////////////////////////////////////////////////////////////
 // WebContentsViewEfl, WebContentsView implementation:

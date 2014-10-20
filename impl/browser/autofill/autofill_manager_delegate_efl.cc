@@ -43,6 +43,7 @@ namespace autofill {
 
 AutofillManagerDelegateEfl::AutofillManagerDelegateEfl(content::WebContents* web_contents)
     : content::WebContentsObserver(web_contents)
+    , webview_(NULL)
     , web_contents_(web_contents)
     , database_(WebDataServiceFactory::GetInstance()->GetAutofillWebDataForProfile())
     , is_autofill_enabled_(true)

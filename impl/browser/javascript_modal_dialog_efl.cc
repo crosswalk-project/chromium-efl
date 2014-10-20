@@ -35,12 +35,27 @@ JavaScriptModalDialogEfl::JavaScriptModalDialogEfl(content::WebContents* web_con
                                                    const base::string16& message_text,
                                                    const base::string16& default_prompt_text,
                                                    const content::JavaScriptDialogManager::DialogClosedCallback& callback)
-    : callback_(callback), origin_url_(origin_url), accept_lang_(accept_lang), javascript_message_type_(javascript_message_type),
-      message_text_(message_text), default_prompt_text_(default_prompt_text),
-      window_(NULL), prompt_entry_(NULL), ok_button_(NULL), cancel_button_(NULL) {
+    : callback_(callback)
+    , origin_url_(origin_url)
+    , accept_lang_(accept_lang)
+    , javascript_message_type_(javascript_message_type)
+    , message_text_(message_text)
+    , default_prompt_text_(default_prompt_text)
+    , web_contents_delegate_(NULL)
+    , window_(NULL)
+    , prompt_entry_(NULL)
+    , ok_button_(NULL)
+    , cancel_button_(NULL)
+    , webview_(NULL)
+    , widgetWin_(NULL)
+    , imfContext(NULL) {
   DCHECK(web_contents);
-  web_contents_delegate_ = static_cast<content::WebContentsDelegateEfl*>(web_contents->GetDelegate());
-  webview_ = web_contents_delegate_->web_view()->evas_object();
+  if(NULL != web_contents) {
+    web_contents_delegate_ = static_cast<content::WebContentsDelegateEfl*>(web_contents->GetDelegate());
+  }
+  if(NULL != web_contents_delegate_) {
+    webview_ = web_contents_delegate_->web_view()->evas_object();
+  }
 }
 
 static void promptEntryChanged(void* data, Ecore_IMF_Context* ctx, int value) {

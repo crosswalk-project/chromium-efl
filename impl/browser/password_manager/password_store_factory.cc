@@ -58,7 +58,7 @@ PasswordStoreFactory* PasswordStoreFactory::GetInstance()
 }
 
 PasswordStoreFactory::PasswordStoreFactory()
-{
+    : service_(NULL) {
   WebDataServiceFactory::GetInstance();
   Init();
 }

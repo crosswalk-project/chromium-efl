@@ -75,7 +75,9 @@ CreateSocketFactory(int& port) {
 namespace content {
 
 DevToolsDelegateEfl::DevToolsDelegateEfl(int port)
-    : port_(port) {
+    : port_(port)
+    , browser_context_(NULL)
+    , devtools_http_handler_(NULL) {
   std::string frontend_url;
   devtools_http_handler_ =
     content::DevToolsHttpHandler::Start(CreateSocketFactory(port_),

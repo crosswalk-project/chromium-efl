@@ -34,6 +34,16 @@ class WebPopupMenuProxyEfl;
 class EWebView;
 
 struct _Popup_Picker {
+    _Popup_Picker()
+        : container(NULL)
+        , parent(NULL)
+        , popupList(NULL)
+        , win(NULL)
+        , web_view_(NULL)
+        , radioMain(NULL)
+        , m_genlist_callback_data_list(NULL)
+        , firstItem(NULL)
+        , changedList(NULL) {}
     Evas_Object* container;
     Evas_Object* parent;
     Evas_Object* popupList;
@@ -49,9 +59,10 @@ struct _Popup_Picker {
 typedef struct _Popup_Picker Popup_Picker;
 
 typedef struct _genlist_callback_data {
+    _genlist_callback_data() : user_data(NULL), it(NULL), menuItem(NULL) {}
     int index;
-    void *user_data;
-    Elm_Object_Item *it;
+    void* user_data;
+    Elm_Object_Item* it;
     Popup_Menu_Item* menuItem;
 } genlist_callback_data;
 
