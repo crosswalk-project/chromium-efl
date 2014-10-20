@@ -66,6 +66,7 @@ using tizen_webview::Security_Origin;
 using tizen_webview::GetGURL;
 using tizen_webview::GetURL;
 
+EWebContext* EWebContext::default_context_ = NULL;
 tizen_webview::Mime_Override_Callback EWebContext::mime_override_callback_ = 0;
 
 namespace {

@@ -89,13 +89,20 @@ RenderWidgetHostViewEfl::RenderWidgetHostViewEfl(RenderWidgetHost* widget, EWebV
     scroll_detector_(new EflWebview::ScrollDetector()),
     m_IsEvasGLInit(0),
     device_scale_factor_(1.0f),
-    is_loading_(false),
     m_magnifier(false),
+    is_loading_(false),
     gesture_recognizer_(ui::GestureRecognizer::Create()),
-    egl_image_(0),
+    current_orientation_(0),
+    evas_gl_(NULL),
+    evas_gl_api_(NULL),
+    evas_gl_context_(NULL),
+    evas_gl_surface_(NULL),
+    evas_gl_config_(NULL),
+    egl_image_(NULL),
     current_pixmap_id_(0),
     next_pixmap_id_(0),
     surface_id_(0),
+    is_hw_accelerated_(true),
     is_modifier_key_(false) {
 
 #if defined(OS_TIZEN)
@@ -104,10 +111,8 @@ RenderWidgetHostViewEfl::RenderWidgetHostViewEfl(RenderWidgetHost* widget, EWebV
 
   if (command_line.HasSwitch(switches::kUseSWRenderingPath))
       is_hw_accelerated_ = false;
-  else
 #endif
 #endif
-      is_hw_accelerated_ = true;
 
   set_eweb_view(eweb_view);
   host_->SetView(this);
@@ -118,6 +123,7 @@ RenderWidgetHostViewEfl::RenderWidgetHostViewEfl(RenderWidgetHost* widget, EWebV
     supported_scale_factors.push_back(ui::SCALE_FACTOR_100P);
     supported_scale_factors.push_back(ui::SCALE_FACTOR_200P);
     ui::SetSupportedScaleFactors(supported_scale_factors);
+    scale_factor_initialized = true;
   }
 
   gesture_recognizer_->AddGestureEventHelper(this);

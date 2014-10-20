@@ -187,13 +187,7 @@ class ContextMenuControllerEfl
   static void contextMenuItemSelectedCallback(void* data, Evas_Object* obj, void* eventInfo);
 
   ContextMenuControllerEfl(tizen_webview::WebView* wv, ContextMenuType type, WebContents& web_contents)
-    : webview_(wv),
-      popup_(0),
-      menu_items_(0),
-      type_(type),
-      web_contents_(web_contents),
-      weak_ptr_factory_(this) {
-  }
+      : webview_(wv), popup_(NULL), menu_items_(NULL), type_(type), web_contents_(web_contents), weak_ptr_factory_(this) {}
 
   ~ContextMenuControllerEfl();
 

@@ -35,8 +35,8 @@
 EdgeEffect::EdgeEffect(Evas_Object* view)
     : enabled(true)
     , m_view(view)
-    , m_edgeObject(0)
-    , ewk_view_settings_get_(0) {
+    , m_edgeObject(NULL)
+    , ewk_view_settings_get_(NULL) {
   assert(m_view);
 
   evas_object_event_callback_add(m_view, EVAS_CALLBACK_RESIZE, viewResizeCallback, this);
