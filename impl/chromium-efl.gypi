@@ -8,6 +8,7 @@
       }],
     ],
    'chromium_efl_tizen_version%': '2.3',
+   'custom_libc_dir%': '',
   },
   'target_defaults': {
     'defines': [
@@ -36,10 +37,6 @@
        ['building_for_tizen==1', {
          'defines': [
          'OS_TIZEN=1',
-         # For GCC 4.5.3 bundled arm.h has a bug and don't define __ARM_PCS when it should.
-         # Force define this flag for the whole chromium on gbs gcc 4.5.3.
-         # Non-arm builds will ingore it in any case.
-         '__ARM_PCS',
          ],
         'conditions': [
            ['chromium_efl_tizen_version=="2.3"', {
@@ -56,7 +53,6 @@
          'sources/': [
            ['exclude', 'browser/device_sensors/data_fetcher_shared_memory_default.cc$'],
          ],
-         'cflags_cc': [ '-std=gnu++0x', '-fpermissive' ],
       }, {
         'sources/': [
           ['exclude', 'browser/device_sensors/data_fetcher_impl_tizen\\.(cc|h)$'],
@@ -76,7 +72,9 @@
            ],
       }],
       ['building_for_tizen==1 and building_for_tizen_tv==1', {
-       'defines': ['OS_TIZEN_TV=1'],
+       'defines': [
+          'OS_TIZEN_TV=1'
+        ],
       }],
       ['host_arch=="arm"', {
         'target_conditions': [
@@ -87,7 +85,6 @@
           }],
         ],
       }],
-
     ],
   },
 }

@@ -14,6 +14,15 @@
         '<(efl_impl_dir)/chromium-efl-deps.gyp:tizen',
       ],
      }],
+     ['custom_libc_dir!=""', {
+       'ldflags': [
+         # We want to statically link libstdc++/libgcc_s.
+         '-static-libstdc++',
+         '-static-libgcc',
+         '-Wl,-rpath,<(custom_libc_dir)',
+         '-Wl,--dynamic-linker=<(custom_libc_dir)/ld-linux.so.3',
+       ],
+     }],
   ]},
 
   'includes': [

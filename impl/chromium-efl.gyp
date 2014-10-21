@@ -6,6 +6,18 @@
     'webdb_dir%': '/usr/share/chromium-efl/db/',
     'edje_compiler%': 'edje_cc',
   },
+  'target_defaults': {
+    'conditions': [
+     ['custom_libc_dir!=""', {
+       'ldflags': [
+         # We want to statically link libstdc++/libgcc_s.
+         '-static-libstdc++',
+         '-static-libgcc',
+         '-Wl,-rpath,<(custom_libc_dir)',
+         '-Wl,--dynamic-linker=<(custom_libc_dir)/ld-linux.so.3',
+       ],
+     }],
+  ]},
   'targets': [{
     'target_name': 'chromium-efl',
     'type': 'shared_library',
@@ -333,8 +345,6 @@
         ['_toolset=="target"', {
           'libraries': [ '<!($(echo ${CXX_target:-g++}) -print-libgcc-file-name)', ]
         }],
-        ['ewk_bringup==1', {
-        }]
       ],
     },
     'rules': [{
