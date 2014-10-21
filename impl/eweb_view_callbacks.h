@@ -97,6 +97,7 @@ enum CallbackType {
   IMECandidatePanelHide,
   IMEInputMethodChanged,
   GeoLocationPermissionRequest,
+  GeoLocationValid,
   RequestCertificateConfirm,
   AuthChallenge,
   NotificationShow,
@@ -254,6 +255,7 @@ DECLARE_EWK_VIEW_CALLBACK(ProvisionalLoadStarted, "load,provisional,started", vo
 DECLARE_EWK_VIEW_CALLBACK(ProvisionalLoadRedirect, "load,provisional,redirect", void);
 DECLARE_EWK_VIEW_CALLBACK(LoadCommitted, "load,committed", void);
 DECLARE_EWK_VIEW_CALLBACK(GeoLocationPermissionRequest, "geolocation,permission,request", _Ewk_Geolocation_Permission_Request*);
+DECLARE_EWK_VIEW_CALLBACK(GeoLocationValid, "geolocation,valid", Eina_Bool*);
 DECLARE_EWK_VIEW_CALLBACK(RequestCertificateConfirm, "request,certificate,confirm", _Ewk_Certificate_Policy_Decision*);
 DECLARE_EWK_VIEW_CALLBACK(AuthChallenge, "authentication,challenge", _Ewk_Auth_Challenge*);
 DECLARE_EWK_VIEW_CALLBACK(NotificationShow, "notification,show", tizen_webview::Notification*);

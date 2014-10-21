@@ -37,15 +37,27 @@ void GeolocationPermissionContextEfl::RequestGeolocationPermissionOnUIThread(int
   if (!web_view)
     return;
 
-  std::string host = requesting_frame.host();
-  std::string port = requesting_frame.port();
-  std::string protocol = requesting_frame.scheme();
-  _Ewk_Geolocation_Permission_Request *request = new _Ewk_Geolocation_Permission_Request(web_view->evas_object(),
-                                                                                         host.c_str(),
-                                                                                         protocol.c_str(),
-                                                                                         atoi(port.c_str()),
-                                                                                         callback);
-  web_view->SmartCallback<EWebViewCallbacks::GeoLocationPermissionRequest>().call(request);
+  // Permission request is sent before even creating location provider -
+  // it's the only place where we can clearly ask certain view if
+  // we can enable it.
+  Eina_Bool geolocation_valid = EINA_TRUE;
+  web_view->SmartCallback<EWebViewCallbacks::GeoLocationValid>().call(
+      &geolocation_valid);
+  if (EINA_TRUE == geolocation_valid) {
+    std::string host = requesting_frame.host();
+    std::string port = requesting_frame.port();
+    std::string protocol = requesting_frame.scheme();
+    _Ewk_Geolocation_Permission_Request *request =
+    new _Ewk_Geolocation_Permission_Request(web_view->evas_object(),
+                                                host.c_str(),
+                                                protocol.c_str(),
+                                                atoi(port.c_str()),
+                                                callback);
+    web_view->SmartCallback<EWebViewCallbacks::GeoLocationPermissionRequest>().call(
+        request);
+  } else {
+    callback.Run(false);
+  }
 }
 
 void GeolocationPermissionContextEfl::RequestGeolocationPermission(int render_process_id,
