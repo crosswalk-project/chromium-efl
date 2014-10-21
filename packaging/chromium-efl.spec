@@ -200,6 +200,9 @@ fi
 %if 0%{?_remove_webcore_debug_symbols:1}
   -Dremove_webcore_debug_symbols=1 \
 %endif
+%if 0%{?custom_libc_dir:1}
+  -Dcustom_libc_dir=%{custom_libc_dir} \
+%endif
 %if 0%{?chromium_efl_tizen_version:1}
   -Dchromium_efl_tizen_version=%{chromium_efl_tizen_version} \
 %endif
