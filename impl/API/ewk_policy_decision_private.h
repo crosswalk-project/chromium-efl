@@ -32,7 +32,7 @@
 #include <browser/navigation_policy_handler_efl.h>
 #include <browser/policy_response_delegate_efl.h>
 
-#include "ewk_frame_private.h"
+#include "tizen_webview/public/tw_frame.h"
 
 struct NavigationPolicyParams;
 
@@ -89,7 +89,7 @@ class _Ewk_Policy_Decision {
 
   NavigationPolicyHandlerEfl* GetNavigationPolicyHandler() const { return navigation_policy_handler_.get(); }
 
-  Ewk_Frame* GetFrameRef() const;
+  tizen_webview::Frame* GetFrameRef() const;
 
   void InitializeOnUIThread();
 
@@ -117,7 +117,7 @@ class _Ewk_Policy_Decision {
   content::WebContentsDelegateEfl* new_window_policy_delegate_;
   scoped_refptr<PolicyResponseDelegateEfl> policy_response_delegate_;
   scoped_ptr<NavigationPolicyHandlerEfl> navigation_policy_handler_;
-  scoped_ptr<Ewk_Frame> frame_;
+  scoped_ptr<tizen_webview::Frame> frame_;
   std::string cookie_;
   std::string url_;
   std::string host_;

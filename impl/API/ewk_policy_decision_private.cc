@@ -121,7 +121,7 @@ _Ewk_Policy_Decision::_Ewk_Policy_Decision(const GURL &request_url, const net::H
 _Ewk_Policy_Decision::_Ewk_Policy_Decision(const NavigationPolicyParams &params, content::RenderViewHost* rvh)
   : new_window_policy_delegate_(NULL)
   , navigation_policy_handler_(new NavigationPolicyHandlerEfl(rvh, params))
-  , frame_(new Ewk_Frame(params))
+  , frame_(new tizen_webview::Frame(params))
   , responseHeaders_(NULL)
   , decisionType_(TW_POLICY_DECISION_USE)
   , navigationType_(static_cast<tizen_webview::Policy_Navigation_Type>(params.type))
@@ -158,7 +158,7 @@ _Ewk_Policy_Decision::_Ewk_Policy_Decision(content::WebContentsDelegateEfl* view
   if (url.has_password() && url.has_username())
     SetAuthorizationIfNecessary(url);
 
-  frame_.reset(new Ewk_Frame(rfh));
+  frame_.reset(new tizen_webview::Frame(rfh));
 }
 
 _Ewk_Policy_Decision::~_Ewk_Policy_Decision() {
@@ -245,12 +245,12 @@ void _Ewk_Policy_Decision::InitializeOnUIThread() {
        * In some situations there is no renderer associated to the response
        * Such case can be observed while running TC utc_blink_ewk_geolocation_permission_request_suspend_func
        */
-      frame_.reset(new Ewk_Frame(host));
+      frame_.reset(new tizen_webview::Frame(host));
     }
   }
 }
 
-Ewk_Frame* _Ewk_Policy_Decision::GetFrameRef() const {
+tizen_webview::Frame* _Ewk_Policy_Decision::GetFrameRef() const {
   DCHECK(BrowserThread::CurrentlyOn(BrowserThread::UI));
   // Ups, forgot to initialize something?
   DCHECK(frame_.get());

@@ -21,7 +21,6 @@ class HttpResponseHeaders;
 
 // TODO: break below dependency
 class NavigationPolicyHandlerEfl;
-class Ewk_Frame;
 class GURL;
 class _Ewk_Policy_Decision;
 class PolicyResponseDelegateEfl;
@@ -29,6 +28,8 @@ struct NavigationPolicyParams;
 class EWebView;
 
 namespace tizen_webview {
+
+class Frame;
 
 enum Policy_Decision_Type {
   TW_POLICY_DECISION_USE,
@@ -75,7 +76,7 @@ class PolicyDecision {
   tizen_webview::Policy_Decision_Type GetDecisionType() const;
   Eina_Hash* GetResponseHeaders() const;
   int GetResponseStatusCode() const;
-  Ewk_Frame* GetFrameRef() const;
+  Frame* GetFrameRef() const;
  private:
   typedef ::_Ewk_Policy_Decision Impl;
   Impl* impl_;

@@ -100,7 +100,7 @@ int PolicyDecision::GetResponseStatusCode() const {
   return impl_->GetResponseStatusCode();
 }
 
-Ewk_Frame* PolicyDecision::GetFrameRef() const {
+tizen_webview::Frame* PolicyDecision::GetFrameRef() const {
   return impl_->GetFrameRef();
 }
 
