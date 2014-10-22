@@ -56,16 +56,12 @@ static void promptEnterKeyDownCallback(void* data, Evas_Object* obj, void* event
 }
 
 bool JavaScriptModalDialogEfl::ShowJavaScriptDialog() {
-  LOG(INFO) << "ShowJavaScriptDialog() ";
-
   popup_ = popupAdd();
 
   if (!popup_)
     return false;
 
   if (javascript_message_type_ == content::JAVASCRIPT_MESSAGE_TYPE_PROMPT) {
-    LOG(INFO) << "JAVASCRIPT_MESSAGE_TYPE_PROMPT() ";
-
     if (message_text_.c_str())
       elm_object_part_text_set(popup_, "title,text", UTF16ToUTF8(message_text_).c_str());
 
@@ -106,8 +102,6 @@ bool JavaScriptModalDialogEfl::ShowJavaScriptDialog() {
 
 #if !defined(EWK_BRINGUP)
   } else if (javascript_message_type_ == content::JAVASCRIPT_MESSAGE_TYPE_NAVIGATION_PROMPT) {
-    LOG(INFO) << "JAVASCRIPT_MESSAGE_TYPE_NAVIGATION_PROMPT() ";
-
     if (message_text_.c_str())
       elm_object_part_text_set(popup_, "title,text", UTF16ToUTF8(message_text_).c_str());
 
@@ -132,7 +126,6 @@ bool JavaScriptModalDialogEfl::ShowJavaScriptDialog() {
     evas_object_smart_callback_add(ok_button_, "clicked", CancelButtonHandlerForPrompt, this);
 #endif
   } else if (javascript_message_type_ == content::JAVASCRIPT_MESSAGE_TYPE_ALERT) {
-    LOG(INFO) << "JAVASCRIPT_MESSAGE_TYPE_ALERT() ";
     if (!setLabelText(UTF16ToUTF8(message_text_).c_str()))
       return false;
 
@@ -143,7 +136,6 @@ bool JavaScriptModalDialogEfl::ShowJavaScriptDialog() {
 
     evas_object_smart_callback_add(ok_button_, "clicked", OkButtonHandlerForAlert, this);
   } else if(javascript_message_type_ == content::JAVASCRIPT_MESSAGE_TYPE_CONFIRM) {
-    LOG(INFO) << "JAVASCRIPT_MESSAGE_TYPE_CONFIRM() ";
     if (!setLabelText(UTF16ToUTF8(message_text_).c_str()))
       return false;
 

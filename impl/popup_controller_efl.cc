@@ -13,9 +13,6 @@ static void item_selected_cb(void *data, Evas_Object *obj, void *event_info) {
   PopupControllerEfl* controller = static_cast<PopupControllerEfl*>(data);
   std::string info = elm_object_item_text_get(static_cast<Elm_Object_Item*>(event_info));
 
-  LOG(INFO) << __PRETTY_FUNCTION__ << " : " << info << " content: " << controller->fullContent().c_str()
-    << " type: " << controller->popupContentType();
-
   controller->closePopup();
 
   service_h svcHandle = 0;
@@ -64,9 +61,6 @@ static void item_selected_cb(void *data, Evas_Object *obj, void *event_info) {
 
 static void copy_cb(void *data, Evas_Object *obj, void *event_info) {
   PopupControllerEfl* controller = static_cast<PopupControllerEfl*>(data);
-
-  LOG(INFO) << __PRETTY_FUNCTION__ << " : " << elm_object_item_text_get(static_cast<Elm_Object_Item*>(event_info))
-    << " content: " << controller->fullContent().c_str() << " type: " << controller->popupContentType();
 
   ClipboardHelperEfl::GetInstance()->SetData(controller->content(), ClipboardHelperEfl::CLIPBOARD_DATA_TYPE_PLAIN_TEXT);
 

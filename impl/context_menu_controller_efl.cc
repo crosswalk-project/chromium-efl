@@ -61,7 +61,6 @@ ContextMenuControllerEfl::~ContextMenuControllerEfl() {
 }
 
 bool ContextMenuControllerEfl::PopulateAndShowContextMenu(const ContextMenuParams &params) {
-  LOG(INFO) << __PRETTY_FUNCTION__;
   EWebView* view = webview_->GetImpl();
   if (!view)
     return false;
@@ -250,8 +249,6 @@ void ContextMenuControllerEfl::contextMenuItemSelectedCallback(void* data, Evas_
 bool ContextMenuControllerEfl::ShowContextMenu() {
   if (!popup_)
     return false;
-
-  LOG(INFO) << __PRETTY_FUNCTION__ << "param.x = " << params_.x << " params.y = " << params_.y;
 
   if (type_ == MENU_TYPE_SELECTION) {
     int webViewX, webViewY, webViewWidth, webViewHeight;
