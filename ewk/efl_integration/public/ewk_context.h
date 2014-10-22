@@ -557,21 +557,6 @@ EAPI void ewk_context_did_start_download_callback_set(Ewk_Context* context, Ewk_
 EAPI void ewk_context_mime_override_callback_set(Ewk_Context_Override_Mime_For_Url_Callback callback);
 
 /**
- * start memory sampler.
- *
- * @param context context object
- * @param interval time gap to fire the timer
-*/
-EAPI void ewk_context_memory_sampler_start(Ewk_Context* context, double timer_interval);
-
-/**
-* stop memory sampler.
-*
-* @param context context object
-*/
-EAPI void ewk_context_memory_sampler_stop(Ewk_Context* context);
-
-/**
  * @typedef Ewk_Vibration_Client_Vibrate_Cb Ewk_Vibration_Client_Vibrate_Cb
  * @brief Type definition for a function that will be called back when vibrate
  * request receiveed from the vibration controller.

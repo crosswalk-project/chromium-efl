@@ -319,8 +319,6 @@ void RenderWidgetHostViewEfl::Init_EvasGL(int width, int height) {
       evas_gl_, GLSharedContextEfl::GetEvasGLContext());
   if (!evas_gl_context_) {
     LOG(ERROR) << "set_eweb_view -- Create evas gl context Fail";
-  } else {
-    LOG(INFO) << "set_eweb_view -- Create evas gl context Success";
   }
 
   if(width > MAX_SURFACE_WIDTH_EGL)
@@ -594,7 +592,6 @@ void RenderWidgetHostViewEfl::SetIsLoading(bool is_loading) {
 
 void RenderWidgetHostViewEfl::TextInputStateChanged(
     const ViewHostMsg_TextInputState_Params& params) {
-  LOG(INFO) << "RenderWidgetHostViewEfl::TextInputStateChanged";
   if (!params.show_ime_if_needed && !eweb_view()->GetSettings()->useKeyPadWithoutUserAction())
     return;
 
@@ -1090,16 +1087,13 @@ void RenderWidgetHostViewEfl::HandleEvasEvent(const Evas_Event_Mouse_Wheel* even
 }
 
 void RenderWidgetHostViewEfl::HandleEvasEvent(const Evas_Event_Key_Down* event) {
-  LOG(INFO) << __PRETTY_FUNCTION__ << " : " << event->key;
   bool wasFiltered = false;
 
   if (!strcmp(event->key, "XF86Phone")) {
-    LOG(INFO) <<"Temp: host_->WasHidden() called";
     host_->WasHidden();
   }
 
   if (!strcmp(event->key, "XF86PowerOff")) {
-    LOG(INFO) <<"Temp:host_->WasHidden() called";
     host_->WasHidden();
   }
 
@@ -1395,7 +1389,6 @@ void RenderWidgetHostViewEfl::OnDidChangeContentsSize(int width, int height) {
 }
 
 void RenderWidgetHostViewEfl::OnOrientationChangeEvent(int orientation) {
-  LOG(INFO) << __PRETTY_FUNCTION__;
   current_orientation_ = orientation;
 }
 

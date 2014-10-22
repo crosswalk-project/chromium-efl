@@ -193,12 +193,4 @@ void WebContext::SetMimeOverrideCallback(Mime_Override_Callback callback) {
   EWebContext::SetMimeOverrideCallback(callback);
 }
 
-void WebContext::StartMemorySampler(double timerInterval) const {
-  impl->StartMemorySampler(timerInterval);
-}
-
-void WebContext::StopMemorySampler() const {
-  impl->StopMemorySampler();
-}
-
 } // namespace tizen_webview

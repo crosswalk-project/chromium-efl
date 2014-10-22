@@ -353,18 +353,6 @@ void ewk_context_mime_override_callback_set(Ewk_Context_Override_Mime_For_Url_Ca
   WebContext::SetMimeOverrideCallback(callback);
 }
 
-void ewk_context_memory_sampler_start(Ewk_Context* context, double timerInterval)
-{
-  EINA_SAFETY_ON_NULL_RETURN(context);
-  context->StartMemorySampler(timerInterval);
-}
-
-void ewk_context_memory_sampler_stop(Ewk_Context* context)
-{
-  EINA_SAFETY_ON_NULL_RETURN(context);
-  context->StopMemorySampler();
-}
-
 Eina_Bool ewk_context_additional_plugin_path_set(Ewk_Context *context, const char *path)
 {
   EINA_SAFETY_ON_NULL_RETURN_VAL(context, EINA_FALSE);

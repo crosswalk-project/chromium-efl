@@ -99,8 +99,6 @@ class EWebContext {
   void GetAllOriginsWithFileSystem(tizen_webview::Local_File_System_Origins_Get_Callback callback, void* user_data) const;
   bool SetFaviconDatabasePath(const char *path);
   Evas_Object *AddFaviconObject(const char *uri, Evas *canvas) const;
-  void StartMemorySampler(double timerInterval) const;
-  void StopMemorySampler() const;
 
   void SendWidgetInfo(int widget_id, double scale, const std::string &theme, const std::string &encoded_bundle);
   void SendWrtMessage(const tizen_webview::WrtIpcMessageData& message);

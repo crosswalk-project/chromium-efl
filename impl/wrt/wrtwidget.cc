@@ -50,7 +50,6 @@ void WrtWidget::ParseUrl(const GURL& url, GURL& new_url) {
 void WrtWidget::StartSession(v8::Handle<v8::Context> context,
                              int routingHandle) {
   if (widgetHandle_ != -1 && !context.IsEmpty()) {
-    LOG(INFO) << "Calling start session with id = " << widgetHandle_ << "\n";
     DynamicPlugin::instance().startSession(widgetHandle_,
                                            context,
                                            routingHandle,

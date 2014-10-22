@@ -1157,7 +1157,6 @@ bool EWebView::GetSelectionRange(Eina_Rectangle* left_rect, Eina_Rectangle* righ
 // TODO(sns.park) : better to move this method to SelectionController
 bool EWebView::ClearSelection()
 {
-    LOG(INFO) << "EWebView::ClearSelection";
     bool retval = false;
     if (selection_controller_->GetSelectionStatus()) {
       selection_controller_->ClearSelection();
