@@ -40,7 +40,7 @@ COMMON_GYP_PARAMETERS="--depth=${TOPDIR}/src
                       -Goutput_dir=${GYP_GENERATOR_OUTPUT}
                       -Dchrome_src_dir=${TOPDIR}/src
                       -Defl_impl_dir=${TOPDIR}/impl
-                      -Duse_libjpeg_turbo=0
+                      -Duse_libjpeg_turbo=1
                       -Dproprietary_codecs=1
                       -Dclang=0
                       -Duse_aura=1
@@ -74,7 +74,7 @@ else
                -Duse_system_expat=1
                -Duse_system_flac=1
                -Duse_system_icu=1
-               -Duse_system_libjpeg=1
+               -Duse_system_libjpeg=0
                -Duse_system_libpng=1
                -Duse_system_libusb=1
                -Duse_system_libxml=1
