@@ -121,6 +121,10 @@ std::string VersionInfo::ProductNameAndVersionForUserAgent() const {
 }
 
 std::string VersionInfo::DefaultUserAgent() const {
+  char* override_ua = getenv("CHROMIUM_EFL_OVERRIDE_UA_STRING");
+  if (override_ua)
+    return override_ua;
+
   std::string product = ProductNameAndVersionForUserAgent();
 
   if (CommandLine::ForCurrentProcess()->HasSwitch(
