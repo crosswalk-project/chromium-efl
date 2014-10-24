@@ -27,31 +27,6 @@
 
 class utc_blink_ewk_view_add : public utc_blink_ewk_base
 {
-protected:
-  Evas_Object *webview, *window;
-  /* Startup function */
-  void SetUp()
-  {
-    /* 2. Initialization of the EFL (and other) libraries */
-#if !GLIB_CHECK_VERSION(2, 36, 0)
-    g_type_init();
-#endif
-    ewk_init();
-    elm_init(0, NULL);
-
-    elm_config_preferred_engine_set("opengl_x11");
-  }
-
-  /* Cleanup function */
-  void TearDown()
-  {
-    /* 2. Freeing resources */
-    if (webview)
-      evas_object_del(webview);
-
-    if (window)
-      evas_object_del(window);
-  }
 };
 
 /**
@@ -60,12 +35,12 @@ protected:
 TEST_F(utc_blink_ewk_view_add, POS_TEST)
 {
   Eina_Bool result = EINA_FALSE;
-  window = elm_win_add(NULL, "TC Launcher", ELM_WIN_BASIC);
+  Evas_Object* window = elm_win_add(NULL, "TC Launcher", ELM_WIN_BASIC);
   elm_win_title_set(window, "TC Launcher");
   Evas *evas = evas_object_evas_get(window);
 
   /* Initialization of webview */
-  webview = ewk_view_add(evas);
+  Evas_Object* webview = ewk_view_add(evas);
 
   if( webview)
     result = EINA_TRUE;
@@ -83,7 +58,7 @@ TEST_F(utc_blink_ewk_view_add, POS_TEST)
  */
 TEST_F(utc_blink_ewk_view_add, NEG_TEST)
 {
-  webview = ewk_view_add(NULL);
+  Evas_Object* webview = ewk_view_add(NULL);
   if( webview)
     utc_fail();
 }
