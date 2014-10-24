@@ -58,7 +58,7 @@ protected:
     evas_object_smart_callback_add(GetEwkWebView(), "contextmenu,customize", contextmenu_customize_callback, this);
   }
 
-  virtual void TearDown()
+  virtual void PreTearDown()
   {
     evas_object_smart_callback_del(GetEwkWebView(), "contextmenu,customize", contextmenu_customize_callback);
   }
