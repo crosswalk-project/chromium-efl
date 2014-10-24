@@ -7,7 +7,8 @@ SCRIPTDIR=$(cd $(dirname $0); pwd -P)
 
 ${SCRIPTDIR}/apply_patches.sh
 
-PROFILE_NAME=$(echo "$@" | grep -Po "(?<=\-P\s)[^\s]*")
+# "|| :" means "or always succeeding built-in command"
+PROFILE_NAME=$(echo "$@" | grep -Po "(?<=\-P\s)[^\s]*" || :)
 
 if [ "$PROFILE_NAME" == "" ]; then
   PROFILE_NAME=tztv_v2.2.1_prehawk
