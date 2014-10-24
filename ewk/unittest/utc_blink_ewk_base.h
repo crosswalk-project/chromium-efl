@@ -52,6 +52,8 @@
 #include "ewk_text_style.h"
 #include "ewk_web_application_icon_data.h"
 
+#include "base/compiler_specific.h"
+
 /* Definitions and macros */
 #define DEFAULT_WIDTH_OF_WINDOW 480
 #define DEFAULT_HEIGHT_OF_WINDOW 800
@@ -238,7 +240,7 @@ protected:
      *
      * @note This method should not be overriden.
      */
-    void SetUp();
+    void SetUp() FINAL;
 
     /**
      * Performs unit test deinitialization. It calls PreTearDown before default deinitialization
@@ -246,7 +248,7 @@ protected:
      *
      * @note This method should not be overriden.
      */
-    void TearDown();
+    void TearDown() FINAL;
 
     template<class T> static void OwnerFromVoid(void *owner, T** out)
     {

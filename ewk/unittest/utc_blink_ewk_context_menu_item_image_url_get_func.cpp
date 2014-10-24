@@ -59,7 +59,7 @@ protected:
     image_path = GetResourceUrl("/ewk_context_menu/webkit.png");
   }
 
-  virtual void TearDown()
+  virtual void PreTearDown()
   {
     evas_object_smart_callback_del(GetEwkWebView(), "contextmenu,customize", contextmenu_customize_callback);
     evas_object_smart_callback_del(GetEwkWebView(), "contextmenu,selected", contextmenu_selected_callback);
