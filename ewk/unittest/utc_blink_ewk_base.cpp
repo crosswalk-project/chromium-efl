@@ -277,8 +277,6 @@ void utc_blink_ewk_base::EwkDeinit()
     utc_message("[[ TET_MSG ]]:: ============ Cleanup ============");
 
     /* 2. Freeing resources */
-/*
-    FIXME: This code happen segmentation fault. So, commented out.
     ewk_context_unref(ewk_context);
     if (ewk_webview)
         evas_object_del(ewk_webview);
@@ -290,6 +288,5 @@ void utc_blink_ewk_base::EwkDeinit()
     ewk_evas = NULL;
     ewk_background = NULL;
     ewk_webview = NULL;
-*/
 }
 
