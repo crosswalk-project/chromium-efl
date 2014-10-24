@@ -35,6 +35,8 @@ private:
   // chromium processes. They should remain unchanged until engine shutdown.
   typedef std::vector<std::string> ArgumentVector;
   static ArgumentVector original_arguments_;
+
+  static bool is_initialized_;
 };
 
 #endif // COMMAND_LINE_EFL

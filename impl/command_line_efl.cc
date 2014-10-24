@@ -17,8 +17,12 @@
 int CommandLineEfl::argc_ = 0;
 char** CommandLineEfl::argv_ = NULL;
 CommandLineEfl::ArgumentVector CommandLineEfl::original_arguments_;
+bool CommandLineEfl::is_initialized_ = false;
 
 void CommandLineEfl::Init(int argc, char *argv[]) {
+  if (CommandLineEfl::is_initialized_) {
+    LOG(ERROR) << "CommandLineEfl::Init should not be called more than once";
+  }
   CommandLine::Init(argc, argv);
   argc_ = argc;
   argv_ = argv;
@@ -31,9 +35,13 @@ void CommandLineEfl::Init(int argc, char *argv[]) {
   // See: chromium/src/content/common/set_process_title_linux.cc
   for (int i = 0; i < argc; ++i)
     original_arguments_.push_back(std::string(argv[i]));
+  CommandLineEfl::is_initialized_ = true;
 }
 
 content::MainFunctionParams CommandLineEfl::GetDefaultPortParams() {
+  if (!CommandLineEfl::is_initialized_) {
+    CommandLineEfl::Init(0, NULL);
+  }
   CommandLine* p_command_line = CommandLine::ForCurrentProcess();
 
   p_command_line->AppendSwitch(switches::kNoSandbox);
