@@ -11,6 +11,8 @@ int main(int argc, char* argv[])
 #if !GLIB_CHECK_VERSION(2, 36, 0)
   g_type_init();
 #endif
+  ewk_set_arguments(argc, argv);
+
   ewk_init();
   elm_init(0, NULL);
 
