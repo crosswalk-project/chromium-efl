@@ -27,35 +27,6 @@
 
 class utc_blink_ewk_view_add_with_context : public utc_blink_ewk_base
 {
-protected:
-  /* Startup function */
-  void SetUp()
-  {
-    /* 1. Standard TETware test initialization message */
-    utc_message("[[ TET_MSG ]]:: ============ Startup ============ ");
-
-    /* 2. Initialization of the EFL (and other) libraries */
-#if !GLIB_CHECK_VERSION(2, 36, 0)
-    g_type_init();
-#endif
-    elm_init(0, NULL);
-  }
-
-  /* Cleanup function */
-  void TearDown()
-  {
-    /* Standard TETware test end/cleanup messages */
-    utc_message("[[ TET_MSG ]]:: ============ Cleanup ============ ");
-
-    /* Closing whole EWK */
-    ecore_evas_shutdown();
-    ecore_shutdown();
-    evas_shutdown();
-    // elm_shutdown();
-    // TODO
-    // *** ECORE ERROR: Ecore Magic Check Failed!!!
-    // *** IN FUNCTION: ecore_evas_free()
-  }
 };
 
 /**

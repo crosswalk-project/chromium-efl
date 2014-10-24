@@ -144,7 +144,6 @@
         'utc_blink_ewk_hit_test_node_value_get_func.cpp',
         'utc_blink_ewk_hit_test_result_context_get_func.cpp',
         'utc_blink_ewk_hit_test_tag_name_get_func.cpp',
-        'utc_blink_ewk_init_func.cpp',
         'utc_blink_ewk_notification_body_get_func.cpp',
         'utc_blink_ewk_notification_clicked_func.cpp',
         'utc_blink_ewk_notification_icon_url_get_func.cpp',
@@ -179,7 +178,6 @@
         'utc_blink_ewk_security_origin_host_get_func.cpp',
         'utc_blink_ewk_security_origin_port_get_func.cpp',
         'utc_blink_ewk_security_origin_protocol_get_func.cpp',
-        'utc_blink_ewk_set_arguments_func.cpp',
         'utc_blink_ewk_settings_autofill_password_form_enabled_get_func.cpp',
         'utc_blink_ewk_settings_autofill_password_form_enabled_set_func.cpp',
         'utc_blink_ewk_settings_auto_fitting_get_func.cpp',
@@ -220,7 +218,6 @@
         'utc_blink_ewk_settings_text_zoom_enabled_set_func.cpp',
         'utc_blink_ewk_settings_uses_encoding_detector_set_func.cpp',
         'utc_blink_ewk_settings_uses_keypad_without_user_action_set_func.cpp',
-        'utc_blink_ewk_shutdown_func.cpp',
         'utc_blink_ewk_text_style_align_center_get_func.cpp',
         'utc_blink_ewk_text_style_align_full_get_func.cpp',
         'utc_blink_ewk_text_style_align_left_get_func.cpp',
@@ -344,6 +341,9 @@
     ['ewk_bringup==1', {
       'defines': [ 'EWK_BRINGUP=1' ],
       'sources!': [
+        #XXX: enable *local_file_system* once we find a way to set --allow-file-access-from-files flag at runtime
+        'utc_blink_ewk_context_local_file_system_all_delete_func.cpp',
+        'utc_blink_ewk_context_local_file_system_delete_func.cpp',
         'utc_blink_ewk_history_back_list_length_get_func.cpp',
         'utc_blink_ewk_history_forward_list_length_get.cpp',
         'utc_blink_ewk_history_free_func.cpp',
