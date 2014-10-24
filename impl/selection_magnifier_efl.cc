@@ -62,8 +62,14 @@ SelectionMagnifierEfl::~SelectionMagnifierEfl() {
     evas_object_del(content_image_);
     content_image_ = 0;
   }
+
   if (container_)
     evas_object_del(container_);
+
+  if (animator_) {
+    ecore_animator_del(animator_);
+    animator_ = 0;
+  }
 }
 
 void SelectionMagnifierEfl::HandleLongPress(const gfx::Point& touch_point) {
