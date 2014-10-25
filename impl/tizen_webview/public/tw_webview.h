@@ -36,6 +36,7 @@ class TouchEvent;
 
 namespace tizen_webview {
 
+class Frame;
 class ContextMenuController;
 class SelectionController;
 class WebContext;
@@ -61,6 +62,8 @@ class WebView {
   WebViewEvasEventHandler* GetEvasEventHandler();
   ContextMenuController* GetContextMenuController();
   void ResetContextMenuController();
+
+  Frame* GetMainFrame();
 
   // ---- User Agent
   bool SetUserAgent(const char* userAgent);

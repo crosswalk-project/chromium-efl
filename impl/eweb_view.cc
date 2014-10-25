@@ -812,6 +812,19 @@ Ewk_Settings* EWebView::GetSettings() {
   return settings_.get();
 }
 
+tizen_webview::Frame* EWebView::GetMainFrame() {
+  DCHECK(BrowserThread::CurrentlyOn(BrowserThread::UI));
+
+  if (!frame_.get()) {
+    RenderViewHost* render_view_host = web_contents_->GetRenderViewHost();
+
+    if (render_view_host)
+      frame_.reset(new tizen_webview::Frame(render_view_host->GetMainFrame()));
+  }
+
+  return frame_.get();
+}
+
 void EWebView::UpdateWebKitPreferences() {
   RenderViewHost* render_view_host = web_contents_->GetRenderViewHost();
   if (!render_view_host)
