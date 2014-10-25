@@ -74,6 +74,7 @@
 #include "tizen_webview/public/tw_touch_event.h"
 #include "tizen_webview/public/tw_callbacks.h"
 #include "tizen_webview/public/tw_content_security_policy.h"
+#include "tizen_webview/public/tw_frame.h"
 #include "tizen_webview/public/tw_input_type.h"
 #include "tizen_webview/public/tw_find_options.h"
 #include "tizen_webview/public/tw_touch_event.h"
@@ -261,6 +262,7 @@ class EWebView {
   const char* GetUserAgentAppName() const;
   const char* GetSelectedText() const;
   Ewk_Settings* GetSettings();
+  tizen_webview::Frame* GetMainFrame();
   void UpdateWebKitPreferences();
   void LoadHTMLString(const char* html, const char* base_uri, const char* unreachable_uri);
   void LoadPlainTextString(const char* plain_text);
@@ -437,6 +439,7 @@ class EWebView {
   scoped_ptr<content::WebContentsDelegateEfl> web_contents_delegate_;
   std::string pending_url_request_;
   scoped_ptr<Ewk_Settings> settings_;
+  scoped_ptr<tizen_webview::Frame> frame_;
   scoped_ptr<tizen_webview::PolicyDecision> window_policy_;
   Evas_Object* evas_object_;
   bool touch_events_enabled_;

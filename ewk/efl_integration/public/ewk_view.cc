@@ -806,11 +806,7 @@ Eina_Bool ewk_view_touch_events_enabled_get(const Evas_Object *view)
 Ewk_Frame_Ref ewk_view_main_frame_get(Evas_Object* o)
 {
   EWK_VIEW_IMPL_GET_OR_RETURN(o, impl, NULL);
-#if !defined(EWK_BRINGUP)
   return impl->GetMainFrame();
-#else
-  return NULL;
-#endif
 }
 
 Eina_Bool ewk_view_main_frame_scrollbar_visible_set(Evas_Object* ewkView, Eina_Bool visible)

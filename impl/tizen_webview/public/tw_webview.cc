@@ -80,6 +80,9 @@ void WebView::ResetContextMenuController() {
   return impl_->context_menu_.reset();
 }
 
+tizen_webview::Frame* WebView::GetMainFrame() {
+  return impl_->GetMainFrame();
+}
 
 bool WebView::SetUserAgent(const char* userAgent) {
   return impl_->SetUserAgent(userAgent);
