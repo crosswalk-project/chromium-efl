@@ -22,8 +22,9 @@ BrowserContextEfl::ResourceContextEfl::ResourceContextEfl(BrowserContextEfl *ctx
 
 BrowserContextEfl::~BrowserContextEfl() {
   if (resource_context_) {
-    DCHECK(BrowserThread::DeleteSoon(BrowserThread::IO, FROM_HERE, resource_context_));
-    resource_context_ = NULL;
+    resource_context_->set_url_request_context_getter(NULL);
+    bool ok = BrowserThread::DeleteSoon(BrowserThread::IO, FROM_HERE, resource_context_);
+    DCHECK(ok);
   }
 }
 
