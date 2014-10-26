@@ -114,7 +114,15 @@ class SelectionControllerEfl : public tizen_webview::SelectionController {
   bool TextSelectionUp(int x, int y);
 
  private:
+  // TODO: This method should be renamed to ScheduleShowHandleAndContextMenuIfNeeded
+  // as it now performs an asyncrhonous hit test passing the method that actually
+  // updates the selection handles and context menu as a registered callback.
   void ShowHandleAndContextMenuIfRequired(bool anchor_first = true);
+  void ShowHandleAndContextMenuIfRequired(Evas_Object*,
+      int x, int y, int mode, tizen_webview::Hit_Test*, bool anchor_first);
+  static void ShowHandleAndContextMenuIfRequiredCallback(Evas_Object*,
+      int x, int y, int mode, tizen_webview::Hit_Test*, void* data);
+
   void Clear();
   bool IsSelectionValid(const gfx::Rect& left_rect, const gfx::Rect& right_rect);
 
