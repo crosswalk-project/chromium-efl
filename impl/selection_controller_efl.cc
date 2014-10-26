@@ -152,6 +152,26 @@ void SelectionControllerEfl::UpdateSelectionDataAndShow(const gfx::Rect& left_re
   expecting_update_ = false;
 }
 
+namespace {
+struct HitTestContext {
+  HitTestContext(SelectionControllerEfl* controller, bool anchor)
+      : owner(controller), anchor_first(anchor) {}
+
+  SelectionControllerEfl* owner;
+  bool anchor_first;
+};
+} // namespace
+
+void SelectionControllerEfl::ShowHandleAndContextMenuIfRequiredCallback(
+    Evas_Object* o, int x, int y, int mode, tizen_webview::Hit_Test* hit_test, void* data) {
+  HitTestContext* context = static_cast<HitTestContext*>(data);
+  DCHECK(context);
+  DCHECK(context->owner);
+  context->owner->ShowHandleAndContextMenuIfRequired(
+      o, x, y, mode, hit_test, context->anchor_first);
+  delete context;
+}
+
 void SelectionControllerEfl::ShowHandleAndContextMenuIfRequired(bool anchor_first) {
   TRACE_EVENT0("selection,efl", __PRETTY_FUNCTION__);
   if (!selection_data_->GetStatus())
@@ -159,6 +179,20 @@ void SelectionControllerEfl::ShowHandleAndContextMenuIfRequired(bool anchor_firs
 
   if (scrolling_)
     return;
+
+  HitTestContext* context = new HitTestContext(this, anchor_first);
+
+  int hitX, hitY;
+  hitX = selection_data_->GetContextMenuParams()->x;
+  hitY = selection_data_->GetContextMenuParams()->y;
+
+  parent_view_->AsyncRequestHitTestDataAt(hitX, hitY, tizen_webview::TW_HIT_TEST_MODE_DEFAULT,
+      ShowHandleAndContextMenuIfRequiredCallback, context);
+}
+
+void SelectionControllerEfl::ShowHandleAndContextMenuIfRequired(
+    Evas_Object* o, int x, int y, int mode, tizen_webview::Hit_Test* hit_test, bool anchor_first) {
+  DCHECK(!scrolling_);
 
   gfx::Rect left, right;
   if (anchor_first) {
@@ -169,19 +203,11 @@ void SelectionControllerEfl::ShowHandleAndContextMenuIfRequired(bool anchor_firs
     left = selection_data_->GetRightRect();
   }
 
-  int hitX, hitY;
-  hitX = selection_data_->GetContextMenuParams()->x;
-  hitY = selection_data_->GetContextMenuParams()->y;
-
-  scoped_ptr<tizen_webview::Hit_Test> hit_test(
-    parent_view_->RequestHitTestDataAt(hitX, hitY, tizen_webview::TW_HIT_TEST_MODE_DEFAULT));
-
   // Is in edit field and no text is selected. show only single handle
   if (selection_data_->IsInEditField() && left == right) {
 
-    if (hit_test.get() &&
-        selection_data_->IsInEditField() &&
-        !(hit_test->GetResultContext() & tizen_webview::TW_HIT_TEST_RESULT_CONTEXT_EDITABLE))
+    if (hit_test
+        && !(hit_test->GetResultContext() & tizen_webview::TW_HIT_TEST_RESULT_CONTEXT_EDITABLE))
       return;
 
     gfx::Rect left = selection_data_->GetLeftRect();
@@ -204,8 +230,8 @@ void SelectionControllerEfl::ShowHandleAndContextMenuIfRequired(bool anchor_firs
     return;
   }
 
-  if (hit_test.get() &&
-    !(hit_test->GetResultContext() & tizen_webview::TW_HIT_TEST_RESULT_CONTEXT_SELECTION))
+  if (hit_test
+      && !(hit_test->GetResultContext() & tizen_webview::TW_HIT_TEST_RESULT_CONTEXT_SELECTION))
     return;
 
   // The base position of start_handle should be set to the middle of the left rectangle.
