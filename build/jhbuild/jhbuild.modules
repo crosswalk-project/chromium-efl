@@ -55,7 +55,7 @@
   </autotools>
 
   <autotools id="evas" autogen-sh="configure"
-             autogenargs="--enable-gl-xlib --enable-fb --enable-gl-flavor-gles --enable-gles-variety-sgx --disable-wayland-shm --disable-wayland-egl">
+             autogenargs="--enable-gl-xlib --enable-fb --enable-gl-flavor-gles --enable-gles-variety-sgx --enable-wayland-shm=no --enable-wayland-egl=no">
     <branch module="releases/evas-1.7.5.tar.bz2" version="1.7.5"
             repo="download.enlightenment.org"
             hash="sha256:70b350a970b2086787622845896f3e54de278fe698b8069796fd752e70427374"
@@ -67,7 +67,7 @@
   </autotools>
 
   <autotools id="ecore" autogen-sh="configure"
-             autogenargs="--enable-ecore-evas-opengl-x11">
+             autogenargs="--enable-ecore-evas-opengl-x11 --enable-ecore-wayland=no">
     <branch module="releases/ecore-1.7.5.tar.bz2" version="1.7.5"
             repo="download.enlightenment.org"
             hash="sha256:4bbaba2153db0c356d13c45adfbcc90c7118abd112d0817581417e708d6a9222"
