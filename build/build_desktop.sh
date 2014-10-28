@@ -58,9 +58,24 @@ if echo "$@" | grep -cq '\-\-build_ewk_unittests'; then
   BUILD_EWK_UNITTESTS=1
 fi
 
-JHBUILD_STAMPFILE="${GYP_GENERATOR_OUTPUT}/Dependencies/jhbuild.stamp"
+JHBUILD_STAMPFILE="${GYP_GENERATOR_OUTPUT}/Dependencies/Root/jhbuild.stamp"
 
-if echo "$@" | grep -cq '\-\-force-jhbuild'; then
+shouldForceJHBuild() {
+  if echo "$@" | grep -cq '\-\-force-jhbuild'; then
+    return 1
+  fi
+
+  # Check if anything in jhbuild is more recent than stamp file.
+  for i in $(find "$SCRIPTDIR/jhbuild"); do
+    if [ -f "$i" -a "$JHBUILD_STAMPFILE" -ot "$i" ]; then
+      return 1
+    fi
+  done
+
+  return 0
+}
+
+if [ "$(shouldForceJHBuild $@)" == "1" ]; then
   rm -f $JHBUILD_STAMPFILE
 fi
 
