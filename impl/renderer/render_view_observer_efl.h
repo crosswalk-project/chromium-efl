@@ -12,8 +12,10 @@
 #include "content/public/renderer/render_view_observer.h"
 #include "API/ewk_hit_test_private.h"
 #include "third_party/WebKit/public/platform/WebSize.h"
+#include "third_party/WebKit/public/web/WebViewModeEnums.h"
 #include "tizen_webview/public/tw_content_security_policy.h"
 #include "tizen_webview/public/tw_hit_test.h"
+#include "tizen_webview/public/tw_view_mode.h"
 
 namespace base {
 class FilePath;
@@ -68,6 +70,9 @@ class RenderViewObserverEfl: public content::RenderViewObserver {
   void CheckContentsSize();
   void OnSuspendScheduledTasks();
   void OnResumeScheduledTasks();
+
+  // This function sets CSS "view-mode" media feature value.
+  void OnSetViewMode(blink::WebViewMode view_mode);
 
   blink::WebSize max_scroll_offset_;
   float cached_min_page_scale_factor_;

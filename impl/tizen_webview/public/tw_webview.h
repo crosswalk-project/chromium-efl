@@ -17,6 +17,7 @@
 #include "tizen_webview/public/tw_find_options.h"
 #include "tizen_webview/public/tw_macro.h"
 #include "tizen_webview/public/tw_touch_event.h"
+#include "tizen_webview/public/tw_view_mode.h"
 
 // TODO: Remove this dependency
 #include "EdgeEffect.h"
@@ -133,7 +134,7 @@ class WebView {
   void SendOrientationChangeEventIfNeeded(int orientation);
   void SetOrientationLockCallback(Orientation_Lock_Cb func, void* data);
   // > View mode
-  void SetViewMode(int view_mode); // mode: windowed, floating, fullscreen, max/minimized
+  void SetViewMode(tizen_webview::View_Mode view_mode);
   bool IsFullscreen();
   void ExitFullscreen();
   // > View Snapshot

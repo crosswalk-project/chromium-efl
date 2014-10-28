@@ -202,6 +202,8 @@
 
       'common/content_client_efl.cc',
       'common/content_client_efl.h',
+      'common/content_switches_efl.cc',
+      'common/content_switches_efl.h',
       'common/message_generator_efl.cc',
       'common/message_generator_efl.h',
       'common/render_messages_efl.h',

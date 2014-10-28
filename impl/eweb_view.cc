@@ -44,6 +44,7 @@
 
 #include "tizen_webview/public/tw_hit_test.h"
 #include "tizen_webview/public/tw_touch_point.h"
+#include "tizen_webview/public/tw_view_mode.h"
 #include "tizen_webview/public/tw_web_context.h"
 #include "tizen_webview/public/tw_webview.h"
 #include "tizen_webview/public/tw_webview_delegate.h"
@@ -1651,6 +1652,10 @@ void EWebView::ShowFileChooser(const content::FileChooserParams& params) {
 #endif
   file_chooser_.reset(new content::FileChooserControllerEfl(render_view_host, &params));
   file_chooser_->open();
+}
+
+void EWebView::SetViewMode(tizen_webview::View_Mode view_mode) {
+  rwhv()->SetViewMode(view_mode);
 }
 
 #ifdef TIZEN_CONTENTS_DETECTION

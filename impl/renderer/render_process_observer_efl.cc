@@ -5,12 +5,15 @@
 #include "renderer/render_process_observer_efl.h"
 
 #include "base/allocator/allocator_extension.h"
+#include "base/command_line.h"
+#include "common/content_switches_efl.h"
 #include "content/public/renderer/render_thread.h"
 #include "third_party/WebKit/public/web/WebCache.h"
 #include "third_party/sqlite/sqlite3.h"
 #include "v8/include/v8.h"
 #include "renderer/content_renderer_client_efl.h"
 
+#include "third_party/WebKit/public/web/WebRuntimeFeatures.h"
 // XXX:  config.h needs to be included before internal blink headers.
 // XXX2: It'd be great if we did not include internal blibk headers.
 #include "third_party/WebKit/Source/config.h"
@@ -18,7 +21,15 @@
 
 
 using blink::WebCache;
+using blink::WebRuntimeFeatures;
 using content::RenderThread;
+
+RenderProcessObserverEfl::RenderProcessObserverEfl(ContentRendererClientEfl* content_client)
+    : content_client_(content_client), webkit_initialized_(false) {
+  const CommandLine& command_line = *CommandLine::ForCurrentProcess();
+  if (command_line.HasSwitch(switches::kEnableViewMode))
+    WebRuntimeFeatures::enableCSSViewModeMediaFeature(true);
+}
 
 bool RenderProcessObserverEfl::OnControlMessageReceived(const IPC::Message& message)
 {

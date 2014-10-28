@@ -19,11 +19,9 @@ class ContentRendererClientEfl;
 
 class RenderProcessObserverEfl : public content::RenderProcessObserver {
 public:
-  explicit RenderProcessObserverEfl(ContentRendererClientEfl* content_client)
-      : content_client_(content_client), webkit_initialized_(false) { }
-
-  virtual bool OnControlMessageReceived(const IPC::Message& message) override;
-  virtual void WebKitInitialized() override;
+  explicit RenderProcessObserverEfl(ContentRendererClientEfl* content_client);
+  bool OnControlMessageReceived(const IPC::Message& message) override;
+  void WebKitInitialized() override;
   void OnClearCache();
   void OnPurgeMemory();
   

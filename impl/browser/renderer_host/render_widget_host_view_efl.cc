@@ -42,6 +42,7 @@
 #include "third_party/WebKit/public/web/WebInputEvent.h"
 #include "third_party/WebKit/public/platform/WebScreenInfo.h"
 #include "third_party/WebKit/public/web/WebTouchPoint.h"
+#include "third_party/WebKit/public/web/WebViewModeEnums.h"
 #include "ui/gfx/display.h"
 #include "ui/gfx/rect.h"
 #include "ui/gfx/screen.h"
@@ -1545,6 +1546,17 @@ void RenderWidgetHostViewEfl::OnSwapCompositorFrame(
                                     output_surface_id,
                                     host_->GetProcess()->GetID(),
                                     ack);
+}
+
+void RenderWidgetHostViewEfl::SetViewMode(tizen_webview::View_Mode view_mode) {
+  blink::WebViewMode view_mode_for_blink;
+  if (view_mode == tizen_webview::TW_VIEW_MODE_WINDOWED)
+    view_mode_for_blink = blink::WebViewModeWindowed;
+  else if (view_mode == tizen_webview::TW_VIEW_MODE_FULLSCREEN)
+    view_mode_for_blink = blink::WebViewModeFullscreen;
+  else
+    return;
+  host_->Send(new ViewMsg_SetViewMode(host_->GetRoutingID(), view_mode_for_blink));
 }
 
 }  // namespace content

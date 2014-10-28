@@ -966,23 +966,16 @@ void ewk_view_session_data_get(Evas_Object* ewkView, const char** data, unsigned
 
 Eina_Bool ewk_view_mode_set(Evas_Object* ewkView, Ewk_View_Mode view_mode)
 {
- EWK_VIEW_IMPL_GET_OR_RETURN(ewkView, impl, EINA_FALSE);
+  EWK_VIEW_IMPL_GET_OR_RETURN(ewkView, impl, EINA_FALSE);
 
-#if !defined(EWK_BRINGUP)
-#warning "[M38] view mode is not supported in M38"
-  switch (view_mode) {
-    case EWK_VIEW_MODE_WINDOWED:
-    case EWK_VIEW_MODE_FLOATING:
-    case EWK_VIEW_MODE_FULLSCREEN:
-    case EWK_VIEW_MODE_MAXIMIZED:
-    case EWK_VIEW_MODE_MINIMIZED:
-        impl->SetViewMode((int)view_mode);
-        break;
-    default:
-        return EINA_FALSE;
-    }
-#endif
-  return EINA_TRUE;
+  if (view_mode == EWK_VIEW_MODE_WINDOWED || view_mode == EWK_VIEW_MODE_FULLSCREEN) {
+    tizen_webview::View_Mode tizen_webview_view_mode;
+    tizen_webview_view_mode = chromium_glue::to(view_mode);
+    impl->SetViewMode(tizen_webview_view_mode);
+    return EINA_TRUE;
+  } else {
+    return EINA_FALSE;
+  }
 }
 
 Eina_Bool ewk_view_split_scroll_overflow_enabled_set(Evas_Object* ewkView, const Eina_Bool enabled)

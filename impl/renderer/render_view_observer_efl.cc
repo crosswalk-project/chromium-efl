@@ -562,3 +562,9 @@ void RenderViewObserverEfl::OnResumeScheduledTasks()
   if (view)
     view->resumeScheduledTasks();
 }
+
+void RenderViewObserverEfl::OnSetViewMode(blink::WebViewMode view_mode) {
+  blink::WebView* view = render_view()->GetWebView();
+  if (view)
+    view->setViewMode(view_mode);
+}

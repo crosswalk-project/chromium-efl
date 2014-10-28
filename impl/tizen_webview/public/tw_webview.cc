@@ -285,11 +285,8 @@ void WebView::SetOrientationLockCallback(Orientation_Lock_Cb func, void* data) {
   return impl_->SetOrientationLockCallback(func, data);
 }
 
-void WebView::SetViewMode(int view_mode) {
-#warning "[M37] View Mode is not supported by engine any more"
-#if 0
+void WebView::SetViewMode(View_Mode view_mode) {
   return impl_->SetViewMode(view_mode);
-#endif
 }
 
 bool WebView::IsFullscreen() {

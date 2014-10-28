@@ -223,6 +223,9 @@ class RenderWidgetHostViewEfl
   void KeyUpEventQueuePush(int key) { keyupev_queue_.push(key); }
   void ClearQueues();
 
+  // This function sets CSS "view-mode" media feature value.
+  void SetViewMode(tizen_webview::View_Mode view_mode);
+
  protected:
   friend class RenderWidgetHostView;
 

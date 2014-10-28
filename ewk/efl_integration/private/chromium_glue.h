@@ -28,6 +28,7 @@
 #include <tizen_webview/public/tw_touch_event.h>
 #include <tizen_webview/public/tw_custom_handlers.h>
 #include <tizen_webview/public/tw_find_options.h>
+#include <tizen_webview/public/tw_view_mode.h>
 
 namespace chromium_glue {
 
@@ -69,6 +70,9 @@ Ewk_Find_Options from(tw::Find_Options);
 
 tw::ContentSecurityPolicyType to(Ewk_CSP_Header_Type);
 Ewk_CSP_Header_Type from(tw::ContentSecurityPolicyType);
+
+tw::View_Mode to(Ewk_View_Mode);
+Ewk_View_Mode from(tw::View_Mode);
 
 } // namespace chromium_glue
 

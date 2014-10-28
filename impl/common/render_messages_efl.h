@@ -17,11 +17,13 @@
 #include "renderer/print_pages_params.h"
 #include "third_party/WebKit/public/web/WebNavigationPolicy.h"
 #include "third_party/WebKit/public/web/WebNavigationType.h"
+#include "third_party/WebKit/public/web/WebViewModeEnums.h"
 #include "ui/gfx/ipc/gfx_param_traits.h"
 #include "url/gurl.h"
 
 #include "tizen_webview/public/tw_content_security_policy.h"
 #include "tizen_webview/public/tw_hit_test.h"
+#include "tizen_webview/public/tw_view_mode.h"
 #include "tizen_webview/public/tw_wrt.h"
 
 #include <string>
@@ -126,6 +128,8 @@ IPC_STRUCT_TRAITS_BEGIN(tizen_webview::WrtIpcMessageData)
   IPC_STRUCT_TRAITS_MEMBER(id)
   IPC_STRUCT_TRAITS_MEMBER(reference_id)
 IPC_STRUCT_TRAITS_END()
+
+IPC_ENUM_TRAITS(blink::WebViewMode)
 
 // Tells the renderer to clear the cache.
 IPC_MESSAGE_CONTROL0(EflViewMsg_ClearCache)
@@ -278,3 +282,7 @@ IPC_MESSAGE_ROUTED1(EwkViewMsg_WebAppCapableGet,
 IPC_MESSAGE_ROUTED2(EwkHostMsg_WebAppCapableGet,
                     bool, /* capable */
                     int /* calback id */)
+
+// Used to set view mode.
+IPC_MESSAGE_ROUTED1(ViewMsg_SetViewMode,
+                    blink::WebViewMode /* view_mode */)

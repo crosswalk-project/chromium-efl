@@ -42,6 +42,7 @@
 #include "browser/inputpicker/InputPicker.h"
 #include "third_party/WebKit/Source/platform/text/TextDirection.h"
 #include "tizen_webview/public/tw_hit_test.h"
+#include "tizen_webview/public/tw_view_mode.h"
 
 #ifdef TIZEN_CONTENTS_DETECTION
 #include "popup_controller_efl.h"
@@ -383,6 +384,7 @@ class EWebView {
   void SetLinkMagnifierEnabled(bool enabled);
 
   void SetOverrideEncoding(const std::string& encoding);
+  void SetViewMode(tizen_webview::View_Mode view_mode);
 
   /// ---- Event handling
   bool HandleShow();
