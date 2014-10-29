@@ -1050,6 +1050,9 @@ void EWebView::Find(const char* text, tizen_webview::Find_Options find_options) 
 
 void EWebView::SetScale(double scale_factor, int x, int y) {
   RenderViewHost* render_view_host = web_contents_->GetRenderViewHost();
+  //saving the scale value in the proxy variable before sending IPC
+  page_scale_factor_ = std::min(std::max(scale_factor, min_page_scale_factor_),
+                                max_page_scale_factor_);
   render_view_host->Send(new EwkViewMsg_Scale(render_view_host->GetRoutingID(), scale_factor, x, y));
 }
 

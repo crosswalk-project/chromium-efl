@@ -3,10 +3,12 @@
 // found in the LICENSE file.
 
 #include "utc_blink_ewk_base.h"
+#include <limits>
 
 class utc_blink_ewk_view_scale_get : public utc_blink_ewk_base
 {
  protected:
+  utc_blink_ewk_view_scale_get() : precision(std::numeric_limits<double>::epsilon()) { }
 
   /* Callback for load finished */
   void LoadFinished(Evas_Object* webview)
@@ -24,6 +26,7 @@ class utc_blink_ewk_view_scale_get : public utc_blink_ewk_base
 
 protected:
   static const char*const sample;
+  const double precision;
 };
 
 const char*const utc_blink_ewk_view_scale_get::sample="/common/sample.html";
@@ -33,26 +36,39 @@ const char*const utc_blink_ewk_view_scale_get::sample="/common/sample.html";
   */
 TEST_F(utc_blink_ewk_view_scale_get, POS_TEST)
 {
-  if(!ewk_view_url_set(GetEwkWebView(),GetResourceUrl(sample).c_str()))
-    utc_fail();
-  if(Success!=EventLoopStart())
-    utc_fail();
+  ASSERT_TRUE(ewk_view_url_set(GetEwkWebView(), GetResourceUrl(sample).c_str()));
+  ASSERT_EQ(Success, EventLoopStart());
 
-  const double scaleFactor = 1.0;
+  double minScale = 0, maxScale = 0;
+  ewk_view_scale_range_get(GetEwkWebView(), &minScale, &maxScale);
+  ASSERT_GT(abs(maxScale - minScale), precision);
+
+  const double scaleFactor = minScale + (maxScale - minScale)/2;
   const Evas_Coord centerX = 5;
   const Evas_Coord centerY = 5;
 
-  Eina_Bool result = ewk_view_scale_set(GetEwkWebView(), scaleFactor, centerX, centerY);
+  ASSERT_TRUE(ewk_view_scale_set(GetEwkWebView(), scaleFactor, centerX, centerY));
+  double currentScale = ewk_view_scale_get(GetEwkWebView());
+  ASSERT_LT(abs(scaleFactor - currentScale), precision);
+
   ecore_timer_add(0.5f, mainLoopQuit, this);
-  if(Success!=EventLoopStart())
-    utc_fail();
+  ASSERT_EQ(Success, EventLoopStart());
 
-  const double getScaleFactor = ewk_view_scale_get(GetEwkWebView());
+  currentScale = ewk_view_scale_get(GetEwkWebView());
+  ASSERT_LT(abs(scaleFactor - currentScale), precision);
 
-  if (scaleFactor != getScaleFactor)
-    result = EINA_FALSE;
+  ASSERT_TRUE(ewk_view_scale_set(GetEwkWebView(), maxScale + 1, centerX, centerY));
+  currentScale = ewk_view_scale_get(GetEwkWebView());
+  ASSERT_LT(abs(maxScale - currentScale), precision);
 
-  utc_check_eq(result, EINA_TRUE);
+  // Now scale is set to max. Set overscale once again to make sure getter return correct value
+  ASSERT_TRUE(ewk_view_scale_set(GetEwkWebView(), maxScale + 1, centerX, centerY));
+  currentScale = ewk_view_scale_get(GetEwkWebView());
+  ASSERT_LT(abs(maxScale - currentScale), precision);
+
+  ASSERT_TRUE(ewk_view_scale_set(GetEwkWebView(), minScale - 1, centerX, centerY));
+  currentScale = ewk_view_scale_get(GetEwkWebView());
+  ASSERT_LT(abs(minScale - currentScale), precision);
 }
 
 /**
@@ -61,5 +77,5 @@ TEST_F(utc_blink_ewk_view_scale_get, POS_TEST)
 TEST_F(utc_blink_ewk_view_scale_get, NEG_TEST)
 {
   const double getScaleFactor = ewk_view_scale_get(NULL);
-  utc_check_eq(getScaleFactor, -1);
+  ASSERT_LT(abs(getScaleFactor + 1), precision);
 }
