@@ -1,3 +1,7 @@
+// Copyright 2014 Samsung Electronics. All rights reserved.
+// Use of this source code is governed by a BSD-style license that can be
+// found in the LICENSE file.
+
 #include "utc_blink_ewk_context_form_autofill_profile_utils.h"
 #include "utc_blink_ewk_base.h"
 #include "ewk_autofill_profile.h"
