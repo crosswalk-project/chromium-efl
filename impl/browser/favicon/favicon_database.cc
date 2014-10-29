@@ -37,7 +37,8 @@ bool FaviconDatabase::Open() {
   }
   int result = sqlite3_open(d->path.c_str(), &d->sqlite);
   if (result != SQLITE_OK) {
-    fprintf(stderr, "[FaviconDatabase] :: Error opening SQLite database (%d)!\n", result);
+    LOG(ERROR) << "[FaviconDatabase] :: Error opening SQLite database ("
+               << result << ")!";
     return false;
   }
   if (!IsDatabaseInitialized()) {

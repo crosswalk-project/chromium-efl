@@ -324,7 +324,8 @@ void WebContentsDelegateEfl::DidFinishLoad(RenderFrameHost* render_frame_host,
 
   // download favicon if there is no such in database
   if (!fs.ExistsForFaviconURL(favicon.url)) {
-    fprintf(stderr, "[DidFinishLoad] :: no favicon in database for URL: %s\n", favicon.url.spec().c_str());
+    LOG(ERROR) << "[DidFinishLoad] :: no favicon in database for URL: "
+               << favicon.url.spec();
     favicon_downloader_.reset(new FaviconDownloader(&web_contents_,
                                                    favicon.url,
                                                    base::Bind(&WebContentsDelegateEfl::DidDownloadFavicon,
