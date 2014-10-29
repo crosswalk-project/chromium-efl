@@ -1,3 +1,7 @@
+// Copyright 2014 Samsung Electronics. All rights reserved.
+// Use of this source code is governed by a BSD-style license that can be
+// found in the LICENSE file.
+
 #include "browser/favicon/favicon_service.h"
 #include "browser/favicon/favicon_database.h"
 #include "browser/favicon/favicon_database_p.h"

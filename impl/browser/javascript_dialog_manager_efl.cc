@@ -1,3 +1,7 @@
+// Copyright 2014 Samsung Electronics. All rights reserved.
+// Use of this source code is governed by a BSD-style license that can be
+// found in the LICENSE file.
+
 #include "web_contents_delegate_efl.h"
 #include "browser/javascript_dialog_manager_efl.h"
 #include "browser/javascript_modal_dialog_efl.h"
