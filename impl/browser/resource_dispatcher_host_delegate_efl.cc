@@ -1,3 +1,7 @@
+// Copyright 2014 Samsung Electronics. All rights reserved.
+// Use of this source code is governed by a BSD-style license that can be
+// found in the LICENSE file.
+
 #include "resource_dispatcher_host_delegate_efl.h"
 
 #include "content/public/browser/browser_thread.h"

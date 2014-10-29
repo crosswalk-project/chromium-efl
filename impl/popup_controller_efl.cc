@@ -1,3 +1,7 @@
+// Copyright 2014 Samsung Electronics. All rights reserved.
+// Use of this source code is governed by a BSD-style license that can be
+// found in the LICENSE file.
+
 #include "base/logging.h"
 #include "popup_controller_efl.h"
 #include "components/clipboard/clipboard_helper_efl.h"
