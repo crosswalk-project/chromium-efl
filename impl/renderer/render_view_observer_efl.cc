@@ -195,11 +195,7 @@ void RenderViewObserverEfl::OnSetScroll(int x, int y)
   blink::WebFrame* frame = render_view()->GetWebView()->mainFrame();
   if (!frame)
     return;
-
-#if !defined(EWK_BRINGUP)
-  // I think we should use SetCrollOffset here!
-  frame->setScrollPosition(blink::WebSize(x, y));
-#endif
+  frame->setScrollOffset(blink::WebSize(x, y));
 }
 
 void RenderViewObserverEfl::OnUseSettingsFont()
