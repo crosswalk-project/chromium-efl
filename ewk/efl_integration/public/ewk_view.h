@@ -1337,9 +1337,6 @@ EAPI Eina_Bool ewk_view_scale_set(const Evas_Object* o, double scaleFactor, int 
 /**
  * Queries the current scale factor of the page.
  *
- * It returns previous scale factor after ewk_view_scale_set is called immediately
- * until scale factor of page is really changed.
- *
  * @param o view object to get the scale factor
  *
  * @return current scale factor in use on success or @c -1.0 on failure
