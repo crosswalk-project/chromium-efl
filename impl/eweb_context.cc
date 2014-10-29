@@ -483,7 +483,14 @@ Evas_Object *EWebContext::AddFaviconObject(const char* uri, Evas* canvas) const 
   Evas_Object *favicon = evas_object_image_filled_add(canvas);
   evas_object_image_size_set(favicon, bitmap.width(), bitmap.height());
   evas_object_image_colorspace_set(favicon, EVAS_COLORSPACE_ARGB8888);
-  bitmap.copyPixelsTo(evas_object_image_data_get(favicon, EINA_TRUE), bitmap.getSize());
+  evas_object_image_fill_set(favicon, 0, 0, bitmap.width(), bitmap.height());
+  evas_object_image_filled_set(favicon, EINA_TRUE);
+  evas_object_image_alpha_set(favicon, EINA_TRUE);
+  void* pixels = evas_object_image_data_get(favicon, EINA_TRUE);
+  if (pixels) {
+    bitmap.copyPixelsTo(pixels, bitmap.getSize());
+    evas_object_image_data_set(favicon, pixels);
+  }
 
   return favicon;
 }
