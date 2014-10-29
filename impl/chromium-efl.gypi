@@ -35,6 +35,14 @@
       ['exclude', 'x11_types\\.cc$'],
     ],
     'conditions': [
+       ['tizen_multimedia_support==1', {
+         'defines': [
+           'TIZEN_MULTIMEDIA_SUPPORT=1',
+         ],
+         'sources/': [
+           ['exclude', 'renderer/media/audio_decoder\\.(cc|h)$'],
+         ],
+       }],
        ['building_for_tizen==1', {
          'defines': [
            'OS_TIZEN=1',
@@ -64,8 +72,6 @@
           ['exclude', 'browser/geolocation/location_provider_efl\\.(cc|h)$'],
           ['exclude', 'browser/motion/MotionUI\\.(h|cc)$'],
           ['exclude', 'browser/motion/wkext_motion\\.(h|cc)$'],
-#          ['exclude', 'browser/media/tizen/webaudio_decoder_browser_tizen\\.(h|cc)$'],
-  #        ['exclude', 'renderer/media/tizen/audio_decoder_tizen\\.(h|cc)$'],
           ['exclude', 'third_party/webrtc/system_wrappers/source/cpu_features_tizen.c'],
         ],
       }],

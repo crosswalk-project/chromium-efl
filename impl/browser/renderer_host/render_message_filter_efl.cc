@@ -12,6 +12,10 @@
 #include "net/url_request/url_request_context_getter.h"
 #include "web_contents_delegate_efl.h"
 
+#if defined(TIZEN_MULTIMEDIA_SUPPORT)
+#include "content/browser/media/tizen/webaudio_decoder_browser_gstreamer.h"
+#endif
+
 using web_contents_utils::WebContentsFromViewID;
 using content::BrowserThread;
 
@@ -36,6 +40,9 @@ bool RenderMessageFilterEfl::OnMessageReceived(const IPC::Message& message) {
   bool handled = true;
   IPC_BEGIN_MESSAGE_MAP(RenderMessageFilterEfl, message)
     IPC_MESSAGE_HANDLER(EwkHostMsg_DecideNavigationPolicy, OnDecideNavigationPolicy)
+#if defined(TIZEN_MULTIMEDIA_SUPPORT)
+    IPC_MESSAGE_HANDLER(EflViewHostMsg_GstWebAudioDecode, OnGstWebAudioDecode)
+#endif
     IPC_MESSAGE_UNHANDLED(handled = false)
   IPC_END_MESSAGE_MAP()
   return handled;
@@ -53,3 +60,12 @@ void RenderMessageFilterEfl::OnDecideNavigationPolicy(NavigationPolicyParams par
   }
 }
 
+#if defined(TIZEN_MULTIMEDIA_SUPPORT)
+void RenderMessageFilterEfl::OnGstWebAudioDecode(
+    base::SharedMemoryHandle encoded_data_handle,
+    base::FileDescriptor pcm_output,
+    uint32_t data_size) {
+  content::BrowserMessageFilterTizen::GetInstance()->EncodedDataReceived(
+      encoded_data_handle, pcm_output, data_size);
+}
+#endif

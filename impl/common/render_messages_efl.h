@@ -29,6 +29,11 @@
 #include <string>
 #include <map>
 
+#if defined(TIZEN_MULTIMEDIA_SUPPORT)
+#include "base/file_descriptor_posix.h"
+#include "base/memory/shared_memory.h"
+#endif
+
 typedef std::map<std::string, std::string> StringMap;
 
 //-----------------------------------------------------------------------------
@@ -286,3 +291,11 @@ IPC_MESSAGE_ROUTED2(EwkHostMsg_WebAppCapableGet,
 // Used to set view mode.
 IPC_MESSAGE_ROUTED1(ViewMsg_SetViewMode,
                     blink::WebViewMode /* view_mode */)
+
+#if defined(TIZEN_MULTIMEDIA_SUPPORT)
+// This message runs the GStreamer for decoding audio for webaudio.
+IPC_MESSAGE_CONTROL3(EflViewHostMsg_GstWebAudioDecode,
+                    base::SharedMemoryHandle /* encoded_data_handle */,
+                    base::FileDescriptor /* pcm_output */,
+                    uint32_t /* data_size*/)
+#endif

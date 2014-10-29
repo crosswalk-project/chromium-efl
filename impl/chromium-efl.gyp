@@ -380,6 +380,11 @@
         ],
     }], # rules
     'conditions': [
+      ['tizen_multimedia_support==1', {
+        'includes': [
+          'chromium-efl-mm.gypi',
+        ],
+      }],
       ['building_for_tizen==1', {
         'dependencies': [ 'chromium-efl-deps.gyp:tizen' ],
       }],

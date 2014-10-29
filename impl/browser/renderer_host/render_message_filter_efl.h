@@ -13,6 +13,11 @@
 #include "third_party/WebKit/public/web/WebNavigationType.h"
 #include "url/gurl.h"
 
+#if defined(TIZEN_MULTIMEDIA_SUPPORT)
+#include "base/file_descriptor_posix.h"
+#include "base/memory/shared_memory.h"
+#endif
+
 struct NavigationPolicyParams;
 
 namespace net {
@@ -36,6 +41,12 @@ class RenderMessageFilterEfl : public content::BrowserMessageFilter {
   void OnDecideNavigationPolicy(NavigationPolicyParams, bool* handled);
   void OnReceivedHitTestData(int view, const _Ewk_Hit_Test& hit_test_data,
       const NodeAttributesMap& node_attributes);
+
+#if defined(TIZEN_MULTIMEDIA_SUPPORT)
+  void OnGstWebAudioDecode(base::SharedMemoryHandle encoded_data_handle,
+      base::FileDescriptor pcm_output,
+      uint32_t data_size);
+#endif
 
   int render_process_id_;
 };
