@@ -42,7 +42,7 @@ void WebContentsViewEfl::CreateView(const gfx::Size& initial_size,
 }
 
 RenderWidgetHostViewBase* WebContentsViewEfl::CreateViewForWidget(
-    RenderWidgetHost* render_widget_host) {
+    RenderWidgetHost* render_widget_host, bool is_guest_view_hack) {
   WebContentsDelegateEfl* delegate =
       static_cast<WebContentsDelegateEfl*>(web_contents_->GetDelegate());
   if (!delegate) {

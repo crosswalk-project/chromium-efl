@@ -597,6 +597,15 @@ void RenderWidgetHostViewEfl::SetIsLoading(bool is_loading) {
   UpdateCursor(WebCursor());
 }
 
+void RenderWidgetHostViewEfl::TextInputTypeChanged(ui::TextInputType type,
+                                                   ui::TextInputMode input_mode,
+                                                   bool can_compose_inline,
+                                                   int flags) {
+  NOTIMPLEMENTED();
+}
+
+#if !defined(EWK_BRINGUP)
+// [M40] Need to migrate!!!
 void RenderWidgetHostViewEfl::TextInputStateChanged(
     const ViewHostMsg_TextInputState_Params& params) {
   if (!params.show_ime_if_needed && !eweb_view()->GetSettings()->useKeyPadWithoutUserAction())
@@ -621,6 +630,7 @@ void RenderWidgetHostViewEfl::TextInputStateChanged(
         params.type == ui::TEXT_INPUT_TYPE_CONTENT_EDITABLE);
   }
 }
+#endif
 
 void RenderWidgetHostViewEfl::ImeCancelComposition() {
   if (im_context_)
@@ -945,7 +955,7 @@ bool RenderWidgetHostViewEfl::CanCopyToVideoFrame() const {
   return false;
 }
 
-void RenderWidgetHostViewEfl::AcceleratedSurfaceInitialized(int host_id, int route_id) {
+void RenderWidgetHostViewEfl::AcceleratedSurfaceInitialized(int route_id) {
   // FIXME: new API in M34. need proper implementation.
   NOTIMPLEMENTED();
 }
@@ -954,41 +964,6 @@ void RenderWidgetHostViewEfl::AcceleratedSurfaceInitialized(int host_id, int rou
 // texture_manager.h with efl GL API wrappers.
 
 extern GLuint GetTextureIdFromTexture(gpu::gles2::Texture* texture);
-
-void RenderWidgetHostViewEfl::AcceleratedSurfaceBuffersSwapped(
-  const GpuHostMsg_AcceleratedSurfaceBuffersSwapped_Params& params,
-  int gpu_host_id) {
-
-  if (m_IsEvasGLInit) {
-    gpu::gles2::MailboxManager* manager =
-        GLSharedContextEfl::GetMailboxManager();
-
-    gpu::gles2::Texture* texture =
-        manager->ConsumeTexture(GL_TEXTURE_2D, params.mailbox);
-
-    texture_id_ = GetTextureIdFromTexture(texture);
-    evas_object_image_pixels_dirty_set(content_image_, true);
-  }
-
-  AcceleratedSurfaceMsg_BufferPresented_Params ack_params;
-  ack_params.sync_point = 0;
-  RenderWidgetHostImpl::AcknowledgeBufferPresent(
-    params.route_id, gpu_host_id, ack_params);
-}
-
-void RenderWidgetHostViewEfl::AcceleratedSurfacePostSubBuffer(
-  const GpuHostMsg_AcceleratedSurfacePostSubBuffer_Params& params,
-  int gpu_host_id) {
-  NOTIMPLEMENTED();
-}
-
-void RenderWidgetHostViewEfl::AcceleratedSurfaceSuspend() {
-  NOTIMPLEMENTED();
-}
-
-void RenderWidgetHostViewEfl::AcceleratedSurfaceRelease() {
-  NOTIMPLEMENTED();
-}
 
 bool RenderWidgetHostViewEfl::HasAcceleratedSurface(const gfx::Size&) {
   return false;
@@ -1021,7 +996,7 @@ gfx::Rect RenderWidgetHostViewEfl::GetBoundsInRootWindow() {
 
 gfx::GLSurfaceHandle RenderWidgetHostViewEfl::GetCompositingSurface() {
   if (is_hw_accelerated_) {
-    return gfx::GLSurfaceHandle(gfx::kNullPluginWindow, gfx::TEXTURE_TRANSPORT);
+    return gfx::GLSurfaceHandle(gfx::kNullPluginWindow, gfx::NULL_TRANSPORT);
   }
 }
 

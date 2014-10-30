@@ -24,10 +24,6 @@ class EflScreen : public gfx::Screen {
   virtual ~EflScreen() {
   }
 
-  virtual bool IsDIPEnabled() override {
-    return true;
-  }
-
   virtual gfx::Point GetCursorScreenPoint() override {
     XDisplay* display = gfx::GetXDisplay();
 

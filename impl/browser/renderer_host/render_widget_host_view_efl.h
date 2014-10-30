@@ -93,8 +93,14 @@ class RenderWidgetHostViewEfl
   virtual void Blur() override;
   virtual void UpdateCursor(const WebCursor&) override;
   virtual void SetIsLoading(bool) override;
-  virtual void TextInputStateChanged(
-      const ViewHostMsg_TextInputState_Params& params) override;
+
+  // [M40] TODO: Migrate this to proper method.
+  void OnTextInputStateChanged(const ViewHostMsg_TextInputState_Params& params);
+
+  virtual void TextInputTypeChanged(ui::TextInputType type,
+                                    ui::TextInputMode mode,
+                                    bool can_compose_inline,
+                                    int flags) override;
 
   virtual void ImeCancelComposition() override;
   virtual void ImeCompositionRangeChanged(const gfx::Range&, const std::vector<gfx::Rect>&) override;
@@ -130,17 +136,8 @@ class RenderWidgetHostViewEfl
   virtual void OnContentsDetected(const char*) override;
 #endif
 
-  virtual void AcceleratedSurfaceInitialized(int, int) override;
-  virtual void AcceleratedSurfaceBuffersSwapped(
-    const GpuHostMsg_AcceleratedSurfaceBuffersSwapped_Params&,
-    int) override;
+  virtual void AcceleratedSurfaceInitialized(int) override;
 
-  virtual void AcceleratedSurfacePostSubBuffer(
-    const GpuHostMsg_AcceleratedSurfacePostSubBuffer_Params&,
-    int) override;
-
-  virtual void AcceleratedSurfaceSuspend() override;
-  virtual void AcceleratedSurfaceRelease() override;
   virtual bool HasAcceleratedSurface(const gfx::Size&) override;
   virtual void GetScreenInfo(blink::WebScreenInfo*) override;
   virtual gfx::Rect GetBoundsInRootWindow() override;

@@ -48,7 +48,7 @@
       '<(chrome_src_dir)/components/components.gyp:visitedlink_browser',
       '<(chrome_src_dir)/components/components.gyp:visitedlink_renderer',
       '<(chrome_src_dir)/third_party/icu/icu.gyp:icuuc',
-      '<(chrome_src_dir)/components/components.gyp:sessions',
+      '<(chrome_src_dir)/components/components.gyp:sessions_content',
 # [M37] TODO:Autofill related code chagned. Need to enable after Fixing.
       #'<(chrome_src_dir)/components/components.gyp:autofill_content_renderer',
       #'<(chrome_src_dir)/components/components.gyp:autofill_content_browser',
@@ -211,6 +211,7 @@
       'common/webcursor_efl.cc',
       'common/webcursor_efl.h',
       'components/clipboard/clipboard_efl.cc',
+      'components/clipboard/clipboard_efl.h',
       'components/clipboard/clipboard_helper_efl.cc',
       'components/clipboard/clipboard_helper_efl.h',
       'components/editing/content/browser/editor_client_observer.cc',

@@ -108,7 +108,10 @@ class WebContentsDelegateEfl
                                                 const GURL& url,
                                                 ui::PageTransition transition_type) override;
 
-  virtual void DidNavigateAnyFrame(const LoadCommittedDetails& details, const FrameNavigateParams& params) override;
+  virtual void DidNavigateAnyFrame(RenderFrameHost* render_frame_host,
+                                   const LoadCommittedDetails& details,
+                                   const FrameNavigateParams& params) override;
+
   void OnAuthRequired(net::URLRequest* request,
                       const std::string& realm,
                       LoginDelegateEfl* login_delegate);

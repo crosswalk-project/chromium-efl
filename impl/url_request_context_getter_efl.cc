@@ -6,7 +6,7 @@
 #include "url_request_context_getter_efl.h"
 
 #include "base/command_line.h"
-#include "base/file_util.h"
+#include "base/files/file_util.h"
 #include "base/strings/string_number_conversions.h"
 #include "base/threading/worker_pool.h"
 #include "base/threading/sequenced_worker_pool.h"
@@ -207,7 +207,7 @@ net::URLRequestContext* URLRequestContextGetterEfl::GetURLRequestContext() {
 
     // Set up interceptors in the reverse order.
     scoped_ptr<net::URLRequestJobFactory> top_job_factory =
-        job_factory.PassAs<net::URLRequestJobFactory>();
+        job_factory.Pass();
     for (URLRequestInterceptorScopedVector::reverse_iterator i =
              request_interceptors_.rbegin();
          i != request_interceptors_.rend();

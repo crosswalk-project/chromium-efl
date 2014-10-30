@@ -13,6 +13,7 @@
 #include "common/render_messages_efl.h"
 #include "common/version_info.h"
 #include "components/sessions/serialized_navigation_entry.h"
+#include "components/sessions/content/content_serialized_navigation_builder.h"
 #include "API/ewk_policy_decision_private.h"
 #include "API/ewk_settings_private.h"
 #include "API/ewk_text_style_private.h"
@@ -1563,7 +1564,7 @@ void EWebView::GetSessionData(const char **data, unsigned *length) const {
   for (int i = 0; i < itemCount; i++) {
     NavigationEntry *navigationEntry = navigationController.GetEntryAtIndex(i);
     sessions::SerializedNavigationEntry serializedEntry =
-      sessions::SerializedNavigationEntry::FromNavigationEntry(i, *navigationEntry);
+      sessions::ContentSerializedNavigationBuilder::FromNavigationEntry(i, *navigationEntry);
     serializedEntry.WriteToPickle(MAX_SESSION_ENTRY_SIZE, &sessionPickle);
   }
 
@@ -1593,8 +1594,11 @@ bool EWebView::RestoreFromSessionData(const char *data, unsigned length) {
   if (!entryCount)
     return true;
 
-  std::vector<NavigationEntry *> navigationEntries =
-    sessions::SerializedNavigationEntry::ToNavigationEntries(serializedEntries, context()->browser_context());
+  ScopedVector<content::NavigationEntry> scopedEntries =
+    sessions::ContentSerializedNavigationBuilder::ToNavigationEntries(serializedEntries, context()->browser_context());
+  std::vector<NavigationEntry *> navigationEntries;
+  scopedEntries.release(&navigationEntries);
+
   NavigationController &navigationController = web_contents_->GetController();
 
   if (currentEntry < 0)

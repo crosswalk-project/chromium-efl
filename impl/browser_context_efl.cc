@@ -5,7 +5,7 @@
 #include "browser_context_efl.h"
 
 #include "base/bind.h"
-#include "base/file_util.h"
+#include "base/files/file_util.h"
 #include "base/path_service.h"
 #include "components/visitedlink/browser/visitedlink_master.h"
 #include "content/public/browser/browser_thread.h"

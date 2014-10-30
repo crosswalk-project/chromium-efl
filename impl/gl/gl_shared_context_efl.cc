@@ -4,7 +4,7 @@
 
 #include "gl/gl_shared_context_efl.h"
 
-#include "gpu/command_buffer/service/mailbox_manager.h"
+#include "gpu/command_buffer/service/mailbox_manager_impl.h"
 #include "ui/gl/gl_context.h"
 #include "ui/gl/gl_share_group.h"
 
@@ -126,7 +126,7 @@ gfx::GLShareGroup* GLSharedContextEfl::GetShareGroup() {
 // static
 gpu::gles2::MailboxManager* GLSharedContextEfl::GetMailboxManager() {
   static scoped_refptr<gpu::gles2::MailboxManager> mailbox_manager_ =
-      new gpu::gles2::MailboxManager();
+      new gpu::gles2::MailboxManagerImpl();
   return mailbox_manager_.get();
 }
 

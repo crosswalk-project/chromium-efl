@@ -284,7 +284,7 @@ void WebContentsDelegateEfl::DidCommitProvisionalLoadForFrame(RenderFrameHost* r
   web_view_->SmartCallback<EWebViewCallbacks::LoadCommitted>().call();
 }
 
-void WebContentsDelegateEfl::DidNavigateAnyFrame(const LoadCommittedDetails& details, const FrameNavigateParams& params) {
+void WebContentsDelegateEfl::DidNavigateAnyFrame(RenderFrameHost* render_frame_host, const LoadCommittedDetails& details, const FrameNavigateParams& params) {
   web_view_->SmartCallback<EWebViewCallbacks::ProvisionalLoadRedirect>().call();
   static_cast<BrowserContextEfl*>(web_contents_.GetBrowserContext())->AddVisitedURLs(params.redirects);
 }

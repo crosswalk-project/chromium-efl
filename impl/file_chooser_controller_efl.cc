@@ -4,12 +4,12 @@
 
 #include "content/common/view_messages.h"
 #include "content/public/browser/render_view_host.h"
+#include "content/public/common/file_chooser_file_info.h"
 #include "file_chooser_controller_efl.h"
 #include <Eina.h>
 #include <Elementary.h>
 
 #include "base/files/file_path.h"
-#include "ui/shell_dialogs/selected_file_info.h"
 #include "base/strings/utf_string_conversions.h"
 
 namespace content {
@@ -19,7 +19,7 @@ static void _fs_done(void *data, Evas_Object *obj,void *event_info) {
 
   FileChooserControllerEfl *inst = (FileChooserControllerEfl*) data;
 
-  std::vector<ui::SelectedFileInfo> files;
+  std::vector<content::FileChooserFileInfo> files;
 
   RenderViewHost* render_view_host = inst->getRenderViewHost();
   if (!render_view_host)
@@ -29,7 +29,9 @@ static void _fs_done(void *data, Evas_Object *obj,void *event_info) {
     GURL url(sel_path);
     if (!url.is_valid()) {
       base::FilePath path(url.SchemeIsFile() ? url.path() : sel_path);
-      files.push_back(ui::SelectedFileInfo(path, base::FilePath()));
+      content::FileChooserFileInfo file_info;
+      file_info.file_path = path;
+      files.push_back(file_info);
     }
   }
 

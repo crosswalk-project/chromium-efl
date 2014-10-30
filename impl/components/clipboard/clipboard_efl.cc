@@ -2,8 +2,7 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-#undef USE_CLIPBOARD_AURAX11
-#include "ui/base/clipboard/clipboard.h"
+#include "clipboard_efl.h"
 
 #include <Elementary.h>
 
@@ -29,7 +28,12 @@ const char kMimeTypePepperCustomData[] = "chromium/x-pepper-custom-data";
 const char kMimeTypeWebCustomData[] = "chromium/x-web-custom-data";
 } // namespace
 
-Clipboard::FormatType::FormatType() {
+// Clipboard factory method.
+Clipboard* Clipboard::Create() {
+  return new ClipboardEfl;
+}
+
+ClipboardEfl::FormatType::FormatType() {
 }
 
 Clipboard::FormatType::FormatType(const std::string& native_format)
@@ -53,16 +57,16 @@ bool Clipboard::FormatType::Equals(const FormatType& other) const {
   return data_ == other.data_;
 }
 
-Clipboard::Clipboard() {
+ClipboardEfl::ClipboardEfl() {
   DCHECK(CalledOnValidThread());
 }
 
-Clipboard::~Clipboard() {
+ClipboardEfl::~ClipboardEfl() {
   DCHECK(CalledOnValidThread());
 }
 
 // Main entry point used to write several values in the clipboard.
-void Clipboard::WriteObjects(ClipboardType type, const ObjectMap& objects) {
+void ClipboardEfl::WriteObjects(ClipboardType type, const ObjectMap& objects) {
   DCHECK(CalledOnValidThread());
   DCHECK_EQ(type, CLIPBOARD_TYPE_COPY_PASTE);
 
@@ -72,7 +76,7 @@ void Clipboard::WriteObjects(ClipboardType type, const ObjectMap& objects) {
   }
 }
 
-uint64 Clipboard::GetSequenceNumber(ClipboardType /* type */) {
+uint64 ClipboardEfl::GetSequenceNumber(ClipboardType /* type */) {
   DCHECK(CalledOnValidThread());
   // TODO: implement this. For now this interface will advertise
   // that the clipboard never changes. That's fine as long as we
@@ -80,7 +84,7 @@ uint64 Clipboard::GetSequenceNumber(ClipboardType /* type */) {
   return 0;
 }
 
-bool Clipboard::IsFormatAvailable(const Clipboard::FormatType& format,
+bool ClipboardEfl::IsFormatAvailable(const Clipboard::FormatType& format,
                                   ClipboardType /* clipboard_type */) const {
   DCHECK(CalledOnValidThread());
   int count = ClipboardHelperEfl::GetInstance()->NumberOfItems();
@@ -115,11 +119,11 @@ bool Clipboard::IsFormatAvailable(const Clipboard::FormatType& format,
   return false;
 }
 
-void Clipboard::Clear(ClipboardType /* type */) {
+void ClipboardEfl::Clear(ClipboardType /* type */) {
   ClipboardHelperEfl::GetInstance()->Clear();
 }
 
-void Clipboard::ReadAvailableTypes(ClipboardType type, std::vector<string16>* types,
+void ClipboardEfl::ReadAvailableTypes(ClipboardType type, std::vector<string16>* types,
                                    bool* contains_filenames) const {
   DCHECK(CalledOnValidThread());
   DCHECK_EQ(type, CLIPBOARD_TYPE_COPY_PASTE);
@@ -139,7 +143,7 @@ void Clipboard::ReadAvailableTypes(ClipboardType type, std::vector<string16>* ty
     types->push_back(base::ASCIIToUTF16(blink::mimeTypeImagePng));
 }
 
-void Clipboard::ReadText(ClipboardType type, string16* result) const {
+void ClipboardEfl::ReadText(ClipboardType type, string16* result) const {
   DCHECK(CalledOnValidThread());
   DCHECK_EQ(type, CLIPBOARD_TYPE_COPY_PASTE);
   std::string utf8;
@@ -147,7 +151,7 @@ void Clipboard::ReadText(ClipboardType type, string16* result) const {
   *result = base::UTF8ToUTF16(utf8);
 }
 
-void Clipboard::ReadAsciiText(ClipboardType type, std::string* result) const {
+void ClipboardEfl::ReadAsciiText(ClipboardType type, std::string* result) const {
   DCHECK(CalledOnValidThread());
   DCHECK_EQ(type, CLIPBOARD_TYPE_COPY_PASTE);
   int count = ClipboardHelperEfl::GetInstance()->NumberOfItems();
@@ -167,7 +171,7 @@ void Clipboard::ReadAsciiText(ClipboardType type, std::string* result) const {
   }
 }
 
-void Clipboard::ReadHTML(ClipboardType type, string16* markup,
+void ClipboardEfl::ReadHTML(ClipboardType type, string16* markup,
     std::string* src_url, uint32* fragment_start,
     uint32* fragment_end) const {
   DCHECK(CalledOnValidThread());
@@ -196,11 +200,11 @@ void Clipboard::ReadHTML(ClipboardType type, string16* markup,
   }
 }
 
-void Clipboard::ReadRTF(ClipboardType type, std::string* result) const {
+void ClipboardEfl::ReadRTF(ClipboardType type, std::string* result) const {
   NOTIMPLEMENTED();
 }
 
-SkBitmap Clipboard::ReadImage(ClipboardType type) const {
+SkBitmap ClipboardEfl::ReadImage(ClipboardType type) const {
   DCHECK(CalledOnValidThread());
   DCHECK_EQ(type, CLIPBOARD_TYPE_COPY_PASTE);
   NOTIMPLEMENTED();
@@ -208,17 +212,17 @@ SkBitmap Clipboard::ReadImage(ClipboardType type) const {
   return SkBitmap();
 }
 
-void Clipboard::ReadBookmark(string16* title, std::string* url) const {
+void ClipboardEfl::ReadBookmark(string16* title, std::string* url) const {
   NOTIMPLEMENTED();
 }
 
-void Clipboard::ReadCustomData(ClipboardType clipboard_type,
+void ClipboardEfl::ReadCustomData(ClipboardType clipboard_type,
                                const string16& type,
                                string16* result) const {
   NOTIMPLEMENTED();
 }
 
-void Clipboard::ReadData(const FormatType& format, std::string* result) const {
+void ClipboardEfl::ReadData(const FormatType& format, std::string* result) const {
   DCHECK(CalledOnValidThread());
   NOTIMPLEMENTED();
 }
@@ -276,34 +280,34 @@ const Clipboard::FormatType& Clipboard::GetPepperCustomDataFormatType() {
   return type;
 }
 
-void Clipboard::WriteText(const char* text_data, size_t text_len) {
+void ClipboardEfl::WriteText(const char* text_data, size_t text_len) {
   ClipboardHelperEfl::GetInstance()->
       SetData(std::string(text_data, text_len), ClipboardHelperEfl::CLIPBOARD_DATA_TYPE_PLAIN_TEXT);
 }
 
-void Clipboard::WriteHTML(const char* markup_data, size_t markup_len,
+void ClipboardEfl::WriteHTML(const char* markup_data, size_t markup_len,
                           const char* url_data, size_t url_len) {
   NOTIMPLEMENTED();
 }
 
-void Clipboard::WriteRTF(const char* rtf_data, size_t data_len) {
+void ClipboardEfl::WriteRTF(const char* rtf_data, size_t data_len) {
   NOTIMPLEMENTED();
 }
 
-void Clipboard::WriteBookmark(const char* title_data, size_t title_len,
+void ClipboardEfl::WriteBookmark(const char* title_data, size_t title_len,
                               const char* url_data, size_t url_len) {
   NOTIMPLEMENTED();
 }
 
-void Clipboard::WriteWebSmartPaste() {
+void ClipboardEfl::WriteWebSmartPaste() {
   NOTIMPLEMENTED();
 }
 
-void Clipboard::WriteBitmap(const SkBitmap& bitmap) {
+void ClipboardEfl::WriteBitmap(const SkBitmap& bitmap) {
   NOTIMPLEMENTED();
 }
 
-void Clipboard::WriteData(const FormatType& format, const char* data_data, size_t data_len) {
+void ClipboardEfl::WriteData(const FormatType& format, const char* data_data, size_t data_len) {
   NOTIMPLEMENTED();
 }
 
