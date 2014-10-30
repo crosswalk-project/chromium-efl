@@ -177,4 +177,28 @@ void WebContentsViewEfl::ShowContextMenu(RenderFrameHost* render_frame_host, con
     delegate_->ShowContextMenu(render_frame_host, params);
 }
 
+#if defined(OS_MACOSX) || defined(OS_ANDROID) || defined(OS_TIZEN)
+void WebContentsViewEfl::ShowPopupMenu(RenderFrameHost* render_frame_host,
+                                       const gfx::Rect& bounds,
+                                       int item_height,
+                                       double item_font_size,
+                                       int selected_item,
+                                       const std::vector<MenuItem>& items,
+                                       bool right_aligned,
+                                       bool allow_multiple_selection) {
+  WebContentsDelegateEfl* delegate =
+      static_cast<WebContentsDelegateEfl*>(web_contents_->GetDelegate());
+  if (delegate) {
+    delegate->ShowPopupMenu(render_frame_host,
+                            bounds,
+                            blink::TextDirection(right_aligned),
+                            0,
+                            items,
+                            0,
+                            selected_item,
+                            allow_multiple_selection);
+  }
+}
+#endif
+
 } // namespace content

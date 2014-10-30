@@ -141,7 +141,14 @@ class WebContentsDelegateEfl
 
   void OnFormSubmit(const GURL&);
   void SetContentSecurityPolicy(const std::string& policy, tizen_webview::ContentSecurityPolicyType header_type);
-  void ShowPopupMenu(const gfx::Rect& rect, blink::TextDirection textDirection, double pageScaleFactor, const std::vector<MenuItem>& items, int data, int selectedIndex, bool multiple);
+  void ShowPopupMenu(RenderFrameHost* render_frame_host,
+                     const gfx::Rect& rect,
+                     blink::TextDirection textDirection,
+                     double pageScaleFactor,
+                     const std::vector<MenuItem>& items,
+                     int data,
+                     int selectedIndex,
+                     bool multiple);
   void HidePopupMenu();
 
   void set_new_window_policy(bool policy) { should_open_new_window_ = policy; }

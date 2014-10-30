@@ -39,6 +39,7 @@
       '<(chrome_src_dir)/third_party/WebKit', # [M34] without this, build errors occur due to #include path changes in M34. for example, see WebFrame.h.
       '<(chrome_src_dir)/third_party/skia/include/core',
       '<(chrome_src_dir)/third_party/mesa/src/include',
+      '<(chrome_src_dir)/v8/include',
 
       '<(PRODUCT_DIR)/gen',
       '<(SHARED_INTERMEDIATE_DIR)',
@@ -285,6 +286,8 @@
       'renderer/print_pages_params.h',
       'renderer/print_web_view_helper_efl.cc',
       'renderer/print_web_view_helper_efl.h',
+      'renderer/render_frame_observer_efl.cc',
+      'renderer/render_frame_observer_efl.h',
       'renderer/render_process_observer_efl.cc',
       'renderer/render_process_observer_efl.h',
       'renderer/render_view_observer_efl.cc',

@@ -15,6 +15,7 @@
 #include "content/public/renderer/render_thread.h"
 #include "content/public/renderer/render_view.h"
 #include "content/child/request_extra_data.h"
+#include "renderer/render_frame_observer_efl.h"
 #include "renderer/render_view_observer_efl.h"
 #include "content/public/renderer/content_renderer_client.h"
 #include "third_party/WebKit/public/platform/WebURLError.h"
@@ -60,6 +61,10 @@ void ContentRendererClientEfl::RenderThreadStarted()
   thread->AddObserver(visited_link_slave_.get());
 }
 
+void ContentRendererClientEfl::RenderFrameCreated(content::RenderFrame* render_frame) {
+  new content::RenderFrameObserverEfl(render_frame);
+}
+
 void ContentRendererClientEfl::RenderViewCreated(content::RenderView* render_view) {
   // Deletes itself when render_view is destroyed.
   new RenderViewObserverEfl(render_view, this);
@@ -88,7 +93,7 @@ bool ContentRendererClientEfl::HandleNavigation(content::RenderFrame* render_fra
       content::RenderView::FromWebView(frame->view());
   bool result = false;
   GURL referrer_url(GURL(request.httpHeaderField(blink::WebString::fromUTF8("Referer"))));
-  blink::WebReferrerPolicy referrer_policy =  
+  blink::WebReferrerPolicy referrer_policy =
       request.isNull() ? frame->document().referrerPolicy() : request.referrerPolicy();
   int render_view_id = render_view->GetRoutingID();
 

@@ -34,6 +34,7 @@ static void __picker_radio_icon_changed_cb(void* data, Evas_Object* obj, void* e
   Popup_Picker* picker = static_cast<Popup_Picker*>(callback_data->user_data);
 
   int index = elm_radio_value_get(picker->radioMain);
+  elm_genlist_item_selected_set(callback_data->it, true);
   picker->selectedIndex = index;
   view_popup_menu_select(picker->web_view_, index);
 }
@@ -43,7 +44,7 @@ static char* __picker_label_get_cb(void* data, Evas_Object* obj, const char* par
   Popup_Menu_Item* menuItem = static_cast<Popup_Menu_Item*>(callback_data->menuItem);
 
   if (!strncmp(part, "elm.text", strlen("elm.text")))
-    return strdup(popup_menu_item_text_get(menuItem));
+    return elm_entry_utf8_to_markup(popup_menu_item_text_get(menuItem));
 
   return 0;
 }
@@ -52,7 +53,8 @@ static Evas_Object* __picker_icon_get_cb(void* data, Evas_Object* obj, const cha
   genlist_callback_data *callback_data = static_cast<genlist_callback_data*>(data);
   Popup_Picker* picker = static_cast<Popup_Picker*>(callback_data->user_data);
 
-  if (!strcmp(part, "elm.icon") || !strcmp(part, "elm.swallow.icon")) {
+  if (!strcmp(part, "elm.swallow.end") &&
+      popup_menu_item_enabled_get(callback_data->menuItem) == EINA_TRUE) {
     Evas_Object *radio = elm_radio_add(obj);
     elm_radio_state_value_set(radio, callback_data->index);
     elm_radio_group_add(radio, picker->radioMain);
@@ -71,12 +73,16 @@ static Evas_Object* __picker_icon_get_cb(void* data, Evas_Object* obj, const cha
 static void __picker_item_selected_cb(void* data, Evas_Object* obj, void* event_info) {
   genlist_callback_data *callback_data = static_cast<genlist_callback_data*>(data);
   Popup_Picker* picker = static_cast<Popup_Picker*>(callback_data->user_data);
-  Evas_Object *radio_icon = elm_object_item_part_content_get((Elm_Object_Item *)event_info, "elm.icon");
+  Evas_Object* radio_icon = elm_object_item_part_content_get((Elm_Object_Item *)event_info, "elm.swallow.end");
 
   int index = callback_data->index;
-  elm_radio_value_set(radio_icon, callback_data->index);
-  picker->selectedIndex = index;
-  view_popup_menu_select(picker->web_view_, index);
+  elm_genlist_item_selected_set(callback_data->it, false);
+
+  if (popup_menu_item_enabled_get(callback_data->menuItem) == EINA_TRUE) {
+    elm_radio_value_set(radio_icon, callback_data->index);
+    picker->selectedIndex = index;
+    view_popup_menu_select(picker->web_view_, index);
+  }
 }
 
 void clear_genlist_callback_data(Popup_Picker* picker) {
@@ -97,6 +103,9 @@ void menuItemActivated(void* data, Evas_Object* obj, void* event_info) {
   Popup_Picker* picker = static_cast<Popup_Picker*>(data);
   Elm_Object_Item* selected = static_cast<Elm_Object_Item*>(event_info);
   int index = elm_genlist_item_index_get(selected);
+  // elm_genlist_item_index_get iterrate starting from 1
+  if (index > 0)
+    index--;
 
   if (picker->multiSelect) {
     int pos = eina_inarray_search(picker->changedList, &index, compareChangedItems);
@@ -104,10 +113,9 @@ void menuItemActivated(void* data, Evas_Object* obj, void* event_info) {
       eina_inarray_push(picker->changedList, &index);
     else
       eina_inarray_remove(picker->changedList, &index);
-    return;
   }
-  picker->selectedIndex = index;
-  view_popup_menu_select(picker->web_view_, index);
+
+  view_popup_menu_multiple_select(picker->web_view_, picker->changedList);
 }
 
 void menuItemDeactivated(void* data, Evas_Object* obj, void* event_info) {
@@ -115,12 +123,17 @@ void menuItemDeactivated(void* data, Evas_Object* obj, void* event_info) {
   Elm_Object_Item* deselectedItem = static_cast<Elm_Object_Item*>(event_info);
 
   int deselectedIndex = elm_genlist_item_index_get(deselectedItem);
+  // elm_genlist_item_index_get iterrate starting from 1
+  if (deselectedIndex > 0)
+    deselectedIndex--;
   int pos = eina_inarray_search(picker->changedList, &deselectedIndex, compareChangedItems);
 
   if (pos == -1)
     eina_inarray_push(picker->changedList, &deselectedIndex);
   else
     eina_inarray_remove(picker->changedList, &deselectedIndex);
+
+  view_popup_menu_multiple_select(picker->web_view_, picker->changedList);
 }
 
 void listClosed(void* data, Evas_Object* obj, const char* emission, const char* source) {
@@ -130,7 +143,11 @@ void listClosed(void* data, Evas_Object* obj, const char* emission, const char* 
     view_popup_menu_multiple_select(picker->web_view_, picker->changedList);
   else
     view_popup_menu_select(picker->web_view_, picker->selectedIndex);
-  eina_inarray_free(picker->changedList);
+
+  if (picker->changedList) {
+    eina_inarray_free(picker->changedList);
+    picker->changedList = 0;
+  }
 
   // FIXME: remove this check
   if (!picker->multiSelect)
@@ -141,14 +158,14 @@ void listClosed(void* data, Evas_Object* obj, const char* emission, const char* 
 
 void navigateToNext(void *data, Evas_Object *obj, const char *emission, const char *source)
 {
-  Popup_Picker* picker = static_cast<Popup_Picker*>(data);
+  //Popup_Picker* picker = static_cast<Popup_Picker*>(data);
   // DJKim : FIXME
   //ewk_view_form_navigate(picker->parent, true);
 }
 
 void navigateToPrev(void *data, Evas_Object *obj, const char *emission, const char *source)
 {
-  Popup_Picker* picker = static_cast<Popup_Picker*>(data);
+  //Popup_Picker* picker = static_cast<Popup_Picker*>(data);
   // DJKim : FIXME
   //ewk_view_form_navigate(picker->parent, false);
 }
@@ -158,7 +175,7 @@ static char* _listLabelGet(void* data, Evas_Object* obj, const char* part)
   Popup_Menu_Item* menuItem = static_cast<Popup_Menu_Item*>(data);
 
   if (!strncmp(part, "elm.text", strlen("elm.text")) && popup_menu_item_text_get(menuItem))
-    return strdup(popup_menu_item_text_get(menuItem));
+    return elm_entry_utf8_to_markup(popup_menu_item_text_get(menuItem));
   return 0;
 }
 
@@ -198,7 +215,7 @@ static void createAndShowPopupList(Evas_Object* win, Popup_Picker* picker, Eina_
     elm_radio_state_value_set(picker->radioMain, 0);
     elm_radio_value_set(picker->radioMain, 0);
 
-    itemClass.item_style = "1text.1icon.7";
+    itemClass.item_style = "default";
     itemClass.func.text_get = __picker_label_get_cb;
     itemClass.func.content_get = __picker_icon_get_cb;
     itemClass.func.state_get = 0;
@@ -236,7 +253,7 @@ static void createAndShowPopupList(Evas_Object* win, Popup_Picker* picker, Eina_
     }
     evas_object_smart_callback_add(picker->popupList, "changed", __picker_radio_icon_changed_cb, picker);
   } else {
-    itemClass.item_style = "1text";
+    itemClass.item_style = "default";
     itemClass.func.text_get = _listLabelGet;
     itemClass.func.content_get = 0;
     itemClass.func.state_get = 0;
@@ -255,7 +272,7 @@ static void createAndShowPopupList(Evas_Object* win, Popup_Picker* picker, Eina_
 
       if (popup_menu_item_selected_get(menuItem)) {
         eina_inarray_push(picker->changedList, &index);
-        elm_genlist_item_selected_set(itemObject, true);
+        elm_genlist_item_selected_set(itemObject, EINA_TRUE);
       }
       if (!(popup_menu_item_enabled_get(menuItem)))
         elm_object_item_disabled_set(itemObject, EINA_TRUE);
@@ -297,7 +314,10 @@ Popup_Picker* popup_picker_new(EWebView* web_view, Evas_Object* parent, Eina_Lis
   picker->multiSelect = multiple;
   picker->changedList = eina_inarray_new(sizeof(int), 0);
 
-  Evas_Object* topParent = elm_object_top_widget_get(elm_object_parent_widget_get(parent));
+  Evas_Object* obj = elm_object_parent_widget_get(parent);
+  if (obj == NULL)
+    obj = parent;
+  Evas_Object* topParent = elm_object_top_widget_get(obj);
   picker->win = elm_win_add(topParent, "combo_box Window", ELM_WIN_BASIC);
   elm_win_alpha_set(picker->win, EINA_TRUE);
 
@@ -419,18 +439,18 @@ void view_popup_menu_select(EWebView* web_view, int selectedIndex) {
 }
 
 void view_popup_menu_multiple_select(EWebView* web_view, Eina_Inarray* changeList) {
-  std::vector<int> selectedIndex;
+  std::vector<int> selectedIndices;
   Eina_Iterator* itr;
   void* data;
   itr = eina_inarray_iterator_new(changeList);
 
   EINA_ITERATOR_FOREACH(itr, data) {
     int* pData = static_cast<int*>(data);
-    selectedIndex.push_back(*pData);
+    selectedIndices.push_back(*pData);
   }
   eina_iterator_free(itr);
 
-  web_view->DidMultipleSelectPopupMenuItem(selectedIndex);
+  web_view->DidMultipleSelectPopupMenuItem(selectedIndices);
 }
 
 void view_popup_menu_close(EWebView* web_view) {

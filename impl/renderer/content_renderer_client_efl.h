@@ -35,6 +35,8 @@ class ContentRendererClientEfl : public content::ContentRendererClient
 
   virtual void RenderThreadStarted();
 
+  virtual void RenderFrameCreated(content::RenderFrame* render_frame);
+
   virtual void RenderViewCreated(content::RenderView* render_view);
 
   void SetWidgetInfo(int widgetHandle,

@@ -362,9 +362,7 @@ EWebView::~EWebView()
   mhtml_callback_map_.Clear();
 
 #if defined(OS_TIZEN)
-  void* item;
-  EINA_LIST_FREE(popupMenuItems_, item);
-    delete static_cast<Popup_Menu_Item*>(item);
+  ReleasePopupMenuList();
 
   if (popupPicker_)
     popup_picker_del(popupPicker_);
@@ -373,6 +371,20 @@ EWebView::~EWebView()
   delete evas_event_handler_;
   public_webview_ = NULL;
 }
+
+#if defined(OS_TIZEN)
+void EWebView::ReleasePopupMenuList() {
+  if (!popupMenuItems_)
+    return;
+
+  void* dummyItem;
+  EINA_LIST_FREE(popupMenuItems_, dummyItem) {
+    delete static_cast<Popup_Menu_Item*>(dummyItem);
+  }
+
+  popupMenuItems_ = 0;
+}
+#endif
 
 void EWebView::SetFocus(Eina_Bool focus)
 {
@@ -617,8 +629,10 @@ void EWebView::HandleTouchEvents(tizen_webview::Touch_Event_Type type, const Ein
       // Chromium doesn't expect (and doesn't like) these events.
       continue;
     }
-    ui::TouchEvent touch_event = WebEventFactoryEfl::toUITouchEvent(point, evas_object(), rwhv()->device_scale_factor());
-    rwhv()->HandleTouchEvent(&touch_event);
+    if (rwhv()) {
+      ui::TouchEvent touch_event = WebEventFactoryEfl::toUITouchEvent(point, evas_object(), rwhv()->device_scale_factor());
+      rwhv()->HandleTouchEvent(&touch_event);
+    }
   }
 }
 
@@ -918,15 +932,15 @@ void EWebView::ShowPopupMenu(const gfx::Rect& rect, blink::TextDirection textDir
   for (size_t i = 0; i < size; ++i) {
     popupItems = eina_list_append(popupItems, Popup_Menu_Item::create(blink::WebPopupItem(blink::WebPopupItem::Type(items[i].type), base::UTF16ToUTF8(items[i].label), blink::TextDirection(items[i].rtl), items[i].has_directional_override, base::UTF16ToUTF8(items[i].tool_tip), base::UTF16ToUTF8(items[i].label), items[i].enabled, true, items[i].checked)).leakPtr());
   }
+
+  ReleasePopupMenuList();
   popupMenuItems_ = popupItems;
 
   // DJKim : FIXME
 #if 0 //ENABLE(TIZEN_WEBKIT2_FORM_NAVIGATION)
-  if (FormIsNavigating()) {
-#if 0 //ENABLE(TIZEN_MULTIPLE_SELECT
-    popupPicker_->multiSelect = true;
-#endif
-    PopupMenuUpdate(popupMenuItems_, 0);
+  if (popupPicker_ && FormIsNavigating()) {
+    popupPicker_->multiSelect = multiple;
+    PopupMenuUpdate(popupMenuItems_, selectedIndex);
     SetFormIsNavigating(false);
     return;
   }
@@ -960,6 +974,77 @@ Eina_Bool EWebView::HidePopupMenu() {
   return true;
 }
 
+bool EWebView::IsSelectPickerShown() const {
+#if defined(OS_TIZEN)
+  return (popupPicker_ != NULL);
+#else
+  return false;
+#endif
+}
+
+void EWebView::CloseSelectPicker() {
+#if defined(OS_TIZEN)
+  listClosed(popupPicker_, 0, 0, 0);
+#endif
+}
+
+void EWebView::SetFormIsNavigating(bool formIsNavigating) {
+#if defined(OS_TIZEN)
+  formIsNavigating_ = formIsNavigating;
+#endif
+}
+
+Eina_Bool EWebView::PopupMenuUpdate(Eina_List* items, int selectedIndex) {
+#if defined(OS_TIZEN)
+  if (popupPicker_)
+    return false;
+
+  popup_picker_update(evas_object(), popupPicker_, items, selectedIndex);
+  // DJKim : FIXME
+  //popup_picker_buttons_update(popupPicker_, formIsNavigating_.position, formIsNavigating_.count, false);
+#endif
+  return true;
+}
+
+Eina_Bool EWebView::DidSelectPopupMenuItem(int selectedIndex) {
+#if defined(OS_TIZEN)
+  RenderFrameHostImpl* render_frame_host = static_cast<RenderFrameHostImpl*>(web_contents_->GetMainFrame());
+  if (!render_frame_host)
+    return false;
+
+  if (!popupMenuItems_)
+    return false;
+
+  //When user select empty space then no index is selected, so selectedIndex value is -1
+  //In that case we should call valueChanged() with -1 index.That in turn call popupDidHide()
+  //in didChangeSelectedIndex() for reseting the value of m_popupIsVisible in RenderMenuList.
+  if (selectedIndex != -1 && selectedIndex >= (int)eina_list_count(popupMenuItems_))
+    return false;
+
+  //In order to reuse RenderFrameHostImpl::DidSelectPopupMenuItems() method in Android,
+  //put selectedIndex into std::vector<int>.
+  std::vector<int> selectedIndices;
+  selectedIndices.push_back(selectedIndex);
+
+  render_frame_host->DidSelectPopupMenuItems(selectedIndices);
+#endif
+  return true;
+}
+
+Eina_Bool EWebView::DidMultipleSelectPopupMenuItem(std::vector<int>& selectedIndices) {
+#if defined(OS_TIZEN)
+  RenderFrameHostImpl* render_frame_host = static_cast<RenderFrameHostImpl*>(web_contents_->GetMainFrame());
+  if (!render_frame_host)
+    return false;
+
+  if (!popupMenuItems_)
+    return false;
+
+  render_frame_host->DidSelectPopupMenuItems(selectedIndices);
+#endif
+  return true;
+}
+
 Eina_Bool EWebView::PopupMenuClose() {
 #if defined(OS_TIZEN)
 // DJKim : FIXME
@@ -988,69 +1073,11 @@ Eina_Bool EWebView::PopupMenuClose() {
   delete static_cast<Popup_Menu_Item*>(item);
 #endif
 
-  RenderViewHostImpl* render_view_host = static_cast<RenderViewHostImpl*>(web_contents_->GetRenderViewHost());
-  if (!render_view_host)
+  RenderFrameHostImpl* render_frame_host = static_cast<RenderFrameHostImpl*>(web_contents_->GetMainFrame());
+  if (!render_frame_host)
     return false;
 
-#if !defined(EWK_BRINGUP)
-  render_view_host->PopupMenuClose();
-#endif
-#endif
-  return true;
-}
-
-void EWebView::SetFormIsNavigating(bool formIsNavigating) {
-#if defined(OS_TIZEN)
-  formIsNavigating_ = formIsNavigating;
-#endif
-}
-
-Eina_Bool EWebView::PopupMenuUpdate(Eina_List* items, int selectedIndex) {
-#if defined(OS_TIZEN)
-  if (popupPicker_)
-    return false;
-
-  popup_picker_update(evas_object(), popupPicker_, items, selectedIndex);
-  // DJKim : FIXME
-  //popup_picker_buttons_update(popupPicker_, formIsNavigating_.position, formIsNavigating_.count, false);
-#endif
-  return true;
-}
-
-Eina_Bool EWebView::DidSelectPopupMenuItem(int selectedindex) {
-#if defined(OS_TIZEN)
-  RenderViewHostImpl* render_view_host = static_cast<RenderViewHostImpl*>(web_contents_->GetRenderViewHost());
-  if (!render_view_host)
-    return false;
-
-  if (!popupMenuItems_)
-    return false;
-
-  //When user select empty space then no index is selected, so selectedIndex value is -1
-  //In that case we should call valueChanged() with -1 index.That in turn call popupDidHide()
-  //in didChangeSelectedIndex() for reseting the value of m_popupIsVisible in RenderMenuList.
-  if (selectedindex != -1 && selectedindex >= (int)eina_list_count(popupMenuItems_))
-    return false;
-
-#if !defined(EWK_BRINGUP)
-  render_view_host->DidSelectPopupMenuItem(selectedindex);
-#endif
-#endif
-  return true;
-}
-
-Eina_Bool EWebView::DidMultipleSelectPopupMenuItem(std::vector<int>& selectedindex) {
-#if defined(OS_TIZEN)
-  RenderViewHostImpl* render_view_host = static_cast<RenderViewHostImpl*>(web_contents_->GetRenderViewHost());
-  if (!render_view_host)
-    return false;
-
-  if (!popupMenuItems_)
-    return false;
-
-#if !defined(EWK_BRINGUP)
-  render_view_host->DidMultipleSelectPopupMenuItem(selectedindex);
-#endif
+  render_frame_host->DidClosePopupMenu();
 #endif
   return true;
 }

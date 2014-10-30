@@ -34,6 +34,12 @@
       ['exclude', 'x11_types\\.cc$'],
     ],
     'target_conditions': [
+      ['_target_name=="content_renderer" and use_efl==1', {
+        'sources': [
+          '<(chrome_src_dir)/content/renderer/external_popup_menu.cc',
+          '<(chrome_src_dir)/content/renderer/external_popup_menu.h',
+        ],
+      }],
       ['_target_name=="webcore_rendering"', {
         'sources/': [
           # Have to exclude under target_conditions here because of multiple

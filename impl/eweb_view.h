@@ -280,11 +280,13 @@ class EWebView {
   void SetContentSecurityPolicy(const char* policy, tizen_webview::ContentSecurityPolicyType type);
   void ShowPopupMenu(const gfx::Rect& rect, blink::TextDirection textDirection, double pageScaleFactor, const std::vector<content::MenuItem>& items, int data, int selectedIndex, bool multiple);
   Eina_Bool HidePopupMenu();
+  bool IsSelectPickerShown() const;
+  void CloseSelectPicker();
   bool FormIsNavigating() const { return formIsNavigating_; }
   void SetFormIsNavigating(bool formIsNavigating);
   Eina_Bool PopupMenuUpdate(Eina_List* items, int selectedIndex);
-  Eina_Bool DidSelectPopupMenuItem(int selectedindex);
-  Eina_Bool DidMultipleSelectPopupMenuItem(std::vector<int>& selectedindex);
+  Eina_Bool DidSelectPopupMenuItem(int selectedIndex);
+  Eina_Bool DidMultipleSelectPopupMenuItem(std::vector<int>& selectedIndices);
   Eina_Bool PopupMenuClose();
   void ShowContextMenu(const content::ContextMenuParams& params, content::ContextMenuType type = content::MENU_TYPE_LINK);
   void CancelContextMenu(int request_id);
@@ -448,6 +450,10 @@ class EWebView {
 #endif
   content::RenderWidgetHostViewEfl* rwhv() const;
   JavaScriptDialogManagerEfl* GetJavaScriptDialogManagerEfl();
+
+#if defined(OS_TIZEN)
+  void ReleasePopupMenuList();
+#endif
 
   // For popup windows the WebContents is created internally and we need to associate it with the
   // new view created by the embedder. We set this before calling the "create,window" callback and
