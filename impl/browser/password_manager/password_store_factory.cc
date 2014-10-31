@@ -71,17 +71,13 @@ PasswordStoreFactory::~PasswordStoreFactory()
 void PasswordStoreFactory::Init()
 {
   base::FilePath db_path;
-  PathService::Get(PathsEfl::WEB_DATABSE_DIR, &db_path);
-
-#ifndef OS_TIZEN
-  if(PathService::Override(base::DIR_MODULE, db_path) == false) {
-    LOG(ERROR)<<"Could not access login database path.";
+  if (!PathService::Get(PathsEfl::WEB_DATABASE_DIR, &db_path)) {
+    LOG(ERROR) << "Could not access login database path.";
     return;
   }
-#endif
 
-  base::FilePath login_db_file_path = db_path.Append(FILE_PATH_LITERAL("LoginData.db"));
-  LOG(ERROR) <<login_db_file_path.value();
+  base::FilePath login_db_file_path = db_path.Append(FILE_PATH_LITERAL(".LoginData.db"));
+
   scoped_ptr<LoginDatabase> login_db(new LoginDatabase());
   {
     base::ThreadRestrictions::ScopedAllowIO allow_io;

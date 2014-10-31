@@ -45,14 +45,14 @@ WebDataServiceWrapper* WebDataServiceWrapper::GetInstance(){
 
 WebDataServiceWrapper::WebDataServiceWrapper() {
   base::FilePath db_path;
-  PathService::Get(PathsEfl::WEB_DATABSE_DIR, &db_path);
+  PathService::Get(PathsEfl::WEB_DATABASE_DIR, &db_path);
 #ifndef OS_TIZEN
   if(PathService::Override(base::DIR_MODULE, db_path) == false) {
     LOG(ERROR)<<"Could not access web database path.";
     return;
   }
 #endif
-  base::FilePath path = db_path.Append(FILE_PATH_LITERAL("FormData.db"));
+  base::FilePath path = db_path.Append(FILE_PATH_LITERAL(".FormData.db"));
 
   scoped_refptr<base::MessageLoopProxy> ui_thread =
       BrowserThread::GetMessageLoopProxyForThread(BrowserThread::UI);

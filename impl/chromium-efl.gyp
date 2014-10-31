@@ -4,7 +4,6 @@
     'exe_dir%': '/usr/lib/chromium-efl/',
     'edje_dir%': '/usr/share/chromium-efl/themes/',
     'locale_dir%': '/usr/share/chromium-efl/locale/',
-    'webdb_dir%': '/usr/share/chromium-efl/db/',
     'edje_compiler%': 'edje_cc',
     'chromium_efl_library_type%': 'shared_library',
   },
@@ -24,7 +23,6 @@
       'DATA_DIR="<(data_dir)"',
       'EXE_DIR="<(exe_dir)"',
       'EDJE_DIR="<(edje_dir)"',
-      'WEBDB_DIR="<(webdb_dir)"',
     ],
   },
   'targets': [{

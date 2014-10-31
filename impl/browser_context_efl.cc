@@ -13,6 +13,7 @@
 #include "content/public/browser/render_view_host.h"
 #include "content/public/browser/web_contents.h"
 #include "eweb_context.h"
+#include "paths_efl.h"
 
 using std::pair;
 
@@ -133,6 +134,7 @@ BrowserContextEfl::ResourceContextEfl* BrowserContextEfl::GetResourceContextEfl(
   return resource_context_;
 }
 
+// TODO Can this API be called from multiple threads?
 base::FilePath BrowserContextEfl::GetPath() const {
   if (IsOffTheRecord()) {
     // Empty path indicates in memory storage. All data that would be persistent
@@ -144,11 +146,8 @@ base::FilePath BrowserContextEfl::GetPath() const {
   // TODO: Figure out something better for data storage.
 
   static base::FilePath path;
-  static bool pathInitialized = false;
-
-  if (!pathInitialized)
-    PathService::Get(base::DIR_TEMP, &path);
-
+  if (path.empty())
+    PathService::Get(PathsEfl::DIR_USER_DATA, &path);
   return path;
 }
 
@@ -163,10 +162,17 @@ net::URLRequestContextGetter* BrowserContextEfl::CreateRequestContext(
     content::ProtocolHandlerMap* protocol_handlers,
     URLRequestInterceptorScopedVector request_interceptors) {
   // TODO: Implement support for chromium network log
+
+  base::FilePath cache_base_path;
+  if (!PathService::Get(base::DIR_CACHE, &cache_base_path)) {
+    LOG(ERROR) << "Could not retrieve path to the cache directory";
+    return NULL;
+  }
+
   request_context_getter_ = new URLRequestContextGetterEfl(
       *web_context_,
       false,
-      GetPath(),
+      cache_base_path,
       BrowserThread::GetMessageLoopProxyForThread(BrowserThread::IO),
       BrowserThread::GetMessageLoopProxyForThread(BrowserThread::FILE),
       protocol_handlers,

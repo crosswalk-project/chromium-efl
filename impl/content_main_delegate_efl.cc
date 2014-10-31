@@ -35,8 +35,41 @@ std::string SubProcessPath() {
   return pak_file.AsUTF8Unsafe();
 }
 
+void InitializeUserDataDir() {
+  CommandLine* command_line = CommandLine::ForCurrentProcess();
+
+  base::FilePath user_data_dir = command_line->GetSwitchValuePath("user-data-dir");
+  if (!user_data_dir.empty() && !PathService::OverrideAndCreateIfNeeded(
+      PathsEfl::DIR_USER_DATA, user_data_dir, true, true)) {
+    DLOG(WARNING) << "Could not set user data directory to " << user_data_dir.value();
+
+    if (!PathService::Get(PathsEfl::DIR_USER_DATA, &user_data_dir))
+      CHECK(false) << "Could not get default user data directory";
+
+    command_line->AppendSwitchPath("user-data-dir", user_data_dir);
+  }
+}
+
+void InitializeDiskCacheDir() {
+  CommandLine* command_line = CommandLine::ForCurrentProcess();
+
+  base::FilePath disk_cache_dir = command_line->GetSwitchValuePath("disk-cache-dir");
+  if (!disk_cache_dir.empty() && !PathService::OverrideAndCreateIfNeeded(
+      base::DIR_CACHE, disk_cache_dir, true, true)) {
+    DLOG(WARNING) << "Could not set disk cache directory to " << disk_cache_dir.value();
+
+    if (!PathService::Get(base::DIR_CACHE, &disk_cache_dir))
+      CHECK(false) << "Could not get default disk cache directory";
+
+    command_line->AppendSwitchPath("disk-cache-dir", disk_cache_dir);
+  }
+}
+
 void ContentMainDelegateEfl::PreSandboxStartup() {
   PathService::Override(base::FILE_EXE, base::FilePath(SubProcessPath()));
+
+  InitializeUserDataDir();
+  InitializeDiskCacheDir();
 
   // needed for gpu process
   CommandLine::ForCurrentProcess()->AppendSwitchPath(

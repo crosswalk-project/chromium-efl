@@ -5,27 +5,23 @@
 #ifndef _PATHS_EFL_H_
 #define _PATHS_EFL_H_
 
-namespace base {
-class FilePath;
-}
+#include "base/base_paths.h"
 
-class PathsEfl {
- public:
-  enum {
-    // The value here is taken from chromium/src/chrome/common/chrome_paths.h.
-    PATH_START = 1000,
-    EDJE_RESOURCE_DIR,
-    WEB_DATABSE_DIR,
-    DIR_LOCALE,
-    PATH_END
-  };
-
-  // Register EFL specific path providers, should be called once
-  // per each process type.
-  static void Register();
-
- private:
-  static bool GetPath(int key, base::FilePath* result);
+namespace PathsEfl {
+enum {
+  // The value here is taken from chromium/src/chrome/common/chrome_paths.h.
+  PATH_START = 1000,
+  EDJE_RESOURCE_DIR,
+  WEB_DATABASE_DIR,
+  DIR_USER_DATA,
+  DIR_DATA_PATH,
+  DIR_LOCALE,
+  PATH_END
 };
+
+// Call once per each process type to register the provider for the
+// path keys defined above
+void Register();
+}
 
 #endif // _PATHS_EFL_H_

@@ -141,8 +141,6 @@ Chromium EFL unit test utilities
 %global CHROMIUM_EXE_DIR %{_libdir}/%{name}
 # Constant read only data used by chromium-efl port
 %global CHROMIUM_DATA_DIR %{_datadir}/%{name}
-# Web Databse read write data used by chromium-efl port
-%global CHROMIUM_WEBDB_DIR /opt/usr/apps/%{name}
 # Chromium unit tests install directory
 %global CHROMIUM_UNITTESTS_DIR /opt/usr/chromium-unittests/
 %global LOCALE_DIR /usr/share/chromium-efl
@@ -213,7 +211,6 @@ fi
 %if 0%{?chromium_efl_tizen_version:1}
   -Dchromium_efl_tizen_version=%{chromium_efl_tizen_version} \
 %endif
-  -Dwebdb_dir="%{CHROMIUM_WEBDB_DIR}"/data/db \
   -Dbuilding_for_tizen_"%{OUTPUT_BUILD_PROFILE_TARGET}"=1
 %endif
 
@@ -309,35 +306,6 @@ install -m 0755 ewk/utc_gtest_run.sh %{buildroot}/opt/usr/utc_exec/
 %post
 # apply smack rule
 smack_reload.sh
-
-# create webdatabase directory
-mkdir -p %{CHROMIUM_WEBDB_DIR}/data/db/
-
-# create dummy webdatabase
-if [ ! -f %{CHROMIUM_WEBDB_DIR}/data/db/FormData.db ];
-then
-    sqlite3 %{CHROMIUM_WEBDB_DIR}/data/db/FormData.db 'PRAGMA journal_mode=PERSIST;
-    create table dummy_table(id integer primary key);'
-fi
-if [ ! -f %{CHROMIUM_WEBDB_DIR}/data/db/LoginData.db ];
-then
-    sqlite3 %{CHROMIUM_WEBDB_DIR}/data/db/LoginData.db 'PRAGMA journal_mode=PERSIST;
-    create table dummy_table(id integer primary key);'
-fi
-
-# change db file owner & permission
-chmod 660 %{CHROMIUM_WEBDB_DIR}/data/db/FormData.db
-chmod 660 %{CHROMIUM_WEBDB_DIR}/data/db/FormData.db-journal
-chmod 660 %{CHROMIUM_WEBDB_DIR}/data/db/LoginData.db
-chmod 660 %{CHROMIUM_WEBDB_DIR}/data/db/LoginData.db-journal
-
-chown -R 5000:5000 %{CHROMIUM_WEBDB_DIR}/
-
-# Apply SMACK label to database files
-if [ -f /usr/lib/rpm-plugins/msm.so ]
-then
-    chsmack -a 'chromium-efl' %{CHROMIUM_WEBDB_DIR}/data/db/*.db*
-fi
 
 %postun
 
