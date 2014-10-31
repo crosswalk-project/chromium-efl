@@ -135,6 +135,7 @@ enum CallbackType {
   WebloginCheckboxClicked,
   WebloginCheckboxResume,
   WebloginReady,
+  ZoomFinished,
 #if defined(OS_TIZEN_TV)
   NewWindowNavigationPolicyDecision,
 #endif // OS_TIZEN_TV
@@ -297,6 +298,7 @@ DECLARE_EWK_VIEW_CALLBACK(TouchmoveHandled, "touchmove,handled", bool);
 DECLARE_EWK_VIEW_CALLBACK(WebloginCheckboxClicked, "weblogin,checkbox,clicked", void);
 DECLARE_EWK_VIEW_CALLBACK(WebloginCheckboxResume, "weblogin,checkbox,resume", void);
 DECLARE_EWK_VIEW_CALLBACK(WebloginReady, "weblogin,ready" , void);
+DECLARE_EWK_VIEW_CALLBACK(ZoomFinished, "zoom,finished", void);
 #if defined(OS_TIZEN_TV)
 DECLARE_EWK_VIEW_CALLBACK(NewWindowNavigationPolicyDecision, "policy,decision,new,window", Ewk_Navigation_Policy_Decision*);
 #endif // OS_TIZEN_TV

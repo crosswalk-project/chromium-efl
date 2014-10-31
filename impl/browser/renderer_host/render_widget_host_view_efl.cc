@@ -1230,6 +1230,10 @@ void RenderWidgetHostViewEfl::HandleGesture(ui::GestureEvent* event) {
     return;
   }
 
+  if (event->type() == ui::ET_GESTURE_PINCH_END) {
+    eweb_view()->SmartCallback<EWebViewCallbacks::ZoomFinished>().call();
+  }
+
   blink::WebGestureEvent gesture = content::MakeWebGestureEventFromUIEvent(*event);
 
   if (event->type() == ui::ET_GESTURE_TAP ||
