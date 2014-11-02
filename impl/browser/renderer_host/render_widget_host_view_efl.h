@@ -50,6 +50,7 @@ class ScrollDetector;
 
 namespace content {
 
+class DisambiguationPopupEfl;
 class IMContextEfl;
 class RenderWidgetHostImpl;
 class RenderWidgetHostView;
@@ -148,15 +149,14 @@ class RenderWidgetHostViewEfl
   virtual void ResizeCompositingSurface(const gfx::Size&);
   virtual void RenderProcessGone(base::TerminationStatus, int) override;
   virtual bool OnMessageReceived(const IPC::Message&) override;
+
   void OnFilteredMessageReceived(const IPC::Message&);
 
   virtual void ProcessAckedTouchEvent(const TouchEventWithLatencyInfo&, InputEventAckState) override;
   virtual void DidStopFlinging() override;
 
-#if defined(TOOLKIT_VIEWS) || defined(USE_AURA)
   virtual void ShowDisambiguationPopup(const gfx::Rect& rect_pixels,
                                        const SkBitmap& zoomed_bitmap) override;
-#endif
 
   // ui::GestureEventHelper implementation.
   virtual bool CanDispatchToConsumer(ui::GestureConsumer* consumer) override;
@@ -302,6 +302,8 @@ class RenderWidgetHostViewEfl
   // The gesture recognizer for this view.
   // In Aura GestureRecognizer is global. Should we follow that?
   scoped_ptr<ui::GestureRecognizer> gesture_recognizer_;
+
+  scoped_ptr<DisambiguationPopupEfl> disambiguation_popup_;
 
   int current_orientation_;
 

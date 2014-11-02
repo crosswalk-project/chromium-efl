@@ -22,7 +22,7 @@ Source0: %{name}-%{version}.tar.gz
 Requires(post): /sbin/ldconfig
 Requires(post): xkeyboard-config
 Requires(postun): /sbin/ldconfig
-BuildRequires: which, vi, python, python-xml, bison, flex, gperf, gettext, perl, edje-bin
+BuildRequires: which, vi, python, python-xml, bison, flex, gperf, gettext, perl, edje-tools
 BuildRequires: libjpeg-turbo-devel, expat-devel, libhaptic, libcap-devel
 BuildRequires: pkgconfig(glesv2)
 BuildRequires: pkgconfig(libpulse)

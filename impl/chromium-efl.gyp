@@ -97,6 +97,8 @@
       'browser/device_sensors/data_fetcher_impl_tizen.cc',
       'browser/device_sensors/data_fetcher_impl_tizen.h',
       'browser/device_sensors/data_fetcher_shared_memory_tizen.cc',
+      'browser/disambiguation_popup_efl.cc',
+      'browser/disambiguation_popup_efl.h',
       'browser/download_manager_delegate_efl.cc',
       'browser/download_manager_delegate_efl.h',
       'browser/favicon/favicon_commands.cc',

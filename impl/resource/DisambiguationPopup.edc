@@ -1,0 +1,270 @@
+collections {
+    group {
+        name: "elm/ctxpopup/bg/default";
+        parts {
+            part {
+                name: "bg";
+                type: RECT;
+                mouse_events: 1;
+                description {
+                    state: "default" 0.0;
+                    visible: 0;
+                }
+                description {
+                    state: "visible" 0.0;
+                    color: 0 0 0 80;
+                    visible: 1;
+                }
+            }
+        }
+        programs {
+            program {
+                name: "clicked_event";
+                signal: "mouse,clicked,1";
+                source: "bg";
+                action: SIGNAL_EMIT "elm,action,click" "";
+            }
+            program {
+                name: "show";
+                signal: "elm,state,show";
+                source: "elm";
+                action: STATE_SET "visible" 0.0;
+                target: "bg";
+            }
+            program {
+                name: "hide";
+                signal: "elm,state,hide";
+                source: "elm";
+                action: STATE_SET "default" 0.0;
+                target: "bg";
+            }
+        }
+    }
+
+    group {
+        name: "elm/ctxpopup/base/default";
+        parts {
+            #define CTXPOPUP_SHADOW_LEFT_PADDING 14
+            #define CTXPOPUP_SHADOW_RIGHT_PADDING 14
+            #define CTXPOPUP_SHADOW_TOP_PADDING 14
+            #define CTXPOPUP_SHADOW_BOTTOM_PADDING 14
+            #define CTXPOPUP_ARROW_SIZE_INC 36 36
+
+            part {
+                name: "frame_shadow_left_top_padding";
+                type: SPACER;
+                scale: 1;
+                description {
+                    state: "default" 0.0;
+                    min: CTXPOPUP_SHADOW_LEFT_PADDING CTXPOPUP_SHADOW_TOP_PADDING;
+                    max: CTXPOPUP_SHADOW_LEFT_PADDING CTXPOPUP_SHADOW_TOP_PADDING;
+                    rel2 { relative: 0 0; }
+                    align: 0 0;
+                    fixed: 1 1;
+                }
+            }
+            part {
+                name: "frame_shadow_right_bottom_padding";
+                type: SPACER;
+                scale: 1;
+                description {
+                    state: "default" 0.0;
+                    min: CTXPOPUP_SHADOW_RIGHT_PADDING CTXPOPUP_SHADOW_BOTTOM_PADDING;
+                    max: CTXPOPUP_SHADOW_RIGHT_PADDING CTXPOPUP_SHADOW_BOTTOM_PADDING;
+                    rel1 { relative: 1 1; }
+                    align: 1 1;
+                    fixed: 1 1;
+                }
+            }
+            part {
+                name: "ctxpopup_frame_left_top";
+                type: SPACER;
+                scale: 1;
+                description {
+                    state: "default" 0.0;
+                    align: 0 0;
+                    fixed: 1 1;
+                    min: 1 1;
+                    max: 1 1;
+                    rel1 { relative: 1 1; to: "frame_shadow_left_top_padding"; }
+                }
+            }
+            part {
+                name: "ctxpopup_frame_right_bottom";
+                type: SPACER;
+                scale: 1;
+                description {
+                    state: "default" 0.0;
+                    align: 1 1;
+                    fixed: 1 1;
+                    min: 1 1;
+                    max: 1 1;
+                    rel2 { relative: 0 0; to: "frame_shadow_right_bottom_padding"; }
+                }
+            }
+            part {
+                name: "arrow_area_up";
+                type: SPACER;
+                scale: 1;
+                description {
+                    state: "default" 0.0;
+                    min: CTXPOPUP_ARROW_SIZE_INC;
+                    fixed: 1 1;
+                    align: 0.5 1;
+                    rel1 {
+                        relative: 1 1;
+                        to_x: "ctxpopup_frame_left_top";
+                        to_y: "ctxpopup_frame_left_top";
+                    }
+                    rel2 {
+                        relative: 0 1;
+                        to_x: "ctxpopup_frame_right_bottom";
+                        to_y: "ctxpopup_frame_left_top";
+                    }
+                }
+            }
+            part {
+                name: "arrow_area_down";
+                type: SPACER;
+                scale: 1;
+                description {
+                    state: "default" 0.0;
+                    min: CTXPOPUP_ARROW_SIZE_INC;
+                    fixed: 1 1;
+                    align: 0.5 0;
+                    rel1 {
+                        relative: 1 0;
+                        to_x: "ctxpopup_frame_left_top";
+                        to_y: "ctxpopup_frame_right_bottom";
+                    }
+                    rel2 {
+                        relative: 0 0;
+                        to_x: "ctxpopup_frame_right_bottom";
+                        to_y: "ctxpopup_frame_right_bottom";
+                    }
+                }
+            }
+            part {
+                name: "elm.swallow.arrow_up";
+                type: SWALLOW;
+                mouse_events: 0;
+                scale: 1;
+                dragable {
+                    x: 1 1 0;
+                    y: 1 1 0;
+                    confine: "arrow_area_up";
+                }
+                description {
+                    state: "default" 0.0;
+                    min: CTXPOPUP_ARROW_SIZE_INC;
+                    fixed: 1 1;
+                    visible: 1;
+                }
+            }
+            part {
+                name: "elm.swallow.arrow_down";
+                type: SWALLOW;
+                mouse_events: 0;
+                scale: 1;
+                dragable {
+                    x: 1 1 0;
+                    y: 1 1 0;
+                    confine: "arrow_area_down";
+                }
+                description {
+                    state: "default" 0.0;
+                    min: CTXPOPUP_ARROW_SIZE_INC;
+                    fixed: 1 1;
+                    visible: 1;
+                }
+            }
+            part {
+                name: "arrow_area_left";
+                type: SPACER;
+                scale: 1;
+                description {
+                    state: "default" 0.0;
+                    min: CTXPOPUP_ARROW_SIZE_INC;
+                    fixed: 1 1;
+                    align: 1 0.5;
+                    rel1 {
+                        relative: 1 1;
+                        to_x: "ctxpopup_frame_left_top";
+                        to_y: "ctxpopup_frame_left_top";
+                    }
+                    rel2 {
+                        relative: 1 0;
+                        to_x: "ctxpopup_frame_left_top";
+                        to_y: "ctxpopup_frame_right_bottom";
+                    }
+                }
+            }
+            part {
+                name: "arrow_area_right";
+                type: SPACER;
+                scale: 1;
+                description {
+                    state: "default" 0.0;
+                    min: CTXPOPUP_ARROW_SIZE_INC;
+                    fixed: 1 1;
+                    align: 0 0.5;
+                    rel1 {
+                        relative: 0 1;
+                        to_x: "ctxpopup_frame_right_bottom";
+                        to_y: "ctxpopup_frame_left_top";
+                    }
+                    rel2 {
+                        relative: 0 0;
+                        to_x: "ctxpopup_frame_right_bottom";
+                        to_y: "ctxpopup_frame_right_bottom";
+                    }
+                }
+            }
+            part {
+                name: "elm.swallow.arrow_left";
+                type: SWALLOW;
+                mouse_events: 0;
+                scale: 1;
+                dragable {
+                    x: 1 1 0;
+                    y: 1 1 0;
+                    confine: "arrow_area_left";
+                }
+                description {
+                    state: "default" 0.0;
+                    min: CTXPOPUP_ARROW_SIZE_INC;
+                    fixed: 1 1;
+                    visible: 1;
+                }
+            }
+            part {
+                name: "elm.swallow.arrow_right";
+                type: SWALLOW;
+                mouse_events: 0;
+                scale: 1;
+                dragable {
+                    x: 1 1 0;
+                    y: 1 1 0;
+                    confine: "arrow_area_right";
+                }
+                description {
+                    state: "default" 0.0;
+                    min: CTXPOPUP_ARROW_SIZE_INC;
+                    fixed: 1 1;
+                    visible: 1;
+                }
+            }
+            part {
+                name: "elm.swallow.content";
+                type: SWALLOW;
+                scale: 1;
+                description {
+                    state: "default" 0.0;
+                    align: 0 0;
+                    rel1 { to: "frame_shadow_left_top_padding"; relative: 1 1; }
+                    rel2 { to: "frame_shadow_right_bottom_padding"; relative: 0 0; }
+                }
+            }
+        }
+    }
+}
