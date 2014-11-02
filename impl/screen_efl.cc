@@ -24,11 +24,11 @@ class EflScreen : public gfx::Screen {
   virtual ~EflScreen() {
   }
 
-  virtual bool IsDIPEnabled() OVERRIDE {
+  virtual bool IsDIPEnabled() override {
     return true;
   }
 
-  virtual gfx::Point GetCursorScreenPoint() OVERRIDE {
+  virtual gfx::Point GetCursorScreenPoint() override {
     XDisplay* display = gfx::GetXDisplay();
 
     ::Window root, child;
@@ -47,37 +47,37 @@ class EflScreen : public gfx::Screen {
     return gfx::Point(root_x, root_y);
   }
 
-  virtual gfx::NativeWindow GetWindowUnderCursor() OVERRIDE {
+  virtual gfx::NativeWindow GetWindowUnderCursor() override {
     return GetWindowAtScreenPoint(GetCursorScreenPoint());
   }
 
-  virtual gfx::NativeWindow GetWindowAtScreenPoint(const gfx::Point& point) OVERRIDE {
+  virtual gfx::NativeWindow GetWindowAtScreenPoint(const gfx::Point& point) override {
     return NULL;
   }
 
-  virtual int GetNumDisplays() const OVERRIDE {
+  virtual int GetNumDisplays() const override {
     return 1;
   }
 
-  virtual std::vector<gfx::Display> GetAllDisplays() const OVERRIDE {
+  virtual std::vector<gfx::Display> GetAllDisplays() const override {
     return std::vector<gfx::Display>(1, GetPrimaryDisplay());
   }
 
-  virtual gfx::Display GetDisplayNearestWindow(gfx::NativeView view) const OVERRIDE {
+  virtual gfx::Display GetDisplayNearestWindow(gfx::NativeView view) const override {
     return GetPrimaryDisplay();
   }
 
   virtual gfx::Display GetDisplayNearestPoint(
-      const gfx::Point& point) const OVERRIDE {
+      const gfx::Point& point) const override {
     return GetPrimaryDisplay();
   }
 
   virtual gfx::Display GetDisplayMatching(
-      const gfx::Rect& match_rect) const OVERRIDE {
+      const gfx::Rect& match_rect) const override {
     return GetPrimaryDisplay();
   }
 
-  virtual gfx::Display GetPrimaryDisplay() const OVERRIDE {
+  virtual gfx::Display GetPrimaryDisplay() const override {
     static ::Screen* screen = DefaultScreenOfDisplay(gfx::GetXDisplay());
 
     static gfx::Display display(0,
@@ -94,10 +94,10 @@ class EflScreen : public gfx::Screen {
     return display;
   }
 
-  virtual void AddObserver(gfx::DisplayObserver* observer) OVERRIDE {
+  virtual void AddObserver(gfx::DisplayObserver* observer) override {
   }
 
-  virtual void RemoveObserver(gfx::DisplayObserver* observer) OVERRIDE {
+  virtual void RemoveObserver(gfx::DisplayObserver* observer) override {
   }
 
  private:

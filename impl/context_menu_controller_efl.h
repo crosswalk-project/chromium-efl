@@ -193,7 +193,7 @@ class ContextMenuControllerEfl
                             std::string link_url,
                             std::string icon_path);
   void HideSelectionHandle();
-  virtual void OnDownloadUpdated(content::DownloadItem* download) OVERRIDE;
+  virtual void OnDownloadUpdated(content::DownloadItem* download) override;
   void OnDownloadStarted(content::DownloadItem* item, content::DownloadInterruptReason interrupt_reason);
   base::FilePath DownloadFile(const GURL url,
                               const base::FilePath outputDir,

@@ -15,10 +15,10 @@ class GeolocationPermissionContextEfl : public GeolocationPermissionContext {
 public:
     GeolocationPermissionContextEfl() { }
 
-    virtual void RequestGeolocationPermission(int, int, int, const GURL&, base::Callback<void(bool)>) OVERRIDE;
+    virtual void RequestGeolocationPermission(int, int, int, const GURL&, base::Callback<void(bool)>) override;
 
     // The renderer is cancelling a pending permission request.
-    virtual void CancelGeolocationPermissionRequest(int, int, int, const GURL&) OVERRIDE;
+    virtual void CancelGeolocationPermissionRequest(int, int, int, const GURL&) override;
 
 private:
     void RequestGeolocationPermissionOnUIThread(int, int, int, const GURL&, base::Callback<void(bool)>);

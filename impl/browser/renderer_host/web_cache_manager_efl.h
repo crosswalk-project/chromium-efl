@@ -26,7 +26,7 @@ class WebCacheManagerEfl : public content::NotificationObserver {
   // content::NotificationObserver implementation:
   virtual void Observe(int type,
                        const content::NotificationSource& source,
-                       const content::NotificationDetails& details) OVERRIDE;
+                       const content::NotificationDetails& details) override;
   void ClearCache();
   void SetCacheModel(tizen_webview::Cache_Model model);
   tizen_webview::Cache_Model GetCacheModel() const { return cache_model_; }

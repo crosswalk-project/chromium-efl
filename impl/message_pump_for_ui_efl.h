@@ -20,10 +20,10 @@ class BASE_EXPORT MessagePumpForUIEfl : public base::MessagePump {
   MessagePumpForUIEfl();
   virtual ~MessagePumpForUIEfl();
 
-  virtual void Run(Delegate *) OVERRIDE;
-  virtual void Quit() OVERRIDE;
-  virtual void ScheduleWork() OVERRIDE;
-  virtual void ScheduleDelayedWork(const base::TimeTicks&) OVERRIDE;
+  virtual void Run(Delegate *) override;
+  virtual void Quit() override;
+  virtual void ScheduleWork() override;
+  virtual void ScheduleDelayedWork(const base::TimeTicks&) override;
 
  private:
   static void PipeCallback(void*, void*, unsigned int);

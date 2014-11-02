@@ -25,7 +25,7 @@ class WebDataServiceWrapper{
 
   virtual ~WebDataServiceWrapper();
 
-  virtual void Shutdown() OVERRIDE;
+  virtual void Shutdown() override;
 
   virtual scoped_refptr<autofill::AutofillWebDataService> GetAutofillWebData();
 

@@ -16,14 +16,14 @@ public:
     // content::DownloadManagerDelegate implementation.
     virtual bool DetermineDownloadTarget(
         content::DownloadItem*,
-        const content::DownloadTargetCallback&) OVERRIDE;
+        const content::DownloadTargetCallback&) override;
     virtual bool ShouldCompleteDownload(
         content::DownloadItem*,
-        const base::Closure&) OVERRIDE;
+        const base::Closure&) override;
     virtual bool ShouldOpenDownload(
         content::DownloadItem*,
-        const content::DownloadOpenDelayedCallback&) OVERRIDE;
-    virtual void GetNextId(const content::DownloadIdCallback&) OVERRIDE;
+        const content::DownloadOpenDelayedCallback&) override;
+    virtual void GetNextId(const content::DownloadIdCallback&) override;
 };
 
 #endif // DOWNLOAD_MANAGER_DELEGATE_EFL_H

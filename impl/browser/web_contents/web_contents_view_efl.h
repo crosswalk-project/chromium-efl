@@ -24,29 +24,29 @@ class WebContentsViewEfl
 
   // content::WebContentsView implementation.
   virtual void CreateView(
-      const gfx::Size& initial_size, gfx::NativeView context) OVERRIDE;
+      const gfx::Size& initial_size, gfx::NativeView context) override;
   virtual RenderWidgetHostViewBase* CreateViewForWidget(
-      RenderWidgetHost* render_widget_host) OVERRIDE;
+      RenderWidgetHost* render_widget_host) override;
   virtual RenderWidgetHostViewBase* CreateViewForPopupWidget(
-      RenderWidgetHost* render_widget_host) OVERRIDE;
-  virtual void SetPageTitle(const base::string16& title) OVERRIDE;
-  virtual void RenderViewCreated(RenderViewHost* host) OVERRIDE;
-  virtual void RenderViewSwappedIn(RenderViewHost* host) OVERRIDE;
-  virtual void SetOverscrollControllerEnabled(bool enabled) OVERRIDE;
-  virtual gfx::NativeView GetNativeView() const OVERRIDE;
-  virtual gfx::NativeView GetContentNativeView() const OVERRIDE;
-  virtual gfx::NativeWindow GetTopLevelNativeWindow() const OVERRIDE;
-  virtual void GetContainerBounds(gfx::Rect* out) const OVERRIDE;
-  virtual void SizeContents(const gfx::Size& size) OVERRIDE;
-  virtual void Focus() OVERRIDE;
-  virtual void SetInitialFocus() OVERRIDE;
-  virtual void StoreFocus() OVERRIDE;
-  virtual void RestoreFocus() OVERRIDE;
-  virtual DropData* GetDropData() const OVERRIDE;
-  virtual gfx::Rect GetViewBounds() const OVERRIDE;
+      RenderWidgetHost* render_widget_host) override;
+  virtual void SetPageTitle(const base::string16& title) override;
+  virtual void RenderViewCreated(RenderViewHost* host) override;
+  virtual void RenderViewSwappedIn(RenderViewHost* host) override;
+  virtual void SetOverscrollControllerEnabled(bool enabled) override;
+  virtual gfx::NativeView GetNativeView() const override;
+  virtual gfx::NativeView GetContentNativeView() const override;
+  virtual gfx::NativeWindow GetTopLevelNativeWindow() const override;
+  virtual void GetContainerBounds(gfx::Rect* out) const override;
+  virtual void SizeContents(const gfx::Size& size) override;
+  virtual void Focus() override;
+  virtual void SetInitialFocus() override;
+  virtual void StoreFocus() override;
+  virtual void RestoreFocus() override;
+  virtual DropData* GetDropData() const override;
+  virtual gfx::Rect GetViewBounds() const override;
 
   // content::RenderViewHostDelegateView implementation.
-  virtual void ShowContextMenu(RenderFrameHost* render_frame_host, const ContextMenuParams& params) OVERRIDE;
+  virtual void ShowContextMenu(RenderFrameHost* render_frame_host, const ContextMenuParams& params) override;
 
   void UpdateDragDest(RenderViewHost* host);
 

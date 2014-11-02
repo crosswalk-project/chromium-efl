@@ -16,13 +16,13 @@ namespace IPC {
 class ContentClientEfl : public content::ContentClient {
  public:
   // ContentClient implementation.
-  virtual std::string GetProduct() const OVERRIDE;
-  virtual std::string GetUserAgent() const OVERRIDE;
-  virtual base::string16 GetLocalizedString(int message_id) const OVERRIDE;
+  virtual std::string GetProduct() const override;
+  virtual std::string GetUserAgent() const override;
+  virtual base::string16 GetLocalizedString(int message_id) const override;
   virtual base::StringPiece GetDataResource(
       int resource_id,
-      ui::ScaleFactor scale_factor) const OVERRIDE;
-  virtual bool CanSendWhileSwappedOut(const IPC::Message* message) OVERRIDE;
+      ui::ScaleFactor scale_factor) const override;
+  virtual bool CanSendWhileSwappedOut(const IPC::Message* message) override;
 };
 
 #endif  // CONTENT_CLIENT_EFL_H_

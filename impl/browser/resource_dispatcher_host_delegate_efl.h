@@ -30,11 +30,11 @@ class ResourceDispatcherHostDelegateEfl
       ResourceContext* resource_context,
       AppCacheService* appcache_service,
       ResourceType resource_type,
-      ScopedVector<ResourceThrottle>* throttles) OVERRIDE;
+      ScopedVector<ResourceThrottle>* throttles) override;
 
   // Create login delegate.
   virtual ResourceDispatcherHostLoginDelegate* CreateLoginDelegate(
-      net::AuthChallengeInfo* auth_info, net::URLRequest* request) OVERRIDE;
+      net::AuthChallengeInfo* auth_info, net::URLRequest* request) override;
 
   // Called to trigger download.
   virtual void DownloadStarting(
@@ -45,12 +45,12 @@ class ResourceDispatcherHostDelegateEfl
       int request_id,
       bool is_content_initiated,
       bool must_download,
-      ScopedVector<content::ResourceThrottle>* throttles) OVERRIDE;
+      ScopedVector<content::ResourceThrottle>* throttles) override;
 
 #if !defined(EWK_BRINGUP)
   // Return true if it should override mime type, otherwise, return false.
   virtual bool ShouldOverrideMimeType(
-      const GURL& url, std::string& mime_type) OVERRIDE;
+      const GURL& url, std::string& mime_type) override;
 #endif
 
  private:

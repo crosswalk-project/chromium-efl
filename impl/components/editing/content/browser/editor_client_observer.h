@@ -18,9 +18,9 @@ class EditorClientObserver : public content::BrowserMessageFilter {
  public:
   EditorClientObserver(int render_process_id);
 
-  virtual bool OnMessageReceived(const IPC::Message& message) OVERRIDE;
+  virtual bool OnMessageReceived(const IPC::Message& message) override;
   virtual void OverrideThreadForMessage(const IPC::Message& message,
-                                        content::BrowserThread::ID* thread) OVERRIDE;
+                                        content::BrowserThread::ID* thread) override;
  private:
   void OnUndoNotify(int render_view_id, size_t undoStackSize);
   void OnRedoNotify(int render_view_id, size_t redoStackSize);

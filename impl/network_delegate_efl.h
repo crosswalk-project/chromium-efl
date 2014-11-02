@@ -23,42 +23,42 @@ class NetworkDelegateEfl : public NetworkDelegate {
   // NetworkDelegate implementation.
   virtual int OnBeforeURLRequest(URLRequest* request,
                                  const CompletionCallback& callback,
-                                 GURL* new_url) OVERRIDE;
+                                 GURL* new_url) override;
   virtual int OnBeforeSendHeaders(URLRequest* request,
                                   const CompletionCallback& callback,
-                                  HttpRequestHeaders* headers) OVERRIDE;
+                                  HttpRequestHeaders* headers) override;
   virtual void OnSendHeaders(URLRequest* request,
-                             const HttpRequestHeaders& headers) OVERRIDE;
+                             const HttpRequestHeaders& headers) override;
   virtual int OnHeadersReceived(
       URLRequest* request,
       const CompletionCallback& callback,
       const HttpResponseHeaders* original_response_headers,
       scoped_refptr<HttpResponseHeaders>* override_response_headers,
-      GURL* allowed_unsafe_redirect_url) OVERRIDE;
+      GURL* allowed_unsafe_redirect_url) override;
   virtual void OnBeforeRedirect(URLRequest* request,
-                                const GURL& new_location) OVERRIDE;
-  virtual void OnResponseStarted(URLRequest* request) OVERRIDE;
-  virtual void OnRawBytesRead(const URLRequest& request, int bytes_read) OVERRIDE;
-  virtual void OnCompleted(URLRequest* request, bool started) OVERRIDE;
-  virtual void OnURLRequestDestroyed(URLRequest* request) OVERRIDE;
+                                const GURL& new_location) override;
+  virtual void OnResponseStarted(URLRequest* request) override;
+  virtual void OnRawBytesRead(const URLRequest& request, int bytes_read) override;
+  virtual void OnCompleted(URLRequest* request, bool started) override;
+  virtual void OnURLRequestDestroyed(URLRequest* request) override;
   virtual void OnPACScriptError(int line_number,
-                                const base::string16& error) OVERRIDE;
+                                const base::string16& error) override;
   virtual AuthRequiredResponse OnAuthRequired(
       URLRequest* request,
       const AuthChallengeInfo& auth_info,
       const AuthCallback& callback,
-      AuthCredentials* credentials) OVERRIDE;
+      AuthCredentials* credentials) override;
   virtual bool OnCanGetCookies(const URLRequest& request,
-                               const CookieList& cookie_list) OVERRIDE;
+                               const CookieList& cookie_list) override;
   virtual bool OnCanSetCookie(const URLRequest& request,
                               const std::string& cookie_line,
-                              CookieOptions* options) OVERRIDE;
+                              CookieOptions* options) override;
   virtual bool OnCanAccessFile(const URLRequest& request,
-                               const base::FilePath& path) const OVERRIDE;
-  virtual bool OnCanThrottleRequest(const URLRequest& request) const OVERRIDE;
+                               const base::FilePath& path) const override;
+  virtual bool OnCanThrottleRequest(const URLRequest& request) const override;
   virtual int OnBeforeSocketStreamConnect(
       SocketStream* stream,
-      const CompletionCallback& callback) OVERRIDE;
+      const CompletionCallback& callback) override;
 
   typedef base::hash_map<uint64, scoped_refptr<PolicyResponseDelegateEfl> > ResponsePolicyDelegateTable;
   ResponsePolicyDelegateTable policy_response_delegate_map_;

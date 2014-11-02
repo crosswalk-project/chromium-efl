@@ -34,20 +34,20 @@ class ContentPasswordManagerDriver : public PasswordManagerDriver,
 
   // PasswordManagerDriver implementation.
   virtual void FillPasswordForm(const autofill::PasswordFormFillData& form_data)
-      OVERRIDE;
-  virtual bool DidLastPageLoadEncounterSSLErrors() OVERRIDE;
-  virtual bool IsOffTheRecord() OVERRIDE;
-  virtual PasswordGenerationManager* GetPasswordGenerationManager() OVERRIDE;
-  virtual PasswordManager* GetPasswordManager() OVERRIDE;
-  virtual autofill::AutofillManager* GetAutofillManager() OVERRIDE;
+      override;
+  virtual bool DidLastPageLoadEncounterSSLErrors() override;
+  virtual bool IsOffTheRecord() override;
+  virtual PasswordGenerationManager* GetPasswordGenerationManager() override;
+  virtual PasswordManager* GetPasswordManager() override;
+  virtual autofill::AutofillManager* GetAutofillManager() override;
   virtual void AllowPasswordGenerationForForm(autofill::PasswordForm* form)
-      OVERRIDE;
+      override;
 
   // content::WebContentsObserver overrides.
-  virtual bool OnMessageReceived(const IPC::Message& message) OVERRIDE;
+  virtual bool OnMessageReceived(const IPC::Message& message) override;
   virtual void DidNavigateMainFrame(
       const content::LoadCommittedDetails& details,
-      const content::FrameNavigateParams& params) OVERRIDE;
+      const content::FrameNavigateParams& params) override;
 
  private:
   // Must outlive this instance.

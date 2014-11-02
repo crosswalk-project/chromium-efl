@@ -123,13 +123,13 @@ class WebViewBrowserMessageFilter: public content::BrowserMessageFilter {
       web_contents->GetRenderProcessHost()->AddFilter(this);
   }
 
-  virtual void OverrideThreadForMessage(const IPC::Message& message, BrowserThread::ID* thread) OVERRIDE
+  virtual void OverrideThreadForMessage(const IPC::Message& message, BrowserThread::ID* thread) override
   {
     if (message.type() == EwkViewHostMsg_HitTestAsyncReply::ID)
       *thread = BrowserThread::UI;
   }
 
-  virtual bool OnMessageReceived(const IPC::Message& message) OVERRIDE
+  virtual bool OnMessageReceived(const IPC::Message& message) override
   {
     bool handled = true;
     IPC_BEGIN_MESSAGE_MAP(WebViewBrowserMessageFilter, message)

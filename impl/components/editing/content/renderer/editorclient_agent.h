@@ -25,7 +25,7 @@ class EditorClientAgent : public content::RenderViewObserver {
   EditorClientAgent(content::RenderView* render_view);
 
   // RenderView::Observer:
-  virtual bool OnMessageReceived(const IPC::Message& message) OVERRIDE;
+  virtual bool OnMessageReceived(const IPC::Message& message) override;
 
  private:
   // blink::WebEditorClient:

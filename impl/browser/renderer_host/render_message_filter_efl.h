@@ -28,9 +28,9 @@ class RenderMessageFilterEfl : public content::BrowserMessageFilter {
  public:
   RenderMessageFilterEfl(int);
   ~RenderMessageFilterEfl();
-  virtual bool OnMessageReceived(const IPC::Message&) OVERRIDE;
+  virtual bool OnMessageReceived(const IPC::Message&) override;
   virtual void OverrideThreadForMessage(const IPC::Message&,
-      content::BrowserThread::ID*) OVERRIDE;
+      content::BrowserThread::ID*) override;
 
  private:
   void OnDecideNavigationPolicy(NavigationPolicyParams, bool* handled);

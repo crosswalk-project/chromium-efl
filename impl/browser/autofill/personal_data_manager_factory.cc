@@ -21,8 +21,8 @@ class PersonalDataManagerServiceImpl : public PersonalDataManagerService {
   virtual ~PersonalDataManagerServiceImpl();
 
   // PersonalDataManagerService:
-  virtual void Shutdown() OVERRIDE;
-  virtual PersonalDataManager* GetPersonalDataManager() OVERRIDE;
+  virtual void Shutdown() override;
+  virtual PersonalDataManager* GetPersonalDataManager() override;
   static PersonalDataManagerServiceImpl* GetInstance() {
     return Singleton<PersonalDataManagerServiceImpl>::get();
   }

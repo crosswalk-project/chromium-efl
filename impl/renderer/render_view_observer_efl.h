@@ -34,16 +34,16 @@ class RenderViewObserverEfl: public content::RenderViewObserver {
   explicit RenderViewObserverEfl(content::RenderView* render_view);
   virtual ~RenderViewObserverEfl();
 
-  void DidChangeScrollOffset(blink::WebLocalFrame* frame) OVERRIDE;
-  bool OnMessageReceived(const IPC::Message& message) OVERRIDE;
-  virtual void DidCreateDocumentElement(blink::WebLocalFrame* frame) OVERRIDE;
-  virtual void OrientationChangeEvent() OVERRIDE;
+  void DidChangeScrollOffset(blink::WebLocalFrame* frame) override;
+  bool OnMessageReceived(const IPC::Message& message) override;
+  virtual void DidCreateDocumentElement(blink::WebLocalFrame* frame) override;
+  virtual void OrientationChangeEvent() override;
 #if !defined(EWK_BRINGUP)
-  virtual void DidChangePageScaleFactor() OVERRIDE;
+  virtual void DidChangePageScaleFactor() override;
 #endif
   //Changes in PageScaleFactorLimits are applied when layoutUpdated is called
   //So using this notification to update minimum and maximum page scale factor values
-  virtual void DidUpdateLayout() OVERRIDE;
+  virtual void DidUpdateLayout() override;
 
  private:
   void OnSetContentSecurityPolicy(const std::string& policy, tizen_webview::ContentSecurityPolicyType header_type);
