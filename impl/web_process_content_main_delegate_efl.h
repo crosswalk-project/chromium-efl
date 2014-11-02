@@ -13,9 +13,9 @@ namespace content {
 
 class WebProcessContentMainDelegateEfl: public content::ContentMainDelegate {
  public:
-  virtual void PreSandboxStartup() OVERRIDE;
-  virtual bool BasicStartupComplete(int* exit_code) OVERRIDE;
-  virtual ContentRendererClient* CreateContentRendererClient() OVERRIDE;
+  virtual void PreSandboxStartup() override;
+  virtual bool BasicStartupComplete(int* exit_code) override;
+  virtual ContentRendererClient* CreateContentRendererClient() override;
 };
 
 } // namespace content

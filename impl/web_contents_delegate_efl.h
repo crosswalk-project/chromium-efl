@@ -43,13 +43,13 @@ class WebContentsDelegateEfl
   ~WebContentsDelegateEfl();
 
   virtual WebContents* OpenURLFromTab(WebContents* source,
-      const content::OpenURLParams& params) OVERRIDE;
+      const content::OpenURLParams& params) override;
   virtual void NavigationStateChanged(const WebContents* source,
-                                      InvalidateTypes changed_flags) OVERRIDE;
+                                      InvalidateTypes changed_flags) override;
 
-  virtual void LoadProgressChanged(WebContents* source, double progress) OVERRIDE;
+  virtual void LoadProgressChanged(WebContents* source, double progress) override;
   virtual void LoadingStateChanged(WebContents* source,
-                                   bool to_different_document) OVERRIDE;
+                                   bool to_different_document) override;
 
   virtual bool ShouldCreateWebContents(
       WebContents*,
@@ -58,36 +58,36 @@ class WebContentsDelegateEfl
       const base::string16& frame_name,
       const GURL& target_url,
       const std::string& partition_id,
-      SessionStorageNamespace* session_storage_namespace) OVERRIDE;
+      SessionStorageNamespace* session_storage_namespace) override;
 
   virtual void WebContentsCreated(
       WebContents* source_contents,
       int opener_render_frame_id,
       const base::string16& frame_name,
       const GURL& target_url,
-      WebContents* new_contents) OVERRIDE;
+      WebContents* new_contents) override;
 
-  virtual void CloseContents(WebContents* source) OVERRIDE;
+  virtual void CloseContents(WebContents* source) override;
 
   virtual void ToggleFullscreenModeForTab(WebContents* web_contents,
-                                          bool enter_fullscreen) OVERRIDE;
+                                          bool enter_fullscreen) override;
   virtual bool IsFullscreenForTabOrPending(
-      const WebContents* web_contents) const OVERRIDE;
+      const WebContents* web_contents) const override;
   virtual void RequestMediaAccessPermission(
       WebContents* web_contents,
       const MediaStreamRequest& request,
-      const MediaResponseCallback& callback) OVERRIDE;
+      const MediaResponseCallback& callback) override;
   void RegisterProtocolHandler(WebContents* web_contents,
                                const std::string& protocol,
                                const GURL& url,
-                               bool user_gesture) OVERRIDE;
+                               bool user_gesture) override;
 
   void FindReply(WebContents* web_contents,
                  int request_id,
                  int number_of_matches,
                  const gfx::Rect& selection_rect,
                  int active_match_ordinal,
-                 bool final_update) OVERRIDE;
+                 bool final_update) override;
 
   void RequestCertificateConfirm(WebContents* web_contents, int cert_error,
       const net::SSLInfo& ssl_info, const GURL& url, ResourceType resource_type,
@@ -102,30 +102,30 @@ class WebContentsDelegateEfl
   virtual void DidStartProvisionalLoadForFrame(RenderFrameHost* render_frame_host,
                                                const GURL& validated_url,
                                                bool is_error_page,
-                                               bool is_iframe_srcdoc) OVERRIDE;
+                                               bool is_iframe_srcdoc) override;
 
   virtual void DidCommitProvisionalLoadForFrame(RenderFrameHost* render_frame_host,
                                                 const GURL& url,
-                                                ui::PageTransition transition_type) OVERRIDE;
+                                                ui::PageTransition transition_type) override;
 
-  virtual void DidNavigateAnyFrame(const LoadCommittedDetails& details, const FrameNavigateParams& params) OVERRIDE;
+  virtual void DidNavigateAnyFrame(const LoadCommittedDetails& details, const FrameNavigateParams& params) override;
   void OnAuthRequired(net::URLRequest* request,
                       const std::string& realm,
                       LoginDelegateEfl* login_delegate);
   virtual void DidFailProvisionalLoad(RenderFrameHost* render_frame_host,
                                       const GURL& validated_url,
                                       int error_code,
-                                      const base::string16& error_description) OVERRIDE;
+                                      const base::string16& error_description) override;
   virtual void DidFailLoad(RenderFrameHost* render_frame_host,
                            const GURL& validated_url,
                            int error_code,
-                           const base::string16& error_description) OVERRIDE;
+                           const base::string16& error_description) override;
 
   virtual void DidFinishLoad(RenderFrameHost* render_frame_host,
-                             const GURL& validated_url) OVERRIDE;
+                             const GURL& validated_url) override;
 
-  virtual void DidStartLoading(RenderViewHost* render_view_host) OVERRIDE;
-  virtual void DidUpdateFaviconURL(const std::vector<FaviconURL>& candidates) OVERRIDE;
+  virtual void DidStartLoading(RenderViewHost* render_view_host) override;
+  virtual void DidUpdateFaviconURL(const std::vector<FaviconURL>& candidates) override;
   virtual void DidDownloadFavicon(bool success, const GURL& icon_url, const SkBitmap& bitmap);
 
   void OnFormSubmit(const GURL&);
@@ -135,19 +135,19 @@ class WebContentsDelegateEfl
 
   void set_new_window_policy(bool policy) { should_open_new_window_ = policy; }
   bool get_new_window_policy() const { return should_open_new_window_; }
-  JavaScriptDialogManager* GetJavaScriptDialogManager() OVERRIDE;
+  JavaScriptDialogManager* GetJavaScriptDialogManager() override;
 
-  void DidFirstVisuallyNonEmptyPaint() OVERRIDE;
+  void DidFirstVisuallyNonEmptyPaint() override;
 
-  bool OnMessageReceived(const IPC::Message& message) OVERRIDE;
+  bool OnMessageReceived(const IPC::Message& message) override;
   void OnPrintedMetafileReceived(const DidPrintPagesParams& params);
-  virtual void NavigationEntryCommitted(const LoadCommittedDetails& load_details) OVERRIDE;
-  virtual void RenderProcessGone(base::TerminationStatus status) OVERRIDE;
+  virtual void NavigationEntryCommitted(const LoadCommittedDetails& load_details) override;
+  virtual void RenderProcessGone(base::TerminationStatus status) override;
   virtual bool AddMessageToConsole(WebContents* source,
                                    int32 level,
                                    const base::string16& message,
                                    int32 line_no,
-                                   const base::string16& source_id) OVERRIDE;
+                                   const base::string16& source_id) override;
   void RunFileChooser(WebContents* web_contents, const FileChooserParams& params);
   ColorChooser* OpenColorChooser(WebContents* web_contents, SkColor color, const std::vector<ColorSuggestion>& suggestions);
   void OnAccessRequestResponse(Eina_Bool allowed);

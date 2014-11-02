@@ -66,103 +66,105 @@ class RenderWidgetHostViewEfl
   explicit RenderWidgetHostViewEfl(RenderWidgetHost*, EWebView*);
 
   // RenderWidgetHostViewBase implementation.
-  virtual void InitAsChild(gfx::NativeView) OVERRIDE;
-  virtual void InitAsPopup(content::RenderWidgetHostView*, const gfx::Rect&) OVERRIDE;
-  virtual void InitAsFullscreen(content::RenderWidgetHostView*) OVERRIDE;
-  virtual RenderWidgetHost* GetRenderWidgetHost() const OVERRIDE;
-  virtual void SetSize(const gfx::Size&) OVERRIDE;
-  virtual void SetBounds(const gfx::Rect&) OVERRIDE;
-  virtual gfx::Vector2dF GetLastScrollOffset() const OVERRIDE;
-  virtual gfx::NativeView GetNativeView() const OVERRIDE;
-  virtual gfx::NativeViewId GetNativeViewId() const OVERRIDE;
-  virtual gfx::NativeViewAccessible GetNativeViewAccessible() OVERRIDE;
-  virtual bool IsSurfaceAvailableForCopy() const OVERRIDE;
-  virtual void Show() OVERRIDE;
-  virtual void Hide() OVERRIDE;
-  virtual bool IsShowing() OVERRIDE;
-  virtual gfx::Rect GetViewBounds() const OVERRIDE;
-  virtual bool LockMouse() OVERRIDE;
-  virtual void UnlockMouse() OVERRIDE;
-  virtual void WasShown() OVERRIDE;
-  virtual void WasHidden() OVERRIDE;
-  virtual void Focus() OVERRIDE;
-  virtual bool HasFocus() const OVERRIDE;
+  virtual void InitAsChild(gfx::NativeView) override;
+  virtual void InitAsPopup(content::RenderWidgetHostView*, const gfx::Rect&) override;
+  virtual void InitAsFullscreen(content::RenderWidgetHostView*) override;
+  virtual RenderWidgetHost* GetRenderWidgetHost() const override;
+  virtual void SetSize(const gfx::Size&) override;
+  virtual void SetBounds(const gfx::Rect&) override;
+  virtual gfx::Vector2dF GetLastScrollOffset() const override;
+  virtual gfx::NativeView GetNativeView() const override;
+  virtual gfx::NativeViewId GetNativeViewId() const override;
+  virtual gfx::NativeViewAccessible GetNativeViewAccessible() override;
+  virtual bool IsSurfaceAvailableForCopy() const override;
+  virtual void Show() override;
+  virtual void Hide() override;
+  virtual bool IsShowing() override;
+  virtual gfx::Rect GetViewBounds() const override;
+  virtual bool LockMouse() override;
+  virtual void UnlockMouse() override;
+  virtual void WasShown() override;
+  virtual void WasHidden() override;
+  virtual void Focus() override;
+  virtual bool HasFocus() const override;
   void MovePluginContainer(const WebPluginGeometry&);
   virtual void MovePluginWindows(
-      const std::vector<WebPluginGeometry>&) OVERRIDE;
-  virtual void Blur() OVERRIDE;
-  virtual void UpdateCursor(const WebCursor&) OVERRIDE;
-  virtual void SetIsLoading(bool) OVERRIDE;
+      const std::vector<WebPluginGeometry>&) override;
+  virtual void Blur() override;
+  virtual void UpdateCursor(const WebCursor&) override;
+  virtual void SetIsLoading(bool) override;
   virtual void TextInputStateChanged(
-      const ViewHostMsg_TextInputState_Params& params) OVERRIDE;
+      const ViewHostMsg_TextInputState_Params& params) override;
 
-  virtual void ImeCancelComposition() OVERRIDE;
-  virtual void ImeCompositionRangeChanged(const gfx::Range&, const std::vector<gfx::Rect>&) OVERRIDE;
-  virtual void FocusedNodeChanged(bool is_editable_node) OVERRIDE;
+  virtual void ImeCancelComposition() override;
+  virtual void ImeCompositionRangeChanged(const gfx::Range&, const std::vector<gfx::Rect>&) override;
+  virtual void FocusedNodeChanged(bool is_editable_node) override;
 
-  virtual void Destroy() OVERRIDE;
-  virtual void SetTooltipText(const base::string16&) OVERRIDE;
-  virtual void SelectionChanged(const base::string16&, size_t, const gfx::Range&) OVERRIDE;
-  virtual void SelectionBoundsChanged(const ViewHostMsg_SelectionBounds_Params&) OVERRIDE;
+  virtual void Destroy() override;
+  virtual void SetTooltipText(const base::string16&) override;
+  virtual void SelectionChanged(const base::string16&, size_t, const gfx::Range&) override;
+  virtual void SelectionBoundsChanged(const ViewHostMsg_SelectionBounds_Params&) override;
   virtual void CopyFromCompositingSurface(
     const gfx::Rect&,
     const gfx::Size& /* dst_size */,
     const base::Callback<void(bool, const SkBitmap&)>&,
-    const SkColorType) OVERRIDE;
+    const SkColorType) override;
 
   virtual void CopyFromCompositingSurfaceToVideoFrame(
     const gfx::Rect&,
     const scoped_refptr<media::VideoFrame>&,
-    const base::Callback<void(bool)>&) OVERRIDE;
+    const base::Callback<void(bool)>&) override;
 
-  virtual bool CanCopyToVideoFrame() const OVERRIDE;
-  virtual bool CanSubscribeFrame() const OVERRIDE;
+  virtual bool CanCopyToVideoFrame() const override;
+  virtual bool CanSubscribeFrame() const override;
   virtual void BeginFrameSubscription(
-      scoped_ptr<RenderWidgetHostViewFrameSubscriber> subscriber) OVERRIDE;
-  virtual void EndFrameSubscription() OVERRIDE;
+      scoped_ptr<RenderWidgetHostViewFrameSubscriber> subscriber) override;
+  virtual void EndFrameSubscription() override;
 
 
 #ifdef TIZEN_EDGE_EFFECT
-  virtual void DidOverscroll(const DidOverscrollParams& params) OVERRIDE;
+  virtual void DidOverscroll(const DidOverscrollParams& params) override;
 #endif
 
 #ifdef TIZEN_CONTENTS_DETECTION
-  virtual void OnContentsDetected(const char*) OVERRIDE;
+  virtual void OnContentsDetected(const char*) override;
 #endif
 
-  virtual void AcceleratedSurfaceInitialized(int, int) OVERRIDE;
+  virtual void AcceleratedSurfaceInitialized(int, int) override;
   virtual void AcceleratedSurfaceBuffersSwapped(
     const GpuHostMsg_AcceleratedSurfaceBuffersSwapped_Params&,
-    int) OVERRIDE;
+    int) override;
 
   virtual void AcceleratedSurfacePostSubBuffer(
     const GpuHostMsg_AcceleratedSurfacePostSubBuffer_Params&,
-    int) OVERRIDE;
+    int) override;
 
-  virtual void AcceleratedSurfaceSuspend() OVERRIDE;
-  virtual void AcceleratedSurfaceRelease() OVERRIDE;
-  virtual bool HasAcceleratedSurface(const gfx::Size&) OVERRIDE;
-  virtual void GetScreenInfo(blink::WebScreenInfo*) OVERRIDE;
-  virtual gfx::Rect GetBoundsInRootWindow() OVERRIDE;
-  virtual gfx::GLSurfaceHandle GetCompositingSurface() OVERRIDE;
+  virtual void AcceleratedSurfaceSuspend() override;
+  virtual void AcceleratedSurfaceRelease() override;
+  virtual bool HasAcceleratedSurface(const gfx::Size&) override;
+  virtual void GetScreenInfo(blink::WebScreenInfo*) override;
+  virtual gfx::Rect GetBoundsInRootWindow() override;
+  virtual gfx::GLSurfaceHandle GetCompositingSurface() override;
   virtual void ResizeCompositingSurface(const gfx::Size&);
-  virtual void RenderProcessGone(base::TerminationStatus, int) OVERRIDE;
-  virtual bool OnMessageReceived(const IPC::Message&) OVERRIDE;
-  virtual void ProcessAckedTouchEvent(const TouchEventWithLatencyInfo&, InputEventAckState) OVERRIDE;
-  virtual void DidStopFlinging() OVERRIDE;
+  virtual void RenderProcessGone(base::TerminationStatus, int) override;
+  virtual bool OnMessageReceived(const IPC::Message&) override;
+  void OnFilteredMessageReceived(const IPC::Message&);
+
+  virtual void ProcessAckedTouchEvent(const TouchEventWithLatencyInfo&, InputEventAckState) override;
+  virtual void DidStopFlinging() override;
 
 #if defined(TOOLKIT_VIEWS) || defined(USE_AURA)
   virtual void ShowDisambiguationPopup(const gfx::Rect& rect_pixels,
-                                       const SkBitmap& zoomed_bitmap) OVERRIDE;
+                                       const SkBitmap& zoomed_bitmap) override;
 #endif
 
   // ui::GestureEventHelper implementation.
-  virtual bool CanDispatchToConsumer(ui::GestureConsumer* consumer) OVERRIDE;
-  virtual void DispatchCancelTouchEvent(ui::TouchEvent* event) OVERRIDE;
-  virtual void DispatchGestureEvent(ui::GestureEvent*) OVERRIDE;
+  virtual bool CanDispatchToConsumer(ui::GestureConsumer* consumer) override;
+  virtual void DispatchCancelTouchEvent(ui::TouchEvent* event) override;
+  virtual void DispatchGestureEvent(ui::GestureEvent*) override;
 
   // IPC::Sender implementation:
-  virtual bool Send(IPC::Message*) OVERRIDE;
+  virtual bool Send(IPC::Message*) override;
 
   void OnSelectionTextStyleState(const SelectionStylePrams& params);
   void OnDidChangeMaxScrollOffset(int maxScrollX, int maxScrollY);

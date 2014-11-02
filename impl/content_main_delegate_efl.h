@@ -24,9 +24,9 @@ class ContentMainDelegateEfl
   // if the process should exit afterwards, and if so, |exit_code| should be
   // set. This is the place for embedder to do the things that must happen at
   // the start. Most of its startup code should be in the methods below.
-  virtual bool BasicStartupComplete(int* exit_code) OVERRIDE;
-  virtual void PreSandboxStartup() OVERRIDE;
-  virtual ContentBrowserClient* CreateContentBrowserClient() OVERRIDE;
+  virtual bool BasicStartupComplete(int* exit_code) override;
+  virtual void PreSandboxStartup() override;
+  virtual ContentBrowserClient* CreateContentBrowserClient() override;
 
  private:
   scoped_ptr<ContentBrowserClient> client_;

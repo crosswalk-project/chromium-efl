@@ -17,33 +17,33 @@ extern void* GLGetCurentContext();
 
 struct GLSharedContextEflPrivate : public gfx::GLContext {
   virtual bool Initialize(
-      gfx::GLSurface*, gfx::GpuPreference) OVERRIDE {
+      gfx::GLSurface*, gfx::GpuPreference) override {
     NOTREACHED();
   }
 
-  virtual void Destroy() OVERRIDE {
+  virtual void Destroy() override {
     NOTREACHED();
   }
 
-  virtual bool MakeCurrent(gfx::GLSurface*) OVERRIDE {
-    NOTREACHED();
-    return false;
-  }
-
-  virtual void ReleaseCurrent(gfx::GLSurface*) OVERRIDE {
-    NOTREACHED();
-  }
-
-  virtual bool IsCurrent(gfx::GLSurface*) OVERRIDE {
+  virtual bool MakeCurrent(gfx::GLSurface*) override {
     NOTREACHED();
     return false;
   }
 
-  virtual void* GetHandle() OVERRIDE {
+  virtual void ReleaseCurrent(gfx::GLSurface*) override {
+    NOTREACHED();
+  }
+
+  virtual bool IsCurrent(gfx::GLSurface*) override {
+    NOTREACHED();
+    return false;
+  }
+
+  virtual void* GetHandle() override {
     return handle_;
   }
 
-  virtual void SetSwapInterval(int) OVERRIDE {
+  virtual void SetSwapInterval(int) override {
     NOTREACHED();
   }
 

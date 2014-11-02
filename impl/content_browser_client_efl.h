@@ -26,24 +26,24 @@ class ContentBrowserClientEfl: public ContentBrowserClient {
   ContentBrowserClientEfl();
 
   virtual BrowserMainParts* CreateBrowserMainParts(
-      const MainFunctionParams& parameters) OVERRIDE;
+      const MainFunctionParams& parameters) override;
 
   virtual net::URLRequestContextGetter* CreateRequestContext(
       BrowserContext* browser_context,
       ProtocolHandlerMap* protocol_handlers,
-      URLRequestInterceptorScopedVector request_interceptors) OVERRIDE;
+      URLRequestInterceptorScopedVector request_interceptors) override;
 
-  virtual AccessTokenStore* CreateAccessTokenStore() OVERRIDE;
+  virtual AccessTokenStore* CreateAccessTokenStore() override;
 #if defined(OS_TIZEN)
-  virtual LocationProvider* OverrideSystemLocationProvider() OVERRIDE;
+  virtual LocationProvider* OverrideSystemLocationProvider() override;
 #endif
 
   // Allows the embedder to pass extra command line flags.
   // switches::kProcessType will already be set at this point.
   virtual void AppendExtraCommandLineSwitches(base::CommandLine* command_line,
-                                              int child_process_id) OVERRIDE;
+                                              int child_process_id) override;
 
-  virtual void ResourceDispatcherHostCreated() OVERRIDE;
+  virtual void ResourceDispatcherHostCreated() override;
 
   virtual void AllowCertificateError(int render_process_id,
                                      int render_frame_id,
@@ -55,12 +55,12 @@ class ContentBrowserClientEfl: public ContentBrowserClient {
                                      bool strict_enforcement,
                                      bool expired_previous_decision,
                                      const base::Callback<void(bool)>& callback,
-                                     CertificateRequestResultType* result) OVERRIDE;
+                                     CertificateRequestResultType* result) override;
 
   // Asks permission to show desktop notifications.
   virtual void RequestDesktopNotificationPermission(const GURL& source_origin,
       content::RenderFrameHost* render_frame_host,
-      const base::Callback<void(blink::WebNotificationPermission)>& callback) OVERRIDE;
+      const base::Callback<void(blink::WebNotificationPermission)>& callback) override;
 
   // Show a desktop notification.  If |worker| is true, the request came from an
   // HTML5 web worker, otherwise, it came from a renderer.
@@ -68,14 +68,14 @@ class ContentBrowserClientEfl: public ContentBrowserClient {
       const content::ShowDesktopNotificationHostMsgParams& params,
       content::RenderFrameHost* render_frame_host,
       scoped_ptr<DesktopNotificationDelegate> delegate,
-      base::Closure* cancel_callback) OVERRIDE;
+      base::Closure* cancel_callback) override;
 
   virtual bool AllowGetCookie(const GURL& url,
                               const GURL& first_party,
                               const net::CookieList& cookie_list,
                               content::ResourceContext* context,
                               int render_process_id,
-                              int render_frame_id) OVERRIDE;
+                              int render_frame_id) override;
 
   virtual bool AllowSetCookie(const GURL& url,
                               const GURL& first_party,
@@ -83,11 +83,11 @@ class ContentBrowserClientEfl: public ContentBrowserClient {
                               content::ResourceContext* context,
                               int render_process_id,
                               int render_frame_id,
-                              net::CookieOptions* options) OVERRIDE;
+                              net::CookieOptions* options) override;
 
-  virtual void RenderProcessWillLaunch(content::RenderProcessHost* host) OVERRIDE;
+  virtual void RenderProcessWillLaunch(content::RenderProcessHost* host) override;
 
-  content::DevToolsManagerDelegate* GetDevToolsManagerDelegate() OVERRIDE;
+  content::DevToolsManagerDelegate* GetDevToolsManagerDelegate() override;
 
  private:
   scoped_ptr<ResourceDispatcherHostDelegateEfl> resource_disp_host_del_efl_;

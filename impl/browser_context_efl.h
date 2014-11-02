@@ -31,43 +31,43 @@ class BrowserContextEfl
   BrowserContextEfl(EWebContext*);
   ~BrowserContextEfl();
 
-  virtual bool IsOffTheRecord() const OVERRIDE { return false; }
-  virtual net::URLRequestContextGetter* GetRequestContext() OVERRIDE;
+  virtual bool IsOffTheRecord() const override { return false; }
+  virtual net::URLRequestContextGetter* GetRequestContext() override;
   URLRequestContextGetterEfl* GetRequestContextEfl()
   { return request_context_getter_.get(); }
-  virtual net::URLRequestContextGetter* GetRequestContextForRenderProcess(int) OVERRIDE
+  virtual net::URLRequestContextGetter* GetRequestContextForRenderProcess(int) override
   { return GetRequestContext(); }
-  virtual net::URLRequestContextGetter* GetMediaRequestContext() OVERRIDE
+  virtual net::URLRequestContextGetter* GetMediaRequestContext() override
   { return GetRequestContext(); }
-  virtual net::URLRequestContextGetter* GetMediaRequestContextForRenderProcess(int) OVERRIDE
+  virtual net::URLRequestContextGetter* GetMediaRequestContextForRenderProcess(int) override
   { return GetRequestContext(); }
   virtual net::URLRequestContextGetter* GetMediaRequestContextForStoragePartition(
-      const base::FilePath&, bool) OVERRIDE
+      const base::FilePath&, bool) override
   { return GetRequestContext(); }
 
   // These methods map to Add methods in visitedlink::VisitedLinkMaster.
   void AddVisitedURLs(const std::vector<GURL>& urls);
   // visitedlink::VisitedLinkDelegate implementation.
   virtual void RebuildTable(
-      const scoped_refptr<URLEnumerator>& enumerator) OVERRIDE;
+      const scoped_refptr<URLEnumerator>& enumerator) override;
   // Reset visitedlink master and initialize it.
   void InitVisitedLinkMaster();
 
-  virtual ResourceContext* GetResourceContext() OVERRIDE;
+  virtual ResourceContext* GetResourceContext() override;
 
-  virtual content::DownloadManagerDelegate* GetDownloadManagerDelegate() OVERRIDE
+  virtual content::DownloadManagerDelegate* GetDownloadManagerDelegate() override
   { return &download_manager_delegate_; }
 
-  virtual BrowserPluginGuestManager* GetGuestManager() OVERRIDE
+  virtual BrowserPluginGuestManager* GetGuestManager() override
   { return 0; }
 
-  virtual storage::SpecialStoragePolicy* GetSpecialStoragePolicy() OVERRIDE
+  virtual storage::SpecialStoragePolicy* GetSpecialStoragePolicy() override
   { return 0; }
 
-  virtual PushMessagingService* GetPushMessagingService() OVERRIDE
+  virtual PushMessagingService* GetPushMessagingService() override
   { return 0; }
 
-  virtual base::FilePath GetPath() const OVERRIDE;
+  virtual base::FilePath GetPath() const override;
 
   net::URLRequestContextGetter* CreateRequestContext(
       content::ProtocolHandlerMap* protocol_handlers,
@@ -83,8 +83,8 @@ class BrowserContextEfl
     ResourceContextEfl(BrowserContextEfl*);
     virtual ~ResourceContextEfl();
 
-    virtual net::HostResolver* GetHostResolver() OVERRIDE;
-    virtual net::URLRequestContext* GetRequestContext() OVERRIDE;
+    virtual net::HostResolver* GetHostResolver() override;
+    virtual net::URLRequestContext* GetRequestContext() override;
     void set_url_request_context_getter(URLRequestContextGetterEfl* getter);
     BrowserContextEfl* getBrowserContext() { return browser_context_; };
 
@@ -97,7 +97,7 @@ class BrowserContextEfl
 
  private:
   static void ReadCertificateAndAdd(base::FilePath* file_path);
-  virtual SSLHostStateDelegate* GetSSLHostStateDelegate() OVERRIDE;
+  virtual SSLHostStateDelegate* GetSSLHostStateDelegate() override;
 
   scoped_ptr<visitedlink::VisitedLinkMaster> visitedlink_master_;
   ResourceContextEfl* resource_context_;

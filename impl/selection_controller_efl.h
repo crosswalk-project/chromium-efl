@@ -77,7 +77,7 @@ class SelectionControllerEfl : public tizen_webview::SelectionController {
   void ClearSelection();
   void ClearSelectionViaEWebView();
   EWebView* GetParentView() { return parent_view_; }
-  void HideHandle() OVERRIDE;
+  void HideHandle() override;
   void HideHandleAndContextMenu();
   bool IsAnyHandleVisible() const;
 

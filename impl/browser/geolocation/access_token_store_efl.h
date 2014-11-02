@@ -17,8 +17,8 @@ class AccessTokenStoreEfl : public content::AccessTokenStore {
   AccessTokenStoreEfl();
 
   // AccessTokenStore
-  virtual void LoadAccessTokens(const LoadAccessTokensCallbackType& callback) OVERRIDE;
-  virtual void SaveAccessToken(const GURL& server_url, const base::string16& access_token) OVERRIDE;
+  virtual void LoadAccessTokens(const LoadAccessTokensCallbackType& callback) override;
+  virtual void SaveAccessToken(const GURL& server_url, const base::string16& access_token) override;
 
  private:
   virtual ~AccessTokenStoreEfl();

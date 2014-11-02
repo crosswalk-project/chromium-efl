@@ -62,7 +62,7 @@ class ContentRendererClientEfl : public content::ContentRendererClient
                         const blink::WebURLRequest& request,
                         blink::WebNavigationType type,
                         blink::WebNavigationPolicy default_policy,
-                        bool is_redirect) OVERRIDE;
+                        bool is_redirect) override;
 #endif
 
   virtual bool WillSendRequest(blink::WebFrame* frame,
@@ -72,9 +72,9 @@ class ContentRendererClientEfl : public content::ContentRendererClient
                                GURL* new_url);
 
   unsigned long long VisitedLinkHash(const char* canonical_url,
-                                     size_t length) OVERRIDE;
+                                     size_t length) override;
 
-  bool IsLinkVisited(unsigned long long link_hash) OVERRIDE;
+  bool IsLinkVisited(unsigned long long link_hash) override;
 
  private:
   scoped_ptr<WrtWidget> wrt_widget_;

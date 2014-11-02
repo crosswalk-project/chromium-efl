@@ -23,7 +23,7 @@ class PasswordStoreService {
 
   scoped_refptr<PasswordStore> GetPasswordStore();
 
-  virtual void Shutdown() OVERRIDE;
+  virtual void Shutdown() override;
 
  private:
   scoped_refptr<PasswordStore> password_store_;
@@ -45,7 +45,7 @@ class PasswordStoreFactory {
   PasswordStoreFactory();
   virtual ~PasswordStoreFactory();
 
-  virtual bool ServiceIsNULLWhileTesting() const OVERRIDE;
+  virtual bool ServiceIsNULLWhileTesting() const override;
   PasswordStoreService * service_;
 
   DISALLOW_COPY_AND_ASSIGN(PasswordStoreFactory);

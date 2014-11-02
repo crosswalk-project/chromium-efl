@@ -24,7 +24,7 @@ struct GpuChildThreadEfl : public content::GpuChildThread {
   explicit GpuChildThreadEfl(const std::string& channel_id)
       : GpuChildThread(channel_id) { }
 
-  virtual bool OnControlMessageReceived(const IPC::Message& msg) OVERRIDE {
+  virtual bool OnControlMessageReceived(const IPC::Message& msg) override {
     bool handled = true;
     IPC_BEGIN_MESSAGE_MAP(GpuChildThreadEfl, msg)
       IPC_MESSAGE_HANDLER(GpuMsg_Initialize, OnInitialize)
@@ -53,7 +53,7 @@ struct InProcessGpuThreadEfl : public content::InProcessGpuThread {
   explicit InProcessGpuThreadEfl(const std::string& channel_id)
       : InProcessGpuThread(channel_id) { }
 
-  virtual void Init() OVERRIDE {
+  virtual void Init() override {
     gpu_process_ = new content::GpuProcess();
     // The process object takes ownership of the thread object, so do not
     // save and delete the pointer.

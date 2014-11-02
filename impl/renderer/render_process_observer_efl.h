@@ -22,8 +22,8 @@ public:
   explicit RenderProcessObserverEfl(ContentRendererClientEfl* content_client)
       : content_client_(content_client), webkit_initialized_(false) { }
 
-  virtual bool OnControlMessageReceived(const IPC::Message& message) OVERRIDE;
-  virtual void WebKitInitialized() OVERRIDE;
+  virtual bool OnControlMessageReceived(const IPC::Message& message) override;
+  virtual void WebKitInitialized() override;
   void OnClearCache();
   void OnPurgeMemory();
   

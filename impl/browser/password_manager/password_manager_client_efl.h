@@ -30,13 +30,13 @@ class PasswordManagerClientEfl
   virtual ~PasswordManagerClientEfl();
 
   // PasswordManagerClient implementation.
-  virtual void PromptUserToSavePassword(PasswordFormManager* form_to_save) OVERRIDE;
-  virtual void PasswordWasAutofilled(const autofill::PasswordFormMap& best_matches) const OVERRIDE;
-  virtual void AuthenticateAutofillAndFillForm(scoped_ptr<autofill::PasswordFormFillData> fill_data) OVERRIDE;
-  virtual PasswordStore* GetPasswordStore() OVERRIDE;
-  virtual PasswordManagerDriver* GetDriver() OVERRIDE;
-  virtual base::FieldTrial::Probability GetProbabilityForExperiment(const std::string& experiment_name) OVERRIDE;
-  virtual bool IsPasswordSyncEnabled() OVERRIDE;
+  virtual void PromptUserToSavePassword(PasswordFormManager* form_to_save) override;
+  virtual void PasswordWasAutofilled(const autofill::PasswordFormMap& best_matches) const override;
+  virtual void AuthenticateAutofillAndFillForm(scoped_ptr<autofill::PasswordFormFillData> fill_data) override;
+  virtual PasswordStore* GetPasswordStore() override;
+  virtual PasswordManagerDriver* GetDriver() override;
+  virtual base::FieldTrial::Probability GetProbabilityForExperiment(const std::string& experiment_name) override;
+  virtual bool IsPasswordSyncEnabled() override;
 
   bool IsPasswordManagerEnabled();
   void SetPasswordManagerEnabled(bool enabled);

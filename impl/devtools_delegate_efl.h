@@ -28,12 +28,12 @@ class DevToolsDelegateEfl : public DevToolsHttpHandlerDelegate {
   void Stop();
 
   // ChromiumDevToolsHttpHandler::Delegate overrides.
-  virtual std::string GetDiscoveryPageHTML() OVERRIDE;
-  virtual bool BundlesFrontendResources() OVERRIDE;
-  virtual base::FilePath GetDebugFrontendDir() OVERRIDE;
+  virtual std::string GetDiscoveryPageHTML() override;
+  virtual bool BundlesFrontendResources() override;
+  virtual base::FilePath GetDebugFrontendDir() override;
   virtual scoped_ptr<net::StreamListenSocket> CreateSocketForTethering(
       net::StreamListenSocket::Delegate* delegate,
-      std::string* name) OVERRIDE;
+      std::string* name) override;
   DevToolsHttpHandler* devtools_http_handler() {
     return devtools_http_handler_;
   }

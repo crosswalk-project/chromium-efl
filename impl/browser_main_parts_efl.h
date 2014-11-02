@@ -23,8 +23,8 @@ class BrowserMainPartsEfl : public BrowserMainParts {
   virtual ~BrowserMainPartsEfl();
 
   // BrowserMainParts overrides.
-  virtual void PreMainMessageLoopRun() OVERRIDE;
-  virtual void PostMainMessageLoopRun() OVERRIDE;
+  virtual void PreMainMessageLoopRun() override;
+  virtual void PostMainMessageLoopRun() override;
 
  private:
   DevToolsDelegateEfl* devtools_delegate_;

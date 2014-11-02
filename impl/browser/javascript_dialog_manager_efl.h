@@ -54,27 +54,27 @@ class JavaScriptDialogManagerEfl: public content::JavaScriptDialogManager {
         const base::string16& message_text,
         const base::string16& default_prompt_text,
         const DialogClosedCallback& callback,
-        bool* did_suppress_message) OVERRIDE;
+        bool* did_suppress_message) override;
 
   virtual void RunBeforeUnloadDialog(content::WebContents* web_contents,
                                      const base::string16& message_text,
                                      bool is_reload,
-                                     const DialogClosedCallback& callback) OVERRIDE;
+                                     const DialogClosedCallback& callback) override;
 
   virtual bool HandleJavaScriptDialog(content::WebContents* web_contents,
                                       bool accept,
-                                      const base::string16* prompt_override) OVERRIDE
+                                      const base::string16* prompt_override) override
   {
     NOTIMPLEMENTED();
     return false;
   }
 
-  virtual void CancelActiveAndPendingDialogs(content::WebContents* web_contents) OVERRIDE
+  virtual void CancelActiveAndPendingDialogs(content::WebContents* web_contents) override
   {
     NOTIMPLEMENTED();
   }
 
-  virtual void WebContentsDestroyed(content::WebContents* web_contents) OVERRIDE
+  virtual void WebContentsDestroyed(content::WebContents* web_contents) override
   {
     NOTIMPLEMENTED();
   }
