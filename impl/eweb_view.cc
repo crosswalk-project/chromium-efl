@@ -274,9 +274,6 @@ void EWebView::Initialize() {
 #ifdef TIZEN_EDGE_EFFECT
   edge_effect_ = EdgeEffect::create(evas_object_);
 #endif
-#if defined(TIZEN_POPUPZOOMER_SUPPORT)
-  disambiguation_popup_controller_.reset(new content::DisambiguationPopupControllerEfl(this));
-#endif
 
   if (contents_for_new_window_) {
      web_contents_.reset(contents_for_new_window_);

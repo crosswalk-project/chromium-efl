@@ -13,9 +13,9 @@
 #include "base/debug/trace_event.h"
 #include "base/message_loop/message_loop.h"
 #include "base/strings/string_number_conversions.h"
-
 #include "base/logging.h"
 #include "base/strings/utf_string_conversions.h"
+#include "browser/disambiguation_popup_efl.h"
 #include "browser/renderer_host/im_context_efl.h"
 #include "browser/renderer_host/scroll_detector.h"
 #include "browser/renderer_host/web_event_factory_efl.h"
@@ -58,6 +58,7 @@
 #include <Ecore_Evas.h>
 #include <Ecore_Input.h>
 #include <Ecore_X.h>
+#include <Elementary.h>
 
 #define EFL_MAX_WIDTH 10000
 #define EFL_MAX_HEIGHT 10000  // borrowed from GTK+ port
@@ -128,6 +129,8 @@ RenderWidgetHostViewEfl::RenderWidgetHostViewEfl(RenderWidgetHost* widget, EWebV
   }
 
   gesture_recognizer_->AddGestureEventHelper(this);
+
+  disambiguation_popup_.reset(new DisambiguationPopupEfl(content_image_, this));
 }
 
 RenderWidgetHostViewEfl::~RenderWidgetHostViewEfl() {
@@ -596,6 +599,8 @@ void RenderWidgetHostViewEfl::UpdateCursor(const WebCursor& webcursor) {
 void RenderWidgetHostViewEfl::SetIsLoading(bool is_loading) {
   is_loading_ = is_loading;
   UpdateCursor(WebCursor());
+  if (disambiguation_popup_)
+    disambiguation_popup_->Dismiss();
 }
 
 void RenderWidgetHostViewEfl::TextInputTypeChanged(ui::TextInputType type,
@@ -698,7 +703,7 @@ void RenderWidgetHostViewEfl::DidStopFlinging() {
 }
 
 void RenderWidgetHostViewEfl::ShowDisambiguationPopup(const gfx::Rect& rect_pixels, const SkBitmap& zoomed_bitmap) {
-  NOTIMPLEMENTED();
+  disambiguation_popup_->Show(rect_pixels, zoomed_bitmap);
 }
 
 bool RenderWidgetHostViewEfl::CanDispatchToConsumer(ui::GestureConsumer* consumer) {
@@ -1069,6 +1074,10 @@ void RenderWidgetHostViewEfl::HandleEvasEvent(const Evas_Event_Mouse_Wheel* even
 void RenderWidgetHostViewEfl::HandleEvasEvent(const Evas_Event_Key_Down* event) {
   bool wasFiltered = false;
 
+  if (WebEventFactoryEfl::isHardwareBackKey(event) && disambiguation_popup_) {
+    disambiguation_popup_->Dismiss();
+  }
+
   if (!strcmp(event->key, "XF86Phone")) {
     host_->WasHidden();
   }
@@ -1198,6 +1207,16 @@ void RenderWidgetHostViewEfl::HandleGesture(ui::GestureEvent* event) {
   }
 
   blink::WebGestureEvent gesture = content::MakeWebGestureEventFromUIEvent(*event);
+
+  if (event->type() == ui::ET_GESTURE_TAP ||
+      event->type() == ui::ET_GESTURE_TAP_CANCEL) {
+      float size = 32.0f; //Default value
+#if defined(OS_TIZEN_MOBILE)
+      size = elm_config_finger_size_get() / device_scale_factor();
+#endif
+      gesture.data.tap.width = size;
+      gesture.data.tap.height = size;
+  }
 
   gesture.x = event->x();
   gesture.y = event->y();

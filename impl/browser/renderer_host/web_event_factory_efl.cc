@@ -320,4 +320,11 @@ ui::TouchEvent WebEventFactoryEfl::toUITouchEvent(const tizen_webview::Touch_Poi
                         p->id, base::TimeDelta::FromMilliseconds(ecore_time_get() * 1000));
 }
 
+bool WebEventFactoryEfl::isHardwareBackKey(const Evas_Event_Key_Down* event) {
+#if defined(OS_TIZEN)
+  return (strcmp(event->key, "XF86Stop") == 0);
+#endif
+  return (strcmp(event->key, "Escape") == 0);
+}
+
 }
