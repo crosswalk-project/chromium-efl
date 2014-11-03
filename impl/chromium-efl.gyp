@@ -333,6 +333,9 @@
       'wrt/dynamicplugin.h',
       'wrt/wrtwidget.cc',
       'wrt/wrtwidget.h',
+
+      # Temporary fix for M40 build
+      'third_party/webrtc/system_wrappers/source/cpu_features_tizen.c',
     ],
     'cflags!': [
       # Symbol visibility controled by chromium-efl.filter
