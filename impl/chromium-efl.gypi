@@ -56,7 +56,7 @@
          'sources/': [
            ['exclude', 'browser/device_sensors/data_fetcher_shared_memory_default.cc$'],
          ],
-      }, {
+      }, { # building_for_tizen != 1
         'sources/': [
           ['exclude', 'browser/device_sensors/data_fetcher_impl_tizen\\.(cc|h)$'],
           ['exclude', 'browser/device_sensors/data_fetcher_shared_memory_tizen\\.cc$'],
@@ -65,16 +65,17 @@
           ['exclude', 'browser/motion/wkext_motion\\.(h|cc)$'],
 #          ['exclude', 'browser/media/tizen/webaudio_decoder_browser_tizen\\.(h|cc)$'],
   #        ['exclude', 'renderer/media/tizen/audio_decoder_tizen\\.(h|cc)$'],
+          ['exclude', 'third_party/webrtc/system_wrappers/source/cpu_features_tizen.c'],
         ],
       }],
-      ['building_for_tizen==1 and building_for_tizen_mobile==1', {
+      ['building_for_tizen_mobile==1', {
          'defines': [
            'OS_TIZEN_MOBILE=1',
            'TIZEN_CONTENTS_DETECTION=1',
            'TIZEN_ENABLE_CAPI_SUPPORT=1',
            ],
       }],
-      ['building_for_tizen==1 and building_for_tizen_tv==1', {
+      ['building_for_tizen_tv==1', {
        'defines': [
           'OS_TIZEN_TV=1'
         ],
