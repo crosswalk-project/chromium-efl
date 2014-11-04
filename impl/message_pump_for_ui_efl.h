@@ -9,11 +9,14 @@
 #include "base/synchronization/lock.h"
 #include <Ecore.h>
 #include <Eina.h>
+#include <unordered_set>
 
 namespace base {
 
 class RunLoop;
 class TimeTicks;
+class MessagePumpForUIEfl;
+typedef std::pair<MessagePumpForUIEfl*, Ecore_Timer*> TimerPair;
 
 class BASE_EXPORT MessagePumpForUIEfl : public base::MessagePump {
  public:
@@ -31,6 +34,7 @@ class BASE_EXPORT MessagePumpForUIEfl : public base::MessagePump {
   void DoWork();
   void DoDelayedWork();
 
+  std::unordered_set<TimerPair*> pending_timers_;
   Ecore_Pipe* pipe_;
   Delegate* delegate_;
   RunLoop* run_loop_;
