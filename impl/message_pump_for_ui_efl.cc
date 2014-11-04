@@ -29,6 +29,11 @@ MessagePumpForUIEfl::MessagePumpForUIEfl()
 }
 
 MessagePumpForUIEfl::~MessagePumpForUIEfl() {
+  for (std::unordered_set<TimerPair*>::iterator it = pending_timers_.begin();
+       it != pending_timers_.end(); ++it) {
+    ecore_timer_del((*it)->second);
+    delete *it;
+  }
 }
 
 // FIXME: need to be implemented for tests.
@@ -68,8 +73,10 @@ void MessagePumpForUIEfl::ScheduleDelayedWork(const base::TimeTicks& delayed_wor
   else
     delay = base::TimeDelta(delayed_work_time - now).InSecondsF();
 
-  Ecore_Timer* result = ecore_timer_add(delay, &TimerCallback, this);
-  DCHECK(result);
+  TimerPair* new_pair = new TimerPair();
+  new_pair->first = this;
+  new_pair->second = ecore_timer_add(delay, &TimerCallback, new_pair);
+  pending_timers_.insert(new_pair);
 }
 
 void MessagePumpForUIEfl::PipeCallback(void *data, void*, unsigned int) {
@@ -77,7 +84,11 @@ void MessagePumpForUIEfl::PipeCallback(void *data, void*, unsigned int) {
 }
 
 Eina_Bool MessagePumpForUIEfl::TimerCallback(void* data) {
-  static_cast<MessagePumpForUIEfl*>(data)->DoDelayedWork();
+  TimerPair* current_timer_pair = static_cast<TimerPair*>(data);
+  current_timer_pair->first->DoDelayedWork();
+  current_timer_pair->first->pending_timers_.erase(current_timer_pair);
+
+  delete current_timer_pair;
   return false;
 }
 
