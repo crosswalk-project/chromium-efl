@@ -624,6 +624,12 @@ Eina_Bool ewk_settings_default_font_size_set(Ewk_Settings* settings, int size)
   return true;
 }
 
+const char* ewk_settings_default_text_encoding_name_get(Ewk_Settings* settings)
+{
+  EINA_SAFETY_ON_NULL_RETURN_VAL(settings, NULL);
+  return settings->defaultTextEncoding();
+}
+
 Eina_Bool ewk_settings_default_text_encoding_name_set(Ewk_Settings* settings, const char* encoding)
 {
 #if defined(OS_TIZEN_TV) && !defined(EWK_BRINGUP)

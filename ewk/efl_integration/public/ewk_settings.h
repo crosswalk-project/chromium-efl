@@ -802,6 +802,15 @@ EAPI int ewk_settings_default_font_size_get(const Ewk_Settings *settings);
 EAPI Eina_Bool ewk_settings_default_font_size_set(Ewk_Settings *settings, int size);
 
 /**
+ * Gets the default text encoding name.
+ *
+ * @param settings settings object to get default text encoding name
+ *
+ * @return @c encoding default text encoding name
+ */
+EAPI const char* ewk_settings_default_text_encoding_name_get(Ewk_Settings *settings);
+
+/**
  * Sets the default text encoding name.
  *
  * @param settings settings object to set default text encoding name
