@@ -745,7 +745,10 @@ bool EWebView::ExecuteJavaScript(const char* script, tizen_webview::View_Script_
     JavaScriptCallbackDetails* script_callback_data = new JavaScriptCallbackDetails(callback, userdata, evas_object_);
     render_frame_host->ExecuteJavaScript(js_script, base::Bind(&JavaScriptComplete, base::Owned(script_callback_data)));
   } else {
-    render_frame_host->ExecuteJavaScript(js_script);
+    // We use ExecuteJavaScriptForTests instead of ExecuteJavaScript because
+    // ExecuteJavaScriptForTests sets user_gesture to true. This was the
+    // behaviour is m34, and we want to keep it that way.
+    render_frame_host->ExecuteJavaScriptForTests(js_script);
   }
 
   return true;
