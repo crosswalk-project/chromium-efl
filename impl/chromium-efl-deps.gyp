@@ -8,64 +8,54 @@
   {
     'target_name': 'efl',
     'type': 'none',
+    'variables': {
+      'dependent_pkgs': [
+        'ecore',
+        'ecore-x',
+        'ecore-evas',
+        'ecore-input',
+        'ecore-imf-evas',
+        'evas',
+        'elementary',
+      ],
+    },
     'direct_dependent_settings': {
       'cflags': [
-        '<!@(<(pkg-config) --cflags ecore)',
-        '<!@(<(pkg-config) --cflags ecore-x)',
-        '<!@(<(pkg-config) --cflags ecore-evas)',
-        '<!@(<(pkg-config) --cflags ecore-input)',
-        '<!@(<(pkg-config) --cflags ecore-imf-evas)',
-        '<!@(<(pkg-config) --cflags evas)',
-        '<!@(<(pkg-config) --cflags elementary)',
+        '<!@(<(pkg-config) --cflags <(dependent_pkgs))',
       ],
     },
     'link_settings': {
       'ldflags': [
-        '<!@(<(pkg-config) --libs-only-L --libs-only-other ecore)',
-        '<!@(<(pkg-config) --libs-only-L --libs-only-other ecore-x)',
-        '<!@(<(pkg-config) --libs-only-L --libs-only-other ecore-evas)',
-        '<!@(<(pkg-config) --libs-only-L --libs-only-other ecore-input)',
-        '<!@(<(pkg-config) --libs-only-L --libs-only-other ecore-imf-evas)',
-        '<!@(<(pkg-config) --libs-only-L --libs-only-other evas)',
-        '<!@(<(pkg-config) --libs-only-L --libs-only-other elementary)',
+        '<!@(<(pkg-config) --libs-only-L --libs-only-other <(dependent_pkgs))',
       ],
       'libraries': [
-        '<!@(<(pkg-config) --libs-only-l ecore)',
-        '<!@(<(pkg-config) --libs-only-l ecore-x)',
-        '<!@(<(pkg-config) --libs-only-l ecore-evas)',
-        '<!@(<(pkg-config) --libs-only-l ecore-input)',
-        '<!@(<(pkg-config) --libs-only-l ecore-imf-evas)',
-        '<!@(<(pkg-config) --libs-only-l evas)',
-        '<!@(<(pkg-config) --libs-only-l elementary)',
+        '<!@(<(pkg-config) --libs-only-l <(dependent_pkgs))',
       ],
     },
   },
   {
     'target_name': 'gstreamer',
     'type': 'none',
+    'variables': {
+      'dependent_pkgs': [
+        'glib-2.0',
+        'gstreamer-0.10',
+        'gstreamer-base-0.10',
+        'gstreamer-app-0.10',
+        'gstreamer-pbutils-0.10',
+      ],
+    },
     'direct_dependent_settings': {
       'cflags': [
-        '<!@(<(pkg-config) --cflags glib-2.0)',
-        '<!@(<(pkg-config) --cflags gstreamer-0.10)',
-        '<!@(<(pkg-config) --cflags gstreamer-base-0.10)',
-        '<!@(<(pkg-config) --cflags gstreamer-app-0.10)',
-        '<!@(<(pkg-config) --cflags gstreamer-pbutils-0.10)',
+        '<!@(<(pkg-config) --cflags <(dependent_pkgs))',
       ],
     },
     'link_settings': {
       'ldflags': [
-        '<!@(<(pkg-config) --libs-only-L --libs-only-other glib-2.0)',
-        '<!@(<(pkg-config) --libs-only-L --libs-only-other gstreamer-0.10)',
-        '<!@(<(pkg-config) --libs-only-L --libs-only-other gstreamer-base-0.10)',
-        '<!@(<(pkg-config) --libs-only-L --libs-only-other gstreamer-app-0.10)',
-        '<!@(<(pkg-config) --libs-only-L --libs-only-other gstreamer-pbutils-0.10)',
+        '<!@(<(pkg-config) --libs-only-L --libs-only-other <(dependent_pkgs))',
       ],
       'libraries': [
-        '<!@(<(pkg-config) --libs-only-l glib-2.0)',
-        '<!@(<(pkg-config) --libs-only-l gstreamer-0.10)',
-        '<!@(<(pkg-config) --libs-only-l gstreamer-base-0.10)',
-        '<!@(<(pkg-config) --libs-only-l gstreamer-app-0.10)',
-        '<!@(<(pkg-config) --libs-only-l gstreamer-pbutils-0.10)',
+        '<!@(<(pkg-config) --libs-only-l <(dependent_pkgs))',
       ],
     },
   },
@@ -78,64 +68,57 @@
       {
         'target_name': 'tizen',
         'type': 'none',
+        'variables': {
+          'dependent_pkgs': [
+            'capi-appfw-application',
+            'capi-system-info',
+            'capi-system-sensor',
+            'capi-system-device',
+            'capi-location-manager',
+            'capi-media-audio-io',
+            'capi-media-camera',
+            'vconf',
+            'libtbm',
+            'libdri2',
+            'gles20',
+            'ui-gadget-1',
+          ],
+        },
         'direct_dependent_settings': {
           'cflags': [
-            '<!@(<(pkg-config) --cflags capi-appfw-application)',
-            '<!@(<(pkg-config) --cflags capi-system-info)',
-            '<!@(<(pkg-config) --cflags capi-system-sensor)',
-            '<!@(<(pkg-config) --cflags capi-system-device)',
-            '<!@(<(pkg-config) --cflags capi-location-manager)',
-            '<!@(<(pkg-config) --cflags capi-media-audio-io)',
-            '<!@(<(pkg-config) --cflags capi-media-camera)',
-            '<!@(<(pkg-config) --cflags vconf)',
-            '<!@(<(pkg-config) --cflags libtbm)',
-            '<!@(<(pkg-config) --cflags libdri2)',
-            '<!@(<(pkg-config) --cflags gles20)',
-            '<!@(<(pkg-config) --libs-only-l ui-gadget-1)',
+            '<!@(<(pkg-config) --cflags <(dependent_pkgs))',
           ],
         },
         'link_settings': {
           'ldflags': [
-            '<!@(<(pkg-config) --libs-only-L --libs-only-other capi-appfw-application)',
-            '<!@(<(pkg-config) --libs-only-L --libs-only-other capi-system-info)',
-            '<!@(<(pkg-config) --libs-only-L --libs-only-other capi-system-sensor)',
-            '<!@(<(pkg-config) --libs-only-L --libs-only-other capi-system-device)',
-            '<!@(<(pkg-config) --libs-only-L --libs-only-other capi-location-manager)',
-            '<!@(<(pkg-config) --libs-only-L --libs-only-other capi-media-audio-io)',
-            '<!@(<(pkg-config) --libs-only-L --libs-only-other capi-media-camera)',
-            '<!@(<(pkg-config) --libs-only-L --libs-only-other vconf)',
+            '<!@(<(pkg-config) --libs-only-L --libs-only-other <(dependent_pkgs))',
           ],
           'libraries': [
-            '<!@(<(pkg-config) --libs-only-l capi-appfw-application)',
-            '<!@(<(pkg-config) --libs-only-l capi-system-info)',
-            '<!@(<(pkg-config) --libs-only-l capi-system-sensor)',
-            '<!@(<(pkg-config) --libs-only-l capi-system-device)',
-            '<!@(<(pkg-config) --libs-only-l capi-location-manager)',
-            '<!@(<(pkg-config) --libs-only-l capi-media-audio-io)',
-            '<!@(<(pkg-config) --libs-only-l capi-media-camera)',
-            '<!@(<(pkg-config) --libs-only-l vconf)',
-            '<!@(<(pkg-config) --libs-only-l libtbm)',
-            '<!@(<(pkg-config) --libs-only-l libdri2)',
-            '<!@(<(pkg-config) --libs-only-l gles20)',
+            '<!@(<(pkg-config) --libs-only-l <(dependent_pkgs))',
           ],
         },
         'conditions': [
           ['building_for_tizen_mobile==1', {
+            'variables': {
+              'dependent_pkgs': [
+                'efl-assist',
+              ],
+            },
             'direct_dependent_settings': {
               'include_dirs': [
                 '/usr/include/ug-1',
                 '/usr/include/appfw',
               ],
               'cflags': [
-                '<!@(<(pkg-config) --cflags efl-assist)',
+                '<!@(<(pkg-config) --cflags <(dependent_pkgs))',
               ],
             },
             'link_settings': {
               'ldflags': [
-                '<!@(<(pkg-config) --libs-only-L --libs-only-other efl-assist)',
+                '<!@(<(pkg-config) --libs-only-L --libs-only-other <(dependent_pkgs))',
               ],
               'libraries': [
-                '<!@(<(pkg-config) --libs-only-l efl-assist)',
+                '<!@(<(pkg-config) --libs-only-l <(dependent_pkgs))',
               ],
             },
           }],
