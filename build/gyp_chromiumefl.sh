@@ -54,6 +54,8 @@ fi
 
 add_desktop_flags() {
   ADDITIONAL_GYP_PARAMETERS+="-Dbuilding_for_tizen=0
+                              -Dbuilding_for_tizen_mobile=0
+                              -Dbuilding_for_tizen_tv=0
                               -Dclang=${USE_CLANG}
                               -Dmake_clang_dir=${CLANG_DIR}
                               -Dtizen_multimedia_use_capi_for_me=0
