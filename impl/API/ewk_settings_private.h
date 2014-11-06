@@ -11,7 +11,7 @@
 #include <content/public/common/web_preferences.h>
 
 #include "tizen_webview/public/tw_legacy_font_size_mode.h"
-
+#include "tizen_webview/public/tw_settings.h"
 
 class Ewk_Settings {
   public:
@@ -78,6 +78,8 @@ class Ewk_Settings {
     void setSpdyEnabled(bool flag);
     void setDetectContentsAutomatically(bool enable) { m_detectContentsAutomatically = enable; }
     bool detectContentsAutomatically() const { return m_detectContentsAutomatically; }
+    tizen_webview::Settings& getWebViewSettings() { return m_settings; }
+    const tizen_webview::Settings& getWebViewSettings() const { return m_settings; }
 
     Evas_Object* getEvasObject() { return m_evas_object; }
     content::WebPreferences& getPreferences() { return m_preferences; }
@@ -88,6 +90,7 @@ class Ewk_Settings {
 
   private:
     content::WebPreferences m_preferences;
+    tizen_webview::Settings m_settings;
     bool m_autofillPasswordForm;
     bool m_formCandidateData;
     bool m_autofillProfileForm;

@@ -8,6 +8,8 @@
 #include <string>
 #include "base/timer/timer.h"
 #include "content/public/renderer/render_view_observer.h"
+#include "content/public/renderer/render_view_observer.h"
+#include "renderer/content_renderer_client_efl.h"
 #include "renderer/print_web_view_helper_efl.h"
 #include "content/public/renderer/render_view_observer.h"
 #include "API/ewk_hit_test_private.h"
@@ -29,11 +31,17 @@ namespace WebKit {
 class WebHitTestResult;
 }
 
+namespace tizen_webview {
+class Settings;
+}
+
 class EwkViewMsg_LoadData_Params;
 
 class RenderViewObserverEfl: public content::RenderViewObserver {
  public:
-  explicit RenderViewObserverEfl(content::RenderView* render_view);
+  explicit RenderViewObserverEfl(
+      content::RenderView* render_view,
+      ContentRendererClientEfl* render_client);
   virtual ~RenderViewObserverEfl();
 
   void DidChangeScrollOffset(blink::WebLocalFrame* frame) override;
@@ -70,6 +78,7 @@ class RenderViewObserverEfl: public content::RenderViewObserver {
   void CheckContentsSize();
   void OnSuspendScheduledTasks();
   void OnResumeScheduledTasks();
+  void OnUpdateSettings(const tizen_webview::Settings& settings);
 
   // This function sets CSS "view-mode" media feature value.
   void OnSetViewMode(blink::WebViewMode view_mode);
@@ -80,6 +89,8 @@ class RenderViewObserverEfl: public content::RenderViewObserver {
   float cached_max_page_scale_factor_;
   gfx::Size last_sent_contents_size_;
   base::OneShotTimer<RenderViewObserverEfl> check_contents_size_timer_;
+
+  content::ContentRendererClient* renderer_client_;
 };
 
 #endif /* RENDER_VIEW_OBSERVER_EFL_H_ */

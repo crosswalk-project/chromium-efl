@@ -845,6 +845,9 @@ void EWebView::UpdateWebKitPreferences() {
     return;
 
   render_view_host->UpdateWebkitPreferences(settings_->getPreferences());
+  render_view_host->Send(
+      new EflViewMsg_UpdateSettings(render_view_host->GetRoutingID(),
+                                    settings_->getWebViewSettings()));
 }
 
 void EWebView::SetContentSecurityPolicy(const char* policy, tizen_webview::ContentSecurityPolicyType type) {

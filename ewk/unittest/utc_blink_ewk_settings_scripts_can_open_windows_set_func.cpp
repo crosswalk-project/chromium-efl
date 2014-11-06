@@ -4,9 +4,9 @@
 
 #include "utc_blink_ewk_base.h"
 
-class utc_blink_ewk_settings_scripts_window_open_set : public utc_blink_ewk_base {
+class utc_blink_ewk_settings_scripts_can_open_windows_set : public utc_blink_ewk_base {
 protected:
-  utc_blink_ewk_settings_scripts_window_open_set()
+  utc_blink_ewk_settings_scripts_can_open_windows_set()
     : settings(NULL)
   {
   }
@@ -16,7 +16,7 @@ protected:
     settings = ewk_view_settings_get(GetEwkWebView());
     ASSERT_TRUE(settings);
     // make sure default value is proper
-    ASSERT_EQ(EINA_FALSE, ewk_settings_scripts_window_open_get(settings));
+    ASSERT_EQ(EINA_FALSE, ewk_settings_scripts_can_open_windows_get(settings));
 
     evas_object_smart_callback_add(GetEwkWebView(), "popup,blocked", ToSmartCallback(popup_blocked_cb), this);
     evas_object_smart_callback_add(GetEwkWebView(), "create,window", ToSmartCallback(create_window_cb), this);
@@ -28,13 +28,13 @@ protected:
     evas_object_smart_callback_del(GetEwkWebView(), "create,window", ToSmartCallback(create_window_cb));
   }
 
-  static void popup_blocked_cb(utc_blink_ewk_settings_scripts_window_open_set* owner, Evas_Object*, Eina_Stringshare* uri)
+  static void popup_blocked_cb(utc_blink_ewk_settings_scripts_can_open_windows_set* owner, Evas_Object*, Eina_Stringshare* uri)
   {
     ASSERT_TRUE(owner);
     owner->EventLoopStop(Success);
   }
 
-  static void create_window_cb(utc_blink_ewk_settings_scripts_window_open_set* owner, Evas_Object*, void*)
+  static void create_window_cb(utc_blink_ewk_settings_scripts_can_open_windows_set* owner, Evas_Object*, void*)
   {
     ASSERT_TRUE(owner);
     owner->EventLoopStop(Failure);
@@ -45,9 +45,9 @@ protected:
 };
 
 /**
- * @brief Positive test case of ewk_settings_scripts_window_open_set()
+ * @brief Positive test case of ewk_settings_scripts_can_open_windows_set()
  */
-TEST_F(utc_blink_ewk_settings_scripts_window_open_set, SetTrue)
+TEST_F(utc_blink_ewk_settings_scripts_can_open_windows_set, SetTrue)
 {
   // first check if new windows are blocked
   char htmlBuffer[] = "<html>"
@@ -59,26 +59,26 @@ TEST_F(utc_blink_ewk_settings_scripts_window_open_set, SetTrue)
   ASSERT_EQ(Success, EventLoopStart());
 
   // now toggle option
-  ASSERT_EQ(EINA_TRUE, ewk_settings_scripts_window_open_set(settings, EINA_TRUE));
+  ASSERT_EQ(EINA_TRUE, ewk_settings_scripts_can_open_windows_set(settings, EINA_TRUE));
 
   // check if option was toggled
-  ASSERT_EQ(EINA_TRUE, ewk_settings_scripts_window_open_get(settings));
+  ASSERT_EQ(EINA_TRUE, ewk_settings_scripts_can_open_windows_get(settings));
 
   // reload page and expect create window smart callback
   ASSERT_EQ(EINA_TRUE, ewk_view_html_string_load(GetEwkWebView(), htmlBuffer, NULL, NULL));
   ASSERT_EQ(Failure, EventLoopStart());
 }
 
-TEST_F(utc_blink_ewk_settings_scripts_window_open_set, ToggleBeforeLoad)
+TEST_F(utc_blink_ewk_settings_scripts_can_open_windows_set, ToggleBeforeLoad)
 {
   // Got feedback, that whem property is modified before loading anything to the view
   // it may not work. This TC checks such case and tests provided solution
 
   // toggle option
-  ASSERT_EQ(EINA_TRUE, ewk_settings_scripts_window_open_set(settings, EINA_TRUE));
+  ASSERT_EQ(EINA_TRUE, ewk_settings_scripts_can_open_windows_set(settings, EINA_TRUE));
 
   // check if option was toggled
-  ASSERT_EQ(EINA_TRUE, ewk_settings_scripts_window_open_get(settings));
+  ASSERT_EQ(EINA_TRUE, ewk_settings_scripts_can_open_windows_get(settings));
 
   char htmlBuffer[] = "<html>"
                         "<head></head>"
@@ -90,10 +90,10 @@ TEST_F(utc_blink_ewk_settings_scripts_window_open_set, ToggleBeforeLoad)
   ASSERT_EQ(Failure, EventLoopStart());
 
   // toggle option again
-  ASSERT_EQ(EINA_TRUE, ewk_settings_scripts_window_open_set(settings, EINA_FALSE));
+  ASSERT_EQ(EINA_TRUE, ewk_settings_scripts_can_open_windows_set(settings, EINA_FALSE));
 
   // check if option was toggled
-  ASSERT_EQ(EINA_FALSE, ewk_settings_scripts_window_open_get(settings));
+  ASSERT_EQ(EINA_FALSE, ewk_settings_scripts_can_open_windows_get(settings));
 
   // reload page and expect create window smart callback
   ASSERT_EQ(EINA_TRUE, ewk_view_html_string_load(GetEwkWebView(), htmlBuffer, NULL, NULL));
@@ -102,9 +102,9 @@ TEST_F(utc_blink_ewk_settings_scripts_window_open_set, ToggleBeforeLoad)
 }
 
 /**
- * @brief Test case of ewk_settings_scripts_window_open_set() when view is NULL
+ * @brief Test case of ewk_settings_scripts_can_open_windows_set() when view is NULL
  */
-TEST_F(utc_blink_ewk_settings_scripts_window_open_set, InvalidArg)
+TEST_F(utc_blink_ewk_settings_scripts_can_open_windows_set, InvalidArg)
 {
-  EXPECT_EQ(EINA_FALSE, ewk_settings_scripts_window_open_set(NULL, EINA_TRUE));
+  EXPECT_EQ(EINA_FALSE, ewk_settings_scripts_can_open_windows_set(NULL, EINA_TRUE));
 }

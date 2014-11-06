@@ -6,6 +6,8 @@
 #define CONTER_RENDERER_CLIENT_EFL_H
 
 #include "content/public/renderer/content_renderer_client.h"
+#include "renderer/content_renderer_client_efl.h"
+#include "tizen_webview/public/tw_settings.h"
 #include "v8/include/v8.h"
 #include "renderer/render_process_observer_efl.h"
 
@@ -51,6 +53,10 @@ class ContentRendererClientEfl : public content::ContentRendererClient
                                         v8::Handle<v8::Context>,
                                         int world_id);
 
+  virtual bool AllowPopup() override {
+    return m_settings.javascript_can_open_windows;
+  }
+
   // Note that this API requires a change in
   // content/public/renderer/content_renderer_client.h
   // The base class declares this method for OS_ANDROID only.
@@ -81,11 +87,13 @@ class ContentRendererClientEfl : public content::ContentRendererClient
                                      size_t length) override;
 
   bool IsLinkVisited(unsigned long long link_hash) override;
+  void SetWebViewSettings(const tizen_webview::Settings& settings) { m_settings = settings; }
 
  private:
   scoped_ptr<WrtWidget> wrt_widget_;
   scoped_ptr<RenderProcessObserverEfl> render_process_observer_;
   scoped_ptr<visitedlink::VisitedLinkSlave> visited_link_slave_;
+  tizen_webview::Settings m_settings;
 };
 
 #endif

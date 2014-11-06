@@ -847,6 +847,18 @@ EAPI Eina_Bool ewk_settings_encoding_detector_enabled_set(Ewk_Settings *settings
 EAPI Eina_Bool ewk_settings_scripts_can_open_windows_set(Ewk_Settings *settings, Eina_Bool enable);
 
 /**
+ * @brief Returns whether the scripts can open new windows.
+ *
+ * @since_tizen 2.3
+ *
+ * @param[in] settings The settingings object to query whether the scripts can open new windows
+ *
+ * @return @c EINA_TRUE if the scripts can open new windows\n
+ *         otherwise @c EINA_FALSE if not or on failure (scripts are disabled)
+ */
+EAPI Eina_Bool ewk_settings_scripts_can_open_windows_get(const Ewk_Settings *settings);
+
+/**
  * Requests enables/disables to the specific extra feature
  *
  * @param settings setting object to enable/disable the specific extra feature

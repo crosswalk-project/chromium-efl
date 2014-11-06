@@ -162,16 +162,12 @@ int ewk_settings_font_default_size_get(const Ewk_Settings* settings)
 
 Eina_Bool ewk_settings_scripts_window_open_set(Ewk_Settings* settings, Eina_Bool allow)
 {
-  EINA_SAFETY_ON_NULL_RETURN_VAL(settings, false);
-  settings->getPreferences().javascript_can_open_windows_automatically = allow;
-  ewkUpdateWebkitPreferences(settings->getEvasObject());
-  return true;
+  return ewk_settings_scripts_can_open_windows_set(settings, allow);
 }
 
 Eina_Bool ewk_settings_scripts_window_open_get(const Ewk_Settings* settings)
 {
-  EINA_SAFETY_ON_NULL_RETURN_VAL(settings, false);
-  return settings->getPreferences().javascript_can_open_windows_automatically;
+  return ewk_settings_scripts_can_open_windows_get(settings);
 }
 
 Eina_Bool ewk_settings_compositing_borders_visible_set(Ewk_Settings* settings, Eina_Bool enable)
@@ -638,14 +634,22 @@ Eina_Bool ewk_settings_default_text_encoding_name_set(Ewk_Settings* settings, co
   return true;
 }
 
-#if defined(OS_TIZEN_TV)
-Eina_Bool ewk_settings_encoding_detector_enabled_set(Ewk_Settings* settings, Eina_Bool enable)
+Eina_Bool ewk_settings_scripts_can_open_windows_set(Ewk_Settings* settings, Eina_Bool enable)
 {
-  LOG_EWK_API_MOCKUP("for Tizen TV Browser");
-  return false;
+  EINA_SAFETY_ON_NULL_RETURN_VAL(settings, false);
+  settings->getWebViewSettings().javascript_can_open_windows = (enable == true);
+  ewkUpdateWebkitPreferences(settings->getEvasObject());
+  return true;
 }
 
-Eina_Bool ewk_settings_scripts_can_open_windows_set(Ewk_Settings* settings, Eina_Bool enable)
+Eina_Bool ewk_settings_scripts_can_open_windows_get(const Ewk_Settings* settings)
+{
+  EINA_SAFETY_ON_NULL_RETURN_VAL(settings, false);
+  return settings->getWebViewSettings().javascript_can_open_windows ? true : false;
+}
+
+#if defined(OS_TIZEN_TV)
+Eina_Bool ewk_settings_encoding_detector_enabled_set(Ewk_Settings* settings, Eina_Bool enable)
 {
   LOG_EWK_API_MOCKUP("for Tizen TV Browser");
   return false;

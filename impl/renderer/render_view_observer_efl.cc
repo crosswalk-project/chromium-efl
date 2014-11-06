@@ -117,10 +117,13 @@ void PopulateNodeAttributesMapFromHitTest(const blink::WebHitTestResult& web_hit
 
 }  //namespace
 
-RenderViewObserverEfl::RenderViewObserverEfl(content::RenderView* render_view)
+RenderViewObserverEfl::RenderViewObserverEfl(
+    content::RenderView* render_view,
+    ContentRendererClientEfl* render_client)
   : content::RenderViewObserver(render_view),
     cached_min_page_scale_factor_(-1.0),
-    cached_max_page_scale_factor_(-1.0)
+    cached_max_page_scale_factor_(-1.0),
+    renderer_client_(render_client)
 {
 }
 
@@ -150,6 +153,7 @@ bool RenderViewObserverEfl::OnMessageReceived(const IPC::Message& message)
     IPC_MESSAGE_HANDLER(EwkViewMsg_SetBrowserFont, OnSetBrowserFont);
     IPC_MESSAGE_HANDLER(EwkViewMsg_SuspendScheduledTask, OnSuspendScheduledTasks);
     IPC_MESSAGE_HANDLER(EwkViewMsg_ResumeScheduledTasks, OnResumeScheduledTasks);
+    IPC_MESSAGE_HANDLER(EflViewMsg_UpdateSettings, OnUpdateSettings);
 
     IPC_MESSAGE_UNHANDLED(handled = false)
   IPC_END_MESSAGE_MAP()
@@ -574,4 +578,12 @@ void RenderViewObserverEfl::OnSetViewMode(blink::WebViewMode view_mode) {
   blink::WebView* view = render_view()->GetWebView();
   if (view)
     view->setViewMode(view_mode);
+}
+
+void RenderViewObserverEfl::OnUpdateSettings(const tizen_webview::Settings& settings)
+{
+  DCHECK(renderer_client_);
+  if (renderer_client_) {
+    static_cast<ContentRendererClientEfl*>(renderer_client_)->SetWebViewSettings(settings);
+  }
 }

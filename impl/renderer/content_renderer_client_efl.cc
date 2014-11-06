@@ -9,6 +9,7 @@
 #endif
 
 #include "url/gurl.h"
+#include "common/render_messages_efl.h"
 #include "paths_efl.h"
 #include "base/path_service.h"
 #include "content/public/renderer/render_thread.h"
@@ -61,7 +62,7 @@ void ContentRendererClientEfl::RenderThreadStarted()
 
 void ContentRendererClientEfl::RenderViewCreated(content::RenderView* render_view) {
   // Deletes itself when render_view is destroyed.
-  new RenderViewObserverEfl(render_view);
+  new RenderViewObserverEfl(render_view, this);
   new editing::EditorClientAgent(render_view);
 
 #ifdef TIZEN_AUTOFILL_SUPPORT

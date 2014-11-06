@@ -8,11 +8,14 @@
 #include <string>
 #include "base/compiler_specific.h"
 #include "content/public/renderer/render_process_observer.h"
-#include "common/render_messages_efl.h"
 #include "cache_params_efl.h"
 
 namespace IPC {
 class Message;
+}
+
+namespace tizen_webview {
+class WrtIpcMessageData;
 }
 
 class ContentRendererClientEfl;

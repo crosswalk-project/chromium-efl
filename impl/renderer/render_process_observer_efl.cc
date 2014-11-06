@@ -7,6 +7,7 @@
 #include "base/allocator/allocator_extension.h"
 #include "base/command_line.h"
 #include "common/content_switches_efl.h"
+#include "common/render_messages_efl.h"
 #include "content/public/renderer/render_thread.h"
 #include "third_party/WebKit/public/web/WebCache.h"
 #include "third_party/sqlite/sqlite3.h"

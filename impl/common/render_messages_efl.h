@@ -23,6 +23,7 @@
 
 #include "tizen_webview/public/tw_content_security_policy.h"
 #include "tizen_webview/public/tw_hit_test.h"
+#include "tizen_webview/public/tw_settings.h"
 #include "tizen_webview/public/tw_view_mode.h"
 #include "tizen_webview/public/tw_wrt.h"
 
@@ -138,6 +139,10 @@ IPC_STRUCT_TRAITS_END()
 
 IPC_ENUM_TRAITS(blink::WebViewMode)
 
+IPC_STRUCT_TRAITS_BEGIN(tizen_webview::Settings)
+  IPC_STRUCT_TRAITS_MEMBER(javascript_can_open_windows)
+IPC_STRUCT_TRAITS_END()
+
 // Tells the renderer to clear the cache.
 IPC_MESSAGE_CONTROL0(EflViewMsg_ClearCache)
 IPC_MESSAGE_ROUTED0(EwkViewMsg_UseSettingsFont)
@@ -187,6 +192,8 @@ IPC_MESSAGE_ROUTED3(EwkViewMsg_PrintToPdf,
                     int, /* width */
                     int, /* height */
                     base::FilePath /* file name to save pdf*/)
+
+IPC_MESSAGE_ROUTED1(EflViewMsg_UpdateSettings, tizen_webview::Settings)
 
 // from renderer to browser
 
