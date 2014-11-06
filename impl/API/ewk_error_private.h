@@ -14,11 +14,13 @@ struct _Ewk_Error {
   Eina_Stringshare* description;
   Eina_Stringshare* domain;
 
-  _Ewk_Error(int error_code_in, const char* url_in, const char* description_in, const char* domain_in = NULL)
+  _Ewk_Error(int error_code_in, const char* url_in, const char* description_in)
       : error_code(error_code_in),
         url(eina_stringshare_add(url_in)),
         description(eina_stringshare_add(description_in)),
-        domain(eina_stringshare_add(domain_in)) {
+        // Chromium always reports "net" as error domain anyways,
+        // so we just hardcode it.
+        domain(eina_stringshare_add("net")) {
   }
 
   ~_Ewk_Error() {
