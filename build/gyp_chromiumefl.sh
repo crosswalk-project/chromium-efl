@@ -48,6 +48,8 @@ COMMON_GYP_PARAMETERS="--depth=${TOPDIR}/src
 
 if [ "$target" == "desktop" ]; then
   ADDITIONAL_GYP_PARAMETERS+="-Dbuilding_for_tizen=0
+                              -Dbuilding_for_tizen_mobile=0
+                              -Dbuilding_for_tizen_tv=0
                              "
 else
   ADDITIONAL_GYP_PARAMETERS+="-Dbuilding_for_tizen=1
