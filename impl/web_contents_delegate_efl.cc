@@ -310,25 +310,26 @@ void WebContentsDelegateEfl::DidFinishLoad(RenderFrameHost* render_frame_host,
   DCHECK(entry);
   FaviconStatus &favicon = entry->GetFavicon();
 
-  // http://107.108.218.239/bugzilla/show_bug.cgi?id=7883
-#if !defined(EWK_BRINGUP)
-  // check/update the url and favicon url in favicon database
-  FaviconService fs;
-  fs.SetFaviconURLForPageURL(favicon.url, validated_url);
+  if (favicon.valid) {
+    // check/update the url and favicon url in favicon database
+    FaviconService fs;
+    fs.SetFaviconURLForPageURL(favicon.url, validated_url);
 
-  // download favicon if there is no such in database
-  if (!fs.ExistsForFaviconURL(favicon.url)) {
-    LOG(ERROR) << "[DidFinishLoad] :: no favicon in database for URL: "
-               << favicon.url.spec();
-    favicon_downloader_.reset(new FaviconDownloader(&web_contents_,
-                                                   favicon.url,
-                                                   base::Bind(&WebContentsDelegateEfl::DidDownloadFavicon,
-                                                              weak_ptr_factory_.GetWeakPtr())));
-    favicon_downloader_->Start();
-  } else {
-    web_view_->SmartCallback<EWebViewCallbacks::IconReceived>().call();
+    // download favicon if there is no such in database
+    if (!fs.ExistsForFaviconURL(favicon.url)) {
+      LOG(ERROR) << "[DidFinishLoad] :: no favicon in database for URL: "
+                 << favicon.url.spec();
+      favicon_downloader_.reset(
+        new FaviconDownloader(&web_contents_,
+                              favicon.url,
+                              base::Bind(
+                                &WebContentsDelegateEfl::DidDownloadFavicon,
+                                weak_ptr_factory_.GetWeakPtr())));
+      favicon_downloader_->Start();
+    } else {
+      web_view_->SmartCallback<EWebViewCallbacks::IconReceived>().call();
+    }
   }
-#endif
 
   web_view_->SmartCallback<EWebViewCallbacks::LoadFinished>().call();
 }
