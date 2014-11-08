@@ -155,6 +155,9 @@ class RenderWidgetHostViewEfl
                                        const SkBitmap& zoomed_bitmap) override;
 #endif
 
+  virtual void OnSwapCompositorFrame(
+      uint32 output_surface_id, scoped_ptr<cc::CompositorFrame> frame) override;
+
   // ui::GestureEventHelper implementation.
   virtual bool CanDispatchToConsumer(ui::GestureConsumer* consumer) override;
   virtual void DispatchCancelTouchEvent(ui::TouchEvent* event) override;

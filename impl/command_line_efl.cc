@@ -58,6 +58,9 @@ content::MainFunctionParams CommandLineEfl::GetDefaultPortParams() {
   p_command_line->AppendSwitchASCII(switches::kUseGL, gfx::kGLImplementationEGLName);
   p_command_line->AppendSwitch(switches::kDisableDelegatedRenderer);
 
+  // (prashant.n): New mechanism supports drawing frame to mailbox only.
+  p_command_line->AppendSwitch(cc::switches::kCompositeToMailbox);
+
 #if defined(OS_TIZEN)
   p_command_line->AppendSwitch(switches::kEnableOverscrollNotifications);
   p_command_line->AppendSwitch(switches::kTouchEvents);

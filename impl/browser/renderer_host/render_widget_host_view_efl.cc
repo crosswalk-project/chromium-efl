@@ -1489,4 +1489,45 @@ void RenderWidgetHostViewEfl::SendCompositionKeyUpEvent(char c) {
   host_->ForwardKeyboardEvent(event);
 }
 
+void RenderWidgetHostViewEfl::OnSwapCompositorFrame(
+    uint32 output_surface_id, scoped_ptr<cc::CompositorFrame> frame) {
+  cc::CompositorFrameAck ack;
+
+  // TODO(prashant.n): Delegated and software frames not supported. So with
+  // those frames black screen will appear.
+  if (frame->gl_frame_data) {
+    ack.gl_frame_data = frame->gl_frame_data.Pass();
+
+    if (m_IsEvasGLInit) {
+      gpu::gles2::MailboxManager* manager =
+          GLSharedContextEfl::GetMailboxManager();
+
+      gpu::gles2::Texture* texture =
+          manager->ConsumeTexture(ack.gl_frame_data->mailbox);
+      if (texture != NULL) {
+        texture_id_ = GetTextureIdFromTexture(texture);
+        evas_object_image_pixels_dirty_set(content_image_, true);
+      } else {
+        LOG(ERROR) << "Frame produced without texture.";
+      }
+    }
+
+    ack.gl_frame_data->sync_point = 0;
+  } else if (frame->delegated_frame_data) {
+    LOG(ERROR) << "Delegated frame is not supported.";
+    cc::TransferableResource::ReturnResources(
+        frame->delegated_frame_data->resource_list,
+        &ack.resources);
+  } else if (frame->software_frame_data) {
+    LOG(ERROR) << "Software frame is not supported.";
+    ack.last_software_frame_id = frame->software_frame_data->id;
+  }
+
+  // TODO(prashant.n): Check if ack should be sent after frame is drawn.
+  host_->SendSwapCompositorFrameAck(host_->GetRoutingID(),
+                                    output_surface_id,
+                                    host_->GetProcess()->GetID(),
+                                    ack);
+}
+
 }  // namespace content
