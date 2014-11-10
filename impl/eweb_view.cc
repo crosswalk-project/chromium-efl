@@ -1469,7 +1469,9 @@ void EWebView::SelectClosestWord(const gfx::Point& touch_point) {
 void EWebView::SelectLinkText(const gfx::Point& touch_point) {
   float device_scale_factor = rwhv()->device_scale_factor();
   RenderViewHost* render_view_host = web_contents_->GetRenderViewHost();
+#if !defined(EWK_BRINGUP)
   render_view_host->Send(new ViewMsg_SelectLinkText(render_view_host->GetRoutingID(), gfx::Point(touch_point.x() / device_scale_factor, touch_point.y() / device_scale_factor)));
+#endif
 }
 
 bool EWebView::GetSelectionRange(Eina_Rectangle* left_rect, Eina_Rectangle* right_rect) {

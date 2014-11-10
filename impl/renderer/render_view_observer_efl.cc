@@ -290,7 +290,9 @@ void RenderViewObserverEfl::OnSelectClosestWord(int x, int y)
   if (!frame)
     return;
 
+#if !defined(EWK_BRINGUP)
   frame->selectClosestWord(x, y);
+#endif
 }
 
 void RenderViewObserverEfl::OnDoHitTest(int view_x, int view_y, tizen_webview::Hit_Test_Mode mode)
