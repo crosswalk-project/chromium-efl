@@ -255,16 +255,16 @@ void RenderWidgetHostViewEfl::PaintTextureToSurface(GLuint texture_id) {
   const GLfloat* vertex_attributes;
 
   const GLfloat vertex_attributes_270[] = {
-      -1.0f, -1.0f, 0.0f, 0.0f, 1.0f,
-      -1.0f,  1.0f, 0.0f, 1.0f, 1.0f,
-       1.0f,  1.0f, 0.0f, 1.0f, 0.0f,
-       1.0f, -1.0f, 0.0f, 0.0f, 0.0f};
-
-  const GLfloat vertex_attributes_90[] = {
       -1.0f, -1.0f, 0.0f, 1.0f, 0.0f,
       -1.0f,  1.0f, 0.0f, 0.0f, 0.0f,
        1.0f,  1.0f, 0.0f, 0.0f, 1.0f,
        1.0f, -1.0f, 0.0f, 1.0f, 1.0f};
+
+  const GLfloat vertex_attributes_90[] = {
+      -1.0f, -1.0f, 0.0f, 0.0f, 1.0f,
+      -1.0f,  1.0f, 0.0f, 1.0f, 1.0f,
+       1.0f,  1.0f, 0.0f, 1.0f, 0.0f,
+       1.0f, -1.0f, 0.0f, 0.0f, 0.0f};
 
   const GLfloat vertex_attributes_0[] = {
       -1.0f, -1.0f, 0.0f, 0.0f, 0.0f,
