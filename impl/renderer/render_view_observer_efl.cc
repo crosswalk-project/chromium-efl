@@ -533,7 +533,7 @@ void RenderViewObserverEfl::OrientationChangeEvent()
 #endif
 }
 
-void RenderViewObserverEfl::WillSubmitForm(blink::WebFrame* frame, const blink::WebFormElement& form)
+void RenderViewObserverEfl::WillSubmitForm(blink::WebLocalFrame* frame, const blink::WebFormElement& form)
 {
   GURL url(form.action());
   Send(new EwkHostMsg_FormSubmit(routing_id(),url));

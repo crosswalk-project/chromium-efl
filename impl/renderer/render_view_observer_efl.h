@@ -45,6 +45,8 @@ class RenderViewObserverEfl: public content::RenderViewObserver {
   //So using this notification to update minimum and maximum page scale factor values
   virtual void DidUpdateLayout() override;
 
+  void WillSubmitForm(blink::WebLocalFrame* frame, const blink::WebFormElement& form) override;
+
  private:
   void OnSetContentSecurityPolicy(const std::string& policy, tizen_webview::ContentSecurityPolicyType header_type);
   void OnScale(double scale_factor, int x, int y);
@@ -62,7 +64,6 @@ class RenderViewObserverEfl: public content::RenderViewObserver {
   void OnWebAppIconUrlGet(int callback_id);
   void OnWebAppIconUrlsGet(int callback_id);
   void OnWebAppCapableGet(int callback_id);
-  void WillSubmitForm(blink::WebFrame* frame, const blink::WebFormElement& form);
   void OnSetBrowserFont();
   void CheckContentsSize();
   void OnSuspendScheduledTasks();
