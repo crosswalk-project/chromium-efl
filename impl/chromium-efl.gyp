@@ -291,6 +291,11 @@
       'selection_magnifier_efl.h',
       # tizen_webview
       #TODO: making separate gyp for tizen_webview
+      'tizen_webview/public/tw_back_forward_history.h',
+      'tizen_webview/public/tw_back_forward_history.cc',
+      'tizen_webview/public/tw_back_forward_list.h',
+      'tizen_webview/public/tw_back_forward_list_impl.h',
+      'tizen_webview/public/tw_back_forward_list_impl.cc',
       'tizen_webview/public/tw_content_security_policy.h',
       'tizen_webview/public/tw_context_menu_controller.h',
       'tizen_webview/public/tw_context_menu_controller.cc',

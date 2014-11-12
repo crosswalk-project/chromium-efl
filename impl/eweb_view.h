@@ -55,6 +55,8 @@
 #include "browser/selectpicker/popup_picker.h"
 #endif
 
+#include "tizen_webview/public/tw_back_forward_history.h"
+#include "tizen_webview/public/tw_back_forward_list_impl.h"
 #include "tizen_webview/public/tw_hit_test.h"
 #include "tizen_webview/public/tw_touch_event.h"
 #include "tizen_webview/public/tw_callbacks.h"
@@ -323,7 +325,9 @@ class EWebView {
   const char* GetTitle();
   bool SaveAsPdf(int width, int height, const std::string& file_name);
   void BackForwardListClear();
+  tizen_webview::BackForwardList* GetBackForwardList() const;
   void InvokeBackForwardListChangedCallback();
+  tizen_webview::BackForwardHistory* GetBackForwardHistory() const;
   bool WebAppCapableGet(tizen_webview::Web_App_Capable_Get_Callback callback, void *userData);
   bool WebAppIconUrlGet(tizen_webview::Web_App_Icon_URL_Get_Callback callback, void *userData);
   bool WebAppIconUrlsGet(tizen_webview::Web_App_Icon_URLs_Get_Callback callback, void *userData);
@@ -485,6 +489,7 @@ class EWebView {
   bool is_initialized_;
 
   std::map<int64_t, AsyncHitTestRequest*> m_pendingAsyncHitTests;
+  scoped_ptr<tizen_webview::BackForwardList> back_forward_list_;
 
 private:
   // only tizen_webview::WebView can create and delete this

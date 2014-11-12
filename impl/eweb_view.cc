@@ -290,6 +290,8 @@ void EWebView::Initialize() {
   }
   web_contents_delegate_.reset(new WebContentsDelegateEfl(this));
   web_contents_->SetDelegate(web_contents_delegate_.get());
+  back_forward_list_.reset(new tizen_webview::BackForwardList(
+      web_contents_->GetController()));
 
   // Activate Event handler
   evas_event_handler_->BindFocusEventHandlers();
@@ -1348,12 +1350,22 @@ void EWebView::BackForwardListClear() {
     }
   }
 
-  if (entry_removed)
+  if (entry_removed) {
+    back_forward_list_->ClearCache();
     InvokeBackForwardListChangedCallback();
+  }
+}
+
+tizen_webview::BackForwardList* EWebView::GetBackForwardList() const {
+  return back_forward_list_.get();
 }
 
 void EWebView::InvokeBackForwardListChangedCallback() {
   SmartCallback<EWebViewCallbacks::BackForwardListChange>().call();
+}
+
+tizen_webview::BackForwardHistory* EWebView::GetBackForwardHistory() const {
+  return new tizen_webview::BackForwardHistory(web_contents_->GetController());
 }
 
 bool EWebView::WebAppCapableGet(tizen_webview::Web_App_Capable_Get_Callback callback, void *userData) {

@@ -5,22 +5,19 @@
 #ifndef EWK_HISTORY_PRIVATE_H
 #define EWK_HISTORY_PRIVATE_H
 
-#if !defined(EWK_BRINGUP)
+#include <tizen_webview/public/tw_back_forward_history.h>
 
-#include <tizen_webview/public/tw_back_forward_list.h>
-
-struct _Ewk_History : public tizen_webview::BackForwardList {
+struct _Ewk_History : public tizen_webview::BackForwardHistory {
 };
 
-struct _Ewk_History_Item : public tizen_webview::BackForwardListItem {
+struct _Ewk_History_Item : public tizen_webview::BackForwardHistoryItem {
 };
 
 namespace chromium_glue {
 
-_Ewk_History *from(tizen_webview::BackForwardList *);
-_Ewk_History_Item *from(tizen_webview::BackForwardListItem *);
+_Ewk_History* from(tizen_webview::BackForwardHistory*);
+_Ewk_History_Item* from(tizen_webview::BackForwardHistoryItem*);
 
 }
 
-#endif // EWK_BRINGUP
 #endif // EWK_HISTORY_PRIVATE_H

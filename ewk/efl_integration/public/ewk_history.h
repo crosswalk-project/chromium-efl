@@ -10,8 +10,6 @@
 #ifndef ewk_history
 #define ewk_history
 
-#if !defined(EWK_BRINGUP)
-
 #include <Eina.h>
 #include "ewk_export.h"
 
@@ -83,7 +81,5 @@ EAPI void ewk_history_free(Ewk_History* history);
 #ifdef __cplusplus
 }
 #endif
-
-#endif // EWK_BRINGUP
 
 #endif // ewk_history

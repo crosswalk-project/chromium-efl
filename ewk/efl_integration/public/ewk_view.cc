@@ -1,6 +1,6 @@
 /*
  * Copyright (C) 2009-2010 ProFUSION embedded systems
- * Copyright (C) 2009-2013 Samsung Electronics. All rights reserved.
+ * Copyright (C) 2009-2014 Samsung Electronics. All rights reserved.
  * Copyright (C) 2012 Intel Corporation
  *
  * This library is free software; you can redistribute it and/or
@@ -46,10 +46,10 @@
 #include "private/ewk_private.h"
 #if !defined(EWK_BRINGUP)
 #include "private/ewk_quota_permission_request_private.h"
-#include "private/ewk_history_private.h"
 #endif
-#include "private/ewk_view_private.h"
 #include "private/chromium_glue.h"
+#include "private/ewk_back_forward_list_private.h"
+#include "private/ewk_history_private.h"
 #include "private/ewk_view_private.h"
 
 using tizen_webview::WebView;
@@ -634,13 +634,11 @@ Eina_Bool ewk_view_hit_test_request(Evas_Object* o, int x, int y, int hit_test_m
   return impl->AsyncRequestHitTestDataAt(x, y, chromium_glue::to(static_cast<Ewk_Hit_Test_Mode>(hit_test_mode)), chromium_glue::to(callback), user_data);
 }
 
-#if !defined(EWK_BRINGUP)
 Ewk_History* ewk_view_history_get(Evas_Object* ewkView)
 {
   EWK_VIEW_IMPL_GET_OR_RETURN(ewkView, impl, NULL);
-  return chromium_glue::from(impl->GetBackForwardList());
+  return chromium_glue::from(impl->GetBackForwardHistory());
 }
-#endif
 
 Eina_Bool ewk_view_notification_closed(Evas_Object* ewkView, Eina_List* notification_list)
 {
@@ -993,13 +991,11 @@ Eina_Bool ewk_view_split_scroll_overflow_enabled_set(Evas_Object* ewkView, const
   return false;
 }
 
-#if defined(OS_TIZEN_TV)
 Ewk_Back_Forward_List* ewk_view_back_forward_list_get(const Evas_Object* ewkView)
 {
-  LOG_EWK_API_MOCKUP("for Tizen TV Browser");
-  return NULL;
+  EWK_VIEW_IMPL_GET_OR_RETURN(ewkView, impl, NULL);
+  return chromium_glue::from(impl->GetBackForwardList());
 }
-#endif
 
 void ewk_view_draw_focus_ring_enable_set(Evas_Object* ewkView, Eina_Bool enable)
 {

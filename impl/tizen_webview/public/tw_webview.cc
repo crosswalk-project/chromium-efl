@@ -173,6 +173,14 @@ void WebView::BackForwardListClear() {
   return impl_->BackForwardListClear();
 }
 
+BackForwardList* WebView::GetBackForwardList() const {
+  return impl_->GetBackForwardList();
+}
+
+BackForwardHistory* WebView::GetBackForwardHistory() const {
+  return impl_->GetBackForwardHistory();
+}
+
 const char* WebView::GetTitle() {
   return impl_->GetTitle();
 }

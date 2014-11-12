@@ -44,7 +44,55 @@ extern "C" {
  *
  * @see Ewk_Object
  */
-typedef struct EwkObject Ewk_Back_Forward_List_Item;
+typedef struct _Ewk_Back_Forward_List_Item Ewk_Back_Forward_List_Item;
+
+/**
+ * Increases the reference count of the given object.
+ *
+ * @param item the back-forward list item instance to increase the reference count
+ *
+ * @return a pointer to the object on success, @c NULL otherwise.
+ */
+EAPI Ewk_Back_Forward_List_Item *ewk_back_forward_list_item_ref(Ewk_Back_Forward_List_Item *item);
+
+/**
+ * Decreases the reference count of the given object, possibly freeing it.
+ *
+ * When the reference count reaches 0, the item is freed.
+ *
+ * @param item the back-forward list item instance to decrease the reference count
+ */
+EAPI void ewk_back_forward_list_item_unref(Ewk_Back_Forward_List_Item *item);
+
+/**
+ * Returns URL of the item.
+ *
+ * The returned URL may differ from the original URL (For example if the page was redirected).
+ *
+ * @see ewk_back_forward_list_item_original_url_get()
+ *
+ * @param item the back-forward list item instance
+ *
+ * @return the URL of the @a item or @c NULL in case of error. This pointer is
+ *         guaranteed to be eina_stringshare, so whenever possible
+ *         save yourself some cpu cycles and use
+ *         eina_stringshare_ref() instead of eina_stringshare_add() or
+ *         strdup()
+ */
+EAPI const char *ewk_back_forward_list_item_url_get(const Ewk_Back_Forward_List_Item *item);
+
+/**
+ * Returns title of the item.
+ *
+ * @param item the back-forward list item instance
+ *
+ * @return the title of the @a item or @c NULL in case of error. This pointer is
+ *         guaranteed to be eina_stringshare, so whenever possible
+ *         save yourself some cpu cycles and use
+ *         eina_stringshare_ref() instead of eina_stringshare_add() or
+ *         strdup()
+ */
+EAPI const char *ewk_back_forward_list_item_title_get(const Ewk_Back_Forward_List_Item *item);
 
 /**
  * Returns original URL of the item.
