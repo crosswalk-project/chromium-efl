@@ -63,7 +63,7 @@
                                      # omxSP_FFTInv_CCSToR_F32_vfp in src/third_party/openmax_dl/dl/sp/api/omxSP.h:2558 .
                                      # Remove this line after a more proper solution is found.
          ],
-        'conditions': [
+         'conditions': [
            ['chromium_efl_tizen_version=="2.3"', {
              'defines': [
                'TIZEN_V_2_3=1',
@@ -72,6 +72,14 @@
            ['chromium_efl_tizen_version=="2.2.1"', {
              'defines': [
                'TIZEN_LEGACY_V_2_2_1=1',
+             ],
+           }],
+           ['tizen_multimedia_support==1', {
+             'sources/': [
+               ['exclude', 'video/capture/linux/video_capture_device_factory_linux.cc$'],
+               ['exclude', 'video/capture/linux/video_capture_device_factory_linux.h$'],
+               ['exclude', 'video/capture/linux/video_capture_device_linux.h$'],
+               ['exclude', 'video/capture/linux/video_capture_device_linux.cc$'],
              ],
            }],
          ],
