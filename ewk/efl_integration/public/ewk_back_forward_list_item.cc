@@ -25,12 +25,35 @@
  */
 
 #include "ewk_back_forward_list_item.h"
-#include "private/ewk_private.h"
+#include "private/ewk_back_forward_list_private.h"
 
-#if defined(OS_TIZEN_TV)
-const char* ewk_back_forward_list_item_original_url_get(const Ewk_Back_Forward_List_Item* item)
+Ewk_Back_Forward_List_Item *ewk_back_forward_list_item_ref(Ewk_Back_Forward_List_Item *item)
 {
-  LOG_EWK_API_MOCKUP("for Tizen TV Browser");
-  return NULL;
+  EINA_SAFETY_ON_NULL_RETURN_VAL(item, NULL);
+  item->AddRef();
+  return item;
 }
-#endif // OS_TIZEN_TV
+
+void ewk_back_forward_list_item_unref(Ewk_Back_Forward_List_Item *item)
+{
+  EINA_SAFETY_ON_NULL_RETURN(item);
+  item->Release();
+}
+
+const char *ewk_back_forward_list_item_url_get(const Ewk_Back_Forward_List_Item *item)
+{
+  EINA_SAFETY_ON_NULL_RETURN_VAL(item, NULL);
+  return eina_stringshare_add(item->GetURL().spec().c_str());
+}
+
+const char *ewk_back_forward_list_item_title_get(const Ewk_Back_Forward_List_Item *item)
+{
+  EINA_SAFETY_ON_NULL_RETURN_VAL(item, NULL);
+  return eina_stringshare_add(item->GetTitle().c_str());
+}
+
+const char *ewk_back_forward_list_item_original_url_get(const Ewk_Back_Forward_List_Item *item)
+{
+  EINA_SAFETY_ON_NULL_RETURN_VAL(item, NULL);
+  return eina_stringshare_add(item->GetOriginalURL().spec().c_str());
+}

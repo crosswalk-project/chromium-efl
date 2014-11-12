@@ -1,8 +1,6 @@
-// Copyright 2012 Samsung Electronics. All rights reserved.
+// Copyright 2014 Samsung Electronics. All rights reserved.
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
-
-#if !defined(EWK_BRINGUP)
 
 #include "ewk_history.h"
 #include "private/ewk_private.h"
@@ -14,7 +12,7 @@ int ewk_history_back_list_length_get(Ewk_History* history)
   // returning -1 here would be better to indicate the error
   // but we need to stick to the WebKit-EFL implementation
   EINA_SAFETY_ON_NULL_RETURN_VAL(history, 0);
-  history->GetBackListLength();
+  return history->GetBackListLength();
 }
 
 int ewk_history_forward_list_length_get(Ewk_History* history)
@@ -28,7 +26,7 @@ int ewk_history_forward_list_length_get(Ewk_History* history)
 Ewk_History_Item* ewk_history_nth_item_get(Ewk_History* history, int index)
 {
   EINA_SAFETY_ON_NULL_RETURN_VAL(history, NULL);
-  return chromium_glue::from(history->GetItemAtIndex(index));
+  return chromium_glue::from(static_cast<tizen_webview::BackForwardHistoryItem *>(history->GetItemAtIndex(index)));
 }
 
 const char* ewk_history_item_uri_get(Ewk_History_Item* item)
@@ -50,5 +48,3 @@ void ewk_history_free(Ewk_History* history)
   EINA_SAFETY_ON_NULL_RETURN(history);
   delete history;
 }
-
-#endif

@@ -9,6 +9,8 @@
 #include <Evas.h>
 #include <string>
 #include <map>
+#include "tizen_webview/public/tw_back_forward_history.h"
+#include "tizen_webview/public/tw_back_forward_list_impl.h"
 #include "tizen_webview/public/tw_callbacks.h"
 #include "tizen_webview/public/tw_content_security_policy.h"
 #include "tizen_webview/public/tw_hit_test.h"
@@ -93,6 +95,8 @@ class WebView {
   bool CanGoBack();
   bool CanGoForward();
   void BackForwardListClear();
+  BackForwardList* GetBackForwardList() const;
+  BackForwardHistory* GetBackForwardHistory() const;
 
   // ---- Contents
   const char* GetTitle();

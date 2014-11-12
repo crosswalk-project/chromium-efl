@@ -126,6 +126,8 @@
       'efl_integration/private/api_static_check.cc',
       'efl_integration/private/chromium_glue.cc',
       'efl_integration/private/chromium_glue.h',
+      'efl_integration/private/ewk_back_forward_list_private.h',
+      'efl_integration/private/ewk_back_forward_list_private.cc',
       'efl_integration/private/ewk_context_private.cc',
       'efl_integration/private/ewk_context_private.h',
       'efl_integration/private/ewk_hit_test_private.h',
