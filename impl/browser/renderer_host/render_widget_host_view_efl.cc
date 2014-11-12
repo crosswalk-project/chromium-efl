@@ -388,6 +388,7 @@ bool RenderWidgetHostViewEfl::OnMessageReceived(const IPC::Message& message) {
     IPC_MESSAGE_HANDLER(EwkHostMsg_ReadMHTMLData, OnMHTMLContentGet)
     IPC_MESSAGE_HANDLER(EwkHostMsg_DidChangePageScaleFactor, OnDidChangePageScaleFactor)
     IPC_MESSAGE_HANDLER(EwkHostMsg_DidChangePageScaleRange, OnDidChangePageScaleRange)
+    IPC_MESSAGE_HANDLER(ViewHostMsg_TextInputStateChanged, OnTextInputStateChanged)
 #if !defined(EWK_BRINGUP)
     IPC_MESSAGE_HANDLER(ViewHostMsg_TextInputInFormStateChanged, OnTextInputInFormStateChanged)
 #endif
@@ -604,9 +605,7 @@ void RenderWidgetHostViewEfl::TextInputTypeChanged(ui::TextInputType type,
   NOTIMPLEMENTED();
 }
 
-#if !defined(EWK_BRINGUP)
-// [M40] Need to migrate!!!
-void RenderWidgetHostViewEfl::TextInputStateChanged(
+void RenderWidgetHostViewEfl::OnTextInputStateChanged(
     const ViewHostMsg_TextInputState_Params& params) {
   if (!params.show_ime_if_needed && !eweb_view()->GetSettings()->useKeyPadWithoutUserAction())
     return;
@@ -630,7 +629,6 @@ void RenderWidgetHostViewEfl::TextInputStateChanged(
         params.type == ui::TEXT_INPUT_TYPE_CONTENT_EDITABLE);
   }
 }
-#endif
 
 void RenderWidgetHostViewEfl::ImeCancelComposition() {
   if (im_context_)

@@ -94,7 +94,6 @@ class RenderWidgetHostViewEfl
   virtual void UpdateCursor(const WebCursor&) override;
   virtual void SetIsLoading(bool) override;
 
-  // [M40] TODO: Migrate this to proper method.
   void OnTextInputStateChanged(const ViewHostMsg_TextInputState_Params& params);
 
   virtual void TextInputTypeChanged(ui::TextInputType type,
