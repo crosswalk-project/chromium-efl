@@ -2,6 +2,14 @@
   'include_dirs': [
     '<(chrome_src_dir)/v8/include',
   ],
+  'variables': {
+    'webrtc_sources': [
+      'content/common/gpu/media/tizen/tizen_video_decode_accelerator.h',
+      'content/common/gpu/media/tizen/tizen_video_decode_accelerator.cc',
+      'content/common/gpu/media/tizen/tizen_video_encode_accelerator.h',
+      'content/common/gpu/media/tizen/tizen_video_encode_accelerator.cc',
+    ],
+  },
   'sources': [
     'media/base/tizen/webaudio_media_codec_info_tizen.h',
     'content/browser/media/tizen/webaudio_decoder_browser_gstreamer.cc',
@@ -34,6 +42,7 @@
     'media/base/tizen/webmediaplayer_tizen.cc',
     'media/base/tizen/webmediaplayer_tizen.h',#ME and MSE
     'media/video/capture/tizen/video_capture_device_factory_tizen_helper.cc',
+    '<@(webrtc_sources)',
   ],
   'conditions': [
     ['building_for_tizen==1', {
@@ -63,5 +72,8 @@
         'media/audio/tizen/audio_session_manager.cc', #ASM
       ],
     }],
+  ],
+  'dependencies': [
+    '<(chrome_src_dir)/third_party/webrtc/modules/modules.gyp:video_processing',
   ],
 }

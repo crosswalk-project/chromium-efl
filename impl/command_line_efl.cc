@@ -59,6 +59,10 @@ content::MainFunctionParams CommandLineEfl::GetDefaultPortParams() {
   // Enables glFinish call
   p_command_line->AppendSwitch(switches::kWaitForFrameComplete);
 
+#if defined(TIZEN_MULTIMEDIA_SUPPORT) && defined(ENABLE_WEBRTC)
+  p_command_line->AppendSwitch(switches::kEnableWebRtcHWH264Encoding);
+#endif
+
 #if defined(OS_TIZEN)
   p_command_line->AppendSwitch(switches::kEnableOverscrollNotifications);
 #if !defined(EWK_BRINGUP)
