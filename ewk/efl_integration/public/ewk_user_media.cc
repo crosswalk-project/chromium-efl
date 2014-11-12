@@ -16,8 +16,10 @@ Eina_Bool ewk_user_media_permission_request_suspend(Ewk_User_Media_Permission_Re
 
 void ewk_user_media_permission_request_set(Ewk_User_Media_Permission_Request *request, Eina_Bool allowed)
 {
+#if defined(TIZEN_MULTIMEDIA_SUPPORT)
   if(request && request->web_contents){
     request->web_contents->OnAccessRequestResponse(allowed);
     delete request;
   }
+#endif
 }

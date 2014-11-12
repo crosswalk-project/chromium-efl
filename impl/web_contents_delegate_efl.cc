@@ -207,6 +207,7 @@ void WebContentsDelegateEfl::RegisterProtocolHandler(WebContents* web_contents,
   web_view_->SmartCallback<EWebViewCallbacks::RegisterProtocolHandler>().call(protocol_data.get());
 }
 
+#if defined(TIZEN_MULTIMEDIA_SUPPORT)
 WebContentsDelegateEfl::PendingAccessRequest::PendingAccessRequest(
   const content::MediaStreamRequest& request,
   const content::MediaResponseCallback& callback)
@@ -217,40 +218,50 @@ WebContentsDelegateEfl::PendingAccessRequest::PendingAccessRequest(
 WebContentsDelegateEfl::PendingAccessRequest::~PendingAccessRequest() {
 }
 
-void WebContentsDelegateEfl::OnAccessRequestResponse(Eina_Bool allowed) {
-#warning "[M37] Fix media permissions"
-#if 0
+void WebContentsDelegateEfl::OnAccessRequestResponse(bool allowed) {
   MediaStreamDevices devices;
-  DVLOG(1) << __FUNCTION__ << " Queue Size: " << requests_Queue_.size();
-  if (requests_Queue_.empty()) {
-    DVLOG(1) << __FUNCTION__ << " Empty Queue ";
+  if (requests_queue_.empty()) {
+    LOG(ERROR) << __FUNCTION__ << " Empty Queue ";
     return;
   }
-  PendingAccessRequest pending_request = requests_Queue_.front();
+  PendingAccessRequest pending_request = requests_queue_.front();
   if (pending_request.callback.is_null()) {
-    requests_Queue_.pop_front();
-    DVLOG(1) << __FUNCTION__ << " Invalid Callback ";
+    requests_queue_.pop_front();
+    LOG(ERROR) << __FUNCTION__ << " Invalid Callback ";
     return;
   }
   if (allowed) {
     if (pending_request.request.audio_type == content::MEDIA_DEVICE_AUDIO_CAPTURE) {
-      DVLOG(1) << __FUNCTION__ << "Added Audio Device";
       devices.push_back(MediaStreamDevice(pending_request.request.audio_type,
                                           "default", "Default"));
     }
     if (pending_request.request.video_type == content::MEDIA_DEVICE_VIDEO_CAPTURE) {
-      DVLOG(1) << __FUNCTION__ << " Added Video Device";
+#if defined(OS_TIZEN_MOBILE)
       devices.push_back(MediaStreamDevice(pending_request.request.video_type,
                                           "1", "1"));
+#elif defined(OS_TIZEN_TV)
+      devices.push_back(MediaStreamDevice(pending_request.request.video_type,
+                                          "0", "0"));
+#else
+      devices.push_back(MediaStreamDevice(pending_request.request.video_type,
+                                          "/dev/video0", "1"));
+#endif
     }
-    pending_request.callback.Run(devices, scoped_ptr<MediaStreamUI>());
+    pending_request.callback.Run(devices, MEDIA_DEVICE_OK,scoped_ptr<MediaStreamUI>());
   } else {
-    DVLOG(1) << __FUNCTION__ << " Decline request with empty list";
+    LOG(ERROR) << __FUNCTION__ << " Decline request with empty list";
     pending_request.callback.Run(MediaStreamDevices(),
+                                 MEDIA_DEVICE_NOT_SUPPORTED,
                                  scoped_ptr<MediaStreamUI>());
   }
-  requests_Queue_.pop_front();
-#endif
+  requests_queue_.pop_front();
+}
+
+bool WebContentsDelegateEfl::CheckMediaAccessPermission(
+    WebContents* web_contents,
+    const GURL& security_origin,
+    MediaStreamType type) {
+  return true;
 }
 
 void WebContentsDelegateEfl::RequestMediaAccessPermission(
@@ -260,10 +271,11 @@ void WebContentsDelegateEfl::RequestMediaAccessPermission(
   //send callback to application to request for user permission.
   _Ewk_User_Media_Permission_Request* media_permission_request =
     new _Ewk_User_Media_Permission_Request(web_view_, request,this);
-  requests_Queue_.push_back(PendingAccessRequest(request, callback));
+  requests_queue_.push_back(PendingAccessRequest(request, callback));
   web_view_->SmartCallback<EWebViewCallbacks::UserMediaPermission>().call(
     media_permission_request);
 }
+#endif
 
 void WebContentsDelegateEfl::OnAuthRequired(net::URLRequest* request,
                                             const std::string& realm,

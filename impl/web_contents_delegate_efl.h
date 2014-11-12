@@ -73,10 +73,18 @@ class WebContentsDelegateEfl
                                           bool enter_fullscreen) override;
   virtual bool IsFullscreenForTabOrPending(
       const WebContents* web_contents) const override;
+#if defined(TIZEN_MULTIMEDIA_SUPPORT)
+  virtual bool CheckMediaAccessPermission(WebContents* web_contents,
+                                          const GURL& security_origin,
+                                          MediaStreamType type) override;
+
   virtual void RequestMediaAccessPermission(
       WebContents* web_contents,
       const MediaStreamRequest& request,
       const MediaResponseCallback& callback) override;
+
+  void OnAccessRequestResponse(bool allowed);
+#endif
   void RegisterProtocolHandler(WebContents* web_contents,
                                const std::string& protocol,
                                const GURL& url,
@@ -153,7 +161,6 @@ class WebContentsDelegateEfl
                                    const base::string16& source_id) override;
   void RunFileChooser(WebContents* web_contents, const FileChooserParams& params);
   ColorChooser* OpenColorChooser(WebContents* web_contents, SkColor color, const std::vector<ColorSuggestion>& suggestions);
-  void OnAccessRequestResponse(Eina_Bool allowed);
   void OpenDateTimeDialog(ui::TextInputType dialog_type,
                           double dialog_value,
                           double min,
@@ -180,6 +187,7 @@ class WebContentsDelegateEfl
     tizen_webview::ContentSecurityPolicyType header_type;
   };
 
+#if defined(TIZEN_MULTIMEDIA_SUPPORT)
   // Structure to hold media request and its callback.
   struct PendingAccessRequest {
     PendingAccessRequest(const content::MediaStreamRequest& request,
@@ -190,7 +198,9 @@ class WebContentsDelegateEfl
   };
 
   //Queue to hold all pending request for requesting user permissions.
-  std::deque<PendingAccessRequest> requests_Queue_;
+  std::deque<PendingAccessRequest> requests_queue_;
+#endif
+
   scoped_ptr<ContentSecurityPolicy> pending_content_security_policy_;
   bool document_created_;
   bool should_open_new_window_;
