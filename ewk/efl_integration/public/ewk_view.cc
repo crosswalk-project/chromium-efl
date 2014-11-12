@@ -424,6 +424,20 @@ Evas_Object* ewk_view_screenshot_contents_get(const Evas_Object* view, Eina_Rect
   return impl->GetSnapshot(view_area);
 }
 
+Eina_Bool ewk_view_screenshot_contents_get_async(const Evas_Object* view, Eina_Rectangle view_area,
+        float scale_factor, Evas* canvas, Ewk_Web_App_Screenshot_Captured_Callback callback, void* user_data)
+{
+  EINA_SAFETY_ON_NULL_RETURN_VAL(callback, NULL);
+  EWK_VIEW_IMPL_GET_OR_RETURN(view, impl, NULL);
+  // Zoom level equality (<=0.001) is sufficient compared to high precision std::numeric_value::epsilon.
+  if (!content::ZoomValuesEqual(scale_factor, 1.0)) {
+    LOG(ERROR) << "We only support scale factor of 1.0."
+               << "Scaling option will be supported after hardware acceleration is enabled.";
+    return EINA_FALSE;
+  }
+  return impl->GetSnapshotAsync(view_area, canvas, callback, user_data) ? EINA_TRUE : EINA_FALSE;
+}
+
 unsigned int ewk_view_inspector_server_start(Evas_Object* ewkView, unsigned int port)
 {
   EWK_VIEW_IMPL_GET_OR_RETURN(ewkView, impl, false);

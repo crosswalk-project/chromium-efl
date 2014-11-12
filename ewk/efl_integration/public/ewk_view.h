@@ -287,6 +287,14 @@ typedef void (*Ewk_Web_App_Capable_Get_Callback)(Eina_Bool capable, void* user_d
 typedef void (*Ewk_Web_App_Icon_URL_Get_Callback)(const char* icon_url, void* user_data);
 
 /**
+ * Callback for ewk_view_screenshot_contents_get_async
+ *
+ * @param image captured screenshot
+ * @param user_data user_data will be passsed when ewk_view_screenshot_contents_get_async is called
+ */
+typedef void (*Ewk_Web_App_Screenshot_Captured_Callback)(Evas_Object* image, void* user_data);
+
+/**
  * Callback for ewk_view_web_app_icon_urls_get.
  *
  * @param icon_urls list of Ewk_Web_App_Icon_Data for web app
@@ -932,6 +940,24 @@ EAPI Eina_Bool ewk_view_visibility_set(const Evas_Object* o, Eina_Bool enable);
  * @return newly allocated evas image object on sucess or @c 0 on failure.
  */
 EAPI Evas_Object* ewk_view_screenshot_contents_get(const Evas_Object* o, Eina_Rectangle viewArea, float scaleFactor, Evas* canvas);
+
+/**
+ * Makes request of evas image object of the specified viewArea of page asynchronously
+ *
+ * The returned evas image object through async callback @b should be freed after use.
+ *
+ * @param o view object to get specified rectangle of cairo surface.
+ * @param viewArea rectangle of cairo surface.
+ * @param scaleFactor scale factor of cairo surface.
+ * @param canvas canvas for creating evas image.
+ * @param callback result callback to get captured screenshot.
+ * @param user_data will be passed when result_callback is called
+ *    -I.e., user data will be kept until callback is called.
+ *
+ * @return @c EINA_TRUE on successful request, @c EINA_FALSE on errors.
+ */
+EAPI Eina_Bool ewk_view_screenshot_contents_get_async(const Evas_Object* o, Eina_Rectangle viewArea,
+         float scaleFactor, Evas* canvas, Ewk_Web_App_Screenshot_Captured_Callback callback, void* user_data);
 
 /**
  * Returns the evas image object for the cache image specified in url.

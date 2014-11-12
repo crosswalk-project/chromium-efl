@@ -94,6 +94,21 @@ class WebViewEvasEventHandler;
 class PolicyDecision;
 }
 
+class WebAppScreenshotCapturedCallback : public base::RefCounted<WebAppScreenshotCapturedCallback> {
+ public:
+      WebAppScreenshotCapturedCallback(tizen_webview::Web_App_Screenshot_Captured_Callback func, void *user_data, Evas* canvas)
+          : func_(func), user_data_(user_data), canvas_(canvas) {}
+  void Run(Evas_Object* image) {
+    if (func_ != NULL)
+      (func_)(image, user_data_);
+  }
+
+ private:
+  tizen_webview::Web_App_Screenshot_Captured_Callback func_;
+  void *user_data_;
+  Evas* canvas_;
+};
+
 class EwkViewPlainTextGetCallback {
  public:
   EwkViewPlainTextGetCallback(tizen_webview::View_Plain_Text_Get_Callback callback,
@@ -309,6 +324,7 @@ class EWebView {
   Evas_Object* GetSnapshot(Eina_Rectangle rect);
   void set_policy_decision(tizen_webview::PolicyDecision* pr) { policy_decision_.reset(pr); }
   tizen_webview::PolicyDecision* get_policy_decision() const { return policy_decision_.get(); }
+  bool GetSnapshotAsync(Eina_Rectangle rect, Evas* canvas, tizen_webview::Web_App_Screenshot_Captured_Callback callback, void* user_data);
   void InvokePolicyResponseCallback(tizen_webview::PolicyDecision* policy_decision);
   void InvokePolicyNavigationCallback(content::RenderViewHost* rvh,
       NavigationPolicyParams params, bool* handled);
@@ -379,6 +395,7 @@ class EWebView {
   bool SetColorPickerColor(int r, int g, int b, int a);
   void InputPickerShow(
       tizen_webview::Input_Type input_type, double input_value);
+  void FindAndRunSnapshotCallback(Evas_Object* image, int snapshotId);
 
 #ifdef TIZEN_EDGE_EFFECT
   scoped_refptr<EdgeEffect> edgeEffect() { return edge_effect_; }
@@ -492,6 +509,7 @@ class EWebView {
   IDMap<WebApplicationIconUrlGetCallback, IDMapOwnPointer> web_app_icon_url_get_callback_map_;
   IDMap<WebApplicationIconUrlsGetCallback, IDMapOwnPointer> web_app_icon_urls_get_callback_map_;
   IDMap<WebApplicationCapableGetCallback, IDMapOwnPointer> web_app_capable_get_callback_map_;
+  IDMap< WebAppScreenshotCapturedCallback, IDMapOwnPointer> screen_capture_cb_map_;
   content::DevToolsDelegateEfl* inspector_server_;
 #ifdef TIZEN_EDGE_EFFECT
   scoped_refptr<EdgeEffect> edge_effect_;

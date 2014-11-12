@@ -312,6 +312,10 @@ Evas_Object* WebView::GetSnapshot(Eina_Rectangle rect) {
   return impl_->GetSnapshot(rect);
 }
 
+bool WebView::GetSnapshotAsync(Eina_Rectangle rect, Evas* canvas, Web_App_Screenshot_Captured_Callback callback, void* user_data) {
+  return impl_->GetSnapshotAsync(rect, canvas, callback, user_data);
+}
+
 void WebView::SetDrawsTransparentBackground(bool enabled) {
   return impl_->SetDrawsTransparentBackground(enabled);
 }

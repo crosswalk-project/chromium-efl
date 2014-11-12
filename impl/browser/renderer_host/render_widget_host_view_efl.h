@@ -139,7 +139,6 @@ class RenderWidgetHostViewEfl
 #endif
 
   virtual void AcceleratedSurfaceInitialized(int) override;
-
   virtual bool HasAcceleratedSurface(const gfx::Size&) override;
   virtual void GetScreenInfo(blink::WebScreenInfo*) override;
   virtual gfx::Rect GetBoundsInRootWindow() override;
@@ -177,6 +176,7 @@ class RenderWidgetHostViewEfl
   void OnDidHandleKeyEvent(const blink::WebInputEvent* input_event, bool processed);
   void GetSnapshotForRect(gfx::Rect& rect);
   void SetRectSnapshot(const SkBitmap& bitmap);
+  void GetSnapshotAsync(const gfx::Rect& snapshot_area, int request_id);
 #endif
 
   Evas* evas() const {
@@ -246,6 +246,7 @@ class RenderWidgetHostViewEfl
   void OnOrientationChangeEvent(int);
   void OnDidChangePageScaleFactor(double);
   void OnDidChangePageScaleRange(double, double);
+  void OnSnapshot(const std::vector<unsigned char> pixData, int snapshotId, const gfx::Size& size);
 
   void HandleTapLink(ui::GestureEvent* event);
 

@@ -1364,6 +1364,39 @@ void EWebView::SetLinkMagnifierEnabled(bool enabled) {
   web_contents_->GetRenderViewHost()->SyncRendererPrefs();
 }
 
+void EWebView::FindAndRunSnapshotCallback(Evas_Object* image, int snapshotId) {
+  WebAppScreenshotCapturedCallback* callback = screen_capture_cb_map_.Lookup(snapshotId);
+  if (!callback) {
+    return;
+  }
+  callback->Run(image);
+  screen_capture_cb_map_.Remove(snapshotId);
+}
+
+bool EWebView::GetSnapshotAsync(Eina_Rectangle rect, Evas* canvas, tizen_webview::Web_App_Screenshot_Captured_Callback callback, void* user_data) {
+ #ifdef OS_TIZEN
+  if (!rwhv())
+    return false;
+  int width = rect.w;
+  int height = rect.h;
+  int x = rect.x;
+  int y = rect.y;
+
+  if (width > rwhv()->GetViewBoundsInPix().width() - rect.x)
+    width = rwhv()->GetViewBoundsInPix().width() - rect.x;
+  if (height > rwhv()->GetViewBoundsInPix().height() - rect.y)
+    height = rwhv()->GetViewBoundsInPix().height() - rect.y;
+
+  WebAppScreenshotCapturedCallback* cb = new WebAppScreenshotCapturedCallback(callback, user_data, canvas);
+
+  int cbId = screen_capture_cb_map_.Add(cb);
+
+  gfx::Rect rect1(x, y, width, height);
+  rwhv()->GetSnapshotAsync(gfx::Rect(x, y, width, height), cbId);
+  return true;
+#endif
+}
+
 void EWebView::GetSnapShotForRect(gfx::Rect& rect) {
 #ifdef OS_TIZEN
   rwhv()->GetSnapshotForRect(rect);

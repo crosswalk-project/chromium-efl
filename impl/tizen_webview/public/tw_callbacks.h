@@ -40,6 +40,14 @@ typedef void (*Web_App_Capable_Get_Callback)(Eina_Bool capable, void* user_data)
 typedef void (*Web_App_Icon_URL_Get_Callback)(const char* icon_url, void* user_data);
 
 /**
+ * Callback for ewk_view_screenshot_contents_get_async
+ *
+ * @param image captured screenshot
+ * @param user_data user_data will be passsed when ewk_view_screenshot_contents_get_async is called
+ */
+typedef void (*Web_App_Screenshot_Captured_Callback)(Evas_Object* image, void* user_data);
+
+/**
  * Callback for ewk_view_web_app_icon_urls_get.
  *
  * @param icon_urls list of Ewk_Web_App_Icon_Data for web app

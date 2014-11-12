@@ -147,6 +147,7 @@ class WebView {
   // > View Snapshot
   // Get snapshot for given |rect|. Return a new created Evas_Object.
   Evas_Object* GetSnapshot(Eina_Rectangle rect);
+  bool GetSnapshotAsync(Eina_Rectangle rect, Evas* canvas, Web_App_Screenshot_Captured_Callback callback, void* user_data);
   // > View Misc.
   void SetDrawsTransparentBackground(bool enabled);
 

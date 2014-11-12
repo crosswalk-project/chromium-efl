@@ -21,6 +21,7 @@
 #include "browser/renderer_host/web_event_factory_efl.h"
 #include "browser/sound_effect.h"
 #include "content/browser/gpu/browser_gpu_channel_host_factory.h"
+#include "content/browser/gpu/compositor_util.h"
 #include "content/browser/renderer_host/render_widget_host_impl.h"
 #include "content/browser/renderer_host/ui_events_helper.h"
 #include "content/browser/renderer_host/event_with_latency_info.h"
@@ -431,6 +432,7 @@ bool RenderWidgetHostViewEfl::OnMessageReceived(const IPC::Message& message) {
     IPC_MESSAGE_HANDLER(ViewHostMsg_TextInputInFormStateChanged, OnTextInputInFormStateChanged)
 #if defined(OS_TIZEN)
     IPC_MESSAGE_HANDLER(InputHostMsg_DidHandleKeyEvent, OnDidHandleKeyEvent)
+    IPC_MESSAGE_HANDLER(ViewHostMsg_SnapshotDataReceived, OnSnapshot)
 #endif
     IPC_MESSAGE_UNHANDLED(handled = false)
   IPC_END_MESSAGE_MAP()
@@ -513,6 +515,14 @@ gfx::NativeView RenderWidgetHostViewEfl::GetNativeView() const {
   // We don't have that so make sure nobody calls this.
   // NOTREACHED();
   return gfx::NativeView();
+}
+
+void RenderWidgetHostViewEfl::OnSnapshot(const std::vector<unsigned char> pixData, int snapshotId, const gfx::Size& size) {
+    Evas_Object* image = evas_object_image_filled_add(evas_);
+    evas_object_image_size_set(image, size.width(), size.height());
+    evas_object_image_data_copy_set(image, const_cast<unsigned char*>(&pixData[0]));
+
+    web_view_->FindAndRunSnapshotCallback(image, snapshotId);
 }
 
 gfx::NativeViewId RenderWidgetHostViewEfl::GetNativeViewId() const {
@@ -770,10 +780,19 @@ void RenderWidgetHostViewEfl::CopyFromCompositingSurface(
   const gfx::Size& /* dst_size */,
   const base::Callback<void(bool, const SkBitmap&)>& callback,
   const SkColorType color_type) {
-  // FIXME: should find a way to do it effectively.
-#warning "[M37] host_ does not have GetSnapshotFromRenderer function anymore"
-  // host_->GetSnapshotFromRenderer(src_subrect, callback);
+
 }
+
+#if defined(OS_TIZEN)
+void RenderWidgetHostViewEfl::GetSnapshotAsync(const gfx::Rect& snapshot_area, int request_id) {
+  if (!IsDelegatedRendererEnabled())
+    Send(new ViewMsg_GetSnapshotFromRender(host_->GetRoutingID(), snapshot_area, request_id));
+  else {
+    //TODO: Add alternative way after porting delegated rendering
+    NOTIMPLEMENTED();
+  }
+}
+#endif
 
 // CopyFromCompositingSurfaceToVideoFrame implementation borrowed from Aura port
 bool RenderWidgetHostViewEfl::CanSubscribeFrame() const {
