@@ -58,6 +58,10 @@ if echo "$@" | grep -cq '\-\-build-ewk-unittests'; then
   BUILD_EWK_UNITTESTS=1
 fi
 
+if echo "$@" | grep -cq '\-\-content_shell'; then
+  BUILD_CONTENT_SHELL=1
+fi
+
 JHBUILD_STAMPFILE="${GYP_GENERATOR_OUTPUT}/Dependencies/Root/jhbuild.stamp"
 
 shouldForceJHBuild() {
@@ -122,6 +126,10 @@ if [ "$SKIP_NINJA" == "0" ]; then
   TARGETS="chromium-efl efl_webprocess chromium-ewk efl_webview_app"
   if [ "$BUILD_EWK_UNITTESTS" == "1" ]; then
     TARGETS="$TARGETS ewk_unittests"
+  fi
+
+  if [ "$BUILD_CONTENT_SHELL" == "1" ]; then
+    TARGETS="$TARGETS content_shell_efl"
   fi
 
   ninja -C ${GYP_GENERATOR_OUTPUT}/${BUILD_SUBDIRECTORY} ${JOBS} ${TARGETS}

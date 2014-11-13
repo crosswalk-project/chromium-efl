@@ -517,5 +517,49 @@
       'chromium-efl',
     ],
   },
+  {
+    'target_name': 'content_shell_efl',
+    'type': 'executable',
+    'dependencies': [
+      'chromium-efl-deps.gyp:efl',
+      'theme/theme.gyp:tizen_theme',
+      '<(chrome_src_dir)/content/content_shell_and_tests.gyp:content_shell_lib',
+      '<(chrome_src_dir)/content/content_shell_and_tests.gyp:content_shell_pak',
+      '<(chrome_src_dir)/breakpad/breakpad.gyp:minidump_stackwalk',
+      '<(chrome_src_dir)/breakpad/breakpad.gyp:dump_syms',
+      '<(chrome_src_dir)/tools/imagediff/image_diff.gyp:image_diff',
+      '<(chrome_src_dir)/base/allocator/allocator.gyp:allocator',
+      '<(chrome_src_dir)/sandbox/sandbox.gyp:sandbox',
+      'chromium-efl',
+    ],
+    'sources': [
+      'shell/shell_efl.cc',
+      'shell/shell_main.cc',
+      'shell/shell_web_contents_view_delegate_efl.cc',
+      'shell/message_pump_efl.h',
+      'shell/message_pump_efl.cc',
+    ],
+    'include_dirs': [
+      '.',
+    ],
+    'conditions': [
+      ['prebuilt_ld_gold_dir!=""', {
+        'ldflags': [
+          '-B<(prebuilt_ld_gold_dir)',
+        ],
+      } , { # prebuild_ld_gold_dir == ""
+        'ldflags': [
+          # Building the RPM in the GBS chroot fails with errors such as
+          # [  XXs] error: create archive failed on file /<path>/libchromium-efl.so: cpio: Bad magic
+          # [  XXs] RPM build errors:
+          # [  XXs]     create archive failed on file /<path>/libchromium-efl.so: cpio: Bad magic
+          # For now, work around it by passing a GNU ld-specific flag that optimizes the
+          # linker for memory usage.
+          # http://107.108.218.239/bugzilla/show_bug.cgi?id=6457
+          '-Wl,--no-keep-memory',
+        ],
+      }],
+    ],
+  },
   ],
 }

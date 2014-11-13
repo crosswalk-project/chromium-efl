@@ -286,7 +286,6 @@ EWebView::EWebView(tizen_webview::WebView* owner, tizen_webview::WebContext* con
       renderer_crashed_(false),
 #endif
       is_initialized_(false) {
-  context->GetImpl()->InitializeGLSharedContext(object);
 }
 
 void EWebView::Initialize() {
@@ -308,6 +307,7 @@ void EWebView::Initialize() {
     contents_for_new_window_ = NULL;
   } else {
     WebContents::CreateParams params(context_->browser_context());
+    params.context = GetContentImageObject();
     web_contents_.reset(WebContents::Create(params));
   }
   web_contents_delegate_.reset(new WebContentsDelegateEfl(this));

@@ -10,6 +10,10 @@
 #include "content/browser/renderer_host/render_view_host_delegate_view.h"
 #include "content/browser/web_contents/web_contents_view.h"
 
+#include <Evas.h>
+
+class EWebView;
+
 namespace content {
 
 class WebContents;
@@ -59,8 +63,14 @@ class WebContentsViewEfl
 #endif
   void UpdateDragDest(RenderViewHost* host);
 
+private:
+  EWebView* GetEWebView() const;
+
   // Our optional views wrapper.
   scoped_ptr<WebContentsViewDelegate> delegate_;
+
+  // Native EFL widget responsible for handling input and drawing
+  Evas_Object* native_view_;
 
   WebDragDestDelegate* drag_dest_delegate_;
 

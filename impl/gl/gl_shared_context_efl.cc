@@ -4,6 +4,7 @@
 
 #include "gl/gl_shared_context_efl.h"
 
+#include "base/threading/thread_restrictions.h"
 #include "gpu/command_buffer/service/mailbox_manager_impl.h"
 #include "ui/gl/gl_context.h"
 #include "ui/gl/gl_share_group.h"
@@ -102,6 +103,7 @@ void GLSharedContextEfl::Initialize(Evas_Object* object) {
   if (GLSharedContextEflPrivate::instance().get())
     return;
 
+  base::ThreadRestrictions::ScopedAllowIO allow_io;
   GLSharedContextEflPrivate::instance() =
       new GLSharedContextEflPrivate(object);
 }

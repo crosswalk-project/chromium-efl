@@ -1,0 +1,5 @@
+#!/bin/sh
+exec @binary@ \
+    --use-gl=egl \
+    --no-sandbox \
+    "$@"

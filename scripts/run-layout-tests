@@ -1,0 +1,26 @@
+#!/bin/sh
+_script=$(readlink -f $0)
+_top_dir=$(dirname $_script)/..
+_runner=$_top_dir/src/third_party/WebKit/Tools/Scripts/run-webkit-tests
+_out="out.x64"
+
+echo $@ | grep -q \\-\\-help && $_runner --help
+
+echo $@ | grep -q \\-\\-debug
+[ $? -gt 0 ] && _mode="Release" || _mode="Debug"
+
+if [ ! -x $_top_dir/$_out/$_mode/content_shell_efl ]; then
+    echo "Please build content_shell_efl in $_mode mode first"
+    exit 1
+fi
+
+# The test runner expects driver binary to be called content_shell.
+ln -f $_top_dir/$_out/$_mode/content_shell_efl \
+      $_top_dir/$_out/$_mode/content_shell
+
+exec $_runner \
+    --build-directory=$_top_dir/out.x64 \
+    --additional-drt-flag=--no-sandbox \
+    --additional-drt-flag=--ignore-gpu-blacklist \
+    --additional-drt-flag=--use-gl=egl \
+    "$@"

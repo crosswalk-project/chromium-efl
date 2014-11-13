@@ -10,6 +10,7 @@
 #include "browser/renderer_host/render_widget_host_view_efl.h"
 #include "eweb_context.h"
 #include "eweb_view.h"
+#include "gl/gl_shared_context_efl.h"
 #include "web_contents_delegate_efl.h"
 #include "content/public/browser/web_contents_view_delegate.h"
 
@@ -27,6 +28,7 @@ WebContentsView* CreateWebContentsView(
 WebContentsViewEfl::WebContentsViewEfl(WebContents* contents,
     WebContentsViewDelegate* delegate)
     : delegate_(delegate)
+    , native_view_(NULL)
     , drag_dest_delegate_(NULL)
     , web_contents_(contents) {}
 
@@ -36,6 +38,8 @@ WebContentsViewEfl::WebContentsViewEfl(WebContents* contents,
 void WebContentsViewEfl::CreateView(const gfx::Size& initial_size,
                                     gfx::NativeView context) {
   requested_size_ = initial_size;
+  native_view_ = static_cast<Evas_Object*>(context);
+  GLSharedContextEfl::Initialize(native_view_);
 
   if (delegate_)
     drag_dest_delegate_ = delegate_->GetDragDestDelegate();
@@ -43,16 +47,8 @@ void WebContentsViewEfl::CreateView(const gfx::Size& initial_size,
 
 RenderWidgetHostViewBase* WebContentsViewEfl::CreateViewForWidget(
     RenderWidgetHost* render_widget_host, bool is_guest_view_hack) {
-  WebContentsDelegateEfl* delegate =
-      static_cast<WebContentsDelegateEfl*>(web_contents_->GetDelegate());
-  if (!delegate) {
-    // If web_contents_ was created internally we do not have our delegate
-    // set up yet. This is the case for popups. We will create
-    // RenderWidgetHostView and the delegate when EWebView is created.
-    return NULL;
-  }
-
-  RenderWidgetHostViewEfl* view = new RenderWidgetHostViewEfl(render_widget_host, delegate->web_view());
+  RenderWidgetHostViewEfl* view = new RenderWidgetHostViewEfl(render_widget_host, GetEWebView());
+  view->Init(native_view_);
   view->Show();
 
   return view;
@@ -60,15 +56,12 @@ RenderWidgetHostViewBase* WebContentsViewEfl::CreateViewForWidget(
 
 RenderWidgetHostViewBase* WebContentsViewEfl::CreateViewForPopupWidget(
     RenderWidgetHost* render_widget_host) {
-  WebContentsDelegateEfl* delegate =
-      static_cast<WebContentsDelegateEfl*>(web_contents_->GetDelegate());
-  return new RenderWidgetHostViewEfl(render_widget_host, delegate->web_view());
+  return new RenderWidgetHostViewEfl(render_widget_host, GetEWebView());
 }
 
 void WebContentsViewEfl::SetPageTitle(const base::string16& title) {
-  WebContentsDelegateEfl* delegate = static_cast<WebContentsDelegateEfl*>(web_contents_->GetDelegate());
-  if (delegate)
-    delegate->web_view()->SmartCallback<EWebViewCallbacks::TitleChange>().call(base::UTF16ToUTF8(title).c_str());
+  if (GetEWebView())
+    GetEWebView()->SmartCallback<EWebViewCallbacks::TitleChange>().call(base::UTF16ToUTF8(title).c_str());
 }
 
 void WebContentsViewEfl::UpdateDragDest(RenderViewHost* host) {
@@ -199,5 +192,18 @@ void WebContentsViewEfl::ShowPopupMenu(RenderFrameHost* render_frame_host,
   }
 }
 #endif
+
+EWebView* WebContentsViewEfl::GetEWebView() const {
+  // TODO: not best way, but until we merge 5486351bf10375c64ec997e613a2155ca3a24cc7
+  // this is the only way to make it work. Fixup ca5b85c82985e02ee7e908952ba894ef7b7d2a32
+  // should be merged too.
+  WebContentsDelegateEfl* delegate =
+      reinterpret_cast<WebContentsDelegateEfl*>(web_contents_->GetDelegate());
+
+  if (delegate)
+    return delegate->web_view();
+
+  return NULL;
+}
 
 } // namespace content

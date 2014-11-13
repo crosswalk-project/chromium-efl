@@ -230,7 +230,6 @@ bool EWebContext::ShouldOverrideMimeForURL(
 
 EWebContext::EWebContext(bool incognito)
     : m_pixmap(0),
-      initialized_(false),
       incognito_(incognito) {
   EwkGlobalData::Ensure();
 
@@ -238,15 +237,6 @@ EWebContext::EWebContext(bool incognito)
   // Notification Service gets init in BrowserMainRunner init,
   // so cache manager can register for notifications only after that.
   web_cache_manager_.reset(new WebCacheManagerEfl(browser_context_.get()));
-}
-
-void EWebContext::InitializeGLSharedContext(Evas_Object* object) {
-  if (initialized_)
-    return;
-
-  initialized_ = true;
-
-  GLSharedContextEfl::Initialize(object);
 }
 
 EWebContext::~EWebContext() {

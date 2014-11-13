@@ -18,6 +18,7 @@ Group: Applications/Internet
 License: LGPLv2.1 or BSD
 
 Source0: %{name}-%{version}.tar.gz
+Source1: content_shell.in
 
 Requires(post): /sbin/ldconfig
 Requires(post): xkeyboard-config
@@ -108,6 +109,15 @@ Group: Development/Libraries
 Requires: %{name} = %{version}-%{release}
 %description devel
 Browser Engine dev library based on Chromium EFL (developement files)
+
+%if 0%{?_enable_content_shell}
+%package shell
+Summary: Chromium EFL port of content_shell application
+Group: Development/Libraries
+Requires: %{name} = %{version}-%{release}
+%description shell
+Chromium EFL version of content_shell application
+%endif
 
 %if 0%{?_enable_unittests}
 %package unittests
@@ -207,6 +217,9 @@ fi
 %endif
 
 build/prebuild/ninja %{_smp_mflags} -C"%{OUTPUT_FOLDER}" \
+%if 0%{?_enable_content_shell}
+  content_shell_efl \
+%endif
 %if 0%{?build_ewk_unittests}
   ewk_unittests \
 %endif
@@ -228,6 +241,7 @@ cp src/third_party/icu/android/icudtl.dat "%{OUTPUT_FOLDER}"
 
 %install
 install -d "%{buildroot}"%{_sysconfdir}/smack/accesses2.d
+install -d "%{buildroot}"%{_bindir}
 install -d "%{buildroot}"%{_bindir}
 install -d "%{buildroot}"%{_libdir}/pkgconfig
 install -d "%{buildroot}"%{_includedir}/chromium-ewk
@@ -258,6 +272,11 @@ install -m 0755 "%{OUTPUT_FOLDER}"/mini_browser      "%{buildroot}"%{_bindir}
 install -m 0644 "%{OUTPUT_FOLDER}"/pkgconfig/*.pc    "%{buildroot}"%{_libdir}/pkgconfig/
 install -m 0644 ewk/efl_integration/public/*.h                  "%{buildroot}"%{_includedir}/chromium-ewk/
 install -m 0644 src/v8/include/*.h "%{buildroot}"%{_includedir}/v8/
+
+%if 0%{?_enable_content_shell}
+install -m 0755 "%{OUTPUT_FOLDER}"/content_shell_efl "%{buildroot}%{CHROMIUM_EXE_DIR}"/content_shell
+sed 's#@binary@#%{CHROMIUM_EXE_DIR}/content_shell#' %{SOURCE1} > "%{buildroot}"%{_bindir}/content_shell
+%endif
 
 install -d "%{buildroot}"/opt/share/packages
 install -m 0644 ewk/efl_webview_app/chromium-efl.xml "%{buildroot}"/opt/share/packages
@@ -337,6 +356,13 @@ fi
 %{_includedir}/chromium-ewk/*.h
 %{_libdir}/pkgconfig/*.pc
 %{_includedir}/v8/*
+
+%if 0%{?_enable_content_shell}
+%files shell
+%defattr(0755,root,root,-)
+%{CHROMIUM_EXE_DIR}/content_shell
+%{_bindir}/content_shell
+%endif
 
 %if 0%{?_enable_unittests}
 %files unittests

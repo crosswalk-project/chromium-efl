@@ -187,8 +187,9 @@ class RenderWidgetHostViewEfl
   void set_magnifier(bool status);
 
   void Init_EvasGL(int width, int height);
+  void Init(Evas_Object* view);
 
-  void set_eweb_view(EWebView*);
+  void set_eweb_view(EWebView* webview) { web_view_ = webview; }
   EWebView* eweb_view() const { return web_view_; }
   RenderWidgetHostImpl* host() const { return host_; }
   IMContextEfl* im_context() const { return im_context_; }

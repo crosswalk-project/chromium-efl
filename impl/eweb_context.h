@@ -95,7 +95,6 @@ class EWebContext {
 
   void ClearCandidateData();
   void ClearPasswordData();
-  void InitializeGLSharedContext(Evas_Object* object);
 #if defined(OS_TIZEN_TV)
   FaviconDatabase* GetFaviconDatabase();
 #endif
@@ -113,7 +112,6 @@ class EWebContext {
   std::string proxy_uri_;
   scoped_ptr<EwkDidStartDownloadCallback> start_download_callback_;
   int m_pixmap;
-  bool initialized_;
   bool incognito_;
 };
 

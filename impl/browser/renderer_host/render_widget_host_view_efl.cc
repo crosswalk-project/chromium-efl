@@ -135,6 +135,27 @@ RenderWidgetHostViewEfl::RenderWidgetHostViewEfl(RenderWidgetHost* widget, EWebV
   }
 
   gesture_recognizer_->AddGestureEventHelper(this);
+}
+
+void RenderWidgetHostViewEfl::Init(Evas_Object* view) {
+  DCHECK(view);
+  content_image_ = view;
+  evas_ = evas_object_evas_get(view);
+
+  // IMContext calls evas() getter on 'this' so it needs to be
+  // initialized after evas_ is valid
+  im_context_ = IMContextEfl::Create(this);
+
+  if (is_hw_accelerated_) {
+    gfx::Rect bounds = GetViewBoundsInPix();
+    if (!bounds.IsEmpty()) {
+      Init_EvasGL(bounds.width(), bounds.height());
+    } else {
+      int w, h;
+      evas_object_image_size_get(content_image_, &w, &h);
+      Init_EvasGL(w, h);
+    }
+  }
 
 #if defined(OS_TIZEN_MOBILE)
   disambiguation_popup_.reset(new DisambiguationPopupEfl(content_image_, this));
@@ -393,26 +414,6 @@ void RenderWidgetHostViewEfl::Init_EvasGL(int width, int height) {
   m_IsEvasGLInit = 1;
 }
 
-void RenderWidgetHostViewEfl::set_eweb_view(EWebView* view) {
-  web_view_ = view;
-  evas_ = web_view_->GetEvas();
-  DCHECK(evas_);
-
-  content_image_ = web_view_->GetContentImageObject();
-  DCHECK(content_image_);
-
-  if (is_hw_accelerated_) {
-    gfx::Rect bounds = GetViewBoundsInPix();
-    if (bounds.width() == 0 && bounds.height() == 0) {
-      LOG(ERROR)<<"set_eweb_view -- view width and height set to '0' --> skip to configure evasgl";
-    } else {
-      Init_EvasGL(bounds.width(), bounds.height());
-    }
-  }
-
-  im_context_ = IMContextEfl::Create(this);
-}
-
 bool RenderWidgetHostViewEfl::OnMessageReceived(const IPC::Message& message) {
   bool handled = true;
   IPC_BEGIN_MESSAGE_MAP(RenderWidgetHostViewEfl, message)
@@ -444,7 +445,8 @@ bool RenderWidgetHostViewEfl::Send(IPC::Message* message) {
 }
 
 void RenderWidgetHostViewEfl::OnSelectionTextStyleState(const SelectionStylePrams& params) {
-  web_view_->OnQuerySelectionStyleReply(params);
+  if (web_view_)
+    web_view_->OnQuerySelectionStyleReply(params);
 }
 
 #if 0
@@ -577,12 +579,16 @@ void RenderWidgetHostViewEfl::WasHidden() {
 }
 
 void RenderWidgetHostViewEfl::Focus() {
-  web_view_->SetFocus(EINA_TRUE);
+  if (web_view_)
+    web_view_->SetFocus(EINA_TRUE);
   host_->Focus();
 }
 
 bool RenderWidgetHostViewEfl::HasFocus() const {
-  return web_view_->HasFocus();
+  if (web_view_)
+    return web_view_->HasFocus();
+
+  return evas_object_focus_get(content_image_) == EINA_TRUE;
 }
 
 void RenderWidgetHostViewEfl::MovePluginContainer(const WebPluginGeometry& move) {
@@ -657,7 +663,9 @@ void RenderWidgetHostViewEfl::OnTextInputStateChanged(
   if (im_context_) {
     im_context_->UpdateInputMethodState(params.type, params.can_compose_inline,
                                         params.show_ime_if_needed);
-    web_view_->QuerySelectionStyle();
+
+    if (web_view_)
+      web_view_->QuerySelectionStyle();
 
     // Obsolete TextInputTypeChanged was doing it in similar code block
     // Probably also required here
@@ -688,18 +696,22 @@ void RenderWidgetHostViewEfl::OnTextInputInFormStateChanged(bool is_in_form_tag)
 void RenderWidgetHostViewEfl::ImeCompositionRangeChanged(
   const gfx::Range& range,
   const std::vector<gfx::Rect>& character_bounds) {
-  SelectionControllerEfl* controller = web_view_->GetSelectionController();
-  if (controller) {
-    controller->SetCaretSelectionStatus(false);
-    controller->HideHandleAndContextMenu();
+  if (web_view_) {
+    SelectionControllerEfl* controller = web_view_->GetSelectionController();
+    if (controller) {
+      controller->SetCaretSelectionStatus(false);
+      controller->HideHandleAndContextMenu();
+    }
   }
 }
 
 void RenderWidgetHostViewEfl::FocusedNodeChanged(bool is_editable_node) {
-  SelectionControllerEfl* controller = web_view_->GetSelectionController();
-  if (controller) {
-    controller->SetCaretSelectionStatus(false);
-    controller->HideHandleAndContextMenu();
+  if (web_view_) {
+    SelectionControllerEfl* controller = web_view_->GetSelectionController();
+    if (controller) {
+      controller->SetCaretSelectionStatus(false);
+      controller->HideHandleAndContextMenu();
+    }
   }
 }
 
@@ -708,15 +720,18 @@ void RenderWidgetHostViewEfl::Destroy() {
 }
 
 void RenderWidgetHostViewEfl::SetTooltipText(const base::string16& text) {
-  web_view_->SmartCallback<EWebViewCallbacks::TooltipTextSet>().call(UTF16ToUTF8(text).c_str());
+  if (web_view_)
+    web_view_->SmartCallback<EWebViewCallbacks::TooltipTextSet>().call(UTF16ToUTF8(text).c_str());
 }
 
 void RenderWidgetHostViewEfl::SelectionChanged(const base::string16& text,
   size_t offset,
   const gfx::Range& range) {
-  SelectionControllerEfl* controller = web_view_->GetSelectionController();
-  if (controller)
-    controller->UpdateSelectionData(text);
+  if (web_view_) {
+    SelectionControllerEfl* controller = web_view_->GetSelectionController();
+    if (controller)
+      controller->UpdateSelectionData(text);
+  }
 }
 
 void RenderWidgetHostViewEfl::SelectionBoundsChanged(
@@ -735,7 +750,8 @@ void RenderWidgetHostViewEfl::SelectionBoundsChanged(
 
 void RenderWidgetHostViewEfl::DidStopFlinging() {
 #ifdef TIZEN_EDGE_EFFECT
-  web_view_->edgeEffect()->hide();
+  if (web_view_)
+    web_view_->edgeEffect()->hide();
 #endif
   // Unhide Selection UI when scrolling with fling gesture
   if (GetSelectionController() && GetSelectionController()->GetScrollStatus())
@@ -760,7 +776,8 @@ void RenderWidgetHostViewEfl::DispatchGestureEvent(ui::GestureEvent* event) {
 
 #ifdef OS_TIZEN
 void RenderWidgetHostViewEfl::SetRectSnapshot(const SkBitmap& bitmap) {
-  web_view_->UpdateMagnifierScreen(bitmap);
+  if (web_view_)
+    web_view_->UpdateMagnifierScreen(bitmap);
 }
 
 void RenderWidgetHostViewEfl::GetSnapshotForRect(gfx::Rect& rect) {
@@ -809,23 +826,26 @@ void RenderWidgetHostViewEfl::EndFrameSubscription() {
 
 #ifdef TIZEN_EDGE_EFFECT
 void RenderWidgetHostViewEfl::DidOverscroll(const DidOverscrollParams& params) {
-  const gfx::Vector2dF& accumulated_overscroll = params.accumulated_overscroll;
-  const gfx::Vector2dF& latest_overscroll_delta = params.latest_overscroll_delta;
+  if (web_view_) {
+    const gfx::Vector2dF& accumulated_overscroll = params.accumulated_overscroll;
+    const gfx::Vector2dF& latest_overscroll_delta = params.latest_overscroll_delta;
 
-  if (latest_overscroll_delta.x() < 0 && (int)accumulated_overscroll.x() < 0)
-    web_view_->edgeEffect()->show("edge,left");
-  if (latest_overscroll_delta.x() > 0 && (int)accumulated_overscroll.x() > 0)
-    web_view_->edgeEffect()->show("edge,right");
-  if (latest_overscroll_delta.y() < 0 && (int)accumulated_overscroll.y() < 0)
-    web_view_->edgeEffect()->show("edge,top");
-  if (latest_overscroll_delta.y() > 0 && (int)accumulated_overscroll.y() > 0)
-    web_view_->edgeEffect()->show("edge,bottom");
+    if (latest_overscroll_delta.x() < 0 && (int)accumulated_overscroll.x() < 0)
+      web_view_->edgeEffect()->show("edge,left");
+    if (latest_overscroll_delta.x() > 0 && (int)accumulated_overscroll.x() > 0)
+      web_view_->edgeEffect()->show("edge,right");
+    if (latest_overscroll_delta.y() < 0 && (int)accumulated_overscroll.y() < 0)
+      web_view_->edgeEffect()->show("edge,top");
+    if (latest_overscroll_delta.y() > 0 && (int)accumulated_overscroll.y() > 0)
+      web_view_->edgeEffect()->show("edge,bottom");
+  }
 }
 #endif
 
 #ifdef TIZEN_CONTENTS_DETECTION
 void RenderWidgetHostViewEfl::OnContentsDetected(const char* message) {
-  web_view_->ShowContentsDetectedPopup(message);
+  if (web_view_)
+    web_view_->ShowContentsDetectedPopup(message);
 }
 #endif
 
@@ -1045,7 +1065,8 @@ gfx::GLSurfaceHandle RenderWidgetHostViewEfl::GetCompositingSurface() {
 }
 
 void RenderWidgetHostViewEfl::ResizeCompositingSurface(const gfx::Size& size) {
-  web_view_->DidChangeContentsArea(size.width(), size.height());
+  if (web_view_)
+    web_view_->DidChangeContentsArea(size.width(), size.height());
 }
 
 void RenderWidgetHostViewEfl::RenderProcessGone(base::TerminationStatus, int error_code) {
@@ -1053,7 +1074,8 @@ void RenderWidgetHostViewEfl::RenderProcessGone(base::TerminationStatus, int err
   // It expects RenderWidgetHostView to delete itself.
   // We only inform |web_view_| that renderer has crashed.
   // and in "process,crashed" callback, app is expected to delete the view.
-  web_view_->set_renderer_crashed();
+  if (web_view_)
+    web_view_->set_renderer_crashed();
   Destroy();
 }
 
@@ -1096,19 +1118,19 @@ void RenderWidgetHostViewEfl::set_magnifier(bool status) {
 }
 
 void RenderWidgetHostViewEfl::HandleEvasEvent(const Evas_Event_Mouse_Down* event) {
-  host_->ForwardMouseEvent(WebEventFactoryEfl::toWebMouseEvent(web_view_->GetEvas(), web_view_->evas_object(), event, device_scale_factor_));
+  host_->ForwardMouseEvent(WebEventFactoryEfl::toWebMouseEvent(evas_, content_image_, event, device_scale_factor_));
 }
 
 void RenderWidgetHostViewEfl::HandleEvasEvent(const Evas_Event_Mouse_Up* event) {
-  host_->ForwardMouseEvent(WebEventFactoryEfl::toWebMouseEvent(web_view_->GetEvas(), web_view_->evas_object(), event, device_scale_factor_));
+  host_->ForwardMouseEvent(WebEventFactoryEfl::toWebMouseEvent(evas_, content_image_, event, device_scale_factor_));
 }
 
 void RenderWidgetHostViewEfl::HandleEvasEvent(const Evas_Event_Mouse_Move* event) {
-  host_->ForwardMouseEvent(WebEventFactoryEfl::toWebMouseEvent(web_view_->GetEvas(), web_view_->evas_object(), event, device_scale_factor_));
+  host_->ForwardMouseEvent(WebEventFactoryEfl::toWebMouseEvent(evas_, content_image_, event, device_scale_factor_));
 }
 
 void RenderWidgetHostViewEfl::HandleEvasEvent(const Evas_Event_Mouse_Wheel* event) {
-  host_->ForwardWheelEvent(WebEventFactoryEfl::toWebMouseEvent(web_view_->GetEvas(), web_view_->evas_object(), event, device_scale_factor_));
+  host_->ForwardWheelEvent(WebEventFactoryEfl::toWebMouseEvent(evas_, content_image_, event, device_scale_factor_));
 }
 
 void RenderWidgetHostViewEfl::HandleEvasEvent(const Evas_Event_Key_Down* event) {
@@ -1126,19 +1148,21 @@ void RenderWidgetHostViewEfl::HandleEvasEvent(const Evas_Event_Key_Down* event) 
     host_->WasHidden();
   }
 
+  if (web_view_) {
 #ifdef TIZEN_CONTENTS_DETECTION
-  if (!strcmp(event->key, "XF86Stop")) {
-    PopupControllerEfl* popup_controller = web_view_->GetPopupController();
-    if (popup_controller)
-      popup_controller->closePopup();
-  }
+    if (!strcmp(event->key, "XF86Stop")) {
+      PopupControllerEfl* popup_controller = web_view_->GetPopupController();
+      if (popup_controller)
+        popup_controller->closePopup();
+    }
 #endif
 
-  //if (!strcmp(event->key, "XF86Stop") || !strcmp(event->key, "BackSpace")) {
-  if (!strcmp(event->key, "BackSpace")) {
-    SelectionControllerEfl* controller = web_view_->GetSelectionController();
-    if (controller)
-      controller->HideHandleAndContextMenu();
+    //if (!strcmp(event->key, "XF86Stop") || !strcmp(event->key, "BackSpace")) {
+    if (!strcmp(event->key, "BackSpace")) {
+      SelectionControllerEfl* controller = web_view_->GetSelectionController();
+      if (controller)
+        controller->HideHandleAndContextMenu();
+    }
   }
 
   if (im_context_) {
@@ -1317,22 +1341,27 @@ void RenderWidgetHostViewEfl::HandleGesture(ui::GestureEvent* event) {
   } else if (event->type() == ui::ET_GESTURE_END) {
     // Gesture end event is received (1) After scroll end (2) After Fling start
 #ifdef TIZEN_EDGE_EFFECT
-    web_view_->edgeEffect()->hide();
+    if (web_view_)
+      web_view_->edgeEffect()->hide();
 #endif
   }
 #ifdef TIZEN_EDGE_EFFECT
   else if (event->type() == ui::ET_GESTURE_SCROLL_UPDATE) {
-    if (gesture.data.scrollUpdate.deltaX < 0)
-      web_view_->edgeEffect()->hide("edge,left");
-    else if (gesture.data.scrollUpdate.deltaX > 0)
-      web_view_->edgeEffect()->hide("edge,right");
-    if (gesture.data.scrollUpdate.deltaY < 0)
-      web_view_->edgeEffect()->hide("edge,top");
-    else if (gesture.data.scrollUpdate.deltaY > 0)
-      web_view_->edgeEffect()->hide("edge,bottom");
+    if (web_view_) {
+      if (gesture.data.scrollUpdate.deltaX < 0)
+        web_view_->edgeEffect()->hide("edge,left");
+      else if (gesture.data.scrollUpdate.deltaX > 0)
+        web_view_->edgeEffect()->hide("edge,right");
+      if (gesture.data.scrollUpdate.deltaY < 0)
+        web_view_->edgeEffect()->hide("edge,top");
+      else if (gesture.data.scrollUpdate.deltaY > 0)
+        web_view_->edgeEffect()->hide("edge,bottom");
+    }
   } else if (event->type() == ui::ET_GESTURE_PINCH_BEGIN) {
+    if (web_view_)
       web_view_->edgeEffect()->disable();
   } else if (event->type() == ui::ET_GESTURE_PINCH_END) {
+    if (web_view_)
       web_view_->edgeEffect()->enable();
   }
 #endif
@@ -1446,7 +1475,8 @@ void RenderWidgetHostViewEfl::OnWebAppIconUrlsGet(const std::map<std::string, st
 
 void RenderWidgetHostViewEfl::OnDidChangeContentsSize(int width, int height) {
   DCHECK(content::BrowserThread::CurrentlyOn(content::BrowserThread::UI));
-  web_view_->DidChangeContentsSize(width, height);
+  if (web_view_)
+    web_view_->DidChangeContentsSize(width, height);
   host_->ScrollFocusedEditableNodeIntoRect(gfx::Rect(0, 0, 0, 0));
 
   if (is_hw_accelerated_ && !m_IsEvasGLInit)
@@ -1491,7 +1521,10 @@ void RenderWidgetHostViewEfl::OnDidChangePageScaleRange(double min_scale, double
 }
 
 SelectionControllerEfl* RenderWidgetHostViewEfl::GetSelectionController() {
-  return web_view_->GetSelectionController();
+  if (web_view_)
+    return web_view_->GetSelectionController();
+
+  return NULL;
 }
 
 void RenderWidgetHostViewEfl::SetComposition(const ui::CompositionText& composition_text) {
