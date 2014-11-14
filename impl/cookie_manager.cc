@@ -44,7 +44,7 @@ void TriggerHostPolicyGetCallbackAsyncOnUIThread(tizen_webview::Cookie_Accept_Po
                                                  void *data) {
   DCHECK(BrowserThread::CurrentlyOn(BrowserThread::UI));
   if (callback)
-    (*callback)(policy, NULL, data);
+    (*callback)(policy, data);
 }
 
 }

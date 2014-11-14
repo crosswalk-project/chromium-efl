@@ -50,8 +50,8 @@ void ewk_cookie_manager_accept_policy_set(Ewk_Cookie_Manager* manager,
   cookie_manager->SetCookiePolicy(chromium_glue::to(policy));
 }
 
-void ewk_cookie_manager_async_accept_policy_get(const Ewk_Cookie_Manager* manager,
-                                                Ewk_Cookie_Manager_Async_Policy_Get_Cb callback,
+void ewk_cookie_manager_accept_policy_async_get(const Ewk_Cookie_Manager* manager,
+                                                Ewk_Cookie_Manager_Policy_Async_Get_Cb callback,
                                                 void* data)
 {
   EWK_COOKIE_MANAGER_GET_OR_RETURN(manager, cookie_manager);

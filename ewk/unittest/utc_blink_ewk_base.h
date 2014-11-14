@@ -91,7 +91,8 @@ public:
       NoOp = 0,
       Success,
       Failure,
-      LoadFailure
+      LoadFailure,
+      Timeout
     };
 protected:
     class evas_object_smart_callback_auto
@@ -148,6 +149,8 @@ protected:
      * @retval MainLoopResult::NoOp if event loop is already running.
      *         MainLoopResult::Success if event loop was stopped normally.
      *         MainLoopResult::Failure if stopped abnormally.
+     *         MainLoopResult::LoadFailure if "load,error" smart callback was invoked.
+     *         MainLoopResult::Timeout if max_time was reached.
      */
     MainLoopResult EventLoopStart(double max_time = 30.0);
 
