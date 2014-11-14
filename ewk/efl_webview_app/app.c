@@ -127,7 +127,8 @@ static void __ewk_view_plain_text_get_cb(Evas_Object* o, const char* content_tex
 static void __ewk_view_plain_text_get_cb_1(Evas_Object* o, const char* content_text, void* user_data);
 static void __load_started_cb(void *data, Evas_Object *obj, void *event_info);
 static void __text_style_state_changed_cb(void *data, Evas_Object *obj, void *event_info);
-static void __ewk_cookie_manager_async_policy_get_cb(Ewk_Cookie_Accept_Policy policy, Ewk_Error *error, void *event_info);
+static void __ewk_cookie_manager_async_policy_get_cb(
+    Ewk_Cookie_Accept_Policy policy, void *event_info);
 static void __ewk_cookie_manager_async_hostnames_get_cb(Eina_List *hostnames, Ewk_Error *error, void *event_info);
 static void __back_forward_list_changed_cb(void *data, Evas_Object *obj, void *event_info);
 static Eina_Bool __mime_override_cb(const char* url, const char *mime, char **new_mime);
@@ -209,7 +210,7 @@ static void on_key_down(void *data, Evas *e, Evas_Object *obj, void *event_info)
         printf("current text zoom level %lf\n", ewk_view_text_zoom_get(view));
     }
     else if (!strcmp(ev->key, "F4")) {
-    	ewk_view_command_execute(view, "Undo", NULL);
+      ewk_view_command_execute(view, "Undo", NULL);
     }
     else if (!strcmp(ev->key, "F5")) {
         printf("selection text \"%s\"\n", ewk_view_text_selection_text_get(view));
@@ -242,7 +243,7 @@ static void on_key_down(void *data, Evas *e, Evas_Object *obj, void *event_info)
             printf("\nEWK_VIEW_PLAIN_TEXT_GET_1 SUCCESS\n");
     }
     else if (!strcmp(ev->key, "F11")) {
-    	ewk_view_command_execute(view, "Redo", NULL);
+      ewk_view_command_execute(view, "Redo", NULL);
     }
     else if (evas_key_modifier_is_set(ev->modifiers, "Control")) {
         if (!strcmp(ev->key, "f") || !strcmp(ev->key, "F"))
@@ -496,8 +497,9 @@ int main(int argc, char** argv)
   evas_object_smart_callback_add(view, "console,message", __console_message_cb, 0);
 
   if(test_cookie) {
-  	set_cookie_policy = EWK_COOKIE_ACCEPT_POLICY_NEVER;
-  	ewk_cookie_manager_accept_policy_set(ewk_context_cookie_manager_get(context), set_cookie_policy);
+    set_cookie_policy = EWK_COOKIE_ACCEPT_POLICY_NEVER;
+    ewk_cookie_manager_accept_policy_set(ewk_context_cookie_manager_get(context),
+                                         set_cookie_policy);
   }
 
   set_url_from_user_input(view, start_url);
@@ -562,25 +564,25 @@ const char* printCookiePolicy(Ewk_Cookie_Accept_Policy policy)
 {
   switch(policy) {
     case EWK_COOKIE_ACCEPT_POLICY_ALWAYS :
-	    return (" Accept Always ");
-	  case EWK_COOKIE_ACCEPT_POLICY_NEVER :
-	    return (" Accept Never ");
-	  case EWK_COOKIE_ACCEPT_POLICY_NO_THIRD_PARTY :
-	    return (" No third party ");
-	}
+      return (" Accept Always ");
+    case EWK_COOKIE_ACCEPT_POLICY_NEVER :
+      return (" Accept Never ");
+    case EWK_COOKIE_ACCEPT_POLICY_NO_THIRD_PARTY :
+      return (" No third party ");
+  }
   return ("");
 }
 
-void __ewk_cookie_manager_async_policy_get_cb(Ewk_Cookie_Accept_Policy policy, Ewk_Error *error, void *event_info)
-{
+void __ewk_cookie_manager_async_policy_get_cb(Ewk_Cookie_Accept_Policy policy,
+                                              void *event_info) {
   printf ("APP.C callback called __ewk_cookie_manager_async_policy_get_cb \n");
   if (set_cookie_policy != policy) {
-  	printf("error in setting cookie policy");
+    printf("error in setting cookie policy");
   }
   else {
     Ewk_Context* context = ewk_context_default_get();
-  	printf("APP.C cookie policy is set properly:%s\n", printCookiePolicy(policy));
-  	printf("APP.c calling ewk_cookie_manager_async_hostnames_with_cookies_get\n");
+    printf("APP.C cookie policy is set properly:%s\n", printCookiePolicy(policy));
+    printf("APP.c calling ewk_cookie_manager_async_hostnames_with_cookies_get\n");
     ewk_cookie_manager_async_hostnames_with_cookies_get(ewk_context_cookie_manager_get(context),
                                                         __ewk_cookie_manager_async_hostnames_get_cb,
                                                         NULL);
@@ -595,11 +597,12 @@ void __load_finished_cb(void *data, Evas_Object *obj, void *event_info)
     ewk_context_cache_clear((Ewk_Context*)data);
 
   if(test_cookie) {
-  	printf("calling get cookie policy async\n");
+    printf("calling get cookie policy async\n");
     Ewk_Context* context = ewk_context_default_get();
-  	ewk_cookie_manager_async_accept_policy_get(ewk_context_cookie_manager_get(context),
-  												                     __ewk_cookie_manager_async_policy_get_cb,
-  												                     NULL);
+    ewk_cookie_manager_accept_policy_async_get(
+        ewk_context_cookie_manager_get(context),
+        __ewk_cookie_manager_async_policy_get_cb,
+        NULL);
   }
 
 }

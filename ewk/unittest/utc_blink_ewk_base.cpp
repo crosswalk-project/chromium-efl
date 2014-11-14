@@ -232,7 +232,7 @@ Eina_Bool utc_blink_ewk_base::timeout_cb(void *data)
 
     if (!ut->TimeOut()) {
         utc_message("[timeout] :: not handled by test, stopping main loop with Failure");
-        ut->EventLoopStop(utc_blink_ewk_base::Failure);
+        ut->EventLoopStop(utc_blink_ewk_base::Timeout);
     }
 
     ut->timeout = NULL;

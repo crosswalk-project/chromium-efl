@@ -11,7 +11,7 @@ class utc_blink_ewk_cookie_manager_accept_policy_set : public utc_blink_ewk_base
 protected:
   Ewk_Cookie_Accept_Policy cookies_policy;
 
-  static void cookies_policy_get_cb(Ewk_Cookie_Accept_Policy policy, Ewk_Error *error, void *event_info)
+  static void cookies_policy_get_cb(Ewk_Cookie_Accept_Policy policy, void *event_info)
   {
     utc_blink_ewk_cookie_manager_accept_policy_set *owner = static_cast<utc_blink_ewk_cookie_manager_accept_policy_set*>(event_info);
     owner->cookies_policy = policy;
@@ -28,7 +28,7 @@ TEST_F(utc_blink_ewk_cookie_manager_accept_policy_set, POS_TEST1)
 
   Ewk_Cookie_Manager* cookieManager = ewk_context_cookie_manager_get(ewk_view_context_get(GetEwkWebView()));
   ewk_cookie_manager_accept_policy_set(cookieManager, EWK_COOKIE_ACCEPT_POLICY_NEVER);
-  ewk_cookie_manager_async_accept_policy_get(cookieManager, cookies_policy_get_cb, this);
+  ewk_cookie_manager_accept_policy_async_get(cookieManager, cookies_policy_get_cb, this);
 
   // Wait until callback finished.
   utc_blink_ewk_base::MainLoopResult main_result = EventLoopStart();
@@ -47,7 +47,7 @@ TEST_F(utc_blink_ewk_cookie_manager_accept_policy_set, POS_TEST2)
 
   Ewk_Cookie_Manager* cookieManager = ewk_context_cookie_manager_get(ewk_view_context_get(GetEwkWebView()));
   ewk_cookie_manager_accept_policy_set(cookieManager, EWK_COOKIE_ACCEPT_POLICY_ALWAYS);
-  ewk_cookie_manager_async_accept_policy_get(cookieManager, cookies_policy_get_cb, this);
+  ewk_cookie_manager_accept_policy_async_get(cookieManager, cookies_policy_get_cb, this);
 
   // Wait until callback finished.
   utc_blink_ewk_base::MainLoopResult main_result = EventLoopStart();
@@ -66,7 +66,7 @@ TEST_F(utc_blink_ewk_cookie_manager_accept_policy_set, POS_TEST3)
 
   Ewk_Cookie_Manager* cookieManager = ewk_context_cookie_manager_get(ewk_view_context_get(GetEwkWebView()));
   ewk_cookie_manager_accept_policy_set(cookieManager, EWK_COOKIE_ACCEPT_POLICY_NO_THIRD_PARTY);
-  ewk_cookie_manager_async_accept_policy_get(cookieManager, cookies_policy_get_cb, this);
+  ewk_cookie_manager_accept_policy_async_get(cookieManager, cookies_policy_get_cb, this);
 
   // Wait until callback finished.
   utc_blink_ewk_base::MainLoopResult main_result = EventLoopStart();
@@ -82,7 +82,7 @@ TEST_F(utc_blink_ewk_cookie_manager_accept_policy_set, POS_TEST3)
 TEST_F(utc_blink_ewk_cookie_manager_accept_policy_set, NEG_TEST1)
 {
   ewk_cookie_manager_accept_policy_set(NULL, EWK_COOKIE_ACCEPT_POLICY_NEVER);
-  ewk_cookie_manager_async_accept_policy_get(NULL, NULL, NULL);
+  ewk_cookie_manager_accept_policy_async_get(NULL, NULL, NULL);
 }
 
 /**
@@ -91,7 +91,7 @@ TEST_F(utc_blink_ewk_cookie_manager_accept_policy_set, NEG_TEST1)
 TEST_F(utc_blink_ewk_cookie_manager_accept_policy_set, NEG_TEST2)
 {
   ewk_cookie_manager_accept_policy_set(NULL, EWK_COOKIE_ACCEPT_POLICY_ALWAYS);
-  ewk_cookie_manager_async_accept_policy_get(NULL, NULL, NULL);
+  ewk_cookie_manager_accept_policy_async_get(NULL, NULL, NULL);
 }
 
 /**
@@ -100,5 +100,5 @@ TEST_F(utc_blink_ewk_cookie_manager_accept_policy_set, NEG_TEST2)
 TEST_F(utc_blink_ewk_cookie_manager_accept_policy_set, NEG_TEST3)
 {
   ewk_cookie_manager_accept_policy_set(NULL, EWK_COOKIE_ACCEPT_POLICY_NO_THIRD_PARTY);
-  ewk_cookie_manager_async_accept_policy_get(NULL, NULL, NULL);
+  ewk_cookie_manager_accept_policy_async_get(NULL, NULL, NULL);
 }

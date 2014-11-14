@@ -28,25 +28,28 @@ struct _Ewk_Error;
 
 class CookieManager 
   : public base::RefCountedThreadSafe<CookieManager> {
-public:
-  typedef void (*AsyncPolicyGetCb)(tizen_webview::Cookie_Accept_Policy, _Ewk_Error*, void *);
-	typedef void (*AsyncHostnamesGetCb)(Eina_List*, _Ewk_Error*, void *);
+ public:
+  typedef void (*AsyncPolicyGetCb)(tizen_webview::Cookie_Accept_Policy,
+                                   void *);
+  typedef void (*AsyncHostnamesGetCb)(Eina_List*, _Ewk_Error*, void *);
 
-  explicit CookieManager(content::URLRequestContextGetterEfl* request_context_getter);
+  explicit CookieManager(
+      content::URLRequestContextGetterEfl* request_context_getter);
   // Delete all cookies that match the specified parameters. If both |url| and
- 	// values |cookie_name| are specified all host and domain cookies matching
+  // values |cookie_name| are specified all host and domain cookies matching
   // both will be deleted. If only |url| is specified all host cookies (but not
-  // domain cookies) irrespective of path will be deleted. If |url| is empty all
-  // cookies for all hosts and domains will be deleted. This method must be
+  // domain cookies) irrespective of path will be deleted. If |url| is empty
+  // all cookies for all hosts and domains will be deleted. This method must be
   // called on the IO thread.
   void DeleteCookiesAsync(const std::string& url = std::string(),
                           const std::string& cookie_name = std::string());
   // Sets the directory path that will be used for storing cookie data. If
-  // |path| is empty data will be stored in memory only. Otherwise, data will be
-  // stored at the specified |path|. To persist session cookies (cookies without
-  // an expiry date or validity interval) set |persist_session_cookies| to true.
-  // Session cookies are generally intended to be transient and most Web browsers
-  // do not persist them. Returns false if cookies cannot be accessed.
+  // |path| is empty data will be stored in memory only. Otherwise, data will
+  // be stored at the specified |path|. To persist session cookies (cookies
+  // without an expiry date or validity interval) set |persist_session_cookies|
+  // to true. Session cookies are generally intended to be transient and most
+  // Web browsers do not persist them. Returns false if cookies cannot be
+  // accessed.
   void SetStoragePath(const std::string& path,
                       bool persist_session_cookies,
                       bool file_storage_type=true);
@@ -86,20 +89,20 @@ public:
   //This is synchronous call
   std::string GetCookiesForURL(const std::string& url);
 
-protected:
+ protected:
   friend class base::RefCountedThreadSafe<CookieManager>;
 
   ~CookieManager()
   {}
 
-private:
+ private:
   struct EwkGetHostCallback;
 
   // Deletes cookie having host name. This must be called in IO thread.
   void DeleteCookiesOnIOThread(const std::string& url,
-                 						   const std::string& cookie_name) ;
+                               const std::string& cookie_name) ;
   void SetStoragePathOnIOThread(const std::string& path,
-                						    bool persist_session_cookies,
+                                bool persist_session_cookies,
                                 bool file_storage_type);
   bool AllowCookies(const GURL& url,
                     const GURL& first_party_url,
