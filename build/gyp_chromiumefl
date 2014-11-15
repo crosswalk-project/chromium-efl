@@ -167,14 +167,17 @@ if __name__ == '__main__':
   if gbs_build:
     args.append("--no-parallel")
 
-  # for debug
-  print args
+  # TODO(b.kelemen): remove the condition once gyp_trunk.py has landed.
+  if os.path.exists(os.path.join(script_dir, 'gyp_trunk.py')):
+    # gyp_trunk works on sys.argv so we merge |args| back.
+    sys.argv = [sys.argv[0]] + args
 
+    import gyp_trunk
+    gyp_trunk.overwrite_arguments()
+    args = sys.argv[1:]
 
-  ###################################
 
   print 'Updating projects from gyp files...'
-  #sys.stdout.flush()
 
   # Off we go...
   sys.exit(gyp.main(args))
