@@ -226,6 +226,50 @@ void RenderWidgetHostViewEfl::initializeProgram() {
   GLuint fragmentShader = evas_gl_api_->glCreateShader(GL_FRAGMENT_SHADER);
   GL_CHECK_STATUS("fragment shader");
 
+  const GLfloat vertex_attributes[] = {
+      -1.0f, -1.0f, 0.0f, 0.0f, 0.0f,
+      -1.0f,  1.0f, 0.0f, 0.0f, 1.0f,
+       1.0f,  1.0f, 0.0f, 1.0f, 1.0f,
+       1.0f, -1.0f, 0.0f, 1.0f, 0.0f};
+
+  GL_CHECK(evas_gl_api_->glGenBuffers(1, &vertex_buffer_obj_));
+  GL_CHECK(evas_gl_api_->glBindBuffer(GL_ARRAY_BUFFER, vertex_buffer_obj_));
+  GL_CHECK(evas_gl_api_->glBufferData(GL_ARRAY_BUFFER,
+                                      sizeof(vertex_attributes),
+                                      vertex_attributes, GL_STATIC_DRAW));
+
+  const GLfloat vertex_attributes_270[] = {
+      -1.0f, -1.0f, 0.0f, 1.0f, 0.0f,
+      -1.0f,  1.0f, 0.0f, 0.0f, 0.0f,
+       1.0f,  1.0f, 0.0f, 0.0f, 1.0f,
+       1.0f, -1.0f, 0.0f, 1.0f, 1.0f};
+
+  GL_CHECK(evas_gl_api_->glGenBuffers(1, &vertex_buffer_obj_270_));
+  GL_CHECK(evas_gl_api_->glBindBuffer(GL_ARRAY_BUFFER, vertex_buffer_obj_270_));
+  GL_CHECK(evas_gl_api_->glBufferData(GL_ARRAY_BUFFER,
+                                      sizeof(vertex_attributes_270),
+                                      vertex_attributes_270, GL_STATIC_DRAW));
+
+  const GLfloat vertex_attributes_90[] = {
+      -1.0f, -1.0f, 0.0f, 0.0f, 1.0f,
+      -1.0f,  1.0f, 0.0f, 1.0f, 1.0f,
+       1.0f,  1.0f, 0.0f, 1.0f, 0.0f,
+       1.0f, -1.0f, 0.0f, 0.0f, 0.0f};
+
+  GL_CHECK(evas_gl_api_->glGenBuffers(1, &vertex_buffer_obj_90_));
+  GL_CHECK(evas_gl_api_->glBindBuffer(GL_ARRAY_BUFFER, vertex_buffer_obj_90_));
+  GL_CHECK(evas_gl_api_->glBufferData(GL_ARRAY_BUFFER,
+                                      sizeof(vertex_attributes_90),
+                                      vertex_attributes_90, GL_STATIC_DRAW));
+
+  const GLushort index_attributes[] = {0, 1, 2, 0, 2, 3};
+  GL_CHECK(evas_gl_api_->glGenBuffers(1, &index_buffer_obj_));
+  GL_CHECK(
+      evas_gl_api_->glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, index_buffer_obj_));
+  GL_CHECK(evas_gl_api_->glBufferData(GL_ELEMENT_ARRAY_BUFFER,
+                                      sizeof(index_attributes),
+                                      index_attributes, GL_STATIC_DRAW));
+
   GL_CHECK(evas_gl_api_->glShaderSource(vertexShader, 1, &vertexShaderSourceProgram, 0));
   GL_CHECK(evas_gl_api_->glShaderSource(fragmentShader, 1, &fragmentShaderSourceProgram, 0));
   GL_CHECK(program_id_ = evas_gl_api_->glCreateProgram());
@@ -257,52 +301,36 @@ void RenderWidgetHostViewEfl::PaintTextureToSurface(GLuint texture_id) {
   GL_CHECK(gl_api->glClear(GL_COLOR_BUFFER_BIT));
   GL_CHECK(gl_api->glUseProgram(program_id_));
 
-  const GLfloat* vertex_attributes;
-
-  const GLfloat vertex_attributes_270[] = {
-      -1.0f, -1.0f, 0.0f, 1.0f, 0.0f,
-      -1.0f,  1.0f, 0.0f, 0.0f, 0.0f,
-       1.0f,  1.0f, 0.0f, 0.0f, 1.0f,
-       1.0f, -1.0f, 0.0f, 1.0f, 1.0f};
-
-  const GLfloat vertex_attributes_90[] = {
-      -1.0f, -1.0f, 0.0f, 0.0f, 1.0f,
-      -1.0f,  1.0f, 0.0f, 1.0f, 1.0f,
-       1.0f,  1.0f, 0.0f, 1.0f, 0.0f,
-       1.0f, -1.0f, 0.0f, 0.0f, 0.0f};
-
-  const GLfloat vertex_attributes_0[] = {
-      -1.0f, -1.0f, 0.0f, 0.0f, 0.0f,
-      -1.0f,  1.0f, 0.0f, 0.0f, 1.0f,
-       1.0f,  1.0f, 0.0f, 1.0f, 1.0f,
-       1.0f, -1.0f, 0.0f, 1.0f, 0.0f};
-
   current_orientation_ = ecore_evas_rotation_get(ecore_evas_ecore_evas_get(evas_));
 
   switch (current_orientation_) {
     case 270:
-      vertex_attributes = vertex_attributes_270;
+      GL_CHECK(gl_api->glBindBuffer(GL_ARRAY_BUFFER, vertex_buffer_obj_270_));
       break;
     case 90:
-      vertex_attributes = vertex_attributes_90;
+      GL_CHECK(gl_api->glBindBuffer(GL_ARRAY_BUFFER, vertex_buffer_obj_90_));
       break;
     default:
-      vertex_attributes = vertex_attributes_0;
+      GL_CHECK(gl_api->glBindBuffer(GL_ARRAY_BUFFER, vertex_buffer_obj_));
   } // switch(current_orientation_)
 
-  const GLushort indices[] = {0, 1, 2, 0, 2, 3};
-
-  GL_CHECK(gl_api->glVertexAttribPointer(position_attrib_, 3, GL_FLOAT,
-      GL_FALSE, 5 * sizeof(GLfloat), vertex_attributes));
-  GL_CHECK(gl_api->glVertexAttribPointer(texcoord_attrib_, 2, GL_FLOAT,
-      GL_FALSE, 5 * sizeof(GLfloat), &vertex_attributes[3]));
-
   GL_CHECK(gl_api->glEnableVertexAttribArray(position_attrib_));
+  // Below 5 * sizeof(GLfloat) value specifies the size of a vertex
+  // attribute (x, y, z, u, v).
+  GL_CHECK(gl_api->glVertexAttribPointer(position_attrib_, 3, GL_FLOAT,
+                                         GL_FALSE, 5 * sizeof(GLfloat), NULL));
   GL_CHECK(gl_api->glEnableVertexAttribArray(texcoord_attrib_));
+  // Below 3 * sizeof(GLfloat) value specifies the location of texture
+  // coordinate in the vertex.
+  GL_CHECK(gl_api->glVertexAttribPointer(texcoord_attrib_, 2, GL_FLOAT,
+                                         GL_FALSE, 5 * sizeof(GLfloat),
+                                         (void*)(3 * sizeof(GLfloat))));
+  GL_CHECK(gl_api->glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, index_buffer_obj_));
+
   GL_CHECK(gl_api->glActiveTexture(GL_TEXTURE0));
   GL_CHECK(gl_api->glBindTexture(GL_TEXTURE_2D, texture_id));
   GL_CHECK(gl_api->glUniform1i(source_texture_location_, 0));
-  GL_CHECK(gl_api->glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_SHORT, indices));
+  GL_CHECK(gl_api->glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_SHORT, NULL));
 
   GL_CHECK(gl_api->glBindTexture(GL_TEXTURE_2D, 0));
   evas_gl_make_current(evas_gl_, 0, 0);

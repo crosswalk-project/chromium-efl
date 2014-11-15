@@ -336,7 +336,10 @@ class RenderWidgetHostViewEfl
   int surface_id_;
   bool is_hw_accelerated_;
   bool is_modifier_key_;
-
+  GLuint vertex_buffer_obj_;
+  GLuint vertex_buffer_obj_270_;
+  GLuint vertex_buffer_obj_90_;
+  GLuint index_buffer_obj_;
   typedef std::queue<int> KeyUpEventQueue;
   KeyUpEventQueue keyupev_queue_;
 
