@@ -6,7 +6,6 @@
 #define JAVA_SCRIPT_MODAL_DIALOG_EFL_H_
 
 #include "content/public/browser/javascript_dialog_manager.h"
-#include "content/public/common/javascript_message_type.h"
 #include <string>
 
 #include "base/strings/string16.h"
@@ -22,13 +21,13 @@ class WebContentsDelegateEfl;
 class JavaScriptModalDialogEfl {
 
  public:
-  JavaScriptModalDialogEfl(content::WebContents* web_contents,
-                           const GURL& origin_url,
-                           const std::string& accept_lang,
-                           content::JavaScriptMessageType javascript_message_type,
-                           const base::string16& message_text,
-                           const base::string16& default_prompt_text,
-                           const content::JavaScriptDialogManager::DialogClosedCallback& callback);
+  enum Type {
+    ALERT,
+    CONFIRM,
+    NAVIGATION,
+    PROMPT
+  };
+
   virtual ~JavaScriptModalDialogEfl();
   static void OkButtonHandlerForAlert(void *data, Evas_Object *obj, void *event_info);
   static void CancelButtonHandlerForAlert(void *data, Evas_Object *obj, void *event_info);
@@ -40,7 +39,7 @@ class JavaScriptModalDialogEfl {
   static JavaScriptModalDialogEfl* CreateDialog(content::WebContents* web_contents,
                            const GURL& origin_url,
                            const std::string& accept_lang,
-                           content::JavaScriptMessageType javascript_message_type,
+                           Type type,
                            const base::string16& message_text,
                            const base::string16& default_prompt_text,
                            const content::JavaScriptDialogManager::DialogClosedCallback& callback);
@@ -52,10 +51,18 @@ class JavaScriptModalDialogEfl {
   Evas_Object* popup_;
 
  private:
+  JavaScriptModalDialogEfl(content::WebContents* web_contents,
+                           const GURL& origin_url,
+                           const std::string& accept_lang,
+                           Type type,
+                           const base::string16& message_text,
+                           const base::string16& default_prompt_text,
+                           const content::JavaScriptDialogManager::DialogClosedCallback& callback);
+
   content::JavaScriptDialogManager::DialogClosedCallback callback_;
   GURL origin_url_;
   std::string accept_lang_;
-  content::JavaScriptMessageType javascript_message_type_;
+  Type type_;
   base::string16 message_text_;
   base::string16 default_prompt_text_;
   content::WebContentsDelegateEfl* web_contents_delegate_;

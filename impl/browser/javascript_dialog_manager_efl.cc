@@ -21,26 +21,19 @@ bool JavaScriptModalCallbacksData::Run(Evas_Object* obj, const char* message_tex
   switch (javascript_message_type_) {
     case content::JAVASCRIPT_MESSAGE_TYPE_ALERT: {
       if (alert_callback_)
-          return alert_callback_(obj, message_text, user_data_);
+        return alert_callback_(obj, message_text, user_data_);
       break;
     }
     case content::JAVASCRIPT_MESSAGE_TYPE_CONFIRM: {
       if (confirm_callback_)
-          return confirm_callback_(obj, message_text, user_data_);
+        return confirm_callback_(obj, message_text, user_data_);
       break;
     }
     case content::JAVASCRIPT_MESSAGE_TYPE_PROMPT: {
       if (prompt_callback_)
-          return prompt_callback_(obj, message_text, default_text, user_data_);
-      break;
-    }
-#if !defined(EWK_BRINGUP)
-    case content::JAVASCRIPT_MESSAGE_TYPE_NAVIGATION_PROMPT: {
-      if (prompt_callback_)
         return prompt_callback_(obj, message_text, default_text, user_data_);
       break;
     }
-#endif
   }
   return false;
 }
@@ -94,36 +87,46 @@ void JavaScriptDialogManagerEfl::RunJavaScriptDialog(content::WebContents* web_c
   DCHECK(BrowserThread::CurrentlyOn(BrowserThread::UI));
   DCHECK(web_contents);
   dialog_closed_callback_ = callback;
-  content::WebContentsDelegateEfl* web_contents_delegate =
+  content::WebContentsDelegateEfl* wcd =
       static_cast<content::WebContentsDelegateEfl*>(web_contents->GetDelegate());
-  web_contents_delegate->web_view()->SmartCallback<EWebViewCallbacks::PopupReplyWaitStart>().call(0);
+  wcd->web_view()->SmartCallback<EWebViewCallbacks::PopupReplyWaitStart>().call(0);
+  JavaScriptModalDialogEfl::Type type = JavaScriptModalDialogEfl::ALERT;
 
   if (javascript_message_type == content::JAVASCRIPT_MESSAGE_TYPE_ALERT) {
+    type = JavaScriptModalDialogEfl::ALERT;
     if (alert_callback_data_) {
-      if (!(alert_callback_data_->Run(web_contents_delegate->web_view()->evas_object(),
+      if (!(alert_callback_data_->Run(wcd->web_view()->evas_object(),
                                       UTF16ToUTF8(message_text).c_str(),
                                       NULL)))
         ExecuteDialogClosedCallBack(false, std::string());
     }
   }
   if (javascript_message_type == content::JAVASCRIPT_MESSAGE_TYPE_CONFIRM) {
+    type = JavaScriptModalDialogEfl::CONFIRM;
     if (confirm_callback_data_) {
-      if (!(confirm_callback_data_->Run(web_contents_delegate->web_view()->evas_object(),
+      if (!(confirm_callback_data_->Run(wcd->web_view()->evas_object(),
                                         UTF16ToUTF8(message_text).c_str(),
                                         NULL)))
         ExecuteDialogClosedCallBack(false, std::string());
     }
   }
   if (javascript_message_type == content::JAVASCRIPT_MESSAGE_TYPE_PROMPT) {
+    type = JavaScriptModalDialogEfl::PROMPT;
     if (prompt_callback_data_) {
-      if (!(prompt_callback_data_->Run(web_contents_delegate->web_view()->evas_object(),
+      if (!(prompt_callback_data_->Run(wcd->web_view()->evas_object(),
                                        UTF16ToUTF8(message_text).c_str(),
                                        UTF16ToUTF8(default_prompt_text).c_str())))
         ExecuteDialogClosedCallBack(false, std::string());
     }
   }
 
-  dialog_ = JavaScriptModalDialogEfl::CreateDialog(web_contents, origin_url, accept_lang, javascript_message_type, message_text, default_prompt_text, callback);
+  dialog_ = JavaScriptModalDialogEfl::CreateDialog(web_contents,
+                                                   origin_url,
+                                                   accept_lang,
+                                                   type,
+                                                   message_text,
+                                                   default_prompt_text,
+                                                   callback);
 }
 
 void JavaScriptDialogManagerEfl::SetAlertCallback(tizen_webview::View_JavaScript_Alert_Callback callback, void* user_data)
@@ -154,7 +157,19 @@ void JavaScriptDialogManagerEfl::RunBeforeUnloadDialog(content::WebContents* web
                                      const base::string16& message_text,
                                      bool is_reload,
                                      const DialogClosedCallback& callback) {
-#if !defined(EWK_BRINGUP)
-  RunJavaScriptDialog(web_contents, GURL(), std::string(), content::JAVASCRIPT_MESSAGE_TYPE_NAVIGATION_PROMPT, base::UTF8ToUTF16(std::string("Confirm Navigation")), message_text, callback, &is_reload);
-#endif
+  DCHECK(BrowserThread::CurrentlyOn(BrowserThread::UI));
+  DCHECK(web_contents);
+  dialog_closed_callback_ = callback;
+  content::WebContentsDelegateEfl* wcd =
+      static_cast<content::WebContentsDelegateEfl*>(web_contents->GetDelegate());
+  wcd->web_view()->SmartCallback<EWebViewCallbacks::PopupReplyWaitStart>().call(0);
+
+  dialog_ = JavaScriptModalDialogEfl::CreateDialog(
+    web_contents,
+    GURL(),
+    std::string(),
+    JavaScriptModalDialogEfl::NAVIGATION,
+    base::UTF8ToUTF16(std::string("Confirm Navigation")),
+    message_text,
+    callback);
 }
