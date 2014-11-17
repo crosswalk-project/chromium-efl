@@ -3,13 +3,20 @@
 // found in the LICENSE file.
 
 #include <memory>
+#include <libintl.h>
+#if defined(OS_TIZEN)
+#include <vconf/vconf.h>
+#endif
 
 #include "url/gurl.h"
+#include "paths_efl.h"
+#include "base/path_service.h"
 #include "content/public/renderer/render_thread.h"
 #include "content/public/renderer/render_view.h"
 #include "content/child/request_extra_data.h"
 #include "renderer/render_view_observer_efl.h"
 #include "content/public/renderer/content_renderer_client.h"
+#include "third_party/WebKit/public/platform/WebURLError.h"
 #include "third_party/WebKit/public/platform/WebURLRequest.h"
 #include "third_party/WebKit/public/web/WebDataSource.h"
 #include "third_party/WebKit/public/web/WebDocument.h"
@@ -148,4 +155,73 @@ unsigned long long ContentRendererClientEfl::VisitedLinkHash(const char* canonic
 
 bool ContentRendererClientEfl::IsLinkVisited(unsigned long long link_hash) {
   return visited_link_slave_->IsVisited(link_hash);
+}
+
+void ContentRendererClientEfl::GetNavigationErrorStrings(
+    content::RenderView* render_view,
+    blink::WebFrame* frame,
+    const blink::WebURLRequest& failed_request,
+    const blink::WebURLError& error,
+    std::string* error_html,
+    base::string16* error_description) {
+  if (error_html) {
+#if defined(OS_TIZEN)
+    base::FilePath locale_dir;
+    PathService::Get(PathsEfl::DIR_LOCALE, &locale_dir);
+
+    setlocale(LC_ALL, vconf_get_str(VCONFKEY_LANGSET));
+    bindtextdomain("WebKit", locale_dir.value().c_str());
+#endif
+
+    std::string errorHead = std::string(dgettext(
+        "WebKit", "IDS_WEBVIEW_HEADER_THIS_WEBPAGE_IS_NOT_AVAILABLE"));
+    std::string errorMessage = std::string(dgettext(
+        "WebKit",
+        "IDS_WEBVIEW_BODY_THE_SERVER_AT_PS_CANT_BE_FOUND_BECAUSE_THE_DNS_LOOK_UP_FAILED_MSG"));
+    errorMessage = base::StringPrintf(
+        errorMessage.c_str(), error.unreachableURL.string().utf8().c_str());
+
+    *error_html =
+      "<html>"
+        "<head>"
+          "<meta name='viewport' content='width=device-width,"
+          "initial-scale=1.0, user-scalable=no'>"
+          "<meta http-equiv='Content-Type' content='text/html; charset=UTF-8'>"
+          "<title>";
+    *error_html += error.unreachableURL.string().utf8();
+    *error_html +=
+          "</title>"
+          "<style type=text/css>"
+          "#body"
+          "{"
+          " background-color: #fff;"
+          " margin: 0;"
+          " padding: 0;"
+          "}"
+          "#Box"
+          "{"
+          " background: #fff;"
+          " width: 80%%;"
+          " min-width: 150px;"
+          " max-width: 750px;"
+          " margin: auto;"
+          " padding: 5px;"
+          " border: 1px solid #BFA3A3;"
+          " border-radius: 1px;"
+          " word-wrap:break-word"
+          "}"
+          "</style>"
+        "</head>"
+        "<body bgcolor=\"#CFCFCF\">"
+        "<div id=Box>"
+        "<h2 align=\"center\">";
+    *error_html += errorHead;
+    *error_html += "</h2></br>";
+    *error_html += errorMessage;
+    *error_html +=
+        "</div>"
+        "</body>"
+      "</html>"
+      ;
+  }
 }

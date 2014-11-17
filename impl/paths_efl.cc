@@ -10,6 +10,7 @@
 
 static const base::FilePath::CharType kDataPath[] = FILE_PATH_LITERAL(DATA_DIR);
 static const base::FilePath::CharType kExePath[] = FILE_PATH_LITERAL(EXE_DIR);
+static const base::FilePath::CharType kLocalePath[] = FILE_PATH_LITERAL(LOCALE_DIR);
 static const base::FilePath::CharType kWebDBPath[] = FILE_PATH_LITERAL(WEBDB_DIR);
 #ifdef OS_TIZEN
 static const base::FilePath::CharType kEdjeThemesDir[] = FILE_PATH_LITERAL("themes");
@@ -30,6 +31,9 @@ bool PathsEfl::GetPath(int key, base::FilePath* result)
 #ifdef OS_TIZEN
    case base::DIR_EXE:
       *result = base::FilePath(kExePath);
+      return true;
+    case DIR_LOCALE:
+      *result = base::FilePath(kLocalePath);
       return true;
     case EDJE_RESOURCE_DIR:
       *result = base::FilePath(kDataPath).Append(kEdjeThemesDir);
