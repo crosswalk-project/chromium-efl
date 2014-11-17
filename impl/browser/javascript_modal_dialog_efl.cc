@@ -10,21 +10,19 @@
 #include "paths_efl.h"
 
 #ifdef OS_TIZEN_MOBILE
-#include <dlfcn.h>
 #include <efl_assist.h>
-extern void* EflAssistHandle;
 #endif
 
 //static
 JavaScriptModalDialogEfl* JavaScriptModalDialogEfl::CreateDialog(content::WebContents* web_contents,
                            const GURL& origin_url,
                            const std::string& accept_lang,
-                           content::JavaScriptMessageType javascript_message_type,
+                           Type type,
                            const base::string16& message_text,
                            const base::string16& default_prompt_text,
                            const content::JavaScriptDialogManager::DialogClosedCallback& callback) {
   JavaScriptModalDialogEfl* dialog = new JavaScriptModalDialogEfl(web_contents,
-      origin_url, accept_lang, javascript_message_type, message_text, default_prompt_text, callback);
+      origin_url, accept_lang, type, message_text, default_prompt_text, callback);
   if (!dialog->ShowJavaScriptDialog()) {
     delete dialog;
     dialog = NULL;
@@ -35,14 +33,14 @@ JavaScriptModalDialogEfl* JavaScriptModalDialogEfl::CreateDialog(content::WebCon
 JavaScriptModalDialogEfl::JavaScriptModalDialogEfl(content::WebContents* web_contents,
                                                    const GURL& origin_url,
                                                    const std::string& accept_lang,
-                                                   content::JavaScriptMessageType javascript_message_type,
+                                                   Type type,
                                                    const base::string16& message_text,
                                                    const base::string16& default_prompt_text,
                                                    const content::JavaScriptDialogManager::DialogClosedCallback& callback)
     : callback_(callback)
     , origin_url_(origin_url)
     , accept_lang_(accept_lang)
-    , javascript_message_type_(javascript_message_type)
+    , type_(type)
     , message_text_(message_text)
     , default_prompt_text_(default_prompt_text)
     , web_contents_delegate_(NULL)
@@ -80,7 +78,7 @@ bool JavaScriptModalDialogEfl::ShowJavaScriptDialog() {
   if (!popup_)
     return false;
 
-  if (javascript_message_type_ == content::JAVASCRIPT_MESSAGE_TYPE_PROMPT) {
+  if (type_ == PROMPT) {
     if (message_text_.c_str())
       elm_object_part_text_set(popup_, "title,text", UTF16ToUTF8(message_text_).c_str());
 
@@ -119,8 +117,7 @@ bool JavaScriptModalDialogEfl::ShowJavaScriptDialog() {
     evas_object_focus_set(ok_button_, true);
     evas_object_smart_callback_add(ok_button_, "clicked", OkButtonHandlerForPrompt, this);
 
-#if !defined(EWK_BRINGUP)
-  } else if (javascript_message_type_ == content::JAVASCRIPT_MESSAGE_TYPE_NAVIGATION_PROMPT) {
+  } else if (type_ == NAVIGATION) {
     if (message_text_.c_str())
       elm_object_part_text_set(popup_, "title,text", UTF16ToUTF8(message_text_).c_str());
 
@@ -143,8 +140,7 @@ bool JavaScriptModalDialogEfl::ShowJavaScriptDialog() {
     elm_object_text_set(ok_button_, "Stay");
     elm_object_part_content_set(popup_, "button2", ok_button_);
     evas_object_smart_callback_add(ok_button_, "clicked", CancelButtonHandlerForPrompt, this);
-#endif
-  } else if (javascript_message_type_ == content::JAVASCRIPT_MESSAGE_TYPE_ALERT) {
+  } else if (type_ == ALERT) {
     if (!setLabelText(UTF16ToUTF8(message_text_).c_str()))
       return false;
 
@@ -154,7 +150,7 @@ bool JavaScriptModalDialogEfl::ShowJavaScriptDialog() {
     elm_object_part_content_set(popup_, "button1", ok_button_);
 
     evas_object_smart_callback_add(ok_button_, "clicked", OkButtonHandlerForAlert, this);
-  } else if(javascript_message_type_ == content::JAVASCRIPT_MESSAGE_TYPE_CONFIRM) {
+  } else if (type_ == CONFIRM) {
     if (!setLabelText(UTF16ToUTF8(message_text_).c_str()))
       return false;
 
@@ -171,20 +167,13 @@ bool JavaScriptModalDialogEfl::ShowJavaScriptDialog() {
     evas_object_smart_callback_add(ok_button_, "clicked", OkButtonHandlerForConfirm, this);
   }
 
-#ifdef OS_TIZEN_MOBILE
-  if (EflAssistHandle) {
-    void (*webkit_ea_object_event_callback_add)(Evas_Object *, Ea_Callback_Type , Ea_Event_Cb func, void *);
-    webkit_ea_object_event_callback_add = (void (*)(Evas_Object *, Ea_Callback_Type , Ea_Event_Cb func, void *))dlsym(EflAssistHandle, "ea_object_event_callback_add");
-#if !defined(EWK_BRINGUP)
-    if(javascript_message_type_ == content::JAVASCRIPT_MESSAGE_TYPE_PROMPT || javascript_message_type_ == content::JAVASCRIPT_MESSAGE_TYPE_NAVIGATION_PROMPT)
-      (*webkit_ea_object_event_callback_add)(popup_, EA_CALLBACK_BACK, CancelButtonHandlerForPrompt, this);
-    else 
-#endif
-    if(javascript_message_type_ == content::JAVASCRIPT_MESSAGE_TYPE_ALERT)
-      (*webkit_ea_object_event_callback_add)(popup_, EA_CALLBACK_BACK, CancelButtonHandlerForAlert, this);
-    else
-      (*webkit_ea_object_event_callback_add)(popup_, EA_CALLBACK_BACK, CancelButtonHandlerForConfirm, this);
-  }
+#if defined(OS_TIZEN_MOBILE)
+  if (type_ == PROMPT || type_ == NAVIGATION)
+    ea_object_event_callback_add(popup_, EA_CALLBACK_BACK, CancelButtonHandlerForPrompt, this);
+  else if (type_ == ALERT)
+    ea_object_event_callback_add(popup_, EA_CALLBACK_BACK, CancelButtonHandlerForAlert, this);
+  else
+    ea_object_event_callback_add(popup_, EA_CALLBACK_BACK, CancelButtonHandlerForConfirm, this);
 #endif
   evas_object_show(popup_);
   evas_object_focus_set(popup_, true);
@@ -252,9 +241,12 @@ void JavaScriptModalDialogEfl::javascriptPopupResizeCallback(void *data, Evas *e
 
 
 Evas_Object* JavaScriptModalDialogEfl::popupAdd() {
-  Evas_Object* parent = elm_object_top_widget_get(elm_object_parent_widget_get(webview_));
+  Evas_Object* parent = elm_object_parent_widget_get(webview_);
   if (!parent)
-    return 0;
+    parent = webview_;
+
+  if (Evas_Object* top = elm_object_top_widget_get(parent))
+    parent = top;
 
   widgetWin_ = elm_win_add(parent, "Blink JavaScript Popup", ELM_WIN_UTILITY);
   if (!widgetWin_)
