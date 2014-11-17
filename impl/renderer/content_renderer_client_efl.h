@@ -71,6 +71,14 @@ class ContentRendererClientEfl : public content::ContentRendererClient
                                const GURL& first_party_for_cookies,
                                GURL* new_url);
 
+  virtual void GetNavigationErrorStrings(
+      content::RenderView* render_view,
+      blink::WebFrame* frame,
+      const blink::WebURLRequest& failed_request,
+      const blink::WebURLError& error,
+      std::string* error_html,
+      base::string16* error_description) override;
+
   unsigned long long VisitedLinkHash(const char* canonical_url,
                                      size_t length) override;
 

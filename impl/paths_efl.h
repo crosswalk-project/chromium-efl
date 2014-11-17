@@ -16,6 +16,7 @@ class PathsEfl {
     PATH_START = 1000,
     EDJE_RESOURCE_DIR,
     WEB_DATABSE_DIR,
+    DIR_LOCALE,
     PATH_END
   };
 
