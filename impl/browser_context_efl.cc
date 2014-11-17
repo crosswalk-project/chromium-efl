@@ -153,8 +153,9 @@ void BrowserContextEfl::RebuildTable(const scoped_refptr<URLEnumerator>& enumera
 }
 
 SSLHostStateDelegate* BrowserContextEfl::GetSSLHostStateDelegate() {
-  // Pure method in BrowserContext class. Need implementation.
-  NOTIMPLEMENTED();
+  // SSLHostStateDelegate may be left unimplemented to use a default strategy of
+  // not remembering certificate decisions at all.
+  return NULL;
 }
 
 }
