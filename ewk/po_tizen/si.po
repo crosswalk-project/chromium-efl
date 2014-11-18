@@ -1,0 +1,234 @@
+msgid "IDS_BR_BODY_SAVE_LINK"
+msgstr "සැබැඳිය සුරකින්න"
+
+msgid "IDS_WEBVIEW_BODY_SHOWING_PD_ITEMS_TTS"
+msgstr "අයිතම %dක් දිස් වේ"
+
+msgid "IDS_WEBVIEW_HEADER_THIS_WEBPAGE_IS_NOT_AVAILABLE"
+msgstr "මෙම වෙබ් පිටුව ලද නොහැක."
+
+msgid "IDS_WEBVIEW_BODY_THE_SERVER_AT_PS_CANT_BE_FOUND_BECAUSE_THE_DNS_LOOK_UP_FAILED_MSG"
+msgstr "%s හි ඇති සේවාදායකය DNS සෙවීම අසාර්ථක බැවින් සොයාගත නොහැක. DNS යනු වෙබ් අඩවියක නම එහි අන්තර්ජාල ලිපිනය වෙත පරිවර්තනය කරන ජාල සේවාවයි. අන්තර්ජාලය වෙත සබැඳුමක් නැති වීමෙන් හෝ වැරදියට වින්‍යාස කළ ජාලයක් නිසා මෙම දෝෂය බොහෝ විට හට ගනී. එය ප්‍රතිචාර නොදක්වන DNS සේවාදායකයක් හෝ ජාලයට ප්‍රවේශ වීම වළක්වන සුරැකුම් පවුරක් මගින්ද හට ගත හැක."
+
+msgid "IDS_WEBVIEW_BODY_DETAILS"
+msgstr "විස්තර"
+
+msgid "IDS_WEBVIEW_BODY_DOUBLE_TAB_TO_EDIT_TTS"
+msgstr "සංස්කරණය කිරීමට ද්වි තට්ටු කරන්න."
+
+msgid "IDS_WEBVIEW_BODY_EDITING_TTS"
+msgstr "සංස්කරණය කරමින්."
+
+msgid "IDS_WEBVIEW_BODY_EDIT_FIELD__M_NOUN_TTS"
+msgstr "සංස්කරණ ක්ෂේත්‍රය"
+
+msgid "IDS_WEBVIEW_BODY_ENTER_AN_EMAIL_ADDRESS"
+msgstr "ඊමේල් ලිපිනයක් ඇතුළත් කරන්න."
+
+msgid "IDS_WEBVIEW_BODY_ENTER_A_LIST_OF_EMAIL_ADDRESSES_SEPARATED_BY_COMMAS"
+msgstr "කොමාවලින් වෙන් කරමින් ඊමේල් ලිපින ලැයිස්තුවක් ඇතුළත් කරන්න."
+
+msgid "IDS_WEBVIEW_BODY_ENTER_A_URL"
+msgstr "URL එකක් ඇතුළු කරන්න."
+
+msgid "IDS_WEBVIEW_BODY_FIELD_CANNOT_BE_BLANK"
+msgstr "මෙය හිස්ව තැබිය නොහැක."
+
+msgid "IDS_WEBVIEW_BODY_INVALID_FORMAT_ENTERED"
+msgstr "වලංගු නොවන හැඩතලයක් ඇතුළුකර ඇත."
+
+msgid "IDS_WEBVIEW_BODY_INVALID_VALUE_ENTERED"
+msgstr "වලංගු නොවන අගයක් ඇතුළුකර ඇත."
+
+msgid "IDS_WEBVIEW_BODY_NOT_SELECTED_TTS"
+msgstr "තෝරා නැත"
+
+msgid "IDS_WEBVIEW_BODY_NO_FILES_HAVE_BEEN_SELECTED"
+msgstr "ගොනු කිසිවක් තෝරාගෙන නැත."
+
+msgid "IDS_WEBVIEW_BODY_PD_CHARACTERS_TTS"
+msgstr "%d අනුලකුණු."
+
+msgid "IDS_WEBVIEW_BODY_PLUG_IN_MISSING"
+msgstr "ප්ලගින් අස්ථානගතයි"
+
+msgid "IDS_WEBVIEW_BODY_SELECTED_TTS"
+msgstr "තේරිණ"
+
+msgid "IDS_WEBVIEW_BODY_UNABLE_TO_LOAD_THE_PAGE_A_SECURE_CONNECTION_COULD_NOT_BE_MADE_TO_PS_THE_MOST_LIKELY_CAUSE_IS_THE_DEVICES_CLOCK_CHECK_THAT_THE_TIME_ON_YOUR_DEVICE_IS_CORRECT_AND_REFRESH_THE_PAGE"
+msgstr "පිටුව පූරණය කළ නොහැක. %s වෙත ආරක්ෂිත සම්බන්ධතාවක් තැනිය නොහැකි විය. මෙයට ආසන්නතම හේතුව උපාංගයේ ඔරලෝසුව විය හැක. ඔබේ උපාංගයේ වේලාව නිවැරදි දැ යි බලා පිටුව අලුත් කරන්න."
+
+msgid "IDS_WEBVIEW_BODY_UNABLE_TO_LOAD_THE_PAGE_PS_MAY_BE_TEMPORARILY_DOWN_OR_HAVE_MOVED_TO_A_NEW_URL"
+msgstr "පිටුව පූරණය කිරීමට නොහැක. %s තාවකාලිකව ලද නොහැකි හෝ නව URL එකක් වෙත ගෙනගොස් ඇත."
+
+msgid "IDS_WEBVIEW_BODY_UNABLE_TO_LOAD_THE_PAGE_PS_TOOK_TOO_LONG_TO_RESPOND_THE_WEBSITE_MAY_BE_DOWN_OR_THERE_MAY_HAVE_BEEN_A_NETWORK_CONNECTION_ERROR"
+msgstr "පිටුව පූරණය කළ නොහැක. %s ප්‍රතිචාර දැක්වීමට කල් ගත විය. වෙබ් අඩවිය බිඳ වැටි හෝ ජාල සම්බන්ධතාවේ දෝෂයක් ඇති වී හෝ තිබිය හැක."
+
+msgid "IDS_WEBVIEW_BODY_VALUE_MUST_BE_AT_LEAST_PD"
+msgstr "අගය අවම වශයෙන් %d විය යුතුය."
+
+msgid "IDS_WEBVIEW_BODY_VALUE_MUST_BE_NO_HIGHER_THAN_PD"
+msgstr "අගය %d වඩා ඉහළ නොවිය යුතුය."
+
+msgid "IDS_WEBVIEW_BODY_YOU_CAN_SEARCH_THIS_INDEX_ENTER_KEYWORDS_C"
+msgstr "ඔබට මෙම දර්ශකය ‍තුළ සෙවිය හැක. මුරපද ඇතුළත් කරන්න:"
+
+msgid "IDS_WEBVIEW_BUTTON2_NEVER"
+msgstr "කවදාවත් නැත"
+
+msgid "IDS_WEBVIEW_BUTTON_DONE"
+msgstr "නිමයි"
+
+msgid "IDS_WEBVIEW_BUTTON_LEAVE"
+msgstr "අත් හරින්න"
+
+msgid "IDS_WEBVIEW_BUTTON_NOT_NOW_ABB"
+msgstr "දැන් එපා"
+
+msgid "IDS_WEBVIEW_BUTTON_RESET"
+msgstr "නැවත සැක."
+
+msgid "IDS_WEBVIEW_BUTTON_SAVE"
+msgstr "සුරකින්න"
+
+msgid "IDS_WEBVIEW_BUTTON_STAY"
+msgstr "රැඳී සිටින්න"
+
+msgid "IDS_WEBVIEW_BUTTON_SUBMIT"
+msgstr "භාරදෙන්න"
+
+msgid "IDS_WEBVIEW_BUTTON_UPLOAD_FILE"
+msgstr "ගොනුව උඩුගත කරන්න"
+
+msgid "IDS_WEBVIEW_BUTTON_UPLOAD_MULTIPLE_FILES"
+msgstr "ගොනු උඩුගත කරන්න‍"
+
+msgid "IDS_WEBVIEW_HEADER_MESSAGE_FROM_PS_M_WEBSITE"
+msgstr "%s වෙතින් පණිවිඩයක්"
+
+msgid "IDS_WEBVIEW_HEADER_REMEMBER_PASSWORD"
+msgstr "මුරපදය මතක තබා ගන්න"
+
+msgid "IDS_WEBVIEW_HEADER_SELECT_COLOUR"
+msgstr "වර්ණය තෝරන්න"
+
+msgid "IDS_WEBVIEW_HEADER_SET_DATE_AND_TIME"
+msgstr "දිනය සහ වේලාව සකසන්න"
+
+msgid "IDS_WEBVIEW_OPT_CLIPBOARD"
+msgstr "ක්ලිප් පුවරුව"
+
+msgid "IDS_WEBVIEW_OPT_COPY"
+msgstr "පිටපත් කරන්න"
+
+msgid "IDS_WEBVIEW_OPT_COPY_AUDIO_URL_ABB"
+msgstr "ශ්‍රව්‍ය URL පිටපත් කරන්න"
+
+msgid "IDS_WEBVIEW_OPT_COPY_IMAGE"
+msgstr "රූපය පිටපත් කරන්න"
+
+msgid "IDS_WEBVIEW_OPT_COPY_LINK_URL_ABB"
+msgstr "සබැඳි URL පිටපත් කර."
+
+msgid "IDS_WEBVIEW_OPT_COPY_TO_CLIPBOARD"
+msgstr "ක්ලිප්බෝඩය වෙත වෙත පිටපත් කරන්න"
+
+msgid "IDS_WEBVIEW_OPT_COPY_VIDEO_URL_ABB"
+msgstr "වීඩියෝ URL ලිපිනය පිටපත් කරග."
+
+msgid "IDS_WEBVIEW_OPT_CUT_ABB"
+msgstr "කපන්න"
+
+msgid "IDS_WEBVIEW_OPT_DO_NOT_SHOW_AGAIN"
+msgstr "නැවත නොපෙන්වන්න"
+
+msgid "IDS_WEBVIEW_OPT_DRAG_AND_DROP_ABB"
+msgstr "ඇද හෙළන්න."
+
+msgid "IDS_WEBVIEW_OPT_ENABLE_DISABLE_REPEAT_MEDIA_ABB"
+msgstr "මාධ්‍ය නැවත නැවත පෙන්වීම සක්‍රීය/අක්‍රීය කරන්න"
+
+msgid "IDS_WEBVIEW_OPT_FULL_VIEW_ABB"
+msgstr "පූර්ණ දර්ශනය"
+
+msgid "IDS_WEBVIEW_OPT_MUTE"
+msgstr "නිහඬ කරන්න"
+
+msgid "IDS_WEBVIEW_OPT_OPEN_IMAGE_IN_NEW_TAB_ABB"
+msgstr "රූපය නව පසුබිම් ටැබයක විවෘත ක."
+
+msgid "IDS_WEBVIEW_OPT_OPEN_LINK_IN_NEW_TAB_ABB"
+msgstr "සබැඳිය නව පසු. ටැබ. විවෘත ක."
+
+msgid "IDS_WEBVIEW_OPT_OPEN_VIDEO_IN_NEW_WINDOW_ABB"
+msgstr "නව කවුළුවක වීඩියෝව විවෘත කරන්න"
+
+msgid "IDS_WEBVIEW_OPT_PASTE"
+msgstr "අලවන්න"
+
+msgid "IDS_WEBVIEW_OPT_PAUSE"
+msgstr "මදකට නවත්වන්න"
+
+msgid "IDS_WEBVIEW_OPT_PLAY"
+msgstr "වාදනය කරන්න"
+
+msgid "IDS_WEBVIEW_OPT_PLAY_AUDIO_IN_NEW_TAB_ABB"
+msgstr "ශ්‍රව්‍ය අංගය නව ටැබයක ධාවනය කර."
+
+msgid "IDS_WEBVIEW_OPT_SAVE_IMAGE_ABB"
+msgstr "රූපය සුරකින්න"
+
+msgid "IDS_WEBVIEW_OPT_SELECT_ABB"
+msgstr "තෝරන්න"
+
+msgid "IDS_WEBVIEW_OPT_SELECT_ALL_ABB"
+msgstr "සියල්. තෝර"
+
+msgid "IDS_WEBVIEW_OPT_SHOW_HIDE_MEDIA_CONTROLS_ABB"
+msgstr "මාධ්‍ය පාලක පෙන්වන්න/සඟවන්න"
+
+msgid "IDS_WEBVIEW_OPT_SIGN_IN_USING_FINGERPRINTS"
+msgstr "ඇඟිලි සලකුණු භාවිතයෙන් පිවිසෙන්න"
+
+msgid "IDS_WEBVIEW_OPT_TRANSLATE_ABB"
+msgstr "පරිවර්තනය කරන්න"
+
+msgid "IDS_WEBVIEW_OPT_UNMUTE"
+msgstr "නිහඬ නොකරන්න"
+
+msgid "IDS_WEBVIEW_OPT_WEB_SEARCH"
+msgstr "වෙබ් සෙවුම"
+
+msgid "IDS_WEBVIEW_POP_A_TEMPORARY_ERROR_HAS_OCCURRED"
+msgstr "තාවකාලික දෝෂයක් සිදු වී ඇත."
+
+msgid "IDS_WEBVIEW_POP_DO_YOU_WANT_THE_DEVICE_TO_REMEMBER_YOUR_PASSWORD_Q"
+msgstr "උපාංගය ඔබේ මුරපදය මතක තබා ගැනීම ඔබට අවශ්‍ය ද?"
+
+msgid "IDS_WEBVIEW_POP_LEAVE_THIS_PAGE_Q"
+msgstr "මෙම පිටුව හැර යන්නද?"
+
+msgid "IDS_WEBVIEW_POP_SIGN_IN_TO_THIS_WEBSITE_AGAIN_BY_SWIPING_ANY_OF_YOUR_REGISTERED_FINGERS_OVER_THE_HOME_KEY_MSG"
+msgstr "මුල් පිටු යතුර ඉහළින් ඔබගේ කිනම් හෝ ලියාපදිංචි කළ ඇඟිල්ලක් ස්වයිප් කිරීම මගින් මෙම වෙබ් අඩවිය වෙත නැවත පිවිසෙන්න. මෙම වෙබ් අඩවිය සඳහා වන ඔබගේ පරිශීලක නම සහ මුරපදය ඔබගේ උපාංගය මත සුරැකෙනු ඇත."
+
+msgid "IDS_BR_HEADER_UNABLE_TO_OPEN_FILE"
+msgstr "ගොනුව විවෘත කළ නොහැක"
+
+msgid "IDS_BR_BODY_UNABLE_TO_OPEN_THE_FILE_AT_PS_IT_MAY_HAVE_BEEN_REMOVED_OR_RENAMED_OR_FILE_PERMISSIONS_MAY_BE_PREVENTING_ACCESS"
+msgstr "%s හි ගොනුව විවෘත කළ නොහැක. එය ඉවත් කර හෝ යළි නම් කර තිබිය හැක, නැතහොත් ගොනු අවසර ප්‍රවේශය වළකමින් සිටිය හැක."
+
+msgid "IDS_WEBVIEW_BUTTON_LATER_ABB"
+msgstr "පසුව"
+
+msgid "IDS_WEBVIEW_BUTTON_NEXT_ABB3"
+msgstr "ඊළඟ"
+
+msgid "IDS_WEBVIEW_BUTTON_PREV_ABB"
+msgstr "පෙර"
+
+msgid "IDS_WEBVIEW_OPT_SELECT_TEXT_ABB"
+msgstr "පෙළ තෝරන්න"
+
+msgid "IDS_WEBVIEW_POP_SAVE_THIS_PASSWORD_ON_THIS_DEVICE_Q"
+msgstr "මෙම මුරපදය මේ උපාංගයේ සුරකින්න ද?"
+

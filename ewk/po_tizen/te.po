@@ -1,0 +1,234 @@
+msgid "IDS_BR_BODY_SAVE_LINK"
+msgstr "లింక్ ను సేవ్ చేయి"
+
+msgid "IDS_WEBVIEW_BODY_SHOWING_PD_ITEMS_TTS"
+msgstr "%d ఐటెమ్‌లను చూపుతోంది"
+
+msgid "IDS_WEBVIEW_HEADER_THIS_WEBPAGE_IS_NOT_AVAILABLE"
+msgstr "ఈ వెబ్‌పేజీ అందుబాటులో లేదు."
+
+msgid "IDS_WEBVIEW_BODY_THE_SERVER_AT_PS_CANT_BE_FOUND_BECAUSE_THE_DNS_LOOK_UP_FAILED_MSG"
+msgstr "%sలో సర్వర్ కనుగొనబడలేదు, ఎందుకంటే DNS లుక్-అప్ విఫలమైంది. DNS అనేది వెబ్‌సైట్ పేరుని దాని ఇంటర్నెట్ చిరునామాకి అనువదించే నెట్‌వర్క్ సర్వీస్. ఈ దోషం ఇంటర్నెట్ లేనందున లేదా తప్పైన కాన్ఫిగరేషన్ నెట్‌వర్క్‌ని కలిగి ఉన్నందున సంభవిస్తుంది. ఇది ప్రతిస్పందించని DNS సర్వర్ ద్వారా లేదా నెట్‌వర్క్‌ని యాక్సెస్ చేయడం నుండి నిరోధించే ఇంటర్నెట్ ఫర్మ్‌వేర్ ద్వారా కూడా సంభవించవచ్చు."
+
+msgid "IDS_WEBVIEW_BODY_DETAILS"
+msgstr "వివరాలు"
+
+msgid "IDS_WEBVIEW_BODY_DOUBLE_TAB_TO_EDIT_TTS"
+msgstr "సవరించడానికి రెండుసార్లు నొక్కండి."
+
+msgid "IDS_WEBVIEW_BODY_EDITING_TTS"
+msgstr "ఎడిట్ చేస్తోంది."
+
+msgid "IDS_WEBVIEW_BODY_EDIT_FIELD__M_NOUN_TTS"
+msgstr "ఫీల్డ్ సవరించు"
+
+msgid "IDS_WEBVIEW_BODY_ENTER_AN_EMAIL_ADDRESS"
+msgstr "ఇమెయిల్ చిరునామాని నమోదు చేయండి."
+
+msgid "IDS_WEBVIEW_BODY_ENTER_A_LIST_OF_EMAIL_ADDRESSES_SEPARATED_BY_COMMAS"
+msgstr "కామాల ద్వారా వేరు చేసిన ఇమెయిల్ చిరునామాల జాబితాను నమోదు చేయండి."
+
+msgid "IDS_WEBVIEW_BODY_ENTER_A_URL"
+msgstr "URLని నమోదు చేయండి."
+
+msgid "IDS_WEBVIEW_BODY_FIELD_CANNOT_BE_BLANK"
+msgstr "ఫీల్డ్ ఖాళీ ఉండరాదు."
+
+msgid "IDS_WEBVIEW_BODY_INVALID_FORMAT_ENTERED"
+msgstr "చెల్లని ఫార్మాట్ నమోదు చేయబడింది."
+
+msgid "IDS_WEBVIEW_BODY_INVALID_VALUE_ENTERED"
+msgstr "చెల్లని విలువ నమోదు చేయబడింది."
+
+msgid "IDS_WEBVIEW_BODY_NOT_SELECTED_TTS"
+msgstr "ఎంచుకోలేదు"
+
+msgid "IDS_WEBVIEW_BODY_NO_FILES_HAVE_BEEN_SELECTED"
+msgstr "ఫైల్‌లు ఎంచుకోబడలేదు."
+
+msgid "IDS_WEBVIEW_BODY_PD_CHARACTERS_TTS"
+msgstr "%d అక్షరాలు."
+
+msgid "IDS_WEBVIEW_BODY_PLUG_IN_MISSING"
+msgstr "ప్లగ్-ఇన్ లేదు"
+
+msgid "IDS_WEBVIEW_BODY_SELECTED_TTS"
+msgstr "ఎంపికైంది"
+
+msgid "IDS_WEBVIEW_BODY_UNABLE_TO_LOAD_THE_PAGE_A_SECURE_CONNECTION_COULD_NOT_BE_MADE_TO_PS_THE_MOST_LIKELY_CAUSE_IS_THE_DEVICES_CLOCK_CHECK_THAT_THE_TIME_ON_YOUR_DEVICE_IS_CORRECT_AND_REFRESH_THE_PAGE"
+msgstr "పేజీని లోడ్ చేయడం సాధ్యం కాదు. %sకు సురక్షిత కనెక్షన్‌ని సృష్టించడం సాధ్యం కాదు. చాలా ప్రధాన కారణం పరికరం యొక్క గడియారం. మీ పరికరంలో సమయం సరిగ్గా ఉందని తనిఖీ చేసి, పేజీని రిఫ్రెష్ చేయండి."
+
+msgid "IDS_WEBVIEW_BODY_UNABLE_TO_LOAD_THE_PAGE_PS_MAY_BE_TEMPORARILY_DOWN_OR_HAVE_MOVED_TO_A_NEW_URL"
+msgstr "పేజీని లోడ్ చేయడం సాధ్యం కాదు. %s తాత్కాలికంగా నెమ్మదిగా ఉండవచ్చు లేదా కొత్త URLకి తరలించబడింది."
+
+msgid "IDS_WEBVIEW_BODY_UNABLE_TO_LOAD_THE_PAGE_PS_TOOK_TOO_LONG_TO_RESPOND_THE_WEBSITE_MAY_BE_DOWN_OR_THERE_MAY_HAVE_BEEN_A_NETWORK_CONNECTION_ERROR"
+msgstr "పేజీని లోడ్ చేయడం సాధ్యం కాదు. %s ప్రతిస్పందించడానికి చాలా సమయాన్ని వెచ్చించింది. వెబ్‌సైట్ నెమ్మదిగా ఉండవచ్చు లేదా నెట్‌వర్క్ కనెక్షన్ దోషం ఉండవచ్చు."
+
+msgid "IDS_WEBVIEW_BODY_VALUE_MUST_BE_AT_LEAST_PD"
+msgstr "విలువ తప్పనిసరిగా కనీసం %d ఉండాలి."
+
+msgid "IDS_WEBVIEW_BODY_VALUE_MUST_BE_NO_HIGHER_THAN_PD"
+msgstr "విలువ తప్పనిసరిగా %d కంటే ఎక్కువ ఉండకూడదు."
+
+msgid "IDS_WEBVIEW_BODY_YOU_CAN_SEARCH_THIS_INDEX_ENTER_KEYWORDS_C"
+msgstr "మీరు ఈ సూచీని శోధించవచ్చు. కీలకపదాలను నమోదు చేయండి:"
+
+msgid "IDS_WEBVIEW_BUTTON2_NEVER"
+msgstr "ఎప్పుడూ లేదు"
+
+msgid "IDS_WEBVIEW_BUTTON_DONE"
+msgstr "పూర్తి"
+
+msgid "IDS_WEBVIEW_BUTTON_LEAVE"
+msgstr "నిష్క్రమించండి"
+
+msgid "IDS_WEBVIEW_BUTTON_NOT_NOW_ABB"
+msgstr "ఇప్పుడు కాదు"
+
+msgid "IDS_WEBVIEW_BUTTON_RESET"
+msgstr "రీసెట్"
+
+msgid "IDS_WEBVIEW_BUTTON_SAVE"
+msgstr "సేవ్ చేయి"
+
+msgid "IDS_WEBVIEW_BUTTON_STAY"
+msgstr "వేచి ఉండండి"
+
+msgid "IDS_WEBVIEW_BUTTON_SUBMIT"
+msgstr "సబ్‌మిట్"
+
+msgid "IDS_WEBVIEW_BUTTON_UPLOAD_FILE"
+msgstr "ఫైల్‌ని అప్‌లోడ్ చేయి"
+
+msgid "IDS_WEBVIEW_BUTTON_UPLOAD_MULTIPLE_FILES"
+msgstr "బహుళ ఫైల్‌లను అప్‌లోడ్ చేయి"
+
+msgid "IDS_WEBVIEW_HEADER_MESSAGE_FROM_PS_M_WEBSITE"
+msgstr "%s నుండి సందేశం"
+
+msgid "IDS_WEBVIEW_HEADER_REMEMBER_PASSWORD"
+msgstr "పాస్‌వర్డ్ గుర్తుంచుకో"
+
+msgid "IDS_WEBVIEW_HEADER_SELECT_COLOUR"
+msgstr "రంగుని ఎంచుకోండి"
+
+msgid "IDS_WEBVIEW_HEADER_SET_DATE_AND_TIME"
+msgstr "తేదీ మరియు సమయాన్ని సెట్ చేయండి"
+
+msgid "IDS_WEBVIEW_OPT_CLIPBOARD"
+msgstr "క్లిప్‌బోర్డ్"
+
+msgid "IDS_WEBVIEW_OPT_COPY"
+msgstr "కాపీ"
+
+msgid "IDS_WEBVIEW_OPT_COPY_AUDIO_URL_ABB"
+msgstr "ఆడియో URLని కాపీ చేయి"
+
+msgid "IDS_WEBVIEW_OPT_COPY_IMAGE"
+msgstr "చిత్రం కాపీ చేయి"
+
+msgid "IDS_WEBVIEW_OPT_COPY_LINK_URL_ABB"
+msgstr "లింక్ URLని కాపీ చేయి"
+
+msgid "IDS_WEBVIEW_OPT_COPY_TO_CLIPBOARD"
+msgstr "క్లిప్ బోర్డ్ కు కాపీ అయింది"
+
+msgid "IDS_WEBVIEW_OPT_COPY_VIDEO_URL_ABB"
+msgstr "వీడియో URLని కాపీ చేయి"
+
+msgid "IDS_WEBVIEW_OPT_CUT_ABB"
+msgstr "కట్"
+
+msgid "IDS_WEBVIEW_OPT_DO_NOT_SHOW_AGAIN"
+msgstr "మళ్లీ చూపించవద్దు"
+
+msgid "IDS_WEBVIEW_OPT_DRAG_AND_DROP_ABB"
+msgstr "డ్రాగ్ చేసి, డ్రాప్ చేయండి"
+
+msgid "IDS_WEBVIEW_OPT_ENABLE_DISABLE_REPEAT_MEDIA_ABB"
+msgstr "పునరావృత మీడియాని ఎనేబుల్/డిసేబుల్ చేయి"
+
+msgid "IDS_WEBVIEW_OPT_FULL_VIEW_ABB"
+msgstr "పూర్తి వీక్షణ"
+
+msgid "IDS_WEBVIEW_OPT_MUTE"
+msgstr "మ్యూట్‌లో ఉంది"
+
+msgid "IDS_WEBVIEW_OPT_OPEN_IMAGE_IN_NEW_TAB_ABB"
+msgstr "చిత్రాన్ని కొత్త ట్యాబ‌్‌ లో తెరవండి"
+
+msgid "IDS_WEBVIEW_OPT_OPEN_LINK_IN_NEW_TAB_ABB"
+msgstr "చిత్రాన్ని కొత్త ట్యాబ‌్‌లో తెరవండి"
+
+msgid "IDS_WEBVIEW_OPT_OPEN_VIDEO_IN_NEW_WINDOW_ABB"
+msgstr "కొత్త విండోలో వీడియోని తెరవండి"
+
+msgid "IDS_WEBVIEW_OPT_PASTE"
+msgstr "అతికించు"
+
+msgid "IDS_WEBVIEW_OPT_PAUSE"
+msgstr "పాజ్ చేయి"
+
+msgid "IDS_WEBVIEW_OPT_PLAY"
+msgstr "ప్లే చేయి"
+
+msgid "IDS_WEBVIEW_OPT_PLAY_AUDIO_IN_NEW_TAB_ABB"
+msgstr "కొత్త ట్యాబ్‌ లో ఆడియోని ప్లే చేయి"
+
+msgid "IDS_WEBVIEW_OPT_SAVE_IMAGE_ABB"
+msgstr "చిత్రాన్ని సేవ్ చేయి"
+
+msgid "IDS_WEBVIEW_OPT_SELECT_ABB"
+msgstr "ఎంచుకోండి"
+
+msgid "IDS_WEBVIEW_OPT_SELECT_ALL_ABB"
+msgstr "అందరిని ఎన్నుకోండి"
+
+msgid "IDS_WEBVIEW_OPT_SHOW_HIDE_MEDIA_CONTROLS_ABB"
+msgstr "మీడియా కంట్రోల్‌లను చూపు/దాచు"
+
+msgid "IDS_WEBVIEW_OPT_SIGN_IN_USING_FINGERPRINTS"
+msgstr "వేలిముద్రలను ఉపయోగంచి సైన్ ఇన్ చేయండి"
+
+msgid "IDS_WEBVIEW_OPT_TRANSLATE_ABB"
+msgstr "అనువదించు"
+
+msgid "IDS_WEBVIEW_OPT_UNMUTE"
+msgstr "అన్‌మ్యూట్ చేయి"
+
+msgid "IDS_WEBVIEW_OPT_WEB_SEARCH"
+msgstr "వెబ్ శోధన"
+
+msgid "IDS_WEBVIEW_POP_A_TEMPORARY_ERROR_HAS_OCCURRED"
+msgstr "తాత్కాలిక దోషం సంభవించింది."
+
+msgid "IDS_WEBVIEW_POP_DO_YOU_WANT_THE_DEVICE_TO_REMEMBER_YOUR_PASSWORD_Q"
+msgstr "మీరు పరికరం మీ పాస్‌వర్డ్‌ను గుర్తుంచుకోవాలనుకుంటున్నారా?"
+
+msgid "IDS_WEBVIEW_POP_LEAVE_THIS_PAGE_Q"
+msgstr "ఈ పేజీ నుండి నిష్క్రమించాలా?"
+
+msgid "IDS_WEBVIEW_POP_SIGN_IN_TO_THIS_WEBSITE_AGAIN_BY_SWIPING_ANY_OF_YOUR_REGISTERED_FINGERS_OVER_THE_HOME_KEY_MSG"
+msgstr "హోమ్ కీపై మీ నమోదు చేసిన ఏవైనా వేళ్లతో స్వైప్ చేయడం ద్వారా ఈ వెబ్‌సైట్‌కు మళ్లీ సైన్ ఇన్ చేయండి. ఈ వెబ్‌సైట్ కోసం మీ వినియోగదారు పేరు మరియు పాస్‌వర్డ్ మీ పరికరంలో సేవ్ చేయబడతాయి."
+
+msgid "IDS_BR_HEADER_UNABLE_TO_OPEN_FILE"
+msgstr "ఫైల్‌ని తెరవడం సాధ్యం కాదు"
+
+msgid "IDS_BR_BODY_UNABLE_TO_OPEN_THE_FILE_AT_PS_IT_MAY_HAVE_BEEN_REMOVED_OR_RENAMED_OR_FILE_PERMISSIONS_MAY_BE_PREVENTING_ACCESS"
+msgstr "%sలో ఫైల్‌ని తెరవడం సాధ్యం కాదు. ఇది తీసివేయబడి లేదా పేరుమార్చబడి ఉండవచ్చు లేదా ఫైల్ అనుమతులు ప్రాప్తిని నిరోధిస్తూ ఉండవచ్చు."
+
+msgid "IDS_WEBVIEW_BUTTON_LATER_ABB"
+msgstr "తర్వాత"
+
+msgid "IDS_WEBVIEW_BUTTON_NEXT_ABB3"
+msgstr "తరువాత"
+
+msgid "IDS_WEBVIEW_BUTTON_PREV_ABB"
+msgstr "మునుపటి"
+
+msgid "IDS_WEBVIEW_OPT_SELECT_TEXT_ABB"
+msgstr "టెక్స్ట్‌ను ఎంచుకోండి"
+
+msgid "IDS_WEBVIEW_POP_SAVE_THIS_PASSWORD_ON_THIS_DEVICE_Q"
+msgstr "ఈ పాస్‌వర్డ్‌ను ఈ పరికరంలో సేవ్ చేయాలా?"
+

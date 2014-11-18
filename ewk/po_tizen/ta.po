@@ -1,0 +1,234 @@
+msgid "IDS_BR_BODY_SAVE_LINK"
+msgstr "இணைப்பினை சேமி."
+
+msgid "IDS_WEBVIEW_BODY_SHOWING_PD_ITEMS_TTS"
+msgstr "%d உருப்படிகளைக் காண்பிக்கிறது"
+
+msgid "IDS_WEBVIEW_HEADER_THIS_WEBPAGE_IS_NOT_AVAILABLE"
+msgstr "இந்த வலைப்பக்கம் கிடைக்கவில்லை."
+
+msgid "IDS_WEBVIEW_BODY_THE_SERVER_AT_PS_CANT_BE_FOUND_BECAUSE_THE_DNS_LOOK_UP_FAILED_MSG"
+msgstr "DNS கண்டறிதல் செயல் தோல்வியடைந்ததால், %s இல் உள்ள வழங்கியை கண்டறிய முடியவில்லை. DNS என்பது ஒரு வலைத்தளத்தின் பெயரை இணைய முகவரியாக மாற்றும் ஒரு நெட்வொர்க் சேவையாகும். பெரும்பாலும் இந்தப் பிழை இணைய இணைப்பு இல்லாததால் அல்லது நெட்வொர்க் உள்ளமைவு தவறாக இருப்பதால் ஏற்படும். DNS வழங்கி பதிலளிக்காமல் போவதால் அல்லது இணையம் நெட்வொர்க்கை அணுக முடியாதபடி ஒரு ஃபயர்வால் தடுப்பதால் கூட இந்தப் பிழை ஏற்படலாம்."
+
+msgid "IDS_WEBVIEW_BODY_DETAILS"
+msgstr "விபரங்கள்"
+
+msgid "IDS_WEBVIEW_BODY_DOUBLE_TAB_TO_EDIT_TTS"
+msgstr "திருத்துவதற்கு இருமுறை டேப் செய்க."
+
+msgid "IDS_WEBVIEW_BODY_EDITING_TTS"
+msgstr "திருத்துகிறது."
+
+msgid "IDS_WEBVIEW_BODY_EDIT_FIELD__M_NOUN_TTS"
+msgstr "புலம் திருத்துக"
+
+msgid "IDS_WEBVIEW_BODY_ENTER_AN_EMAIL_ADDRESS"
+msgstr "மின்னஞ்சல் முகவரியை உள்ளிடுக."
+
+msgid "IDS_WEBVIEW_BODY_ENTER_A_LIST_OF_EMAIL_ADDRESSES_SEPARATED_BY_COMMAS"
+msgstr "காற்புள்ளிகளால் பிரிக்கப்பட்ட மின்னஞ்சல் முகவரிகளின் பட்டியலை உள்ளிடுக."
+
+msgid "IDS_WEBVIEW_BODY_ENTER_A_URL"
+msgstr "URL உள்ளிடவும்."
+
+msgid "IDS_WEBVIEW_BODY_FIELD_CANNOT_BE_BLANK"
+msgstr "புலம் காலியாக இருக்கமுடியாது."
+
+msgid "IDS_WEBVIEW_BODY_INVALID_FORMAT_ENTERED"
+msgstr "செல்லுபடியாகாத வடிவம் உள்ளிடப்பட்டது."
+
+msgid "IDS_WEBVIEW_BODY_INVALID_VALUE_ENTERED"
+msgstr "தவறான மதிப்பு."
+
+msgid "IDS_WEBVIEW_BODY_NOT_SELECTED_TTS"
+msgstr "தேர்ந்தெடுக்கப்படாதவை"
+
+msgid "IDS_WEBVIEW_BODY_NO_FILES_HAVE_BEEN_SELECTED"
+msgstr "கோப்புகள் எதுவும் தேர்ந்தெடுக்கப்படவில்லை."
+
+msgid "IDS_WEBVIEW_BODY_PD_CHARACTERS_TTS"
+msgstr "%d எழுத்துக்கள்."
+
+msgid "IDS_WEBVIEW_BODY_PLUG_IN_MISSING"
+msgstr "ப்ளக்-இன் இல்லாதிருக்கிறது"
+
+msgid "IDS_WEBVIEW_BODY_SELECTED_TTS"
+msgstr "தேர்வுசெய்யப்பட்டது"
+
+msgid "IDS_WEBVIEW_BODY_UNABLE_TO_LOAD_THE_PAGE_A_SECURE_CONNECTION_COULD_NOT_BE_MADE_TO_PS_THE_MOST_LIKELY_CAUSE_IS_THE_DEVICES_CLOCK_CHECK_THAT_THE_TIME_ON_YOUR_DEVICE_IS_CORRECT_AND_REFRESH_THE_PAGE"
+msgstr "பக்கத்தை ஏற்ற முடியவில்லை. %s க்கு பாதுகாப்பான இணைப்பை ஏற்படுத்த முடியவில்லை. அநேகமாக இருக்கக்கூடிய காரணம் சாதனத்தின் கடிகாரம் ஆகும். உங்கள் சாதனத்திலுள்ள நேரம் சரியானது என்பதைச் சரிபார்த்து பக்கத்தைப் புதுப்பிக்கவும்."
+
+msgid "IDS_WEBVIEW_BODY_UNABLE_TO_LOAD_THE_PAGE_PS_MAY_BE_TEMPORARILY_DOWN_OR_HAVE_MOVED_TO_A_NEW_URL"
+msgstr "பக்கத்தை ஏற்ற முடியவில்லை. %s தற்காலிகமாக செயல்படாமல் இருக்கலாம் அல்லது புதிய ஒரு URL க்கு நகர்த்தப்பட்டிருக்கலாம்."
+
+msgid "IDS_WEBVIEW_BODY_UNABLE_TO_LOAD_THE_PAGE_PS_TOOK_TOO_LONG_TO_RESPOND_THE_WEBSITE_MAY_BE_DOWN_OR_THERE_MAY_HAVE_BEEN_A_NETWORK_CONNECTION_ERROR"
+msgstr "பக்கத்தை ஏற்ற முடியவில்லை. %s ஆனது பதிலளிக்க நீண்ட நேரம் எடுத்தது. வலைத்தளம் செயலிழந்து இருக்கலாம் அல்லது அங்கு நெட்வொர்க் இணைப்புப் பிழை இருந்திருக்கலாம்."
+
+msgid "IDS_WEBVIEW_BODY_VALUE_MUST_BE_AT_LEAST_PD"
+msgstr "மதிப்பு, குறைந்தது %d என்றிருக்கவேண்டும்."
+
+msgid "IDS_WEBVIEW_BODY_VALUE_MUST_BE_NO_HIGHER_THAN_PD"
+msgstr "மதிப்பு, %d-ஐ விட மேலானதாக இருக்கக்கூடாது."
+
+msgid "IDS_WEBVIEW_BODY_YOU_CAN_SEARCH_THIS_INDEX_ENTER_KEYWORDS_C"
+msgstr "இந்த அகவரிசையில் தேடியறியலாம். பிரதான சொல் உள்ளிடுக:"
+
+msgid "IDS_WEBVIEW_BUTTON2_NEVER"
+msgstr "எப்போதும் இல்லை"
+
+msgid "IDS_WEBVIEW_BUTTON_DONE"
+msgstr "முடிந்தது"
+
+msgid "IDS_WEBVIEW_BUTTON_LEAVE"
+msgstr "விடு"
+
+msgid "IDS_WEBVIEW_BUTTON_NOT_NOW_ABB"
+msgstr "இப்போது இல்லை"
+
+msgid "IDS_WEBVIEW_BUTTON_RESET"
+msgstr "ரீசெட்"
+
+msgid "IDS_WEBVIEW_BUTTON_SAVE"
+msgstr "சேமி"
+
+msgid "IDS_WEBVIEW_BUTTON_STAY"
+msgstr "தொடர்க"
+
+msgid "IDS_WEBVIEW_BUTTON_SUBMIT"
+msgstr "சமர்ப்பி"
+
+msgid "IDS_WEBVIEW_BUTTON_UPLOAD_FILE"
+msgstr "கோப்பினை பதிவேற்றுக"
+
+msgid "IDS_WEBVIEW_BUTTON_UPLOAD_MULTIPLE_FILES"
+msgstr "பல்கோப்புகளை பதிவேற்றுக"
+
+msgid "IDS_WEBVIEW_HEADER_MESSAGE_FROM_PS_M_WEBSITE"
+msgstr "%s-லிருந்து தகவல்"
+
+msgid "IDS_WEBVIEW_HEADER_REMEMBER_PASSWORD"
+msgstr "கடவுச்சொல்லை நினைவில்கொள்க"
+
+msgid "IDS_WEBVIEW_HEADER_SELECT_COLOUR"
+msgstr "நிறத்தை தேர்வு செய்க"
+
+msgid "IDS_WEBVIEW_HEADER_SET_DATE_AND_TIME"
+msgstr "தேதியும் நேரமும் அமைக்கவும்"
+
+msgid "IDS_WEBVIEW_OPT_CLIPBOARD"
+msgstr "கிளிப்போர்டு"
+
+msgid "IDS_WEBVIEW_OPT_COPY"
+msgstr "நகல்"
+
+msgid "IDS_WEBVIEW_OPT_COPY_AUDIO_URL_ABB"
+msgstr "கேட்பொலி URL நகல் செய்க"
+
+msgid "IDS_WEBVIEW_OPT_COPY_IMAGE"
+msgstr "படிமம் நகல் செய்க"
+
+msgid "IDS_WEBVIEW_OPT_COPY_LINK_URL_ABB"
+msgstr "URL இணைப்பு நகல்."
+
+msgid "IDS_WEBVIEW_OPT_COPY_TO_CLIPBOARD"
+msgstr "க்ளிப்போர்டிற்கு நகல்செய்க"
+
+msgid "IDS_WEBVIEW_OPT_COPY_VIDEO_URL_ABB"
+msgstr "நிகழ்பட URL நகல் செய்க"
+
+msgid "IDS_WEBVIEW_OPT_CUT_ABB"
+msgstr "வெட்டு"
+
+msgid "IDS_WEBVIEW_OPT_DO_NOT_SHOW_AGAIN"
+msgstr "மீண்டும் காட்ட வேண்டாம்"
+
+msgid "IDS_WEBVIEW_OPT_DRAG_AND_DROP_ABB"
+msgstr "ட்ராக் மற்றும் ட்ராப்"
+
+msgid "IDS_WEBVIEW_OPT_ENABLE_DISABLE_REPEAT_MEDIA_ABB"
+msgstr "ஊடக மீ.செய்தலை செயல்படுத்துக/முடக்குக"
+
+msgid "IDS_WEBVIEW_OPT_FULL_VIEW_ABB"
+msgstr "முழு காட்சி"
+
+msgid "IDS_WEBVIEW_OPT_MUTE"
+msgstr "ஒலிதடு"
+
+msgid "IDS_WEBVIEW_OPT_OPEN_IMAGE_IN_NEW_TAB_ABB"
+msgstr "படிமத்தை புதிய டேபிள் திற."
+
+msgid "IDS_WEBVIEW_OPT_OPEN_LINK_IN_NEW_TAB_ABB"
+msgstr "தொடர்பிணைப்பை புதிய டேபிள் திற."
+
+msgid "IDS_WEBVIEW_OPT_OPEN_VIDEO_IN_NEW_WINDOW_ABB"
+msgstr "நிகழ்படத்தை புதிய வின்டோவில் திறக்கவும்"
+
+msgid "IDS_WEBVIEW_OPT_PASTE"
+msgstr "ஒட்டு"
+
+msgid "IDS_WEBVIEW_OPT_PAUSE"
+msgstr "இடைநிறுத்துக"
+
+msgid "IDS_WEBVIEW_OPT_PLAY"
+msgstr "இயக்குக"
+
+msgid "IDS_WEBVIEW_OPT_PLAY_AUDIO_IN_NEW_TAB_ABB"
+msgstr "ஆகேட்பொலி புதிய டேப் இயக்குக"
+
+msgid "IDS_WEBVIEW_OPT_SAVE_IMAGE_ABB"
+msgstr "படிமம் சேமிக்கவும்"
+
+msgid "IDS_WEBVIEW_OPT_SELECT_ABB"
+msgstr "தேர்வு"
+
+msgid "IDS_WEBVIEW_OPT_SELECT_ALL_ABB"
+msgstr "எல்லாம் தேர்வு"
+
+msgid "IDS_WEBVIEW_OPT_SHOW_HIDE_MEDIA_CONTROLS_ABB"
+msgstr "ஊடக கட்டுப்பாடுகளைக் காட்டுக/மறைத்திடுக"
+
+msgid "IDS_WEBVIEW_OPT_SIGN_IN_USING_FINGERPRINTS"
+msgstr "கைரேகைகளைப் பயன்படுத்தி உள்நுழைக"
+
+msgid "IDS_WEBVIEW_OPT_TRANSLATE_ABB"
+msgstr "மொழிபெயர்ப்பு"
+
+msgid "IDS_WEBVIEW_OPT_UNMUTE"
+msgstr "ஒலிதடு நீக்குக"
+
+msgid "IDS_WEBVIEW_OPT_WEB_SEARCH"
+msgstr "வலைத் தேடல்"
+
+msgid "IDS_WEBVIEW_POP_A_TEMPORARY_ERROR_HAS_OCCURRED"
+msgstr "தற்காலிகப் பிழை ஏற்பட்டுள்ளது."
+
+msgid "IDS_WEBVIEW_POP_DO_YOU_WANT_THE_DEVICE_TO_REMEMBER_YOUR_PASSWORD_Q"
+msgstr "சாதனம் உங்கள் கடவுச்சொல்லை நினைவில்கொள்ள விரும்புகிறீர்களா?"
+
+msgid "IDS_WEBVIEW_POP_LEAVE_THIS_PAGE_Q"
+msgstr "இப்பக்கத்திலிருந்து வெளியேறவா?"
+
+msgid "IDS_WEBVIEW_POP_SIGN_IN_TO_THIS_WEBSITE_AGAIN_BY_SWIPING_ANY_OF_YOUR_REGISTERED_FINGERS_OVER_THE_HOME_KEY_MSG"
+msgstr "முகப்பு விசையின் மீது உங்களது பதிவு செய்யப்பட்ட விரல்களில் ஏதேனுமொன்றை ஸ்வைப் செய்வதன் மூலம் இந்த வலைத்தளத்திற்குள் மீண்டும் உள்நுழையவும். இந்த வலைத்தளத்திற்கான உங்கள் பயனர் பெயர் மற்றும் கடவுச்சொல் உங்களது சாதனத்தில் சேமிக்கப்படும்."
+
+msgid "IDS_BR_HEADER_UNABLE_TO_OPEN_FILE"
+msgstr "கோப்பைத் திறக்க இயலவில்லை"
+
+msgid "IDS_BR_BODY_UNABLE_TO_OPEN_THE_FILE_AT_PS_IT_MAY_HAVE_BEEN_REMOVED_OR_RENAMED_OR_FILE_PERMISSIONS_MAY_BE_PREVENTING_ACCESS"
+msgstr "%s-ல் கோப்பைத் திறக்க இயலவில்லை. அது அகற்றப்பட்டிருக்கலாம் அல்லது மறுபெயரிடப்பட்டிருக்கலாம் அல்லது கோப்பு அனுமதிகள் அணுகலைத் தடுக்ககூடும்."
+
+msgid "IDS_WEBVIEW_BUTTON_LATER_ABB"
+msgstr "பின்னர்"
+
+msgid "IDS_WEBVIEW_BUTTON_NEXT_ABB3"
+msgstr "அடுத்து"
+
+msgid "IDS_WEBVIEW_BUTTON_PREV_ABB"
+msgstr "முந்."
+
+msgid "IDS_WEBVIEW_OPT_SELECT_TEXT_ABB"
+msgstr "உரை தேர்வுசெய்க"
+
+msgid "IDS_WEBVIEW_POP_SAVE_THIS_PASSWORD_ON_THIS_DEVICE_Q"
+msgstr "இந்தச் சாதனத்தில் இந்தக் கடவுச்சொல்லைச் சேமிக்கவா?"
+

@@ -1,0 +1,234 @@
+msgid "IDS_BR_BODY_SAVE_LINK"
+msgstr "लिंक सुरक्षित करें"
+
+msgid "IDS_WEBVIEW_BODY_SHOWING_PD_ITEMS_TTS"
+msgstr "%d मदें दिखाना"
+
+msgid "IDS_WEBVIEW_HEADER_THIS_WEBPAGE_IS_NOT_AVAILABLE"
+msgstr "यह वेब पेज उपलब्ध नहीं है"
+
+msgid "IDS_WEBVIEW_BODY_THE_SERVER_AT_PS_CANT_BE_FOUND_BECAUSE_THE_DNS_LOOK_UP_FAILED_MSG"
+msgstr "%s पर स्थित सर्वर ढूँढ़ा नहीं जा सकता क्योंकि DNS लुक-अप विफल हुआ। DNS वह नेटवर्क सेवा है जो किसी वेबसाइट के नाम को इसके इंटरनेट पते में अनुवाद करती है। यह त्रुटि आम तौर पर इंटरनेट से कोई कनेक्शन न होने या गलत कॉन्फ़िगर किए गए नेटवर्क के कारण होती है। यह किसी अप्रतिसादी DNS सर्वर या किसी फ़ायरवॉल द्वारा इंटरनेट को नेटवर्क उपयोग करने से रोकने के कारण भी हो सकती है।"
+
+msgid "IDS_WEBVIEW_BODY_DETAILS"
+msgstr "विवरण"
+
+msgid "IDS_WEBVIEW_BODY_DOUBLE_TAB_TO_EDIT_TTS"
+msgstr "संपादित करने के लिए दोहरा टैप करें।"
+
+msgid "IDS_WEBVIEW_BODY_EDITING_TTS"
+msgstr "संपादित हो रहा है।"
+
+msgid "IDS_WEBVIEW_BODY_EDIT_FIELD__M_NOUN_TTS"
+msgstr "फ़ील्ड संपादित करें"
+
+msgid "IDS_WEBVIEW_BODY_ENTER_AN_EMAIL_ADDRESS"
+msgstr "ईमेल पता दर्ज करें"
+
+msgid "IDS_WEBVIEW_BODY_ENTER_A_LIST_OF_EMAIL_ADDRESSES_SEPARATED_BY_COMMAS"
+msgstr "अल्पविराम से अलग किए ईमेल पतों की सूची दर्ज करें"
+
+msgid "IDS_WEBVIEW_BODY_ENTER_A_URL"
+msgstr "कोई URL दर्ज करें"
+
+msgid "IDS_WEBVIEW_BODY_FIELD_CANNOT_BE_BLANK"
+msgstr "फ़ील्‍ड खाली नहीं रख सकते"
+
+msgid "IDS_WEBVIEW_BODY_INVALID_FORMAT_ENTERED"
+msgstr "अमान्य फ़ॉर्मेट दर्ज किया गया।"
+
+msgid "IDS_WEBVIEW_BODY_INVALID_VALUE_ENTERED"
+msgstr "अमान्य मान दर्ज किया गया।"
+
+msgid "IDS_WEBVIEW_BODY_NOT_SELECTED_TTS"
+msgstr "चयनित नहीं हुआ"
+
+msgid "IDS_WEBVIEW_BODY_NO_FILES_HAVE_BEEN_SELECTED"
+msgstr "कोई भी फ़ाइल चयनित नहीं है"
+
+msgid "IDS_WEBVIEW_BODY_PD_CHARACTERS_TTS"
+msgstr "%d वर्ण।"
+
+msgid "IDS_WEBVIEW_BODY_PLUG_IN_MISSING"
+msgstr "प्लग-इन गुम है"
+
+msgid "IDS_WEBVIEW_BODY_SELECTED_TTS"
+msgstr "चयनित"
+
+msgid "IDS_WEBVIEW_BODY_UNABLE_TO_LOAD_THE_PAGE_A_SECURE_CONNECTION_COULD_NOT_BE_MADE_TO_PS_THE_MOST_LIKELY_CAUSE_IS_THE_DEVICES_CLOCK_CHECK_THAT_THE_TIME_ON_YOUR_DEVICE_IS_CORRECT_AND_REFRESH_THE_PAGE"
+msgstr "पृष्ठ लोड करने में अक्षम। %s से एक सुरक्षित कनेक्शन नहीं किया जा सका। सबसे संभावित कारण डिवाइस की घड़ी है। जाँचें कि आपके डिवाइस का समय सही है और पेज रीफ़्रेश करें।"
+
+msgid "IDS_WEBVIEW_BODY_UNABLE_TO_LOAD_THE_PAGE_PS_MAY_BE_TEMPORARILY_DOWN_OR_HAVE_MOVED_TO_A_NEW_URL"
+msgstr "पेज लोड करने में असमर्थ। %s संभवतः अस्थायी रूप से बंद हो सकते हैं या किसी नये URL पर ले जाए गए हों।"
+
+msgid "IDS_WEBVIEW_BODY_UNABLE_TO_LOAD_THE_PAGE_PS_TOOK_TOO_LONG_TO_RESPOND_THE_WEBSITE_MAY_BE_DOWN_OR_THERE_MAY_HAVE_BEEN_A_NETWORK_CONNECTION_ERROR"
+msgstr "पृष्ठ लोड करने में अक्षम। %s को प्रतिक्रिया देने में बहुत समय लगा। वेबसाइट धीमी हो सकती है या कोई नेटवर्क कनेक्शन त्रुटि हो सकती है।"
+
+msgid "IDS_WEBVIEW_BODY_VALUE_MUST_BE_AT_LEAST_PD"
+msgstr "मान कम से कम %d होना चाहिए"
+
+msgid "IDS_WEBVIEW_BODY_VALUE_MUST_BE_NO_HIGHER_THAN_PD"
+msgstr "मान %d से अधिक नहीं होना चाहिए"
+
+msgid "IDS_WEBVIEW_BODY_YOU_CAN_SEARCH_THIS_INDEX_ENTER_KEYWORDS_C"
+msgstr "आप यह अनुक्रमणिका खोज सकते हैं। कीवर्ड्स दर्ज करें:"
+
+msgid "IDS_WEBVIEW_BUTTON2_NEVER"
+msgstr "कभी नहीं"
+
+msgid "IDS_WEBVIEW_BUTTON_DONE"
+msgstr "पूर्ण"
+
+msgid "IDS_WEBVIEW_BUTTON_LEAVE"
+msgstr "छोड़ें"
+
+msgid "IDS_WEBVIEW_BUTTON_NOT_NOW_ABB"
+msgstr "अभी नहीं"
+
+msgid "IDS_WEBVIEW_BUTTON_RESET"
+msgstr "रीसेट"
+
+msgid "IDS_WEBVIEW_BUTTON_SAVE"
+msgstr "सेव"
+
+msgid "IDS_WEBVIEW_BUTTON_STAY"
+msgstr "ठहरें"
+
+msgid "IDS_WEBVIEW_BUTTON_SUBMIT"
+msgstr "सबमिट करें"
+
+msgid "IDS_WEBVIEW_BUTTON_UPLOAD_FILE"
+msgstr "फ़ाइल अपलोड करें"
+
+msgid "IDS_WEBVIEW_BUTTON_UPLOAD_MULTIPLE_FILES"
+msgstr "एकाधिक फ़ाइल अपलोड करें"
+
+msgid "IDS_WEBVIEW_HEADER_MESSAGE_FROM_PS_M_WEBSITE"
+msgstr "%s से सन्देश"
+
+msgid "IDS_WEBVIEW_HEADER_REMEMBER_PASSWORD"
+msgstr "पासवर्ड याद रखें"
+
+msgid "IDS_WEBVIEW_HEADER_SELECT_COLOUR"
+msgstr "रंग चुनें"
+
+msgid "IDS_WEBVIEW_HEADER_SET_DATE_AND_TIME"
+msgstr "तिथि और समय सेट करें"
+
+msgid "IDS_WEBVIEW_OPT_CLIPBOARD"
+msgstr "क्लिपबोर्ड"
+
+msgid "IDS_WEBVIEW_OPT_COPY"
+msgstr "कॉपी करें"
+
+msgid "IDS_WEBVIEW_OPT_COPY_AUDIO_URL_ABB"
+msgstr "ऑडियो URL की कॉपी करें"
+
+msgid "IDS_WEBVIEW_OPT_COPY_IMAGE"
+msgstr "छवि कॉपी करें"
+
+msgid "IDS_WEBVIEW_OPT_COPY_LINK_URL_ABB"
+msgstr "लिंक URL कॉपी करें"
+
+msgid "IDS_WEBVIEW_OPT_COPY_TO_CLIPBOARD"
+msgstr "क्लिपबोर्ड में कॉपी करें"
+
+msgid "IDS_WEBVIEW_OPT_COPY_VIDEO_URL_ABB"
+msgstr "वीडियो URL कॉपी करें"
+
+msgid "IDS_WEBVIEW_OPT_CUT_ABB"
+msgstr "काटें"
+
+msgid "IDS_WEBVIEW_OPT_DO_NOT_SHOW_AGAIN"
+msgstr "दोबारा न दिखाएँ"
+
+msgid "IDS_WEBVIEW_OPT_DRAG_AND_DROP_ABB"
+msgstr "ड्रैग और ड्रॉप करें"
+
+msgid "IDS_WEBVIEW_OPT_ENABLE_DISABLE_REPEAT_MEDIA_ABB"
+msgstr "दोहराव मीडिया सक्षम/अक्षम करें"
+
+msgid "IDS_WEBVIEW_OPT_FULL_VIEW_ABB"
+msgstr "पूर्ण दृश्‍य"
+
+msgid "IDS_WEBVIEW_OPT_MUTE"
+msgstr "मूक"
+
+msgid "IDS_WEBVIEW_OPT_OPEN_IMAGE_IN_NEW_TAB_ABB"
+msgstr "छवि नए टैब में खोलें"
+
+msgid "IDS_WEBVIEW_OPT_OPEN_LINK_IN_NEW_TAB_ABB"
+msgstr "लिंक नए टैब में खोलें"
+
+msgid "IDS_WEBVIEW_OPT_OPEN_VIDEO_IN_NEW_WINDOW_ABB"
+msgstr "नई विंडो में वीडियो खोलें"
+
+msgid "IDS_WEBVIEW_OPT_PASTE"
+msgstr "पेस्ट करें"
+
+msgid "IDS_WEBVIEW_OPT_PAUSE"
+msgstr "विराम दें"
+
+msgid "IDS_WEBVIEW_OPT_PLAY"
+msgstr "चलाएँ"
+
+msgid "IDS_WEBVIEW_OPT_PLAY_AUDIO_IN_NEW_TAB_ABB"
+msgstr "नए टैब में ऑडियो चलाएँ"
+
+msgid "IDS_WEBVIEW_OPT_SAVE_IMAGE_ABB"
+msgstr "छवि सुरक्षित करें"
+
+msgid "IDS_WEBVIEW_OPT_SELECT_ABB"
+msgstr "चयन करें"
+
+msgid "IDS_WEBVIEW_OPT_SELECT_ALL_ABB"
+msgstr "सभी चुनें"
+
+msgid "IDS_WEBVIEW_OPT_SHOW_HIDE_MEDIA_CONTROLS_ABB"
+msgstr "मीडिया नियंत्रण दिखाएँ/छिपाएँ"
+
+msgid "IDS_WEBVIEW_OPT_SIGN_IN_USING_FINGERPRINTS"
+msgstr "फिंगरप्रिंट्स उपयोग कर साइन इन करें"
+
+msgid "IDS_WEBVIEW_OPT_TRANSLATE_ABB"
+msgstr "अनुवाद करें"
+
+msgid "IDS_WEBVIEW_OPT_UNMUTE"
+msgstr "अनम्यूट करें"
+
+msgid "IDS_WEBVIEW_OPT_WEB_SEARCH"
+msgstr "वेब खोज"
+
+msgid "IDS_WEBVIEW_POP_A_TEMPORARY_ERROR_HAS_OCCURRED"
+msgstr "कोई अस्‍थायी त्रुटि उत्पन्न हुई।"
+
+msgid "IDS_WEBVIEW_POP_DO_YOU_WANT_THE_DEVICE_TO_REMEMBER_YOUR_PASSWORD_Q"
+msgstr "क्‍या आप चाहेंगे कि डिवाइस आपके इस पासवर्ड को याद रखें?"
+
+msgid "IDS_WEBVIEW_POP_LEAVE_THIS_PAGE_Q"
+msgstr "यह पेज छोड़ें?"
+
+msgid "IDS_WEBVIEW_POP_SIGN_IN_TO_THIS_WEBSITE_AGAIN_BY_SWIPING_ANY_OF_YOUR_REGISTERED_FINGERS_OVER_THE_HOME_KEY_MSG"
+msgstr "होम कुंजी पर अपनी कोई भी पंजीकृत उंगली स्वाइप कर इस वेबसाइट में फिर से साइन इन करें। इस वेबसाइट के लिए आपका उपयोगकर्ता नाम और पासवर्ड आपके डिवाइस पर सुरक्षित किया जाएगा।"
+
+msgid "IDS_BR_HEADER_UNABLE_TO_OPEN_FILE"
+msgstr "फाइल खोलने में असमर्थ"
+
+msgid "IDS_BR_BODY_UNABLE_TO_OPEN_THE_FILE_AT_PS_IT_MAY_HAVE_BEEN_REMOVED_OR_RENAMED_OR_FILE_PERMISSIONS_MAY_BE_PREVENTING_ACCESS"
+msgstr "%s पर फाइल खोलने में असमर्थ। हो सकता है इसे निकाल दिया गया हो या इसका नाम बदल दिया गया हो अथवा हो सकता है कि फाइल अनुमतियाँ एक्सेस को प्रतिबंधित करती हों।"
+
+msgid "IDS_WEBVIEW_BUTTON_LATER_ABB"
+msgstr "बाद में"
+
+msgid "IDS_WEBVIEW_BUTTON_NEXT_ABB3"
+msgstr "अगला"
+
+msgid "IDS_WEBVIEW_BUTTON_PREV_ABB"
+msgstr "पिछला"
+
+msgid "IDS_WEBVIEW_OPT_SELECT_TEXT_ABB"
+msgstr "टेक्स्ट चुनें"
+
+msgid "IDS_WEBVIEW_POP_SAVE_THIS_PASSWORD_ON_THIS_DEVICE_Q"
+msgstr "इस डिवाइस पर यह पासवर्ड सुरक्षित करें?"
+
