@@ -1,0 +1,234 @@
+msgid "IDS_BR_BODY_SAVE_LINK"
+msgstr "লিঙ্ক সংরক্ষণ করুন"
+
+msgid "IDS_WEBVIEW_BODY_SHOWING_PD_ITEMS_TTS"
+msgstr "%dটি আইটেম প্রদর্শন করা হচ্ছে"
+
+msgid "IDS_WEBVIEW_HEADER_THIS_WEBPAGE_IS_NOT_AVAILABLE"
+msgstr "এই ওয়েবপৃষ্ঠাটি সুলভ নয়।"
+
+msgid "IDS_WEBVIEW_BODY_THE_SERVER_AT_PS_CANT_BE_FOUND_BECAUSE_THE_DNS_LOOK_UP_FAILED_MSG"
+msgstr "%s-এ থাকা সার্ভারটি DNS লুক-আপ ব্যর্থ হওয়ার কারণে খুঁজে নাও পাওয়া যেতে পারে৷ DNS হল এমন একটি নেটওয়ার্ক পরিষেবা যা কোনও ওয়েবসাইটের নাম ইন্টারনেট ঠিকানাটিতে অনুবাদ করে৷ এই ত্রুটিটি ইন্টারনেটে কোনও সংযোগ না থাকা বা কোনও ত্রুটিপূর্ণভাবে কনফিগার থাকা নেটওয়ার্কের কারণে প্রায়শই হতে পারে৷ এটি একটি অপ্রত্যুত্তরমূলক DNS সার্ভারের বা কোনও ফায়ারওয়াল যা ইন্টারনেটকে নেটওয়ার্ক অ্যাক্সেসে বাধা দিচ্ছে তার কারণে ঘটতে পারে৷"
+
+msgid "IDS_WEBVIEW_BODY_DETAILS"
+msgstr "বিশদ"
+
+msgid "IDS_WEBVIEW_BODY_DOUBLE_TAB_TO_EDIT_TTS"
+msgstr "সম্পাদনা করতে দুবার ট্যাপ করুন।"
+
+msgid "IDS_WEBVIEW_BODY_EDITING_TTS"
+msgstr "সম্পাদনা করা হচ্ছে৷"
+
+msgid "IDS_WEBVIEW_BODY_EDIT_FIELD__M_NOUN_TTS"
+msgstr "ফিল্ড সম্পাদনা করুন"
+
+msgid "IDS_WEBVIEW_BODY_ENTER_AN_EMAIL_ADDRESS"
+msgstr "একটি ইমেল ঠিকানা লিখুন।"
+
+msgid "IDS_WEBVIEW_BODY_ENTER_A_LIST_OF_EMAIL_ADDRESSES_SEPARATED_BY_COMMAS"
+msgstr "কমাগুলি দ্বারা পৃথক করা ইমেল ঠিকানাগুলির একটি তালিকা লিখুন।"
+
+msgid "IDS_WEBVIEW_BODY_ENTER_A_URL"
+msgstr "একটি URL লিখুন।"
+
+msgid "IDS_WEBVIEW_BODY_FIELD_CANNOT_BE_BLANK"
+msgstr "ক্ষেত্র ফাঁকা থাকতে পারেনা।"
+
+msgid "IDS_WEBVIEW_BODY_INVALID_FORMAT_ENTERED"
+msgstr "অবৈধ বিন্যাস লেখা হয়েছে।"
+
+msgid "IDS_WEBVIEW_BODY_INVALID_VALUE_ENTERED"
+msgstr "অবৈধ মান লেখা হয়েছে।"
+
+msgid "IDS_WEBVIEW_BODY_NOT_SELECTED_TTS"
+msgstr "অনির্বাচিত"
+
+msgid "IDS_WEBVIEW_BODY_NO_FILES_HAVE_BEEN_SELECTED"
+msgstr "কোনও ফাইল নির্বাচিত হয়নি।"
+
+msgid "IDS_WEBVIEW_BODY_PD_CHARACTERS_TTS"
+msgstr "%dটি অক্ষর।"
+
+msgid "IDS_WEBVIEW_BODY_PLUG_IN_MISSING"
+msgstr "প্লাগ-ইন অনুপস্থিত"
+
+msgid "IDS_WEBVIEW_BODY_SELECTED_TTS"
+msgstr "নির্বাচিত"
+
+msgid "IDS_WEBVIEW_BODY_UNABLE_TO_LOAD_THE_PAGE_A_SECURE_CONNECTION_COULD_NOT_BE_MADE_TO_PS_THE_MOST_LIKELY_CAUSE_IS_THE_DEVICES_CLOCK_CHECK_THAT_THE_TIME_ON_YOUR_DEVICE_IS_CORRECT_AND_REFRESH_THE_PAGE"
+msgstr "পৃষ্ঠাটি লোড করতে অক্ষম৷ %s এ কোনও সুরক্ষিত সংযোগ তৈরি করা যায়নি৷ সর্বাধিক সম্ভাব্য কারণটি হল ডিভাইসের ঘড়ি৷ আপনার ডিভাইসের সময়টি সঠিক রয়েছে তা পরীক্ষা করুন এবং পৃষ্ঠাটি রিফ্রেশ করুন৷"
+
+msgid "IDS_WEBVIEW_BODY_UNABLE_TO_LOAD_THE_PAGE_PS_MAY_BE_TEMPORARILY_DOWN_OR_HAVE_MOVED_TO_A_NEW_URL"
+msgstr "পৃষ্ঠাটি লোড করতে অক্ষম৷ %s অস্থায়ীভাবে ডাউন থাকতে পারে বা একটি নতুন URL-এ সরে গিয়ে থাকতে পারে৷"
+
+msgid "IDS_WEBVIEW_BODY_UNABLE_TO_LOAD_THE_PAGE_PS_TOOK_TOO_LONG_TO_RESPOND_THE_WEBSITE_MAY_BE_DOWN_OR_THERE_MAY_HAVE_BEEN_A_NETWORK_CONNECTION_ERROR"
+msgstr "পৃষ্ঠাটি লোড করতে অক্ষম৷ %s প্রতিক্রিয়া জানাতে অধিক সময় নিচ্ছে৷ ওয়েবসাইটটি ডাউন হতে পারে বা একটি নেটওয়ার্ক ত্রুটি ঘটতে পারে৷"
+
+msgid "IDS_WEBVIEW_BODY_VALUE_MUST_BE_AT_LEAST_PD"
+msgstr "মান কমপক্ষে %d হওয়া আবশ্যক।"
+
+msgid "IDS_WEBVIEW_BODY_VALUE_MUST_BE_NO_HIGHER_THAN_PD"
+msgstr "মান অবশ্যই %d-এর বেশি হবে না।"
+
+msgid "IDS_WEBVIEW_BODY_YOU_CAN_SEARCH_THIS_INDEX_ENTER_KEYWORDS_C"
+msgstr "আপনি এই সূচিটি অনুসন্ধান করতে পারেন৷ কীওয়ার্ডগুলি লিখুন:"
+
+msgid "IDS_WEBVIEW_BUTTON2_NEVER"
+msgstr "কখনো না"
+
+msgid "IDS_WEBVIEW_BUTTON_DONE"
+msgstr "সম্পন্ন"
+
+msgid "IDS_WEBVIEW_BUTTON_LEAVE"
+msgstr "ছেড়ে যান"
+
+msgid "IDS_WEBVIEW_BUTTON_NOT_NOW_ABB"
+msgstr "এখন নয়"
+
+msgid "IDS_WEBVIEW_BUTTON_RESET"
+msgstr "রিসেট"
+
+msgid "IDS_WEBVIEW_BUTTON_SAVE"
+msgstr "সংরক্ষণ"
+
+msgid "IDS_WEBVIEW_BUTTON_STAY"
+msgstr "থাকুন"
+
+msgid "IDS_WEBVIEW_BUTTON_SUBMIT"
+msgstr "জমা দিন"
+
+msgid "IDS_WEBVIEW_BUTTON_UPLOAD_FILE"
+msgstr "ফাইল আপলোড করুন"
+
+msgid "IDS_WEBVIEW_BUTTON_UPLOAD_MULTIPLE_FILES"
+msgstr "একাধিক ফাইল আপলোড করুন"
+
+msgid "IDS_WEBVIEW_HEADER_MESSAGE_FROM_PS_M_WEBSITE"
+msgstr "%s থেকে বার্তা"
+
+msgid "IDS_WEBVIEW_HEADER_REMEMBER_PASSWORD"
+msgstr "পাসওয়ার্ড মনে রাখুন"
+
+msgid "IDS_WEBVIEW_HEADER_SELECT_COLOUR"
+msgstr "রঙ নির্বাচন করুন"
+
+msgid "IDS_WEBVIEW_HEADER_SET_DATE_AND_TIME"
+msgstr "তারিখ ও সময় সেট করুন"
+
+msgid "IDS_WEBVIEW_OPT_CLIPBOARD"
+msgstr "ক্লিপবোর্ড"
+
+msgid "IDS_WEBVIEW_OPT_COPY"
+msgstr "অনুলিপি করুন"
+
+msgid "IDS_WEBVIEW_OPT_COPY_AUDIO_URL_ABB"
+msgstr "অডিও URL অনুলিপি করুন"
+
+msgid "IDS_WEBVIEW_OPT_COPY_IMAGE"
+msgstr "ছবির প্রতিলিপি করুন"
+
+msgid "IDS_WEBVIEW_OPT_COPY_LINK_URL_ABB"
+msgstr "লিঙ্ক URL অনুলিপি করুন"
+
+msgid "IDS_WEBVIEW_OPT_COPY_TO_CLIPBOARD"
+msgstr "ক্লিপবোর্ডে প্রতিলিপি গঠন"
+
+msgid "IDS_WEBVIEW_OPT_COPY_VIDEO_URL_ABB"
+msgstr "ভিডিও URL অনুলিপি করুন"
+
+msgid "IDS_WEBVIEW_OPT_CUT_ABB"
+msgstr "কাটুন"
+
+msgid "IDS_WEBVIEW_OPT_DO_NOT_SHOW_AGAIN"
+msgstr "আর দেখাবেন না"
+
+msgid "IDS_WEBVIEW_OPT_DRAG_AND_DROP_ABB"
+msgstr "টেনে এনে ছেড়ে দিন"
+
+msgid "IDS_WEBVIEW_OPT_ENABLE_DISABLE_REPEAT_MEDIA_ABB"
+msgstr "পুনরাবৃত্তি মিডিয়া সক্ষম/অক্ষম করুন"
+
+msgid "IDS_WEBVIEW_OPT_FULL_VIEW_ABB"
+msgstr "পূর্ণ দৃশ্য"
+
+msgid "IDS_WEBVIEW_OPT_MUTE"
+msgstr "নীরব করুন"
+
+msgid "IDS_WEBVIEW_OPT_OPEN_IMAGE_IN_NEW_TAB_ABB"
+msgstr "নতুন ট্যাবে ছবি খুলুন"
+
+msgid "IDS_WEBVIEW_OPT_OPEN_LINK_IN_NEW_TAB_ABB"
+msgstr "নতুন ট্যাবে লিঙ্ক খুলুন"
+
+msgid "IDS_WEBVIEW_OPT_OPEN_VIDEO_IN_NEW_WINDOW_ABB"
+msgstr "নতুন উইন্ডোতে ভিডিও খুলুন"
+
+msgid "IDS_WEBVIEW_OPT_PASTE"
+msgstr "প্রতিলেপন"
+
+msgid "IDS_WEBVIEW_OPT_PAUSE"
+msgstr "বিরাম দিন"
+
+msgid "IDS_WEBVIEW_OPT_PLAY"
+msgstr "বাজান"
+
+msgid "IDS_WEBVIEW_OPT_PLAY_AUDIO_IN_NEW_TAB_ABB"
+msgstr "নতুন ট্যাবে অডিও প্লে করুন"
+
+msgid "IDS_WEBVIEW_OPT_SAVE_IMAGE_ABB"
+msgstr "ছবি সংরক্ষণ করুন"
+
+msgid "IDS_WEBVIEW_OPT_SELECT_ABB"
+msgstr "নির্বাচন"
+
+msgid "IDS_WEBVIEW_OPT_SELECT_ALL_ABB"
+msgstr "সব নির্বাচন"
+
+msgid "IDS_WEBVIEW_OPT_SHOW_HIDE_MEDIA_CONTROLS_ABB"
+msgstr "মিডিয়া নিয়ন্ত্রণগুলি দেখান/লুকান"
+
+msgid "IDS_WEBVIEW_OPT_SIGN_IN_USING_FINGERPRINTS"
+msgstr "আঙুলের ছাপগুলি ব্যবহার করে সাইন ইন করুন"
+
+msgid "IDS_WEBVIEW_OPT_TRANSLATE_ABB"
+msgstr "অনুবাদ করুন"
+
+msgid "IDS_WEBVIEW_OPT_UNMUTE"
+msgstr "নীরবমুক্ত করুন"
+
+msgid "IDS_WEBVIEW_OPT_WEB_SEARCH"
+msgstr "ওয়েব সন্ধান"
+
+msgid "IDS_WEBVIEW_POP_A_TEMPORARY_ERROR_HAS_OCCURRED"
+msgstr "একটি অস্থায়ী ত্রুটি ঘটেছে।"
+
+msgid "IDS_WEBVIEW_POP_DO_YOU_WANT_THE_DEVICE_TO_REMEMBER_YOUR_PASSWORD_Q"
+msgstr "আপনি কি ডিভাইসটিকে নিজের পাসওয়ার্ডটি মনে করাতে চান?"
+
+msgid "IDS_WEBVIEW_POP_LEAVE_THIS_PAGE_Q"
+msgstr "এই পৃষ্ঠাটি ছেড়ে যাবেন?"
+
+msgid "IDS_WEBVIEW_POP_SIGN_IN_TO_THIS_WEBSITE_AGAIN_BY_SWIPING_ANY_OF_YOUR_REGISTERED_FINGERS_OVER_THE_HOME_KEY_MSG"
+msgstr "হোম কী-এর উপরে আপনার নথিবদ্ধ আঙুলগুলির একটি সোয়াইপ করে এই ওয়েবসাইটে পুনরায় সাইন ইন করুন। এই ওয়েবসাইটের জন্য আপনার ব্যবহারকারীর নাম এবং পাসওয়ার্ড সংরক্ষিত হবে।"
+
+msgid "IDS_BR_HEADER_UNABLE_TO_OPEN_FILE"
+msgstr "ফাইল খুলতে অক্ষম"
+
+msgid "IDS_BR_BODY_UNABLE_TO_OPEN_THE_FILE_AT_PS_IT_MAY_HAVE_BEEN_REMOVED_OR_RENAMED_OR_FILE_PERMISSIONS_MAY_BE_PREVENTING_ACCESS"
+msgstr "%s-এ ফাইলটি খুলতে অক্ষম। এটি অপসারণ বা পুনরায় নামকরণ করা হয়ে থাকতে পারে, বা ফাইলের অনুমতিগুলি অ্যাক্সেসে বাধা দিচ্ছে।"
+
+msgid "IDS_WEBVIEW_BUTTON_LATER_ABB"
+msgstr "পরে"
+
+msgid "IDS_WEBVIEW_BUTTON_NEXT_ABB3"
+msgstr "পরে"
+
+msgid "IDS_WEBVIEW_BUTTON_PREV_ABB"
+msgstr "আগে"
+
+msgid "IDS_WEBVIEW_OPT_SELECT_TEXT_ABB"
+msgstr "পাঠ্য নির্বাচন"
+
+msgid "IDS_WEBVIEW_POP_SAVE_THIS_PASSWORD_ON_THIS_DEVICE_Q"
+msgstr "এই ডিভাইসে এই পাসওয়ার্ডটি সংরক্ষণ করবেন?"
+

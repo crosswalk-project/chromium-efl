@@ -1,0 +1,234 @@
+msgid "IDS_BR_BODY_SAVE_LINK"
+msgstr "ربط محفوظ کریں"
+
+msgid "IDS_WEBVIEW_BODY_SHOWING_PD_ITEMS_TTS"
+msgstr "‎%d اشیاء دکھا رہا ہے"
+
+msgid "IDS_WEBVIEW_HEADER_THIS_WEBPAGE_IS_NOT_AVAILABLE"
+msgstr "یہ ویب صفحہ دستیاب نہیں ہے"
+
+msgid "IDS_WEBVIEW_BODY_THE_SERVER_AT_PS_CANT_BE_FOUND_BECAUSE_THE_DNS_LOOK_UP_FAILED_MSG"
+msgstr "%s پر واقع سرور نہیں مل سکا چونکہ DNS لک-اپ ناکام ہوگیا۔ DNS وہ نیٹ ورک خدمت ہے جو ایک ویب سائٹ کے نام کا اس کے انٹرنیٹ پتہ سے ترجمہ کرتی ہے۔ یہ غلطی اکثر انٹرنیٹ سے کوئی کنکشن نہ ہونے کی وجہ سے واقع ہوتی ہے یا ایک غلط تشکیل کردہ نیٹ ورک سے۔ یہ ایک غیر جوابدہ DNS سرور کی وجہ سے بھی واقع ہوسکتی ہے یا ایک فصیل سے جو انٹرنیٹ کو نیٹ ورک پر رسائی سے روک رہی ہو۔"
+
+msgid "IDS_WEBVIEW_BODY_DETAILS"
+msgstr "تفصیل"
+
+msgid "IDS_WEBVIEW_BODY_DOUBLE_TAB_TO_EDIT_TTS"
+msgstr "ترمیم کے لیے دوہری تھپکی دیں۔"
+
+msgid "IDS_WEBVIEW_BODY_EDITING_TTS"
+msgstr "تدوین کرنا۔"
+
+msgid "IDS_WEBVIEW_BODY_EDIT_FIELD__M_NOUN_TTS"
+msgstr "فیلڈ تدوین کریں"
+
+msgid "IDS_WEBVIEW_BODY_ENTER_AN_EMAIL_ADDRESS"
+msgstr "ایک ای میل پتہ درج کریں"
+
+msgid "IDS_WEBVIEW_BODY_ENTER_A_LIST_OF_EMAIL_ADDRESSES_SEPARATED_BY_COMMAS"
+msgstr "ای میل پتوں کی ایک فہرست داخل کریں، جو کوما کے ذریعے علیحدہ کئے گئے ہوں"
+
+msgid "IDS_WEBVIEW_BODY_ENTER_A_URL"
+msgstr "ایک URL داخل کریں"
+
+msgid "IDS_WEBVIEW_BODY_FIELD_CANNOT_BE_BLANK"
+msgstr "خانہ خالی نہیں رکھاجاسکتا"
+
+msgid "IDS_WEBVIEW_BODY_INVALID_FORMAT_ENTERED"
+msgstr "غیر مجاز وضع داخل کی گئی۔"
+
+msgid "IDS_WEBVIEW_BODY_INVALID_VALUE_ENTERED"
+msgstr "غیر مجاز قدر داخل کی گئی۔"
+
+msgid "IDS_WEBVIEW_BODY_NOT_SELECTED_TTS"
+msgstr "منتخب نہيں ہوا"
+
+msgid "IDS_WEBVIEW_BODY_NO_FILES_HAVE_BEEN_SELECTED"
+msgstr "کوئی فائلیں منتخب نہيں کی گئی ہیں"
+
+msgid "IDS_WEBVIEW_BODY_PD_CHARACTERS_TTS"
+msgstr "%d حروف۔"
+
+msgid "IDS_WEBVIEW_BODY_PLUG_IN_MISSING"
+msgstr "پلگ-ان غائب"
+
+msgid "IDS_WEBVIEW_BODY_SELECTED_TTS"
+msgstr "منتخب کیا"
+
+msgid "IDS_WEBVIEW_BODY_UNABLE_TO_LOAD_THE_PAGE_A_SECURE_CONNECTION_COULD_NOT_BE_MADE_TO_PS_THE_MOST_LIKELY_CAUSE_IS_THE_DEVICES_CLOCK_CHECK_THAT_THE_TIME_ON_YOUR_DEVICE_IS_CORRECT_AND_REFRESH_THE_PAGE"
+msgstr "صفحہ لوڈ کرنے سے قاصر۔ %s سے ایک قابل بھروسا کنکشن نہیں بنایا جاسکا۔ بیشتر امکانی وجہ آلہ کی گھڑی ہے۔ پڑتال کریں کہ آپ کے آلہ پر وقت درست ہے اور صفحہ پھر تازہ کریں۔"
+
+msgid "IDS_WEBVIEW_BODY_UNABLE_TO_LOAD_THE_PAGE_PS_MAY_BE_TEMPORARILY_DOWN_OR_HAVE_MOVED_TO_A_NEW_URL"
+msgstr "صفحہ لوڈ کرنے سے قاصر۔ ہوسکتا ہے %s عارضی طور پر ڈاؤن ہو یا ایک نئے URL پر منتقل ہوچکا ہو۔"
+
+msgid "IDS_WEBVIEW_BODY_UNABLE_TO_LOAD_THE_PAGE_PS_TOOK_TOO_LONG_TO_RESPOND_THE_WEBSITE_MAY_BE_DOWN_OR_THERE_MAY_HAVE_BEEN_A_NETWORK_CONNECTION_ERROR"
+msgstr "صفحہ لوڈ کرنے سے قاصر۔ ہوسکتا ہے %s نے جواب دینے میں بہت دیر لگا دی۔ ہوسکتا ہے ویب سائٹ ڈاؤن ہو، یا ایک نیٹ ورک غلطی واقع ہوسکتی ہے۔"
+
+msgid "IDS_WEBVIEW_BODY_VALUE_MUST_BE_AT_LEAST_PD"
+msgstr "قیمت کا کم از کم %d ہونا ضروری ہے"
+
+msgid "IDS_WEBVIEW_BODY_VALUE_MUST_BE_NO_HIGHER_THAN_PD"
+msgstr "قیمت کا %d سے بیشتر نہ ہونا ضروری ہے"
+
+msgid "IDS_WEBVIEW_BODY_YOU_CAN_SEARCH_THIS_INDEX_ENTER_KEYWORDS_C"
+msgstr "آپ یہ انڈیکس تلاش کرسکتے ہیں۔ کلیدی الفاظ درج کریں:"
+
+msgid "IDS_WEBVIEW_BUTTON2_NEVER"
+msgstr "کبھی نہیں"
+
+msgid "IDS_WEBVIEW_BUTTON_DONE"
+msgstr "مکمل"
+
+msgid "IDS_WEBVIEW_BUTTON_LEAVE"
+msgstr "چھوڑ دیں"
+
+msgid "IDS_WEBVIEW_BUTTON_NOT_NOW_ABB"
+msgstr "اب نہیں"
+
+msgid "IDS_WEBVIEW_BUTTON_RESET"
+msgstr "پھر سیٹ"
+
+msgid "IDS_WEBVIEW_BUTTON_SAVE"
+msgstr "محفوظ کریں"
+
+msgid "IDS_WEBVIEW_BUTTON_STAY"
+msgstr "ٹھہریں"
+
+msgid "IDS_WEBVIEW_BUTTON_SUBMIT"
+msgstr "ارسال کریں"
+
+msgid "IDS_WEBVIEW_BUTTON_UPLOAD_FILE"
+msgstr "فائل اپ لوڈ کریں"
+
+msgid "IDS_WEBVIEW_BUTTON_UPLOAD_MULTIPLE_FILES"
+msgstr "کئی ایک فائلیں اپ لوڈ کریں"
+
+msgid "IDS_WEBVIEW_HEADER_MESSAGE_FROM_PS_M_WEBSITE"
+msgstr "پیغام از %s"
+
+msgid "IDS_WEBVIEW_HEADER_REMEMBER_PASSWORD"
+msgstr "پاسورڈ یاد رکھیں"
+
+msgid "IDS_WEBVIEW_HEADER_SELECT_COLOUR"
+msgstr "رنگ منتخب کریں"
+
+msgid "IDS_WEBVIEW_HEADER_SET_DATE_AND_TIME"
+msgstr "تاریخ اور وقت سیٹ کریں"
+
+msgid "IDS_WEBVIEW_OPT_CLIPBOARD"
+msgstr "کلپ بورڈ"
+
+msgid "IDS_WEBVIEW_OPT_COPY"
+msgstr "کاپی"
+
+msgid "IDS_WEBVIEW_OPT_COPY_AUDIO_URL_ABB"
+msgstr "آڈیو URL نقل کریں"
+
+msgid "IDS_WEBVIEW_OPT_COPY_IMAGE"
+msgstr "تصویر نقل کریں"
+
+msgid "IDS_WEBVIEW_OPT_COPY_LINK_URL_ABB"
+msgstr "URL لنک نقل کریں"
+
+msgid "IDS_WEBVIEW_OPT_COPY_TO_CLIPBOARD"
+msgstr "کلپ بورڈ پر نقل کریں"
+
+msgid "IDS_WEBVIEW_OPT_COPY_VIDEO_URL_ABB"
+msgstr "ویڈیو URL نقل کریں"
+
+msgid "IDS_WEBVIEW_OPT_CUT_ABB"
+msgstr "کٹ"
+
+msgid "IDS_WEBVIEW_OPT_DO_NOT_SHOW_AGAIN"
+msgstr "دوبارہ مت دکھائیں"
+
+msgid "IDS_WEBVIEW_OPT_DRAG_AND_DROP_ABB"
+msgstr "گھسیٹیں اور ڈالیں"
+
+msgid "IDS_WEBVIEW_OPT_ENABLE_DISABLE_REPEAT_MEDIA_ABB"
+msgstr "میڈیا دہرائیں اہل/نااہل بنائیں"
+
+msgid "IDS_WEBVIEW_OPT_FULL_VIEW_ABB"
+msgstr "پورا منظر"
+
+msgid "IDS_WEBVIEW_OPT_MUTE"
+msgstr "آواز بند"
+
+msgid "IDS_WEBVIEW_OPT_OPEN_IMAGE_IN_NEW_TAB_ABB"
+msgstr "تصویر نئے ٹیب میں کھولیں"
+
+msgid "IDS_WEBVIEW_OPT_OPEN_LINK_IN_NEW_TAB_ABB"
+msgstr "لنک نئے ٹیب میں کھولیں"
+
+msgid "IDS_WEBVIEW_OPT_OPEN_VIDEO_IN_NEW_WINDOW_ABB"
+msgstr "ویڈیو کو نئے دریچہ میں کھولیں"
+
+msgid "IDS_WEBVIEW_OPT_PASTE"
+msgstr "جوڑ دیں"
+
+msgid "IDS_WEBVIEW_OPT_PAUSE"
+msgstr "وقفہ"
+
+msgid "IDS_WEBVIEW_OPT_PLAY"
+msgstr "پلے کریں"
+
+msgid "IDS_WEBVIEW_OPT_PLAY_AUDIO_IN_NEW_TAB_ABB"
+msgstr "آڈیو نئے ٹیب میں پلے کریں"
+
+msgid "IDS_WEBVIEW_OPT_SAVE_IMAGE_ABB"
+msgstr "تصویر محفوظ کریں"
+
+msgid "IDS_WEBVIEW_OPT_SELECT_ABB"
+msgstr "منتخب کریں"
+
+msgid "IDS_WEBVIEW_OPT_SELECT_ALL_ABB"
+msgstr "سب منتخب"
+
+msgid "IDS_WEBVIEW_OPT_SHOW_HIDE_MEDIA_CONTROLS_ABB"
+msgstr "میڈیا کنٹرولز دکھائیں/چھپائیں"
+
+msgid "IDS_WEBVIEW_OPT_SIGN_IN_USING_FINGERPRINTS"
+msgstr "فنگرپرنٹس کا استعمال کرتے ہوئے سائن ان کریں"
+
+msgid "IDS_WEBVIEW_OPT_TRANSLATE_ABB"
+msgstr "ترجمہ کریں"
+
+msgid "IDS_WEBVIEW_OPT_UNMUTE"
+msgstr "آواز کھولیں"
+
+msgid "IDS_WEBVIEW_OPT_WEB_SEARCH"
+msgstr "ویب تلاش"
+
+msgid "IDS_WEBVIEW_POP_A_TEMPORARY_ERROR_HAS_OCCURRED"
+msgstr "ایک عارضی خرابی پیش آگئی ہے۔"
+
+msgid "IDS_WEBVIEW_POP_DO_YOU_WANT_THE_DEVICE_TO_REMEMBER_YOUR_PASSWORD_Q"
+msgstr "کیا آپ چاہتے ہیں کہ آلہ آپ کا پاس ورڈ یاد رکھے؟"
+
+msgid "IDS_WEBVIEW_POP_LEAVE_THIS_PAGE_Q"
+msgstr "یہ صفحہ چھوڑدیں؟"
+
+msgid "IDS_WEBVIEW_POP_SIGN_IN_TO_THIS_WEBSITE_AGAIN_BY_SWIPING_ANY_OF_YOUR_REGISTERED_FINGERS_OVER_THE_HOME_KEY_MSG"
+msgstr "ہوم کی پر اپنی رجسٹرڈ انگلیوں میں سے کسی ایک کو سوائپ کرتے ہوئے اس ویب سائٹ میں دوبارہ سائن ان کریں۔ اس ویب سائٹ کے لئے آپ کے صارف نام اور پاسورڈ کو آپ کے ڈیوائس پر محفوظ کیا جائے گا۔"
+
+msgid "IDS_BR_HEADER_UNABLE_TO_OPEN_FILE"
+msgstr "فائل کھولنے سے قاصر"
+
+msgid "IDS_BR_BODY_UNABLE_TO_OPEN_THE_FILE_AT_PS_IT_MAY_HAVE_BEEN_REMOVED_OR_RENAMED_OR_FILE_PERMISSIONS_MAY_BE_PREVENTING_ACCESS"
+msgstr "%s پر فائل کو کھولنے سے قاصر۔ اسے ہٹا دیا گیا ہے یا اس کا نام تبدیل کردیا گیا ہے، یا ہوسکتا ہے فائل کی اجازتیں رسائی سے روک رہی ہوں۔"
+
+msgid "IDS_WEBVIEW_BUTTON_LATER_ABB"
+msgstr "بعد میں"
+
+msgid "IDS_WEBVIEW_BUTTON_NEXT_ABB3"
+msgstr "اگلا"
+
+msgid "IDS_WEBVIEW_BUTTON_PREV_ABB"
+msgstr "سابق"
+
+msgid "IDS_WEBVIEW_OPT_SELECT_TEXT_ABB"
+msgstr "متن منتخب کریں"
+
+msgid "IDS_WEBVIEW_POP_SAVE_THIS_PASSWORD_ON_THIS_DEVICE_Q"
+msgstr "یہ پاسورڈ اس آلے پر محفوظ کریں؟"
+

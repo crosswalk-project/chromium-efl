@@ -1,0 +1,234 @@
+msgid "IDS_BR_BODY_SAVE_LINK"
+msgstr "Save link"
+
+msgid "IDS_WEBVIEW_BODY_SHOWING_PD_ITEMS_TTS"
+msgstr "Showing %d items"
+
+msgid "IDS_WEBVIEW_HEADER_THIS_WEBPAGE_IS_NOT_AVAILABLE"
+msgstr "This webpage is not available."
+
+msgid "IDS_WEBVIEW_BODY_THE_SERVER_AT_PS_CANT_BE_FOUND_BECAUSE_THE_DNS_LOOK_UP_FAILED_MSG"
+msgstr "The server at %s can't be found because the DNS look-up failed. DNS is the network service that translates a website's name to its Internet address. This error is most often caused by having no connection to the Internet or a misconfigured network. It can also be caused by an unresponsive DNS server or a firewall preventing Internet from accessing the network."
+
+msgid "IDS_WEBVIEW_BODY_DETAILS"
+msgstr "Details"
+
+msgid "IDS_WEBVIEW_BODY_DOUBLE_TAB_TO_EDIT_TTS"
+msgstr "Double tap to edit."
+
+msgid "IDS_WEBVIEW_BODY_EDITING_TTS"
+msgstr "Editing."
+
+msgid "IDS_WEBVIEW_BODY_EDIT_FIELD__M_NOUN_TTS"
+msgstr "Edit field"
+
+msgid "IDS_WEBVIEW_BODY_ENTER_AN_EMAIL_ADDRESS"
+msgstr "Enter an email address."
+
+msgid "IDS_WEBVIEW_BODY_ENTER_A_LIST_OF_EMAIL_ADDRESSES_SEPARATED_BY_COMMAS"
+msgstr "Enter a list of email addresses, separated by commas."
+
+msgid "IDS_WEBVIEW_BODY_ENTER_A_URL"
+msgstr "Enter a URL."
+
+msgid "IDS_WEBVIEW_BODY_FIELD_CANNOT_BE_BLANK"
+msgstr "Field cannot be blank."
+
+msgid "IDS_WEBVIEW_BODY_INVALID_FORMAT_ENTERED"
+msgstr "Invalid format entered."
+
+msgid "IDS_WEBVIEW_BODY_INVALID_VALUE_ENTERED"
+msgstr "Invalid value entered."
+
+msgid "IDS_WEBVIEW_BODY_NOT_SELECTED_TTS"
+msgstr "Not selected"
+
+msgid "IDS_WEBVIEW_BODY_NO_FILES_HAVE_BEEN_SELECTED"
+msgstr "No files have been selected."
+
+msgid "IDS_WEBVIEW_BODY_PD_CHARACTERS_TTS"
+msgstr "%d characters."
+
+msgid "IDS_WEBVIEW_BODY_PLUG_IN_MISSING"
+msgstr "Plug-in missing"
+
+msgid "IDS_WEBVIEW_BODY_SELECTED_TTS"
+msgstr "Selected"
+
+msgid "IDS_WEBVIEW_BODY_UNABLE_TO_LOAD_THE_PAGE_A_SECURE_CONNECTION_COULD_NOT_BE_MADE_TO_PS_THE_MOST_LIKELY_CAUSE_IS_THE_DEVICES_CLOCK_CHECK_THAT_THE_TIME_ON_YOUR_DEVICE_IS_CORRECT_AND_REFRESH_THE_PAGE"
+msgstr "Unable to load the page. A secure connection could not be made to %s. The most likely cause is the device's clock. Check that the time on your device is correct and refresh the page."
+
+msgid "IDS_WEBVIEW_BODY_UNABLE_TO_LOAD_THE_PAGE_PS_MAY_BE_TEMPORARILY_DOWN_OR_HAVE_MOVED_TO_A_NEW_URL"
+msgstr "Unable to load the page. %s may be temporarily down or have moved to a new URL."
+
+msgid "IDS_WEBVIEW_BODY_UNABLE_TO_LOAD_THE_PAGE_PS_TOOK_TOO_LONG_TO_RESPOND_THE_WEBSITE_MAY_BE_DOWN_OR_THERE_MAY_HAVE_BEEN_A_NETWORK_CONNECTION_ERROR"
+msgstr "Unable to load the page. %s took too long to respond. The website may be down, or there may have been a network connection error."
+
+msgid "IDS_WEBVIEW_BODY_VALUE_MUST_BE_AT_LEAST_PD"
+msgstr "Value must be at least %d."
+
+msgid "IDS_WEBVIEW_BODY_VALUE_MUST_BE_NO_HIGHER_THAN_PD"
+msgstr "Value must be no higher than %d."
+
+msgid "IDS_WEBVIEW_BODY_YOU_CAN_SEARCH_THIS_INDEX_ENTER_KEYWORDS_C"
+msgstr "You can search this index. Enter keywords:"
+
+msgid "IDS_WEBVIEW_BUTTON2_NEVER"
+msgstr "Never"
+
+msgid "IDS_WEBVIEW_BUTTON_DONE"
+msgstr "Done"
+
+msgid "IDS_WEBVIEW_BUTTON_LEAVE"
+msgstr "Leave"
+
+msgid "IDS_WEBVIEW_BUTTON_NOT_NOW_ABB"
+msgstr "Not now"
+
+msgid "IDS_WEBVIEW_BUTTON_RESET"
+msgstr "Reset"
+
+msgid "IDS_WEBVIEW_BUTTON_SAVE"
+msgstr "Save"
+
+msgid "IDS_WEBVIEW_BUTTON_STAY"
+msgstr "Stay"
+
+msgid "IDS_WEBVIEW_BUTTON_SUBMIT"
+msgstr "Submit"
+
+msgid "IDS_WEBVIEW_BUTTON_UPLOAD_FILE"
+msgstr "Upload file"
+
+msgid "IDS_WEBVIEW_BUTTON_UPLOAD_MULTIPLE_FILES"
+msgstr "Upload multiple files"
+
+msgid "IDS_WEBVIEW_HEADER_MESSAGE_FROM_PS_M_WEBSITE"
+msgstr "Message from %s"
+
+msgid "IDS_WEBVIEW_HEADER_REMEMBER_PASSWORD"
+msgstr "Remember password"
+
+msgid "IDS_WEBVIEW_HEADER_SELECT_COLOUR"
+msgstr "Select colour"
+
+msgid "IDS_WEBVIEW_HEADER_SET_DATE_AND_TIME"
+msgstr "Set date and time"
+
+msgid "IDS_WEBVIEW_OPT_CLIPBOARD"
+msgstr "Clipboard"
+
+msgid "IDS_WEBVIEW_OPT_COPY"
+msgstr "Copy"
+
+msgid "IDS_WEBVIEW_OPT_COPY_AUDIO_URL_ABB"
+msgstr "Copy audio URL"
+
+msgid "IDS_WEBVIEW_OPT_COPY_IMAGE"
+msgstr "Copy image"
+
+msgid "IDS_WEBVIEW_OPT_COPY_LINK_URL_ABB"
+msgstr "Copy link URL"
+
+msgid "IDS_WEBVIEW_OPT_COPY_TO_CLIPBOARD"
+msgstr "Copy to clipboard"
+
+msgid "IDS_WEBVIEW_OPT_COPY_VIDEO_URL_ABB"
+msgstr "Copy video URL"
+
+msgid "IDS_WEBVIEW_OPT_CUT_ABB"
+msgstr "Cut"
+
+msgid "IDS_WEBVIEW_OPT_DO_NOT_SHOW_AGAIN"
+msgstr "Do not show again"
+
+msgid "IDS_WEBVIEW_OPT_DRAG_AND_DROP_ABB"
+msgstr "Drag and drop"
+
+msgid "IDS_WEBVIEW_OPT_ENABLE_DISABLE_REPEAT_MEDIA_ABB"
+msgstr "Enable/disable repeat media"
+
+msgid "IDS_WEBVIEW_OPT_FULL_VIEW_ABB"
+msgstr "Full view"
+
+msgid "IDS_WEBVIEW_OPT_MUTE"
+msgstr "Mute"
+
+msgid "IDS_WEBVIEW_OPT_OPEN_IMAGE_IN_NEW_TAB_ABB"
+msgstr "Open image in new tab"
+
+msgid "IDS_WEBVIEW_OPT_OPEN_LINK_IN_NEW_TAB_ABB"
+msgstr "Open link in new tab"
+
+msgid "IDS_WEBVIEW_OPT_OPEN_VIDEO_IN_NEW_WINDOW_ABB"
+msgstr "Open video in new window"
+
+msgid "IDS_WEBVIEW_OPT_PASTE"
+msgstr "Paste"
+
+msgid "IDS_WEBVIEW_OPT_PAUSE"
+msgstr "Pause"
+
+msgid "IDS_WEBVIEW_OPT_PLAY"
+msgstr "Play"
+
+msgid "IDS_WEBVIEW_OPT_PLAY_AUDIO_IN_NEW_TAB_ABB"
+msgstr "Play audio in new tab"
+
+msgid "IDS_WEBVIEW_OPT_SAVE_IMAGE_ABB"
+msgstr "Save image"
+
+msgid "IDS_WEBVIEW_OPT_SELECT_ABB"
+msgstr "Select"
+
+msgid "IDS_WEBVIEW_OPT_SELECT_ALL_ABB"
+msgstr "Select all"
+
+msgid "IDS_WEBVIEW_OPT_SHOW_HIDE_MEDIA_CONTROLS_ABB"
+msgstr "Show/hide media controls"
+
+msgid "IDS_WEBVIEW_OPT_SIGN_IN_USING_FINGERPRINTS"
+msgstr "Sign in using fingerprints"
+
+msgid "IDS_WEBVIEW_OPT_TRANSLATE_ABB"
+msgstr "Translate"
+
+msgid "IDS_WEBVIEW_OPT_UNMUTE"
+msgstr "Unmute"
+
+msgid "IDS_WEBVIEW_OPT_WEB_SEARCH"
+msgstr "Web search"
+
+msgid "IDS_WEBVIEW_POP_A_TEMPORARY_ERROR_HAS_OCCURRED"
+msgstr "A temporary error has occurred."
+
+msgid "IDS_WEBVIEW_POP_DO_YOU_WANT_THE_DEVICE_TO_REMEMBER_YOUR_PASSWORD_Q"
+msgstr "Do you want the device to remember your password?"
+
+msgid "IDS_WEBVIEW_POP_LEAVE_THIS_PAGE_Q"
+msgstr "Leave this page?"
+
+msgid "IDS_WEBVIEW_POP_SIGN_IN_TO_THIS_WEBSITE_AGAIN_BY_SWIPING_ANY_OF_YOUR_REGISTERED_FINGERS_OVER_THE_HOME_KEY_MSG"
+msgstr "Sign in to this website again by swiping any of your registered fingers over the home key. Your username and password for this website will be saved on your device."
+
+msgid "IDS_BR_HEADER_UNABLE_TO_OPEN_FILE"
+msgstr "Unable to open file"
+
+msgid "IDS_BR_BODY_UNABLE_TO_OPEN_THE_FILE_AT_PS_IT_MAY_HAVE_BEEN_REMOVED_OR_RENAMED_OR_FILE_PERMISSIONS_MAY_BE_PREVENTING_ACCESS"
+msgstr "Unable to open the file at %s. It may have been removed or renamed, or file permissions may be preventing access."
+
+msgid "IDS_WEBVIEW_BUTTON_LATER_ABB"
+msgstr "Later"
+
+msgid "IDS_WEBVIEW_BUTTON_NEXT_ABB3"
+msgstr "Next"
+
+msgid "IDS_WEBVIEW_BUTTON_PREV_ABB"
+msgstr "Prev."
+
+msgid "IDS_WEBVIEW_OPT_SELECT_TEXT_ABB"
+msgstr "Select text"
+
+msgid "IDS_WEBVIEW_POP_SAVE_THIS_PASSWORD_ON_THIS_DEVICE_Q"
+msgstr "Save this password on this device?"
+

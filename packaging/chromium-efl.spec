@@ -131,6 +131,7 @@ Chromium EFL unit test utilities
 %global CHROMIUM_WEBDB_DIR /opt/usr/apps/%{name}
 # Chromium unit tests install directory
 %global CHROMIUM_UNITTESTS_DIR /opt/usr/chromium-unittests/
+%global LOCALE_DIR /usr/share/chromium-efl
 
 %prep
 %setup -q
@@ -228,6 +229,14 @@ install -d "%{buildroot}"%{_libdir}/pkgconfig
 install -d "%{buildroot}"%{_includedir}/chromium-ewk
 install -d "%{buildroot}%{CHROMIUM_EXE_DIR}"
 install -d "%{buildroot}%{CHROMIUM_DATA_DIR}"/themes
+install -d "%{buildroot}%{CHROMIUM_DATA_DIR}"/locale
+
+mkdir -p %{OUTPUT_FOLDER}/po_tizen
+for file in ewk/po_tizen/*.po; do
+  /usr/bin/msgfmt ${file} -o %{OUTPUT_FOLDER}/po_tizen/$(basename $file .po).mo
+  install -d "%{buildroot}%{CHROMIUM_DATA_DIR}"/locale/$(basename $file .po)/LC_MESSAGES
+  install -m 0755 %{OUTPUT_FOLDER}/po_tizen/$(basename $file .po).mo "%{buildroot}%{CHROMIUM_DATA_DIR}"/locale/$(basename $file .po)/LC_MESSAGES/WebKit.mo
+done
 
 install -m 0755 "%{OUTPUT_FOLDER}"/lib/libchromium-efl.so    "%{buildroot}"%{_libdir}
 install -m 0755 "%{OUTPUT_FOLDER}"/lib/libchromium-ewk.so    "%{buildroot}"%{_libdir}
@@ -315,6 +324,7 @@ fi
 %{_bindir}/mini_browser
 /opt/share/packages/chromium-efl.xml
 /opt/share/icons/mini-browser.png
+%{CHROMIUM_DATA_DIR}/locale/*
 
 %files devel
 %defattr(-,root,root,-)

@@ -11,7 +11,7 @@
 #include <Edje.h>
 
 // FIXME: To use BLINK_TEXT_DIR, following line needs to be modified later.
-#define WEBKIT_TEXT_DIR "/usr/share/ewebkit2-0/locale/po"
+#define WEBKIT_TEXT_DIR "/usr/share/chromium-efl/locale/po"
 
 namespace content {
 

@@ -1,0 +1,234 @@
+msgid "IDS_BR_BODY_SAVE_LINK"
+msgstr "ലിങ്ക് സേവ് ചെയ്യുക"
+
+msgid "IDS_WEBVIEW_BODY_SHOWING_PD_ITEMS_TTS"
+msgstr "%d ഇനങ്ങൾ കാണിക്കുന്നു"
+
+msgid "IDS_WEBVIEW_HEADER_THIS_WEBPAGE_IS_NOT_AVAILABLE"
+msgstr "ഈ വെബ്പേജ് ലഭ്യമല്ല."
+
+msgid "IDS_WEBVIEW_BODY_THE_SERVER_AT_PS_CANT_BE_FOUND_BECAUSE_THE_DNS_LOOK_UP_FAILED_MSG"
+msgstr "DNS തിരയൽ പരാജയപ്പെട്ടതിനാൽ %s-ലെ സെർവറിനെ കണ്ടെത്താനാവില്ല. ഒരു വെബ്സൈറ്റിന്‍റെ പേര് അതിന്‍റെ ഇന്‍റർനെറ്റ് വിലാസത്തിലേക്ക് വിവർത്തനം ചെയ്യുന്ന നെറ്റ്‌വർക്ക് സേവനമാണ് DNS. ഇന്‍റർനെറ്റ് ഇല്ലാതിരിക്കുന്നതുകൊണ്ടോ അല്ലെങ്കിൽ തെറ്റായി കോൺഫിഗർ ചെയ്യപ്പെട്ട ഒരു നെറ്റ്‌വർക്ക് മൂലമോ ആണ് ഈ പിശക് മിക്കപ്പോഴും സംഭവിക്കുന്നത്. പ്രതികരിക്കാത്ത ഒരു DNS സെർവർ മൂലമോ അല്ലെങ്കിൽ നെറ്റ്‌വർക്ക് ആക്സസ് ചെയ്യുന്നതിൽ നിന്ന് ഇന്‍റർനെറ്റിനെ തടയുന്ന ഒരു ഫയർവാൾ വഴിയോ ഇത് സംഭവിക്കാവുന്നതാണ്."
+
+msgid "IDS_WEBVIEW_BODY_DETAILS"
+msgstr "വിശദാംശങ്ങള്‍"
+
+msgid "IDS_WEBVIEW_BODY_DOUBLE_TAB_TO_EDIT_TTS"
+msgstr "എഡിറ്റുചെയ്യാൻ ഇരട്ട ടാപ്പുചെയ്യുക."
+
+msgid "IDS_WEBVIEW_BODY_EDITING_TTS"
+msgstr "എഡിറ്റുചെയ്യുന്നു."
+
+msgid "IDS_WEBVIEW_BODY_EDIT_FIELD__M_NOUN_TTS"
+msgstr "ഫീൽഡ് എഡിറ്റ് ചെയ്യുക"
+
+msgid "IDS_WEBVIEW_BODY_ENTER_AN_EMAIL_ADDRESS"
+msgstr "ഒരു ഈമെയില്‍ വിലാസം നല്‍കുക."
+
+msgid "IDS_WEBVIEW_BODY_ENTER_A_LIST_OF_EMAIL_ADDRESSES_SEPARATED_BY_COMMAS"
+msgstr "കോമകളാല്‍ വേര്‍ത്തിരിച്ച്, ഈമെയില്‍ അഡ്രസ്സുകളുടെ ഒരു ലിസ്റ്റ് നല്‍കുക."
+
+msgid "IDS_WEBVIEW_BODY_ENTER_A_URL"
+msgstr "ഒരു URL നല്‍കുക."
+
+msgid "IDS_WEBVIEW_BODY_FIELD_CANNOT_BE_BLANK"
+msgstr "ഫീല്‍ഡ് ശൂന്യമായിരിക്കാന്‍ പാടില്ല."
+
+msgid "IDS_WEBVIEW_BODY_INVALID_FORMAT_ENTERED"
+msgstr "അസാധുവായ ഫോര്‍മാറ്റ് നല്‍കി."
+
+msgid "IDS_WEBVIEW_BODY_INVALID_VALUE_ENTERED"
+msgstr "അസാധുവായ മൂല്യം നല്‍കി."
+
+msgid "IDS_WEBVIEW_BODY_NOT_SELECTED_TTS"
+msgstr "തിരഞ്ഞെടുത്തില്ല"
+
+msgid "IDS_WEBVIEW_BODY_NO_FILES_HAVE_BEEN_SELECTED"
+msgstr "ഫയലുകളൊന്നും തിരഞ്ഞെടുത്തിട്ടില്ല."
+
+msgid "IDS_WEBVIEW_BODY_PD_CHARACTERS_TTS"
+msgstr "%d അക്ഷരങ്ങൾ."
+
+msgid "IDS_WEBVIEW_BODY_PLUG_IN_MISSING"
+msgstr "പ്ലഗ്-ഇന്‍ ഇല്ല"
+
+msgid "IDS_WEBVIEW_BODY_SELECTED_TTS"
+msgstr "തിരഞ്ഞെടുത്തു"
+
+msgid "IDS_WEBVIEW_BODY_UNABLE_TO_LOAD_THE_PAGE_A_SECURE_CONNECTION_COULD_NOT_BE_MADE_TO_PS_THE_MOST_LIKELY_CAUSE_IS_THE_DEVICES_CLOCK_CHECK_THAT_THE_TIME_ON_YOUR_DEVICE_IS_CORRECT_AND_REFRESH_THE_PAGE"
+msgstr "പേജ് ലോഡുചെയ്യാനാകുന്നില്ല. ഒരു സുരക്ഷിത കണക്ഷന്‍ %s-ലേയ്ക്ക് സ്ഥാപിക്കാനാകില്ല. ഉപകരണത്തിന്‍റെ ക്ലോക്കായിരിക്കാം മിക്കവാറുമുള്ള കാരണം. നിങ്ങളുടെ ഉപകരണത്തിലെ സമയം ശരിയാണോയെന്ന് പരിശോധിച്ച് പേജ് പുതുക്കിയെടുക്കുക."
+
+msgid "IDS_WEBVIEW_BODY_UNABLE_TO_LOAD_THE_PAGE_PS_MAY_BE_TEMPORARILY_DOWN_OR_HAVE_MOVED_TO_A_NEW_URL"
+msgstr "പേജ് ലോഡ് ചെയ്യാനാവില്ല. %s താൽക്കാലികമായി പ്രവർത്തനരഹിതമായിരിക്കാം അല്ലെങ്കിൽ ഒരു പുതിയ URL-ലേക്ക് നീക്കിയിരിക്കാം."
+
+msgid "IDS_WEBVIEW_BODY_UNABLE_TO_LOAD_THE_PAGE_PS_TOOK_TOO_LONG_TO_RESPOND_THE_WEBSITE_MAY_BE_DOWN_OR_THERE_MAY_HAVE_BEEN_A_NETWORK_CONNECTION_ERROR"
+msgstr "പേജ് ലോഡുചെയ്യാനാകുന്നില്ല. %s പ്രതികരിക്കുന്നതിന് കൂടുതല്‍ സമയമെടുക്കുന്നു. വെബ്സൈറ്റ് ഡൌണായിരിക്കാം, അല്ലെങ്കില്‍ ഒരു നെറ്റ്‌വര്‍ക്ക് കണക്ഷന്‍ തെറ്റ് ഉണ്ടായിരിക്കാം."
+
+msgid "IDS_WEBVIEW_BODY_VALUE_MUST_BE_AT_LEAST_PD"
+msgstr "മൂല്യം %d എങ്കിലുമുണ്ടായിരിക്കണം."
+
+msgid "IDS_WEBVIEW_BODY_VALUE_MUST_BE_NO_HIGHER_THAN_PD"
+msgstr "മൂല്യം %d-യിലും ഉയര്‍ന്നതായിരിക്കരുത്."
+
+msgid "IDS_WEBVIEW_BODY_YOU_CAN_SEARCH_THIS_INDEX_ENTER_KEYWORDS_C"
+msgstr "നിങ്ങള്‍ക്ക് ഈ ഇന്‍ഡക്സ് പരിശോധിക്കാനാകും. കീവേഡുകള്‍ നല്‍കുക:"
+
+msgid "IDS_WEBVIEW_BUTTON2_NEVER"
+msgstr "ഒരിക്കലുമില്ല"
+
+msgid "IDS_WEBVIEW_BUTTON_DONE"
+msgstr "ചെയ്തു"
+
+msgid "IDS_WEBVIEW_BUTTON_LEAVE"
+msgstr "വിടുക"
+
+msgid "IDS_WEBVIEW_BUTTON_NOT_NOW_ABB"
+msgstr "ഇപ്പോഴല്ല"
+
+msgid "IDS_WEBVIEW_BUTTON_RESET"
+msgstr "റീസെറ്റ്"
+
+msgid "IDS_WEBVIEW_BUTTON_SAVE"
+msgstr "സേവ് ചെയ്യുക"
+
+msgid "IDS_WEBVIEW_BUTTON_STAY"
+msgstr "നിലനിർത്തുക"
+
+msgid "IDS_WEBVIEW_BUTTON_SUBMIT"
+msgstr "സമര്‍പ്പിക്കുക"
+
+msgid "IDS_WEBVIEW_BUTTON_UPLOAD_FILE"
+msgstr "ഫയല്‍ അപ്‌ലോഡ് ചെയ്യുക"
+
+msgid "IDS_WEBVIEW_BUTTON_UPLOAD_MULTIPLE_FILES"
+msgstr "ഒന്നിലധികം ഫയലുകള്‍ അപ്‌ലോഡ് ചെയ്യുക"
+
+msgid "IDS_WEBVIEW_HEADER_MESSAGE_FROM_PS_M_WEBSITE"
+msgstr "%s-ലെ സന്ദേശം"
+
+msgid "IDS_WEBVIEW_HEADER_REMEMBER_PASSWORD"
+msgstr "പാസ്‌വേഡ് ഓർമ്മിപ്പിക്കുക"
+
+msgid "IDS_WEBVIEW_HEADER_SELECT_COLOUR"
+msgstr "നിറം തിരഞ്ഞെടുക്കുക"
+
+msgid "IDS_WEBVIEW_HEADER_SET_DATE_AND_TIME"
+msgstr "സമയവും തീയതിയും ക്രമീകരിക്കുക"
+
+msgid "IDS_WEBVIEW_OPT_CLIPBOARD"
+msgstr "ക്ലിപ്ബോര്‍ഡ്"
+
+msgid "IDS_WEBVIEW_OPT_COPY"
+msgstr "പകര്‍ത്തുക"
+
+msgid "IDS_WEBVIEW_OPT_COPY_AUDIO_URL_ABB"
+msgstr "ഓഡിയോ URL പകര്‍ത്തുക"
+
+msgid "IDS_WEBVIEW_OPT_COPY_IMAGE"
+msgstr "ഇമേജ് പകര്‍ത്തുക"
+
+msgid "IDS_WEBVIEW_OPT_COPY_LINK_URL_ABB"
+msgstr "ലിങ്ക് URL പകര്‍ത്തുക"
+
+msgid "IDS_WEBVIEW_OPT_COPY_TO_CLIPBOARD"
+msgstr "ക്ലിപ്ബോര്‍ഡിലേക്ക് പകര്‍ത്തുക"
+
+msgid "IDS_WEBVIEW_OPT_COPY_VIDEO_URL_ABB"
+msgstr "വീഡിയോ URL പകര്‍ത്തുക"
+
+msgid "IDS_WEBVIEW_OPT_CUT_ABB"
+msgstr "മുറിക്കുക"
+
+msgid "IDS_WEBVIEW_OPT_DO_NOT_SHOW_AGAIN"
+msgstr "ഇന്ന് വീണ്ടും കാണിക്കരുത്"
+
+msgid "IDS_WEBVIEW_OPT_DRAG_AND_DROP_ABB"
+msgstr "ഇഴച്ചിടുക"
+
+msgid "IDS_WEBVIEW_OPT_ENABLE_DISABLE_REPEAT_MEDIA_ABB"
+msgstr "മീഡിയ അവര്‍ത്തിക്കുക പ്രാപ്തമാക്കുക/അപ്രാപ്തമാക്കുക"
+
+msgid "IDS_WEBVIEW_OPT_FULL_VIEW_ABB"
+msgstr "മുഴുവന്‍ കാഴ്ച"
+
+msgid "IDS_WEBVIEW_OPT_MUTE"
+msgstr "നിശബ്ദമാക്കുക"
+
+msgid "IDS_WEBVIEW_OPT_OPEN_IMAGE_IN_NEW_TAB_ABB"
+msgstr "പുതിയ ടാബില്‍ ഇമേജ് തുറക്കുക"
+
+msgid "IDS_WEBVIEW_OPT_OPEN_LINK_IN_NEW_TAB_ABB"
+msgstr "പുതിയ ടാബില്‍ ലിങ്ക് തുറക്കുക"
+
+msgid "IDS_WEBVIEW_OPT_OPEN_VIDEO_IN_NEW_WINDOW_ABB"
+msgstr "പുതിയ വിന്‍ഡോയില്‍ തുറക്കുക"
+
+msgid "IDS_WEBVIEW_OPT_PASTE"
+msgstr "ഒട്ടിക്കുക"
+
+msgid "IDS_WEBVIEW_OPT_PAUSE"
+msgstr "താല്‍ക്കാലം നിര്‍ത്തുക"
+
+msgid "IDS_WEBVIEW_OPT_PLAY"
+msgstr "പ്ലേചെയ്യുക"
+
+msgid "IDS_WEBVIEW_OPT_PLAY_AUDIO_IN_NEW_TAB_ABB"
+msgstr "പുതിയ ടാബില്‍ ഓഡിയോ പ്ലേ ചെയ്യുക"
+
+msgid "IDS_WEBVIEW_OPT_SAVE_IMAGE_ABB"
+msgstr "ഇമേജ് സംരക്ഷിക്കുക"
+
+msgid "IDS_WEBVIEW_OPT_SELECT_ABB"
+msgstr "തിരഞ്ഞെടുക്കുക"
+
+msgid "IDS_WEBVIEW_OPT_SELECT_ALL_ABB"
+msgstr "എല്ലാം തിരഞ്ഞെടുക്കുക"
+
+msgid "IDS_WEBVIEW_OPT_SHOW_HIDE_MEDIA_CONTROLS_ABB"
+msgstr "മീഡിയാ നിയന്ത്രണങ്ങള്‍ കാണിക്കുക/മറയ്ക്കുക"
+
+msgid "IDS_WEBVIEW_OPT_SIGN_IN_USING_FINGERPRINTS"
+msgstr "വിരലടയാളങ്ങൾ ഉപയോഗിച്ച് സൈൻ ഇൻ ചെയ്യുക"
+
+msgid "IDS_WEBVIEW_OPT_TRANSLATE_ABB"
+msgstr "വിവര്‍ത്തനം ചെയ്യുക"
+
+msgid "IDS_WEBVIEW_OPT_UNMUTE"
+msgstr "ശബ്ദമുള്ളതാക്കുക"
+
+msgid "IDS_WEBVIEW_OPT_WEB_SEARCH"
+msgstr "വെബ് സെര്‍ച്ച്"
+
+msgid "IDS_WEBVIEW_POP_A_TEMPORARY_ERROR_HAS_OCCURRED"
+msgstr "ഒരു സെർവർ പിശക് സംഭവിച്ചു."
+
+msgid "IDS_WEBVIEW_POP_DO_YOU_WANT_THE_DEVICE_TO_REMEMBER_YOUR_PASSWORD_Q"
+msgstr "ഉപകരണം നിങ്ങളുടെ പാസ്‌വേഡ് ഓര്‍മിക്കണമെന്ന് നിങ്ങള്‍ക്ക് ആഗ്രഹമുണ്ടോ?"
+
+msgid "IDS_WEBVIEW_POP_LEAVE_THIS_PAGE_Q"
+msgstr "ഈ പേജ് വിടട്ടെ?"
+
+msgid "IDS_WEBVIEW_POP_SIGN_IN_TO_THIS_WEBSITE_AGAIN_BY_SWIPING_ANY_OF_YOUR_REGISTERED_FINGERS_OVER_THE_HOME_KEY_MSG"
+msgstr "നിങ്ങളുടെ രജിസ്റ്റർ ചെയ്യപ്പെട്ട വിരലുകളിൽ ഏതെങ്കിലും ഒന്ന് ഹോം കീയ്ക്ക് മീതെ സ്വൈപ് ചെയ്ത് ഈ വെബ്സൈറ്റിലേക്ക് വീണ്ടും സൈൻ ഇൻ ചെയ്യുക. ഈ വെബ്സൈറ്റിന് വേണ്ടി നിങ്ങളുടെ ഉപയോക്തൃനാമവും പാസ്‌വേഡും നിങ്ങളുടെ ഉപകരണത്തിൽ സംരക്ഷിക്കപ്പെടും."
+
+msgid "IDS_BR_HEADER_UNABLE_TO_OPEN_FILE"
+msgstr "ഫയൽ തുറക്കാനാവില്ല"
+
+msgid "IDS_BR_BODY_UNABLE_TO_OPEN_THE_FILE_AT_PS_IT_MAY_HAVE_BEEN_REMOVED_OR_RENAMED_OR_FILE_PERMISSIONS_MAY_BE_PREVENTING_ACCESS"
+msgstr "%s-ൽ ഫയൽ തുറക്കാനാവില്ല. അത് നീക്കംചെയ്യപ്പെട്ടിരിക്കാം അല്ലെങ്കിൽ പുനർനാമകരണം ചെയ്യപ്പെട്ടിരിക്കാം, അല്ലെങ്കിൽ ഫയൽ അനുമതികൾ ആക്സസിനെ തടയുന്നുണ്ടാകാം."
+
+msgid "IDS_WEBVIEW_BUTTON_LATER_ABB"
+msgstr "പിന്നീട്"
+
+msgid "IDS_WEBVIEW_BUTTON_NEXT_ABB3"
+msgstr "അടുത്തത്"
+
+msgid "IDS_WEBVIEW_BUTTON_PREV_ABB"
+msgstr "മുമ്പത്തേത്"
+
+msgid "IDS_WEBVIEW_OPT_SELECT_TEXT_ABB"
+msgstr "ടെക്സ്റ്റ്‌ തിരഞ്ഞെടുക്കുക"
+
+msgid "IDS_WEBVIEW_POP_SAVE_THIS_PASSWORD_ON_THIS_DEVICE_Q"
+msgstr "ഈ പാസ്‌വേഡ് ഈ ഉപകരണത്തിൽ സംരക്ഷിക്കട്ടെ?"
+
