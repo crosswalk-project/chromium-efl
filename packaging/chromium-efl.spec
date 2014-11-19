@@ -177,15 +177,6 @@ export LD_RUN_PATH=%{_libdir}
   %global OUTPUT_FOLDER %{OUTPUT_BASE_FOLDER}/Release
 %endif
 
-# Building the RPM in the GBS chroot fails with errors such as
-#   /usr/lib/gcc/i586-tizen-linux/4.7/../../../../i586-tizen-linux/bin/ld:
-#       failed to set dynamic section sizes: Memory exhausted
-# For now, work around it by passing a GNU ld-specific flag that optimizes the
-# linker for memory usage. See bugs:
-#   - http://107.108.218.239/bugzilla/show_bug.cgi?id=6457
-#   - http://107.108.218.239/bugzilla/show_bug.cgi?id=6629
-export LDFLAGS="${LDFLAGS} -Wl,--no-keep-memory"
-
 if type ccache &> /dev/null; then
   source build/ccache_env.sh %{OUTPUT_BUILD_PROFILE_TARGET}
 fi
