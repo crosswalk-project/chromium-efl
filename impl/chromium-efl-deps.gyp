@@ -43,6 +43,8 @@
         'gstreamer-base-0.10',
         'gstreamer-app-0.10',
         'gstreamer-pbutils-0.10',
+        'gstreamer-interfaces-0.10',
+        'gstreamer-video-0.10',
       ],
     },
     'direct_dependent_settings': {
@@ -110,6 +112,27 @@
                 '/usr/include/ug-1',
                 '/usr/include/appfw',
               ],
+              'cflags': [
+                '<!@(<(pkg-config) --cflags <(dependent_pkgs))',
+              ],
+            },
+            'link_settings': {
+              'ldflags': [
+                '<!@(<(pkg-config) --libs-only-L --libs-only-other <(dependent_pkgs))',
+              ],
+              'libraries': [
+                '<!@(<(pkg-config) --libs-only-l <(dependent_pkgs))',
+              ],
+            },
+          }],
+          ['building_for_tizen_tv==1 and tizen_multimedia_support==1', {
+            'variables': {
+              'dependent_pkgs': [
+                'audio-session-mgr',
+                'mm-session',
+              ],
+            },
+            'direct_dependent_settings': {
               'cflags': [
                 '<!@(<(pkg-config) --cflags <(dependent_pkgs))',
               ],

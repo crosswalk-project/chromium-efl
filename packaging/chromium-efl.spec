@@ -79,6 +79,9 @@ BuildRequires: pkgconfig(vpx)
 BuildRequires: pkgconfig(efl-assist)
 BuildRequires: pkgconfig(capi-network-connection)
 BuildRequires: pkgconfig(capi-telephony-network-info)
+%else # TIZEN_PROFILE_TV
+BuildRequires: pkgconfig(audio-session-mgr)
+BuildRequires: pkgconfig(mm-session)
 %endif
 BuildRequires: pkgconfig(gstreamer-0.10)
 BuildRequires: pkgconfig(gstreamer-plugins-base-0.10)
