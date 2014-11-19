@@ -359,11 +359,7 @@ void ewk_context_memory_saving_mode_set(Ewk_Context* context, Eina_Bool mode)
 void ewk_context_form_password_data_clear(Ewk_Context* context)
 {
   EINA_SAFETY_ON_NULL_RETURN(context);
-#if !defined(EWK_BRINGUP)
   context->ClearPasswordData();
-#else
-  LOG_EWK_API_MOCKUP();
-#endif
 }
 
 void ewk_context_form_password_data_delete(Ewk_Context* ewkContext, const char* url)
