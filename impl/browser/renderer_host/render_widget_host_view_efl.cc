@@ -1517,11 +1517,12 @@ void RenderWidgetHostViewEfl::OnSwapCompositorFrame(
     ack.gl_frame_data = frame->gl_frame_data.Pass();
 
     if (m_IsEvasGLInit) {
+      std::swap(ack.gl_frame_data->mailbox, pending_mailbox_);
       gpu::gles2::MailboxManager* manager =
           GLSharedContextEfl::GetMailboxManager();
 
       gpu::gles2::Texture* texture =
-          manager->ConsumeTexture(ack.gl_frame_data->mailbox);
+          manager->ConsumeTexture(pending_mailbox_);
       if (texture != NULL) {
         texture_id_ = GetTextureIdFromTexture(texture);
         evas_object_image_pixels_dirty_set(content_image_, true);

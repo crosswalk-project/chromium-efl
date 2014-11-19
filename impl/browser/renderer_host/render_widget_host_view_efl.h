@@ -21,6 +21,7 @@
 #include "content/browser/accessibility/browser_accessibility_manager.h"
 #include "content/browser/compositor/image_transport_factory.h"
 #include "content/browser/compositor/owned_mailbox.h"
+#include "gpu/command_buffer/common/mailbox.h"
 #include "ui/base/ime/text_input_client.h"
 #include "eweb_view.h"
 #include "browser/renderer_host/im_context_efl.h"
@@ -335,6 +336,8 @@ class RenderWidgetHostViewEfl
 
   // The last scroll offset of the view.
   gfx::Vector2dF last_scroll_offset_;
+
+  gpu::Mailbox pending_mailbox_;
 
   DISALLOW_COPY_AND_ASSIGN(RenderWidgetHostViewEfl);
 };
