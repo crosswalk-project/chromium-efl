@@ -115,8 +115,7 @@ void WebContentsViewEfl::SetOverscrollControllerEnabled(bool enabled) {
 }
 
 gfx::NativeView WebContentsViewEfl::GetNativeView() const {
-  NOTIMPLEMENTED();
-  return 0;
+  return web_contents_->GetRenderWidgetHostView()->GetNativeView();
 }
 
 gfx::NativeView WebContentsViewEfl::GetContentNativeView() const {

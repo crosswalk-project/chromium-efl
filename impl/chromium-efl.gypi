@@ -10,6 +10,7 @@
    'chromium_efl_tizen_version%': '2.3',
    'custom_libc_dir%': '',
    'prebuilt_ld_gold_dir%': '',
+   'grit_additional_defines': ['-D', 'use_efl',],
   },
   'target_defaults': {
     'defines': [

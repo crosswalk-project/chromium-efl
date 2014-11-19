@@ -32,9 +32,11 @@ COMMON_GYP_PARAMETERS="
                       -Duse_libjpeg_turbo=1
                       -Dproprietary_codecs=1
                       -Dclang=0
-                      -Duse_aura=1
-                      -Duse_efl=1
                       -Dtizen_multimedia_support=1
+                      -Duse_aura=0
+                      -Duse_efl=1
+                      -Duse_gnome_keyring=0
+                      -Dtoolkit_uses_gtk=0
                       "
 
 if [ "$target" == "desktop" ]; then

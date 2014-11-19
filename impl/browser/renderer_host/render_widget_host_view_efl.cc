@@ -511,10 +511,7 @@ gfx::Vector2dF RenderWidgetHostViewEfl::GetLastScrollOffset() const {
 }
 
 gfx::NativeView RenderWidgetHostViewEfl::GetNativeView() const {
-  // With aura this is expected to return an aura::Window*.
-  // We don't have that so make sure nobody calls this.
-  // NOTREACHED();
-  return gfx::NativeView();
+  return content_image_;
 }
 
 void RenderWidgetHostViewEfl::OnSnapshot(const std::vector<unsigned char> pixData, int snapshotId, const gfx::Size& size) {

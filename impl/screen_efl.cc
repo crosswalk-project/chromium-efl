@@ -136,5 +136,10 @@ void InstallScreenInstance()
     gfx::Screen::SetScreenInstance(gfx::SCREEN_TYPE_NATIVE, new ui::EflScreen());
   }
 }
-
 } // namespace ui
+
+namespace gfx {
+Screen* CreateNativeScreen() {
+  return new ui::EflScreen();
+}
+} // namespace gfx

@@ -71,6 +71,27 @@
       'LOCALE_DIR="<(locale_dir)"',
     ],
     'sources': [
+      # Extra cc files from chrome_src_dir
+      '<(chrome_src_dir)/ui/events/gestures/gesture_recognizer_impl.h',
+      '<(chrome_src_dir)/ui/events/gestures/gesture_recognizer_impl.cc',
+      # We do not have gesture recognizer for EFL, try to reuse aura recognizer
+      '<(chrome_src_dir)/ui/events/gestures/gesture_provider_aura.h',
+      '<(chrome_src_dir)/ui/events/gestures/gesture_provider_aura.cc',
+      '<(chrome_src_dir)/ui/events/gestures/motion_event_aura.h',
+      '<(chrome_src_dir)/ui/events/gestures/motion_event_aura.cc',
+      '<(chrome_src_dir)/ui/base/nine_image_painter_factory.h',
+      '<(chrome_src_dir)/ui/base/nine_image_painter_factory.cc',
+      '<(chrome_src_dir)/ui/base/cursor/cursor.h',
+      '<(chrome_src_dir)/ui/base/cursor/cursor.cc',
+      '<(chrome_src_dir)/ui/base/cursor/cursor_x11.cc',
+      '<(chrome_src_dir)/ui/base/cursor/cursor_loader_x11.h',
+      '<(chrome_src_dir)/ui/base/cursor/cursor_loader_x11.cc',
+      '<(chrome_src_dir)/ui/base/cursor/cursors_aura.h',
+      '<(chrome_src_dir)/ui/base/cursor/cursors_aura.cc',
+      '<(chrome_src_dir)/ui/gfx/nine_image_painter.h',
+      '<(chrome_src_dir)/ui/gfx/nine_image_painter.cc',
+
+      # API
       'API/ewk_auth_challenge_private.h',
       'API/ewk_autofill_profile_private.h',
       'API/ewk_autofill_profile_private.cc',
@@ -223,8 +244,8 @@
       'common/version_info_efl.h',
       'common/web_contents_utils.cc',
       'common/web_contents_utils.h',
-      'common/webcursor_efl.cc',
-      'common/webcursor_efl.h',
+      'common/cursors/webcursor_efl.cc',
+      'common/cursors/webcursor_efl.h',
       'components/clipboard/clipboard_efl.cc',
       'components/clipboard/clipboard_efl.h',
       'components/clipboard/clipboard_helper_efl.cc',
@@ -293,12 +314,18 @@
       'renderer/render_view_observer_efl.cc',
       'renderer/render_view_observer_efl.h',
 
+      'resource/resource_bundle_efl.cc',
+
       'resource/JavaScriptPopup.edc',
       'resource/AutofillPopup.edc',
       'resource/Edge.edc',
       'resource/Magnifier.edc',
       'resource/control.edc',
       'resource/DisambiguationPopup.edc',
+
+      'ui/native_theme/native_theme_efl.h',
+      'ui/native_theme/native_theme_efl.cc',
+      'ui/snapshot/snapshot_efl.cc',
 
       'screen_efl.cc',
       'screen_efl.h',
