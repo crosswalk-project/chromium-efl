@@ -15,7 +15,7 @@ group {
                 description {
                     state: "default" 0.0;
                     fixed: 1 1;
-                    min: 332 177;
+                    min: 150 80;
                     align: 0.5 0.0;
                     visible: 1;
                     color: 0 0 0 0;
@@ -28,7 +28,7 @@ group {
                 description {
                     state: "default" 0.0;
                     fixed: 1 1;
-                    min: 146 177;
+                    min: 66 80;
                     align: 0.0 0.0;
                     rel1 { relative: 0.0 0.0; to: "bg"; }
                     rel2 { relative: 0.0 1.0; to: "bg"; }
@@ -47,8 +47,8 @@ group {
                 description {
                     state: "default" 0.0;
                     fixed: 1 1;
-                    min: 40 177;
-                    max: 40 999999;
+                    min: 18 80;
+                    max: 18 999999;
                     align: 0.0 0.0;
                     rel1 { relative: 1.0 0.0; to: "bg_left"; }
                     rel2 { relative: 1.0 1.0; to: "bg"; }
@@ -67,7 +67,7 @@ group {
                 description {
                     state: "default" 0.0;
                     fixed: 1 1;
-                    min: 146 177;
+                    min: 66 80;
                     rel1 { relative: 1.0 0.0; to: "bg_middle";}
                     rel2.to: "bg";
                     image {

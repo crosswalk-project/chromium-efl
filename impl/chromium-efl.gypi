@@ -49,6 +49,11 @@
           ['exclude', 'rendering/RenderThemeChromiumLinux\\.cpp$'],
         ],
       }],
+      ['_target_name=="gesture_detection"', {
+        'sources/': [
+          ['exclude', 'gesture_detection/gesture_configuration_default\\.cc$'],
+        ],
+      }],
     ],
     'conditions': [
        ['use_efl==1', {

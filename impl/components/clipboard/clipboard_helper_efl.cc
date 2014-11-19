@@ -123,6 +123,8 @@ void ClipboardHelperEfl::SetData(const std::string& data, ClipboardDataType type
     case CLIPBOARD_DATA_TYPE_IMAGE:
       data_type = ecore_x_atom_get(kCbhmAtomTextUriList);
       break;
+    case CLIPBOARD_DATA_TYPE_MARKUP:
+      data_type = ecore_x_atom_get(kCbhmAtomTextHtml);
     default:
       NOTIMPLEMENTED();
   }
@@ -176,16 +178,24 @@ bool ClipboardHelperEfl::SendCbhmMessage(const std::string& message) {
 }
 
 bool ClipboardHelperEfl::SetClipboardItem(Ecore_X_Atom data_type,const std::string& data) {
+  if (data.empty())
+    return false;
+
   Ecore_X_Window cbhm_win = GetCbhmWindow();
   Ecore_X_Atom atom_cbhm_item = ecore_x_atom_get(kCbhmAtomItem);
+
+  size_t data_start_index = 0;
+  const char prefix[] = "file://";
+  if (data.compare(0, sizeof(prefix) - 1, prefix) == 0)
+    data_start_index = sizeof(prefix) - 1;
 
   ecore_x_sync();
   ecore_x_window_prop_property_set(cbhm_win,
                                    atom_cbhm_item,
                                    data_type,
                                    8,
-                                   const_cast<char*>(data.c_str()),
-                                   data.length() + 1);
+                                   const_cast<char*>(data.c_str()) + data_start_index,
+                                   data.length() - data_start_index + 1);
   ecore_x_sync();
 
   if (SendCbhmMessage(kCbhmMessageSetItem))
@@ -263,6 +273,12 @@ bool ClipboardHelperEfl::RetrieveClipboardItem(int index, int* format, std::stri
       (atom_item_type == ecore_x_atom_get(kCbhmAtomElmMarkup))) {
     *format = ELM_SEL_FORMAT_TEXT;
     data->swap(result);
+    if (atom_item_type == ecore_x_atom_get(kCbhmAtomElmMarkup))
+      *data = std::string(evas_textblock_text_markup_to_utf8(NULL, data->c_str()));
+    return true;
+  } else if (atom_item_type == ecore_x_atom_get(kCbhmAtomTextHtml)) {
+    *format = ELM_SEL_FORMAT_HTML;
+    data->swap(result);
     return true;
   }
   return false;
@@ -331,7 +347,7 @@ int ClipboardHelperEfl::NumberOfItems() {
 static void pasteSelectedClipboardItem(std::string data, std::string type, EWebView *webview) {
   content::SelectionControllerEfl* controller = webview->GetSelectionController();
   if (controller)
-    controller->HideHandle();
+    controller->HideHandleAndContextMenu();
 
   webview->ExecuteEditCommand(type.c_str(), data.c_str());
   ClipboardHelperEfl::connectClipboardWindow();
@@ -413,15 +429,24 @@ static int notifyImage(ClipData* clipData, Ecore_X_Event_Selection_Notify* notif
   return 0;
 }
 
-static int notifyUri(ClipData* clipData, Ecore_X_Event_Selection_Notify* notifyData) {
-  return 0;
+static int notifyUri(ClipData* clipData,
+    Ecore_X_Event_Selection_Notify* notifyData) {
+  Ecore_X_Selection_Data* pData = (Ecore_X_Selection_Data*) notifyData->data;
+  pasteSelectedClipboardItem(
+      std::string(reinterpret_cast<char*>(pData->data), pData->length),
+      "InsertImage", clipData->webView);
 }
 
 static int notifyEdje(ClipData* clipData, Ecore_X_Event_Selection_Notify* notifyData) {
   return 0;
 }
 
-static int notifyHtml(ClipData* clipData, Ecore_X_Event_Selection_Notify* notifyData) {
+static int notifyHtml(ClipData* clipData,
+    Ecore_X_Event_Selection_Notify* notifyData) {
+  Ecore_X_Selection_Data* pData = (Ecore_X_Selection_Data*) notifyData->data;
+  pasteSelectedClipboardItem(
+      std::string(reinterpret_cast<char*>(pData->data), pData->length),
+      "InsertHTML", clipData->webView);
   return 0;
 }
 

@@ -62,11 +62,12 @@ class SelectionControllerEfl : public tizen_webview::SelectionController {
   // To update the bitmap Image to show the magnifier
   void UpdateMagnifierScreen(const SkBitmap& display_image);
   // To update the selection bounds
-  void UpdateSelectionDataAndShow(const gfx::Rect& left_rect, const gfx::Rect& right_rect, bool is_anchor_first);
+  // returns false if rects are invalid, otherwise true
+  bool UpdateSelectionDataAndShow(const gfx::Rect& left_rect,
+      const gfx::Rect& right_rect, bool is_anchor_first, bool show = true);
   void GetSelectionBounds(gfx::Rect* left, gfx::Rect* right);
-
   // Handles the mouse press,move and relase events on selection handles
-  void OnMouseDown(const gfx::Point& touch_point);
+  void OnMouseDown(const gfx::Point& touch_point, SelectionHandleEfl::HandleType);
   void OnMouseMove(const gfx::Point& touch_point, SelectionHandleEfl::HandleType);
   void OnMouseUp(const gfx::Point& touch_point);
 
@@ -92,11 +93,15 @@ class SelectionControllerEfl : public tizen_webview::SelectionController {
   void ChangeContextMenuPosition(gfx::Point& position, int& drawDirection);
 
   bool GetLongPressed() { return long_mouse_press_; }
+  bool IsCaretSelection() { return caret_selection_; }
 
   bool IsShowingMagnifier();
 
-  bool TextSelectionDown(int x, int y);
-  bool TextSelectionUp(int x, int y);
+  bool TextSelectionDown(int x, int y) override;
+  bool TextSelectionUp(int x, int y) override;
+
+  bool GetIsSelectionVisible() const { return is_selection_visible_; }
+  void SetIsSelectionVisible(const bool isVisible) { is_selection_visible_ = isVisible; }
 
  private:
   // TODO: This method should be renamed to ScheduleShowHandleAndContextMenuIfNeeded
@@ -108,7 +113,7 @@ class SelectionControllerEfl : public tizen_webview::SelectionController {
   static void ShowHandleAndContextMenuIfRequiredCallback(Evas_Object*,
       int x, int y, int mode, tizen_webview::Hit_Test*, void* data);
 
-  void Clear();
+  void Clear(bool show_after_scroll = false);
   bool IsSelectionValid(const gfx::Rect& left_rect, const gfx::Rect& right_rect);
 
   static void EvasParentViewMoveCallback(void *data, Evas *e, Evas_Object *obj, void *event_info)
@@ -129,12 +134,23 @@ class SelectionControllerEfl : public tizen_webview::SelectionController {
   // Saves state so that context menu is not displayed during page scrolling
   bool scrolling_;
 
+  // Saves state of context popup menu and handlers before scroll
+  bool show_after_scroll_;
+
+  // Flag which indicates if showing handlers and popup menu was prevented due to selection
+  // behind other layer.
+  bool postponed_;
+
   // True when new caret/selection position was sent to chromium,
   // but no reply was received, yet
   bool expecting_update_;
 
   // Saves state so that handlers and context menu is not shown when seletion change event occurs.
   bool long_mouse_press_;
+
+  // Saves state so that magnifier and context menu is not shown when
+  // long pressing should work like tap, e.g. press into editable field
+  bool caret_selection_;
 
   // Saves the data that are required to draw handle and context menu
   scoped_ptr<SelectionBoxEfl> selection_data_;
@@ -153,11 +169,12 @@ class SelectionControllerEfl : public tizen_webview::SelectionController {
 
   // Rectangle inside of which selection handles should be visible.
   gfx::Rect visibility_rect_;
+
+  bool is_selection_visible_;
 };
 
 SelectionControllerEfl* CastToSelectionControllerEfl(
     tizen_webview::SelectionController* sc);
 
 } // namespace content
-
 #endif

@@ -184,6 +184,7 @@ class RenderWidgetHostViewEfl
     return evas_;
   }
 
+  bool IsLastAvailableTextEmpty() const;
   void set_magnifier(bool status);
 
   void Init_EvasGL(int width, int height);
@@ -210,7 +211,10 @@ class RenderWidgetHostViewEfl
   void HandleEvasEvent(const Evas_Event_Mouse_Wheel*);
   void HandleEvasEvent(const Evas_Event_Key_Down*);
   void HandleEvasEvent(const Evas_Event_Key_Up*);
+  void HandleGestureBegin();
+  void HandleGestureEnd();
   void HandleGesture(ui::GestureEvent*);
+  void HandleGesture(blink::WebGestureEvent&);
   void HandleTouchEvent(ui::TouchEvent*);
   void OnPlainTextGetContents(const std::string&, int);
   void OnWebAppCapableGet(bool capable, int callback_id);
@@ -233,6 +237,7 @@ class RenderWidgetHostViewEfl
 
   void SetComposition(const ui::CompositionText& composition_text);
   void ConfirmComposition(base::string16& text);
+  void SendGestureEvent(blink::WebGestureEvent& event);
 
   bool IsScrollOffsetChanged() const { return scroll_offset_changed_; }
   void SetScrollOffsetChanged() { scroll_offset_changed_ = true; }
@@ -249,7 +254,7 @@ class RenderWidgetHostViewEfl
   void OnDidChangePageScaleRange(double, double);
   void OnSnapshot(const std::vector<unsigned char> pixData, int snapshotId, const gfx::Size& size);
 
-  void HandleTapLink(ui::GestureEvent* event);
+  void HandleTapLink(blink::WebGestureEvent& event);
 
   SelectionControllerEfl* GetSelectionController();
 
@@ -349,6 +354,12 @@ class RenderWidgetHostViewEfl
 
   typedef std::queue<NativeWebKeyboardEvent*> KeyDownEventQueue;
   KeyDownEventQueue keydownev_queue_;
+
+  bool should_restore_selection_menu_;
+  bool selection_acked_on_tap_;
+  // Used only to indicate that user scrolled view
+  // after gesture GestureTapDown.
+  bool was_scrolled_;
 
   // The last scroll offset of the view.
   gfx::Vector2dF last_scroll_offset_;

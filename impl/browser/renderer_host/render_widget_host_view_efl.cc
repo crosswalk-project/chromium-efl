@@ -56,7 +56,6 @@
 #include "browser/motion/wkext_motion.h"
 #include "content/common/input_messages.h"
 #include "common/webcursor_efl.h"
-
 #include <assert.h>
 #include <Ecore.h>
 #include <Ecore_Evas.h>
@@ -117,6 +116,9 @@ RenderWidgetHostViewEfl::RenderWidgetHostViewEfl(RenderWidgetHost* widget, EWebV
     surface_id_(0),
     is_hw_accelerated_(true),
     is_modifier_key_(false),
+    should_restore_selection_menu_(false),
+    selection_acked_on_tap_(false),
+    was_scrolled_(false),
     scroll_offset_changed_(false) {
 
 #if defined(OS_TIZEN)
@@ -654,7 +656,10 @@ void RenderWidgetHostViewEfl::TextInputTypeChanged(ui::TextInputType type,
                                                    ui::TextInputMode input_mode,
                                                    bool can_compose_inline,
                                                    int flags) {
-  NOTIMPLEMENTED();
+  if (GetSelectionController()) {
+    GetSelectionController()->SetSelectionEditable(
+        type != ui::TEXT_INPUT_TYPE_NONE);
+  }
 }
 
 void RenderWidgetHostViewEfl::OnTextInputStateChanged(
@@ -677,10 +682,7 @@ void RenderWidgetHostViewEfl::OnTextInputStateChanged(
 
   if (GetSelectionController()) {
     GetSelectionController()->SetSelectionEditable(
-        params.type == ui::TEXT_INPUT_TYPE_TEXT ||
-        params.type == ui::TEXT_INPUT_TYPE_PASSWORD ||
-        params.type == ui::TEXT_INPUT_TYPE_TEXT_AREA ||
-        params.type == ui::TEXT_INPUT_TYPE_CONTENT_EDITABLE);
+        params.type != ui::TEXT_INPUT_TYPE_NONE);
   }
 }
 
@@ -728,11 +730,20 @@ void RenderWidgetHostViewEfl::SetTooltipText(const base::string16& text) {
 void RenderWidgetHostViewEfl::SelectionChanged(const base::string16& text,
   size_t offset,
   const gfx::Range& range) {
-  if (web_view_) {
-    SelectionControllerEfl* controller = web_view_->GetSelectionController();
-    if (controller)
-      controller->UpdateSelectionData(text);
-  }
+  RenderWidgetHostViewBase::SelectionChanged(text, offset, range);
+
+  if (!web_view_)
+    return;
+
+  SelectionControllerEfl* controller = web_view_->GetSelectionController();
+  if (!controller)
+    return;
+
+  base::string16 selectedText;
+  if (!text.empty() && !range.is_empty())
+    selectedText = GetSelectedText();
+
+  controller->UpdateSelectionData(selectedText);
 }
 
 void RenderWidgetHostViewEfl::SelectionBoundsChanged(
@@ -744,19 +755,34 @@ void RenderWidgetHostViewEfl::SelectionBoundsChanged(
   if (im_context_)
     im_context_->UpdateCaretBounds(gfx::UnionRects(guest_params.anchor_rect, guest_params.focus_rect));
 
-  SelectionControllerEfl* controller = GetSelectionController();
-  if (controller)
-    controller->UpdateSelectionDataAndShow(guest_params.anchor_rect, guest_params.focus_rect, guest_params.is_anchor_first);
+  if (GetSelectionController()) {
+    GetSelectionController()->UpdateSelectionDataAndShow(
+        guest_params.anchor_rect,
+        guest_params.focus_rect,
+        guest_params.is_anchor_first,
+        false);
+  }
 }
 
 void RenderWidgetHostViewEfl::DidStopFlinging() {
-#ifdef TIZEN_EDGE_EFFECT
+#if defined(TIZEN_EDGE_EFFECT)
   if (web_view_)
     web_view_->edgeEffect()->hide();
 #endif
+
+  SelectionControllerEfl* controller = GetSelectionController();
+  if (!controller)
+    return;
+
   // Unhide Selection UI when scrolling with fling gesture
-  if (GetSelectionController() && GetSelectionController()->GetScrollStatus())
-    GetSelectionController()->SetScrollStatus(false);
+  if (controller->GetScrollStatus())
+    controller->SetScrollStatus(false);
+
+  controller->UpdateSelectionDataAndShow(
+      controller->GetLeftRect(),
+      controller->GetRightRect(),
+      false,
+      false);
 }
 
 void RenderWidgetHostViewEfl::ShowDisambiguationPopup(const gfx::Rect& rect_pixels, const SkBitmap& zoomed_bitmap) {
@@ -775,7 +801,7 @@ void RenderWidgetHostViewEfl::DispatchGestureEvent(ui::GestureEvent* event) {
   HandleGesture(event);
 }
 
-#ifdef OS_TIZEN
+#if defined(OS_TIZEN)
 void RenderWidgetHostViewEfl::SetRectSnapshot(const SkBitmap& bitmap) {
   if (web_view_)
     web_view_->UpdateMagnifierScreen(bitmap);
@@ -1100,6 +1126,12 @@ void RenderWidgetHostViewEfl::HandleFocusIn() {
 }
 
 void RenderWidgetHostViewEfl::HandleFocusOut() {
+  if (GetSelectionController() &&
+      GetSelectionController()->IsAnyHandleVisible()) {
+    GetSelectionController()->HideHandleAndContextMenu();
+    GetSelectionController()->ClearSelectionViaEWebView();
+  }
+
   if (im_context_)
     im_context_->OnFocusOut();
 
@@ -1204,7 +1236,7 @@ void RenderWidgetHostViewEfl::HandleEvasEvent(const Evas_Event_Key_Up* event) {
     host_->ForwardKeyboardEvent(WebEventFactoryEfl::toWebKeyboardEvent(evas_, event));
 }
 
-#ifdef OS_TIZEN
+#if defined(OS_TIZEN)
 void RenderWidgetHostViewEfl::FilterInputMotion(const blink::WebGestureEvent& gesture_event) {
   if (gesture_event.type == blink::WebInputEvent::GesturePinchUpdate) {
     Evas_Coord_Point position;
@@ -1266,43 +1298,157 @@ void PlayTapSound(
 
 } // namespace
 
-void RenderWidgetHostViewEfl::HandleTapLink(ui::GestureEvent* event) {
-  web_view_->AsyncRequestHitTestDataAtBlinkCoords(
-      event->x(), event->y(),
+void RenderWidgetHostViewEfl::HandleTapLink(blink::WebGestureEvent& event) {
+  web_view_->AsyncRequestHitTestDataAt(
+      event.x, event.y,
       tizen_webview::TW_HIT_TEST_MODE_NODE_DATA,
       PlayTapSound, NULL);
 }
 
-void RenderWidgetHostViewEfl::HandleGesture(ui::GestureEvent* event) {
-  if ((event->type() == ui::ET_GESTURE_PINCH_BEGIN ||
-       event->type() == ui::ET_GESTURE_PINCH_UPDATE ||
-       event->type() == ui::ET_GESTURE_PINCH_END) &&
+ui::LatencyInfo CreateLatencyInfo(const blink::WebInputEvent& event) {
+  ui::LatencyInfo latency_info;
+  // The latency number should only be added if the timestamp is valid.
+  if (event.timeStampSeconds) {
+    const int64 time_micros = static_cast<int64>(
+        event.timeStampSeconds * base::Time::kMicrosecondsPerSecond);
+    latency_info.AddLatencyNumberWithTimestamp(
+        ui::INPUT_EVENT_LATENCY_ORIGINAL_COMPONENT,
+        0,
+        0,
+        base::TimeTicks() + base::TimeDelta::FromMicroseconds(time_micros),
+        1);
+  }
+  return latency_info;
+}
+
+void RenderWidgetHostViewEfl::SendGestureEvent(
+    blink::WebGestureEvent& event) {
+  HandleGesture(event);
+#if defined(OS_TIZEN)
+  FilterInputMotion(event);
+#endif
+  if (m_magnifier && event.type == blink::WebInputEvent::GestureScrollUpdate)
+    return;
+  if (host_ && event.type != blink::WebInputEvent::Undefined)
+    host_->ForwardGestureEventWithLatencyInfo(event, CreateLatencyInfo(event));
+}
+
+void RenderWidgetHostViewEfl::HandleGestureBegin() {
+  selection_acked_on_tap_ = false;
+  was_scrolled_ = false;
+
+#ifdef TIZEN_EDGE_EFFECT
+  web_view_->edgeEffect()->enable();
+#endif
+  if (GetSelectionController()) {
+    should_restore_selection_menu_ =
+        GetSelectionController()->IsAnyHandleVisible();
+  }
+}
+
+void RenderWidgetHostViewEfl::HandleGestureEnd() {
+  if (GetSelectionController()) {
+    if (GetSelectionController()->GetScrollStatus())
+      GetSelectionController()->SetScrollStatus(false);
+
+    if (should_restore_selection_menu_ && !was_scrolled_ &&
+        !selection_acked_on_tap_) {
+      should_restore_selection_menu_ = false;
+      GetSelectionController()->HideHandleAndContextMenu();
+    } else if (GetSelectionController()->GetSelectionStatus()) {
+      GetSelectionController()->UpdateSelectionDataAndShow(
+          GetSelectionController()->GetLeftRect(),
+          GetSelectionController()->GetRightRect(),
+          false /* unused */,
+          should_restore_selection_menu_);
+    }
+  }
+  // Edge effect should be disabled upon scroll end/fling start.
+  // Gesture end comes just after those events, so it's disabled here.
+#ifdef TIZEN_EDGE_EFFECT
+  web_view_->edgeEffect()->disable();
+#endif
+}
+
+void RenderWidgetHostViewEfl::HandleGesture(
+    blink::WebGestureEvent& event) {
+
+  if (event.type == blink::WebInputEvent::GestureTap) {
+    eweb_view()->HandlePostponedGesture(event.x, event.y, ui::ET_GESTURE_TAP);
+  } else if (event.type == blink::WebInputEvent::GestureShowPress) {
+    eweb_view()->HandlePostponedGesture(
+        event.x, event.y, ui::ET_GESTURE_SHOW_PRESS);
+  } else if (event.type == blink::WebInputEvent::GestureLongPress) {
+    eweb_view()->HandlePostponedGesture(
+        event.x, event.y, ui::ET_GESTURE_LONG_PRESS);
+  }
+
+  if ((event.type == blink::WebInputEvent::GesturePinchBegin ||
+      event.type == blink::WebInputEvent::GesturePinchUpdate ||
+      event.type == blink::WebInputEvent::GesturePinchEnd) &&
       (!pinch_zoom_enabled_ || eweb_view()->IsFullscreen())) {
-    event->SetHandled();
     return;
   }
 
-  if (event->type() == ui::ET_GESTURE_PINCH_END) {
+  if (event.type == blink::WebInputEvent::GestureDoubleTap ||
+      event.type == blink::WebInputEvent::GesturePinchBegin) {
+    eweb_view()->SmartCallback<EWebViewCallbacks::ZoomStarted>().call();
+  }
+  if (event.type == blink::WebInputEvent::GestureDoubleTap ||
+      event.type == blink::WebInputEvent::GesturePinchEnd) {
     eweb_view()->SmartCallback<EWebViewCallbacks::ZoomFinished>().call();
   }
 
-  if (event->type() == ui::ET_GESTURE_TAP &&
+  if (event.type == blink::WebInputEvent::GestureTap &&
       web_view_->GetSettings()->linkEffectEnabled()) {
     HandleTapLink(event);
   }
 
-  blink::WebGestureEvent gesture = content::MakeWebGestureEventFromUIEvent(*event);
-
-  if (event->type() == ui::ET_GESTURE_TAP ||
-      event->type() == ui::ET_GESTURE_TAP_CANCEL) {
-      float size = 32.0f; //Default value
+  if (event.type == blink::WebInputEvent::GestureTap ||
+      event.type == blink::WebInputEvent::GestureTapCancel) {
+    float size = 32.0f; // Default value
 #if defined(OS_TIZEN_MOBILE)
-      size = elm_config_finger_size_get() / device_scale_factor();
+    size = elm_config_finger_size_get() / device_scale_factor();
 #endif
-      gesture.data.tap.width = size;
-      gesture.data.tap.height = size;
+    event.data.tap.width = size;
+    event.data.tap.height = size;
   }
 
+  if (event.type == blink::WebInputEvent::GestureTapDown) {
+    // Webkit does not stop a fling-scroll on tap-down. So explicitly send an
+    // event to stop any in-progress flings.
+    blink::WebGestureEvent fling_cancel = event;
+    fling_cancel.type = blink::WebInputEvent::GestureFlingCancel;
+    fling_cancel.sourceDevice = blink::WebGestureDeviceTouchscreen;
+    SendGestureEvent(fling_cancel);
+  } else if (event.type == blink::WebInputEvent::GestureTapCancel ||
+      event.type == blink::WebInputEvent::GestureTapUnconfirmed) {
+    selection_acked_on_tap_ = should_restore_selection_menu_;
+  } else if (event.type == blink::WebInputEvent::GestureScrollBegin) {
+    was_scrolled_ = true;
+    if (GetSelectionController())
+      GetSelectionController()->SetScrollStatus(true);
+  } else if (web_view_ && event.type == blink::WebInputEvent::GestureScrollUpdate) {
+#ifdef TIZEN_EDGE_EFFECT
+    if (event.data.scrollUpdate.deltaX < 0)
+      web_view_->edgeEffect()->hide("edge,left");
+    else if (event.data.scrollUpdate.deltaX > 0)
+      web_view_->edgeEffect()->hide("edge,right");
+    if (event.data.scrollUpdate.deltaY < 0)
+      web_view_->edgeEffect()->hide("edge,top");
+    else if (event.data.scrollUpdate.deltaY > 0)
+      web_view_->edgeEffect()->hide("edge,bottom");
+  } else if (web_view_ && event.type == blink::WebInputEvent::GesturePinchBegin) {
+    web_view_->edgeEffect()->disable();
+  } else if (web_view_ && event.type == blink::WebInputEvent::GesturePinchEnd) {
+    web_view_->edgeEffect()->enable();
+#endif
+  }
+}
+
+void RenderWidgetHostViewEfl::HandleGesture(ui::GestureEvent* event) {
+  blink::WebGestureEvent gesture =
+      content::MakeWebGestureEventFromUIEvent(*event);
   gesture.x = event->x();
   gesture.y = event->y();
 
@@ -1310,64 +1456,17 @@ void RenderWidgetHostViewEfl::HandleGesture(ui::GestureEvent* event) {
   gesture.globalX = root_point.x();
   gesture.globalY = root_point.y();
 
-  if (event->type() == ui::ET_GESTURE_TAP_DOWN) {
-    // Webkit does not stop a fling-scroll on tap-down. So explicitly send an
-    // event to stop any in-progress flings.
-    blink::WebGestureEvent fling_cancel = gesture;
-    fling_cancel.type = blink::WebInputEvent::GestureFlingCancel;
-    fling_cancel.sourceDevice = blink::WebGestureDeviceTouchscreen;
-    host_->ForwardGestureEvent(fling_cancel);
-  } else if (event->type() == ui::ET_GESTURE_SCROLL_UPDATE) {
-    if (m_magnifier)
-      return;
-  } else if (event->type() == ui::ET_GESTURE_SCROLL_BEGIN) {
-    if (GetSelectionController())
-      GetSelectionController()->SetScrollStatus(true);
-  } else if (event->type() == ui::ET_GESTURE_SCROLL_END) {
-    if (GetSelectionController() && GetSelectionController()->GetScrollStatus())
-      GetSelectionController()->SetScrollStatus(false);
-  } else if (event->type() == ui::ET_GESTURE_TAP_CANCEL) {
-    if (GetSelectionController() && GetSelectionController()->GetSelectionStatus()) {
-      GetSelectionController()->UpdateSelectionDataAndShow(
-        GetSelectionController()->GetLeftRect(),
-        GetSelectionController()->GetRightRect(),
-        false /* unused */);
-    }
-  } else if (event->type() == ui::ET_GESTURE_END) {
-    // Gesture end event is received (1) After scroll end (2) After Fling start
-#ifdef TIZEN_EDGE_EFFECT
-    if (web_view_)
-      web_view_->edgeEffect()->hide();
-#endif
-  }
-#ifdef TIZEN_EDGE_EFFECT
-  else if (event->type() == ui::ET_GESTURE_SCROLL_UPDATE) {
-    if (web_view_) {
-      if (gesture.data.scrollUpdate.deltaX < 0)
-        web_view_->edgeEffect()->hide("edge,left");
-      else if (gesture.data.scrollUpdate.deltaX > 0)
-        web_view_->edgeEffect()->hide("edge,right");
-      if (gesture.data.scrollUpdate.deltaY < 0)
-        web_view_->edgeEffect()->hide("edge,top");
-      else if (gesture.data.scrollUpdate.deltaY > 0)
-        web_view_->edgeEffect()->hide("edge,bottom");
-    }
-  } else if (event->type() == ui::ET_GESTURE_PINCH_BEGIN) {
-    if (web_view_)
-      web_view_->edgeEffect()->disable();
-  } else if (event->type() == ui::ET_GESTURE_PINCH_END) {
-    if (web_view_)
-      web_view_->edgeEffect()->enable();
-  }
-#endif
+  if (event->type() == ui::ET_GESTURE_BEGIN)
+    HandleGestureBegin();
+  else if (event->type() == ui::ET_GESTURE_END)
+    HandleGestureEnd();
 
-#ifdef OS_TIZEN
-  FilterInputMotion(gesture);
-  if (gesture.type != blink::WebInputEvent::Undefined)
-    host_->ForwardGestureEventWithLatencyInfo(gesture, *event->latency());
-#endif
-
+  SendGestureEvent(gesture);
   event->SetHandled();
+}
+
+bool RenderWidgetHostViewEfl::IsLastAvailableTextEmpty() const {
+  return RenderWidgetHostViewBase::selection_text_.empty();
 }
 
 // Copied from render_widget_host_view_aura.cc

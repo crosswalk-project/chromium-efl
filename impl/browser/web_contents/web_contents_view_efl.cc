@@ -173,9 +173,12 @@ gfx::Rect WebContentsViewEfl::GetViewBounds() const {
 
 ////////////////////////////////////////////////////////////////////////////////
 // WebContentsViewEfl, RenderViewHostDelegateView implementation:
-void WebContentsViewEfl::ShowContextMenu(RenderFrameHost* render_frame_host, const ContextMenuParams& params) {
-  if (delegate_)
-    delegate_->ShowContextMenu(render_frame_host, params);
+void WebContentsViewEfl::ShowContextMenu(RenderFrameHost* render_frame_host,
+    const ContextMenuParams& params) {
+  WebContentsDelegateEfl* delegate =
+      static_cast<WebContentsDelegateEfl*>(web_contents_->GetDelegate());
+  if (delegate)
+    delegate->web_view()->ShowContextMenu(params);
 }
 
 void WebContentsViewEfl::SetViewMode(tizen_webview::View_Mode mode) {

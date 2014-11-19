@@ -221,6 +221,7 @@ private:
   void* user_data_;
 };
 
+class WebViewAsyncRequestHitTestDataCallback;
 class JavaScriptDialogManagerEfl;
 class WebViewGeolocationPermissionCallback;
 
@@ -288,6 +289,7 @@ class EWebView {
   const char* GetUserAgent() const;
   const char* GetUserAgentAppName() const;
   const char* GetSelectedText() const;
+  bool IsLastAvailableTextEmpty() const;
   Ewk_Settings* GetSettings();
   tizen_webview::Frame* GetMainFrame();
   void UpdateWebKitPreferences();
@@ -312,7 +314,10 @@ class EWebView {
   Eina_Bool DidSelectPopupMenuItem(int selectedIndex);
   Eina_Bool DidMultipleSelectPopupMenuItem(std::vector<int>& selectedIndices);
   Eina_Bool PopupMenuClose();
-  void ShowContextMenu(const content::ContextMenuParams& params, content::ContextMenuType type = content::MENU_TYPE_LINK);
+  void ShowContextMenu(
+      const content::ContextMenuParams& params,
+      content::ContextMenuType type = content::MENU_TYPE_LINK,
+      bool show_selection = true);
   void CancelContextMenu(int request_id);
   void SetScale(double scale_factor, int x, int y);
   bool GetScrollPosition(int* x, int* y) const;
@@ -356,15 +361,18 @@ class EWebView {
       NavigationPolicyParams params, bool* handled);
   void UseSettingsFont();
 
-  // Deprecated - use async hit tests instead
-  tizen_webview::Hit_Test* RequestHitTestDataAt(
-      int x, int y, tizen_webview::Hit_Test_Mode mode);
-  Eina_Bool AsyncRequestHitTestDataAt(
-      int x, int y, tizen_webview::Hit_Test_Mode mode,
-      tizen_webview::View_Hit_Test_Request_Callback callback, void* user_data);
-  Eina_Bool AsyncRequestHitTestDataAtBlinkCoords(
-      int x, int y, tizen_webview::Hit_Test_Mode mode,
-      tizen_webview::View_Hit_Test_Request_Callback callback, void* user_data);
+  tizen_webview::Hit_Test* RequestHitTestDataAt(int x, int y,
+      tizen_webview::Hit_Test_Mode mode);
+  Eina_Bool AsyncRequestHitTestDataAt(int x, int y,
+      tizen_webview::Hit_Test_Mode mode,
+      tizen_webview::View_Hit_Test_Request_Callback,
+      void* user_data);
+  tizen_webview::Hit_Test* RequestHitTestDataAtBlinkCoords(int x, int y,
+      tizen_webview::Hit_Test_Mode mode);
+  Eina_Bool AsyncRequestHitTestDataAtBlinkCords(int x, int y,
+      tizen_webview::Hit_Test_Mode mode,
+      WebViewAsyncRequestHitTestDataCallback* cb);
+
   void DispatchAsyncHitTestData(const _Ewk_Hit_Test& hit_test_data, const NodeAttributesMap& node_attributes, int64_t request_id);
   void UpdateHitTestData(const _Ewk_Hit_Test& hit_test_data, const NodeAttributesMap& node_attributes);
 
@@ -464,11 +472,15 @@ class EWebView {
   bool HandleEvasEvent(const Evas_Event_Key_Up* event);
   bool HandleGesture(ui::GestureEvent* event);
   bool HandleTouchEvent(ui::TouchEvent* event);
-
   void HandleRendererProcessCrash();
-
+  void HandlePostponedGesture(int x, int y, ui::EventType type);
  private:
-   void InitializeContent();
+  void InitializeContent();
+  void EvasToBlinkCords(int x, int y, int* view_x, int* view_y);
+  void HandleLongPressGesture(int x, int y, tizen_webview::Hit_Test_Mode mode,
+      tizen_webview::Hit_Test*);
+  void HandleTapGesture(int x, int y, tizen_webview::Hit_Test_Mode mode,
+      tizen_webview::Hit_Test*);
 
 #if defined(OS_TIZEN_MOBILE) && !defined(EWK_BRINGUP)
   static void cameraResultCb(service_h request, service_h reply,
@@ -484,8 +496,6 @@ class EWebView {
 #if defined(OS_TIZEN)
   void ReleasePopupMenuList();
 #endif
-
-  void EvasToBlinkCords(int x, int y, int* view_x, int* view_y);
 
   // For popup windows the WebContents is created internally and we need to associate it with the
   // new view created by the embedder. We set this before calling the "create,window" callback and
@@ -560,7 +570,6 @@ class EWebView {
 #endif
   bool is_initialized_;
 
-  std::map<int64_t, AsyncHitTestRequest*> m_pendingAsyncHitTests;
   scoped_ptr<tizen_webview::BackForwardList> back_forward_list_;
 
 private:
@@ -570,6 +579,7 @@ private:
 
   gfx::Vector2d previous_scroll_position_;
 
+  std::map<int64_t, WebViewAsyncRequestHitTestDataCallback*> hit_test_callback_;
   // only tizen_webview::WebView can create and delete this
   EWebView(tizen_webview::WebView* owner, tizen_webview::WebContext*, Evas_Object* smart_object);
   ~EWebView();

@@ -329,6 +329,7 @@
       'ui/native_theme/native_theme_efl.h',
       'ui/native_theme/native_theme_efl.cc',
       'ui/snapshot/snapshot_efl.cc',
+      'ui/events/gesture_detection/gesture_configuration_efl.cc',
 
       'screen_efl.cc',
       'screen_efl.h',

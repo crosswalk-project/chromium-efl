@@ -81,6 +81,13 @@ void WebView::ResetContextMenuController() {
   return impl_->context_menu_.reset();
 }
 
+void WebView::HideSelectionHandlers() {
+#if defined(OS_TIZEN)
+  if (impl_->selection_controller_.get())
+    impl_->selection_controller_->HideHandle();
+#endif
+}
+
 tizen_webview::Frame* WebView::GetMainFrame() {
   return impl_->GetMainFrame();
 }

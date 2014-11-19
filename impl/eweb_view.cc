@@ -122,46 +122,161 @@ void GetEinaRectFromGfxRect(const gfx::Rect& gfx_rect, Eina_Rectangle* eina_rect
 
 } // namespace
 
-class AsyncHitTestRequest {
+class WebViewAsyncRequestHitTestDataCallback
+{
  public:
-  AsyncHitTestRequest(int x, int y, tizen_webview::Hit_Test_Mode mode)
-      : m_x(x),
-        m_y(y),
-        m_mode(mode) {}
-  virtual ~AsyncHitTestRequest() {}
+  WebViewAsyncRequestHitTestDataCallback(int x, int y, tizen_webview::Hit_Test_Mode mode)
+      : x_(x)
+      , y_(y)
+      , mode_(mode) {
+  }
 
   virtual void Run(tizen_webview::Hit_Test *hit_test, EWebView* web_view) = 0;
 
  protected:
-  int GetX() const { return m_x; }
-  int GetY() const { return m_y; }
-  tizen_webview::Hit_Test_Mode GetMode() const { return m_mode; }
+  int GetX() const { return x_; }
+  int GetY() const { return y_; }
+  tizen_webview::Hit_Test_Mode GetMode() const { return mode_; }
 
  private:
-  int m_x;
-  int m_y;
-  tizen_webview::Hit_Test_Mode m_mode;
+  int x_;
+  int y_;
+  tizen_webview::Hit_Test_Mode mode_;
 };
 
-class AsyncHitTestRequestCallback : public AsyncHitTestRequest {
+class WebViewAsyncRequestHitTestDataUserCallback: public WebViewAsyncRequestHitTestDataCallback
+{
  public:
-  AsyncHitTestRequestCallback(int x, int y,
-      tizen_webview::Hit_Test_Mode mode,
-      tizen_webview::View_Hit_Test_Request_Callback callback,
-      void* user_data)
-      : AsyncHitTestRequest(x, y, mode),
-        m_callback(callback),
-        m_user_data(user_data) {
+  WebViewAsyncRequestHitTestDataUserCallback(int x,
+                                             int y,
+                                             tizen_webview::Hit_Test_Mode mode,
+                                             tizen_webview::View_Hit_Test_Request_Callback callback,
+                                             void* user_data)
+      : WebViewAsyncRequestHitTestDataCallback(x, y, mode)
+      , callback_(callback)
+      , user_data_(user_data) {
   }
 
   virtual void Run(tizen_webview::Hit_Test *hit_test, EWebView* web_view) {
-    DCHECK(m_callback);
-    m_callback(web_view->evas_object(), GetX(), GetY(), GetMode(), hit_test, m_user_data);
+    DCHECK(callback_);
+    callback_(web_view->evas_object(), GetX(), GetY(), GetMode(), hit_test, user_data_);
   }
 
  private:
-  tizen_webview::View_Hit_Test_Request_Callback m_callback;
-  void* m_user_data;
+  tizen_webview::View_Hit_Test_Request_Callback callback_;
+  void* user_data_;
+};
+
+class WebViewAsyncRequestHitTestDataInternalCallback: public WebViewAsyncRequestHitTestDataCallback
+{
+ public:
+  typedef void (EWebView::*Callback)(int, int, tizen_webview::Hit_Test_Mode, tizen_webview::Hit_Test*);
+
+ public:
+  WebViewAsyncRequestHitTestDataInternalCallback(int x,
+                                                 int y,
+                                                 tizen_webview::Hit_Test_Mode mode,
+                                                 Callback cb)
+      : WebViewAsyncRequestHitTestDataCallback(x, y, mode)
+      , callback_(cb) {
+  }
+
+  void Run(tizen_webview::Hit_Test* hit_test, EWebView* web_view) {
+    DCHECK(callback_);
+    (web_view->*callback_)(GetX(), GetY(), GetMode(), hit_test);
+  }
+
+ private:
+  Callback callback_;
+};
+
+class WebViewBrowserMessageFilter: public content::BrowserMessageFilter
+{
+ public:
+  WebViewBrowserMessageFilter(EWebView* web_view)
+      : BrowserMessageFilter(ChromeMsgStart)
+      , web_view_(web_view) {
+    WebContents* web_contents = GetWebContents();
+    DCHECK(web_contents);
+
+    if (web_contents && web_contents->GetRenderProcessHost())
+      web_contents->GetRenderProcessHost()->AddFilter(this);
+  }
+
+  virtual void OverrideThreadForMessage(const IPC::Message& message,
+      BrowserThread::ID* thread) override {
+    if (message.type() == EwkViewHostMsg_HitTestAsyncReply::ID)
+      *thread = BrowserThread::UI;
+  }
+
+  virtual bool OnMessageReceived(const IPC::Message& message) override {
+    bool handled = true;
+    IPC_BEGIN_MESSAGE_MAP(WebViewBrowserMessageFilter, message)
+      IPC_MESSAGE_HANDLER(EwkViewHostMsg_HitTestReply, OnReceivedHitTestData)
+      IPC_MESSAGE_HANDLER(EwkViewHostMsg_HitTestAsyncReply, OnReceivedHitTestAsyncData)
+      IPC_MESSAGE_UNHANDLED(handled = false)
+    IPC_END_MESSAGE_MAP()
+    return handled;
+  }
+
+ private:
+  void OnReceivedHitTestData(int render_view, const _Ewk_Hit_Test& hit_test_data,
+      const NodeAttributesMap& node_attributes) {
+    DCHECK(BrowserThread::CurrentlyOn(BrowserThread::IO));
+
+    RenderViewHost* render_view_host= web_view_->web_contents().GetRenderViewHost();
+    CHECK(render_view_host);
+
+    if (render_view_host && render_view_host->GetRoutingID() == render_view)
+      web_view_->UpdateHitTestData(hit_test_data, node_attributes);
+  }
+
+  void OnReceivedHitTestAsyncData(int render_view, const _Ewk_Hit_Test& hit_test_data,
+      const NodeAttributesMap& node_attributes, int64_t request_id) {
+    DCHECK(BrowserThread::CurrentlyOn(BrowserThread::UI));
+    WebContents* contents = GetWebContents();
+    CHECK(contents);
+
+    RenderViewHost* render_view_host= contents->GetRenderViewHost();
+    CHECK(render_view_host);
+    if (render_view_host && render_view_host->GetRoutingID() == render_view)
+      web_view_->DispatchAsyncHitTestData(hit_test_data, node_attributes, request_id);
+  }
+
+  WebContents* GetWebContents() const {
+    if (web_view_)
+      return &(web_view_->web_contents());
+
+    return NULL;
+  }
+
+ private:
+  EWebView* web_view_;
+};
+
+class AsyncHitTestRequest
+{
+ public:
+  AsyncHitTestRequest(int x, int y, tizen_webview::Hit_Test_Mode mode,
+      tizen_webview::View_Hit_Test_Request_Callback callback, void* user_data)
+    : x_(x)
+    , y_(y)
+    , mode_(mode)
+    , callback_(callback)
+    , user_data_(user_data) {
+  }
+
+  void Run(tizen_webview::Hit_Test *hit_test, Evas_Object* web_view) {
+    DCHECK(callback_);
+    callback_(web_view, x_, y_, mode_, hit_test, user_data_);
+  }
+
+ private:
+  int x_;
+  int y_;
+  tizen_webview::Hit_Test_Mode mode_;
+  tizen_webview::View_Hit_Test_Request_Callback callback_;
+  void* user_data_;
 };
 
 class WebViewGeolocationPermissionCallback {
@@ -184,28 +299,6 @@ class WebViewGeolocationPermissionCallback {
   tizen_webview::View_Geolocation_Permission_Callback callback;
   void* user_data;
 };
-
-class WebViewAsyncRequestHitTestDataInternalCallback :
-    public AsyncHitTestRequest {
- public:
-  typedef void (EWebView::*Callback)(int, int, tizen_webview::Hit_Test_Mode,
-                                     tizen_webview::Hit_Test*);
-
-  WebViewAsyncRequestHitTestDataInternalCallback(int x, int y,
-      tizen_webview::Hit_Test_Mode mode, Callback cb)
-      : AsyncHitTestRequest(x, y, mode),
-        m_callback(cb) {
-  }
-
-  void Run(tizen_webview::Hit_Test* hit_test, EWebView* web_view) {
-    DCHECK(m_callback);
-    (web_view->*m_callback)(GetX(), GetY(), GetMode(), hit_test);
-  }
-
- private:
-  Callback m_callback;
-};
-
 
 WebContents* EWebView::contents_for_new_window_ = NULL;
 int EWebView::find_request_id_counter_ = 0;
@@ -317,13 +410,13 @@ void EWebView::Initialize() {
   is_initialized_ = true;
 }
 
-EWebView::~EWebView() {
-  std::map<int64_t, AsyncHitTestRequest*>::iterator it;
-  for (it = m_pendingAsyncHitTests.begin(); it != m_pendingAsyncHitTests.end();
-      it++) {
+EWebView::~EWebView()
+{
+  std::map<int64_t, WebViewAsyncRequestHitTestDataCallback*>::iterator it;
+  for (it = hit_test_callback_.begin(); it != hit_test_callback_.end(); it++)
     delete it->second;
-  }
-  m_pendingAsyncHitTests.clear();
+
+  hit_test_callback_.clear();
 
   if (!is_initialized_) {
     return;
@@ -712,6 +805,86 @@ void EWebView::DispatchPostponedGestureEvent(ui::GestureEvent* event) {
 }
 */
 
+void EWebView::HandleLongPressGesture(int x, int y,
+                                      tizen_webview::Hit_Test_Mode mode,
+                                      tizen_webview::Hit_Test* hit_test) {
+  _Ewk_Hit_Test* hit_test_data = hit_test->impl;
+  if (hit_test_data && hit_test_data->context & TW_HIT_TEST_RESULT_CONTEXT_EDITABLE) {
+    selection_controller_->SetSelectionStatus(true);
+    selection_controller_->SetSelectionEditable(true);
+    selection_controller_->HandleLongPressEvent(rwhv()->ConvertPointInViewPix(gfx::Point(x, y)));
+  } else if (hit_test_data
+      && !(hit_test_data->context & TW_HIT_TEST_RESULT_CONTEXT_LINK)
+      && !(hit_test_data->context & TW_HIT_TEST_RESULT_CONTEXT_IMAGE)
+      && !(hit_test_data->context & TW_HIT_TEST_RESULT_CONTEXT_MEDIA)
+      && hit_test_data->context & TW_HIT_TEST_RESULT_CONTEXT_TEXT) {
+    selection_controller_->SetSelectionStatus(true);
+    selection_controller_->HandleLongPressEvent(rwhv()->ConvertPointInViewPix(gfx::Point(x, y)));
+    LOG(INFO) << __PRETTY_FUNCTION__ << ":: link, !image, !media, text";
+  } else if (hit_test_data && hit_test_data->context & TW_HIT_TEST_RESULT_CONTEXT_DOCUMENT) {
+    LOG(INFO) << __PRETTY_FUNCTION__ << ":: TW_HIT_TEST_RESULT_CONTEXT_DOCUMENT";
+  } else if (hit_test_data && hit_test_data->context & TW_HIT_TEST_RESULT_CONTEXT_IMAGE) {
+    LOG(INFO) << __PRETTY_FUNCTION__ << ":: TW_HIT_TEST_RESULT_CONTEXT_IMAGE";
+  } else if (hit_test_data && hit_test_data->context & TW_HIT_TEST_RESULT_CONTEXT_LINK) {
+    ClearSelection();
+    LOG(INFO) << __PRETTY_FUNCTION__ << ":: TW_HIT_TEST_RESULT_CONTEXT_LINK";
+  } else {
+    LOG(INFO) << __PRETTY_FUNCTION__ << ":: hit_test = " << hit_test_data->context;
+  }
+}
+
+void EWebView::HandleTapGesture(int x, int y,
+                                tizen_webview::Hit_Test_Mode mode,
+                                tizen_webview::Hit_Test* hit_test) {
+  _Ewk_Hit_Test* hit_test_data = hit_test->impl;
+  LOG(INFO) << __PRETTY_FUNCTION__ << " hit_test = " << hit_test_data;
+  if (hit_test_data && hit_test_data->context & TW_HIT_TEST_RESULT_CONTEXT_EDITABLE) {
+    LOG(INFO) << "DispatchPostponedGestureEvent :: TW_HIT_TEST_RESULT_CONTEXT_EDITABLE";
+    selection_controller_->SetSelectionStatus(true);
+    if (selection_controller_->GetSelectionEditable()){
+      selection_controller_->SetCaretSelectionStatus(true);
+    } else {
+      selection_controller_->SetSelectionEditable(true);
+    }
+  } else {
+    if (hit_test_data && hit_test_data->context & TW_HIT_TEST_RESULT_CONTEXT_DOCUMENT)
+      LOG(INFO) << __PRETTY_FUNCTION__ << " DOCUMENT";
+    if (hit_test_data && hit_test_data->context & TW_HIT_TEST_RESULT_CONTEXT_TEXT)
+      LOG(INFO) << __PRETTY_FUNCTION__ << " TEXT";
+
+    selection_controller_->SetSelectionEditable(false);
+  }
+}
+
+void EWebView::HandlePostponedGesture(int x, int y, ui::EventType type) {
+  LOG(INFO) << "HandlePostponedGesture :: " << type;
+  switch (type) {
+    case ui::ET_GESTURE_LONG_PRESS: {
+      ClearSelection();
+      if (settings_->textSelectionEnabled()) {
+        WebViewAsyncRequestHitTestDataInternalCallback* cb =
+            new WebViewAsyncRequestHitTestDataInternalCallback(x,y,
+                TW_HIT_TEST_MODE_DEFAULT, &EWebView::HandleLongPressGesture);
+        // below call takes full ownership of cb.
+        AsyncRequestHitTestDataAtBlinkCords(x, y, TW_HIT_TEST_MODE_DEFAULT, cb);
+      }
+      break;
+    }
+    case ui::ET_GESTURE_TAP:
+    case ui::ET_GESTURE_SHOW_PRESS: {
+      WebViewAsyncRequestHitTestDataInternalCallback* cb =
+          new WebViewAsyncRequestHitTestDataInternalCallback(x, y,
+              TW_HIT_TEST_MODE_DEFAULT, &EWebView::HandleTapGesture);
+      // below call takes full ownership of cb.
+      AsyncRequestHitTestDataAtBlinkCords(x, y, TW_HIT_TEST_MODE_DEFAULT, cb);
+      break;
+      }
+    default:
+      ClearSelection();
+      break;
+  }
+}
+
 bool EWebView::TouchEventsEnabled() const {
   return touch_events_enabled_;
 }
@@ -852,6 +1025,10 @@ const char* EWebView::GetSelectedText() const {
   if (selected_text_.empty())
     return NULL;
   return selected_text_.c_str();
+}
+
+bool EWebView::IsLastAvailableTextEmpty() const {
+  return rwhv() ? rwhv()->IsLastAvailableTextEmpty() : true;
 }
 
 Ewk_Settings* EWebView::GetSettings() {
@@ -1117,7 +1294,10 @@ Eina_Bool EWebView::PopupMenuClose() {
   return true;
 }
 
-void EWebView::ShowContextMenu(const content::ContextMenuParams& params, content::ContextMenuType type) {
+void EWebView::ShowContextMenu(
+    const content::ContextMenuParams& params,
+    content::ContextMenuType type,
+    bool show_selection) {
   // fix for context menu coordinates type: MENU_TYPE_LINK (introduced by CBGRAPHICS-235),
   // this menu is created in renderer process and it does not now anything about
   // view scaling factor and it has another calling sequence, so coordinates is not updated
@@ -1130,14 +1310,27 @@ void EWebView::ShowContextMenu(const content::ContextMenuParams& params, content
 
   context_menu_.reset(new content::ContextMenuControllerEfl(GetPublicWebView(), type, *web_contents_.get()));
 
-  if(!selection_controller_->IsShowingMagnifier()) {
+  Evas_Coord x, y;
+  evas_object_geometry_get(evas_object(), &x, &y, 0, 0);
+  convertedParams.x += x;
+  convertedParams.y += y;
+
+  if (!selection_controller_->IsShowingMagnifier() &&
+      selection_controller_->IsCaretSelection()) {
     if(!context_menu_->PopulateAndShowContextMenu(convertedParams))
       context_menu_.reset();
+    if (show_selection)
+      selection_controller_->UpdateSelectionDataAndShow(
+          selection_controller_->GetLeftRect(),
+          selection_controller_->GetRightRect(),
+          false /* unused */,
+          true);
   }
 }
 
 void EWebView::CancelContextMenu(int request_id) {
-  context_menu_.reset();
+  if (context_menu_)
+    context_menu_->HideContextMenu();
 }
 
 void EWebView::Find(const char* text, tizen_webview::Find_Options find_options) {
@@ -1258,9 +1451,12 @@ void EWebView::OnQuerySelectionStyleReply(const SelectionStylePrams& params) {
 }
 
 void EWebView::SelectClosestWord(const gfx::Point& touch_point) {
-  float device_scale_factor = rwhv()->device_scale_factor();
+  int view_x, view_y;
+  EvasToBlinkCords(touch_point.x(), touch_point.y(), &view_x, &view_y);
+
   RenderViewHost* render_view_host = web_contents_->GetRenderViewHost();
-  render_view_host->Send(new EwkViewMsg_SelectClosestWord(render_view_host->GetRoutingID(), touch_point.x() / device_scale_factor, touch_point.y() / device_scale_factor));
+  render_view_host->Send(new EwkViewMsg_SelectClosestWord(
+      render_view_host->GetRoutingID(), view_x, view_y));
 }
 
 void EWebView::SelectLinkText(const gfx::Point& touch_point) {
@@ -1302,47 +1498,31 @@ tizen_webview::Hit_Test* EWebView::RequestHitTestDataAt(int x, int y,
   int view_x, view_y;
   EvasToBlinkCords(x, y, &view_x, &view_y);
 
-  RenderViewHost* render_view_host = web_contents_->GetRenderViewHost();
-  content::RenderProcessHost* render_process_host =
-      web_contents_->GetRenderProcessHost();
-  DCHECK(render_view_host);
-  DCHECK(render_process_host);
-
-  if (render_view_host && render_process_host) {
-    render_view_host->Send(new EwkViewMsg_DoHitTest(
-        render_view_host->GetRoutingID(), view_x, view_y, mode));
-    // We wait on UI thread till hit test data is updated.
-    hit_test_completion_.Wait();
-    return new tizen_webview::Hit_Test(hit_test_data_);
-  }
-
-  return NULL;
+  return RequestHitTestDataAtBlinkCoords(view_x, view_y, mode);
 }
 
 Eina_Bool EWebView::AsyncRequestHitTestDataAt(int x, int y,
     tizen_webview::Hit_Test_Mode mode,
-    tizen_webview::View_Hit_Test_Request_Callback callback, void* user_data) {
-  int view_x, view_y;
-  EvasToBlinkCords(x, y, &view_x, &view_y);
-  return AsyncRequestHitTestPrivate(view_x, view_y, mode,
-      new AsyncHitTestRequestCallback(x, y, mode, callback, user_data));
-}
-
-Eina_Bool EWebView::AsyncRequestHitTestDataAtBlinkCoords(int x, int y,
-    tizen_webview::Hit_Test_Mode mode,
     tizen_webview::View_Hit_Test_Request_Callback callback,
     void* user_data) {
-  return AsyncRequestHitTestPrivate(x, y, mode,
-      new AsyncHitTestRequestCallback(x, y, mode, callback, user_data));
+  int view_x, view_y;
+  EvasToBlinkCords(x, y, &view_x, &view_y);
+  return AsyncRequestHitTestDataAtBlinkCords(
+      view_x,
+      view_y,
+      mode,
+      new WebViewAsyncRequestHitTestDataUserCallback(x, y, mode, callback, user_data));
 }
 
-Eina_Bool EWebView::AsyncRequestHitTestPrivate(
-    int x, int y, tizen_webview::Hit_Test_Mode mode,
-    AsyncHitTestRequest* asyncHitTestRequest) {
+Eina_Bool EWebView::AsyncRequestHitTestDataAtBlinkCords(int x, int y,
+    tizen_webview::Hit_Test_Mode mode,
+    WebViewAsyncRequestHitTestDataCallback *cb) {
   DCHECK(BrowserThread::CurrentlyOn(BrowserThread::UI));
+  DCHECK(cb);
 
   static int64_t request_id = 1;
-  if (asyncHitTestRequest) {
+
+  if (cb) {
     RenderViewHost* render_view_host = web_contents_->GetRenderViewHost();
     content::RenderProcessHost* render_process_host =
         web_contents_->GetRenderProcessHost();
@@ -1352,14 +1532,14 @@ Eina_Bool EWebView::AsyncRequestHitTestPrivate(
     if (render_view_host && render_process_host) {
       render_view_host->Send(new EwkViewMsg_DoHitTestAsync(
           render_view_host->GetRoutingID(), x, y, mode, request_id));
-      m_pendingAsyncHitTests[request_id] = asyncHitTestRequest;
+      hit_test_callback_[request_id] = cb;
       ++request_id;
       return EINA_TRUE;
     }
   }
 
   // if failed we delete callback as it is not needed anymore
-  delete asyncHitTestRequest;
+  delete cb;
   return EINA_FALSE;
 }
 
@@ -1367,16 +1547,38 @@ void EWebView::DispatchAsyncHitTestData(const _Ewk_Hit_Test& hit_test_data,
     const NodeAttributesMap& node_attributes, int64_t request_id) {
   DCHECK(BrowserThread::CurrentlyOn(BrowserThread::UI));
 
-  std::map<int64_t, AsyncHitTestRequest*>::iterator it =
-      m_pendingAsyncHitTests.find(request_id);
-  if (it == m_pendingAsyncHitTests.end())
-    return;
+  std::map<int64_t, WebViewAsyncRequestHitTestDataCallback*>::iterator it =
+      hit_test_callback_.find(request_id);
 
-  tizen_webview::Hit_Test data(hit_test_data);
-  data.impl->nodeData.PopulateNodeAtributes(node_attributes);
-  it->second->Run(&data, this);
+  if (it == hit_test_callback_.end())
+    return;
+  _Ewk_Hit_Test data = hit_test_data;
+  data.nodeData.PopulateNodeAtributes(node_attributes);
+  tizen_webview::Hit_Test hit_test(data);
+  it->second->Run(&hit_test, this);
   delete it->second;
-  m_pendingAsyncHitTests.erase(it);
+  hit_test_callback_.erase(it);
+}
+
+tizen_webview::Hit_Test* EWebView::RequestHitTestDataAtBlinkCoords(int x, int y, tizen_webview::Hit_Test_Mode mode) {
+  DCHECK(BrowserThread::CurrentlyOn(BrowserThread::UI));
+
+  RenderViewHost* render_view_host = web_contents_->GetRenderViewHost();
+  content::RenderProcessHost* render_process_host = web_contents_->GetRenderProcessHost();
+  DCHECK(render_view_host);
+  DCHECK(render_process_host);
+
+  if (render_view_host && render_process_host) {
+    // We wait on UI thread till hit test data is updated.
+#if !defined(EWK_BRINGUP)
+    base::ThreadRestrictions::ScopedAllowWait allow_wait;
+#endif
+    render_view_host->Send(new EwkViewMsg_DoHitTest(render_view_host->GetRoutingID(), x, y, mode));
+    hit_test_completion_.Wait();
+    return new tizen_webview::Hit_Test(hit_test_data_);
+  }
+
+  return NULL;
 }
 
 void EWebView::EvasToBlinkCords(int x, int y, int* view_x, int* view_y) {
@@ -1973,7 +2175,7 @@ void EWebView::InitializeContent() {
 void EWebView::cameraResultCb(service_h request,
                               service_h reply,
                               service_result_e result,
-		              void* data)
+                              void* data)
 {
   EWebView* webview = static_cast<EWebView*>(data);
   RenderViewHost* render_view_host = webview->web_contents_->GetRenderViewHost();

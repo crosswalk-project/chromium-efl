@@ -67,6 +67,7 @@ class WebView {
   WebViewEvasEventHandler* GetEvasEventHandler();
   ContextMenuController* GetContextMenuController();
   void ResetContextMenuController();
+  void HideSelectionHandlers();
 
   Frame* GetMainFrame();
 

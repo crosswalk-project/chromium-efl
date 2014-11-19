@@ -114,6 +114,7 @@ enum CallbackType {
   EdgeTop,
   EdgeBottom,
   TextStyleState,
+  TextSelectionMode,
   ScrollLeft,
   ScrollRight,
   ScrollUp,
@@ -134,6 +135,7 @@ enum CallbackType {
   WebloginCheckboxClicked,
   WebloginCheckboxResume,
   WebloginReady,
+  ZoomStarted,
   ZoomFinished,
 #if defined(OS_TIZEN_TV)
   NewWindowNavigationPolicyDecision,
@@ -265,6 +267,7 @@ DECLARE_EWK_VIEW_CALLBACK(ContextMenuCustomize, "contextmenu,customize", _Ewk_Co
 DECLARE_EWK_VIEW_CALLBACK(ContextMenuItemSelected, "contextmenu,selected", _Ewk_Context_Menu_Item*);
 DECLARE_EWK_VIEW_CALLBACK(NavigationPolicyDecision, "policy,navigation,decide", tizen_webview::PolicyDecision*);
 DECLARE_EWK_VIEW_CALLBACK(TextFound, "text,found", unsigned int*);
+DECLARE_EWK_VIEW_CALLBACK(TextSelectionMode, "textselection,mode", bool*);
 DECLARE_EWK_VIEW_CALLBACK(NewWindowPolicyDecision, "policy,newwindow,decide", tizen_webview::PolicyDecision*);
 DECLARE_EWK_VIEW_CALLBACK(LoadNonEmptyLayoutFinished, "load,nonemptylayout,finished", void);
 DECLARE_EWK_VIEW_CALLBACK(PopupReplyWaitStart, "popup,reply,wait,start", void*);
@@ -296,6 +299,7 @@ DECLARE_EWK_VIEW_CALLBACK(TouchmoveHandled, "touchmove,handled", bool);
 DECLARE_EWK_VIEW_CALLBACK(WebloginCheckboxClicked, "weblogin,checkbox,clicked", void);
 DECLARE_EWK_VIEW_CALLBACK(WebloginCheckboxResume, "weblogin,checkbox,resume", void);
 DECLARE_EWK_VIEW_CALLBACK(WebloginReady, "weblogin,ready" , void);
+DECLARE_EWK_VIEW_CALLBACK(ZoomStarted, "zoom,started", void);
 DECLARE_EWK_VIEW_CALLBACK(ZoomFinished, "zoom,finished", void);
 #if defined(OS_TIZEN_TV)
 DECLARE_EWK_VIEW_CALLBACK(NewWindowNavigationPolicyDecision, "policy,decision,new,window", Ewk_Navigation_Policy_Decision*);

@@ -22,12 +22,13 @@ class SelectionBoxEfl {
  public:
   SelectionBoxEfl(EWebView* parent_view);
 
-  void SetStatus(bool enable) { status_ = enable; }
+  void SetStatus(bool enable);
   bool GetStatus() const { return status_; }
   void SetEditable(bool enable) { GetContextMenuParams()->is_editable = editable_ = enable; }
   bool GetEditable() const { return editable_; }
   void UpdateSelectStringData(const base::string16& text);
-  void UpdateRectData(const gfx::Rect& left_rect, const gfx::Rect& right_rect);
+  // Returns true if the rectangle is changed.
+  bool UpdateRectData(const gfx::Rect& left_rect, const gfx::Rect& right_rect);
   void ClearRectData();
   bool IsInEditField() const;
   void SetCaretSelectionStatus(const bool enable) { is_caret_selection_ = enable; }

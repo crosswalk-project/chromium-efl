@@ -6,6 +6,8 @@
 #define context_menu_controller_h
 
 #include <Evas.h>
+#include <set>
+
 #include "base/memory/weak_ptr.h"
 #include "content/public/browser/render_view_host.h"
 #include "content/public/browser/download_item.h"
@@ -128,9 +130,9 @@ class ContextMenuItemEfl {
   ContextMenuItemEfl(ContextMenuOptionType item,
                      ContextMenuOption option,
                      const std::string& title,
-                     const std::string& image_url,
-                     const std::string& link_url,
-                     const std::string& icon_path)
+                     const std::string& image_url = std::string(),
+                     const std::string& link_url = std::string(),
+                     const std::string& icon_path = std::string())
     : menu_type_(item)
     , menu_option_(option)
     , title_(title)
@@ -142,16 +144,16 @@ class ContextMenuItemEfl {
 
   ~ContextMenuItemEfl() { }
 
-  const std::string& Title() { return title_; }
+  const std::string& Title() const { return title_; }
   void SetTitle(const std::string& title) { title_ = title; }
 
-  bool IsEnabled() { return is_enabled_; }
+  bool IsEnabled() const { return is_enabled_; }
   void SetEnabled(bool status) { is_enabled_ = status; }
-  ContextMenuOption GetContextMenuOption() { return menu_option_; }
-  ContextMenuOptionType GetContextMenuOptionType() { return menu_type_; }
-  const std::string& LinkURL() { return link_url_; }
-  const std::string& ImageURL() { return image_url_; }
-  const std::string& IconPath() { return icon_path_; }
+  ContextMenuOption GetContextMenuOption() const { return menu_option_; }
+  ContextMenuOptionType GetContextMenuOptionType() const { return menu_type_; }
+  const std::string& LinkURL() const { return link_url_; }
+  const std::string& ImageURL() const { return image_url_; }
+  const std::string& IconPath() const { return icon_path_; }
 
  private:
   ContextMenuOptionType menu_type_;
@@ -167,32 +169,51 @@ class ContextMenuControllerEfl
     : public tizen_webview::ContextMenuController,
       public content::DownloadItem::Observer {
  public:
+  static std::vector<ContextMenuItemEfl> _context_menu_listdata;
 
-  static void contextMenuCancelCallback(void* data, Evas_Object* obj, void* eventInfo);
-  static void contextMenuItemSelectedCallback(void* data, Evas_Object* obj, void* eventInfo);
+  static void ContextMenuCancelCallback(void* data, Evas_Object* obj, void* event_info);
+  static void ContextMenuItemSelectedCallback(void* data, Evas_Object* obj, void* event_info);
+  static void ContextMenuHWBackKey(void* data, Evas_Object* obj, void* event_info);
 
   ContextMenuControllerEfl(tizen_webview::WebView* wv, ContextMenuType type, WebContents& web_contents)
-      : webview_(wv), popup_(NULL), menu_items_(NULL), type_(type), web_contents_(web_contents), weak_ptr_factory_(this) {}
+    : webview_(wv),
+      popup_(NULL),
+      widget_win_(NULL),
+      top_widget_(NULL),
+      menu_items_(NULL),
+      type_(type),
+      web_contents_(web_contents),
+      weak_ptr_factory_(this) {
+  }
 
   ~ContextMenuControllerEfl();
 
-  bool PopulateAndShowContextMenu(const ContextMenuParams &params);
-  Evas_Object* GetPopUp() { return popup_; };
-  void ResetPopUp() { popup_ = NULL; }
-  void MenuItemSelected(ContextMenuItemEfl *menu_item);
+  bool PopulateAndShowContextMenu(const ContextMenuParams& params);
+  void MenuItemSelected(ContextMenuItemEfl* menu_item);
   void HideContextMenu();
+  gfx::Point GetContextMenuShowPos() const { return context_menu_show_pos_; };
+
 
  private:
+  static void ContextMenuListTrackResize(void* data, Evas* e, Evas_Object* obj, void* event_info);
+  static void ContextMenuListRealized(void* data, Evas_Object* obj, void* event_info);
+  static char* ContextMenuGenlistTextSet(void* data, Evas_Object* obj, const char* part);
+  static void ContextMenuPopupBoxResize(Evas_Object* top_widget, void* data);
+  static void ContextMenuPopupResize(void* data, Evas* e, Evas_Object* obj, void* event_info);
+  static void ContextMenuPopupRotationCallback(void* data, Evas_Object* obj, void* event_info);
+  static void BlockClickedCallback(void*, Evas_Object*, void*);
+  void CustomMenuItemSelected(ContextMenuItemEfl*);
   void GetProposedContextMenu();
   bool CreateContextMenu();
   bool ShowContextMenu();
   void AddItemToPropsedList(ContextMenuOptionType item,
                             ContextMenuOption option,
                             std::string title,
-                            std::string image_url,
-                            std::string link_url,
-                            std::string icon_path);
+                            std::string image_url = std::string(),
+                            std::string link_url = std::string(),
+                            std::string icon_path = std::string());
   void HideSelectionHandle();
+  void ShowSelectionHandleAndContextMenu();
   virtual void OnDownloadUpdated(content::DownloadItem* download) override;
   void OnDownloadStarted(content::DownloadItem* item, content::DownloadInterruptReason interrupt_reason);
   base::FilePath DownloadFile(const GURL url,
@@ -201,14 +222,23 @@ class ContextMenuControllerEfl
   bool TriggerDownloadCb(const GURL url);
   void OpenInNewTab(const GURL url);
   Evas_Object* GetWebViewEvasObject();
+  void DeletePopup();
 
+  static int _appended_item_size;
+  static int _popup_item_height;
+  static bool _context_menu_resized;
   tizen_webview::WebView* webview_;
   Evas_Object* popup_;
+  Evas_Object* widget_win_;
+  Evas_Object* top_widget_;
   Eina_List* menu_items_;
   ContextMenuType type_;
   ContextMenuParams params_;
   WebContents& web_contents_;
   base::WeakPtrFactory<ContextMenuControllerEfl> weak_ptr_factory_;
+  gfx::Point context_menu_show_pos_;
+  bool is_text_selection_;
+  std::set<DownloadItem*> observed_download_items_;
 };
 
 } // namespace

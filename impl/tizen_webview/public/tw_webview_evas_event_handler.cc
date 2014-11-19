@@ -253,6 +253,7 @@ bool WebViewEvasEventHandler::HandleEventDefault_KeyDown(const Evas_Event_Key_Do
     if (webview_->GetContextMenuController()) {
       DVLOG(1) << "Hiding context menu due to back key press";
       webview_->ResetContextMenuController();
+      webview_->HideSelectionHandlers();
       handled = true;
     }
     if (webview_->GetSelectionController()->IsAnyHandleVisible()) {
