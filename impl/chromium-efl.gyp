@@ -384,6 +384,22 @@
         'defines': [ 'EWK_BRINGUP=1' ],
         'defines!': [ 'TIZEN_CONTENTS_DETECTION=1' ],
       }],
+      ['prebuilt_ld_gold_dir!=""', {
+        'ldflags': [
+          '-B<(prebuilt_ld_gold_dir)',
+        ],
+      } , { # prebuild_ld_gold_dir == ""
+        'ldflags': [
+          # Building the RPM in the GBS chroot fails with errors such as
+          # [  XXs] error: create archive failed on file /<path>/libchromium-efl.so: cpio: Bad magic
+          # [  XXs] RPM build errors:
+          # [  XXs]     create archive failed on file /<path>/libchromium-efl.so: cpio: Bad magic
+          # For now, work around it by passing a GNU ld-specific flag that optimizes the
+          # linker for memory usage.
+          # http://107.108.218.239/bugzilla/show_bug.cgi?id=6457
+          '-Wl,--no-keep-memory',
+        ],
+      }],
       ['enable_printing==0', {
         'sources!': [
           'renderer/print_pages_params.cc',

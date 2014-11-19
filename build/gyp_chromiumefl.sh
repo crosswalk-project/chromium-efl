@@ -61,6 +61,9 @@ else
                               -Denable_printing=0
                               -Duse_kerberos=0
                               -Duse_gconf=0
+                              -Dlinux_use_bundled_gold=0
+                              -Dlinux_use_bundled_binutils=0
+                              -Dprebuilt_ld_gold_dir=${TOPDIR}/build/prebuild
                              "
 
   if [ "${GBS_ARCH}" == "arm" ]; then

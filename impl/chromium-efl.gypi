@@ -9,6 +9,7 @@
     ],
    'chromium_efl_tizen_version%': '2.3',
    'custom_libc_dir%': '',
+   'prebuilt_ld_gold_dir%': '',
   },
   'target_defaults': {
     'defines': [
