@@ -30,6 +30,8 @@
 #include "browser_context_efl.h"
 #include "ewk_global_data.h"
 #include "memory_purger.h"
+#include "browser/password_manager/password_manager.h"
+#include "browser/password_manager/password_store_factory.h"
 #include "browser/renderer_host/browsing_data_remover_efl.h"
 #include "browser/vibration/vibration_provider_client.h"
 #include "common/render_messages_efl.h"
@@ -498,3 +500,14 @@ void EWebContext::ClearCandidateData() {
   DLOG(WARNING) << "TIZEN_AUTOFILL_SUPPORT is not enabled";
 #endif
 }
+
+void EWebContext::ClearPasswordData() {
+#if defined(TIZEN_AUTOFILL_SUPPORT)
+  PasswordStore* store = PasswordStoreFactory::GetPasswordStore();
+  if (store)
+    store->RemoveLoginsCreatedBetween(base::Time(), base::Time::Max());
+#else
+  DLOG(WARNING) << "TIZEN_AUTOFILL_SUPPORT is not enabled";
+#endif
+}
+

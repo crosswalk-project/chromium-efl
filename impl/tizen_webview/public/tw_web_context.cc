@@ -198,4 +198,8 @@ void WebContext::ClearCandidateData() {
   impl->ClearCandidateData();
 }
 
+void WebContext::ClearPasswordData() {
+  impl->ClearPasswordData();
+}
+
 } // namespace tizen_webview

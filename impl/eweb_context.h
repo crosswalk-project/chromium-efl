@@ -95,6 +95,7 @@ class EWebContext {
   int Pixmap() const { return m_pixmap; }
 
   void ClearCandidateData();
+  void ClearPasswordData();
   void Initialize(Evas_Object* object);
 
  private:
