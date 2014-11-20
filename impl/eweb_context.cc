@@ -261,15 +261,11 @@ void EWebContext::ClearNetworkCache() {
 }
 
 void EWebContext::ClearWebkitCache() {
-#if !defined(EWK_BRINGUP)
   web_cache_manager_->ClearCache();
-#endif
 }
 
 void EWebContext::SetCacheModel(Cache_Model model) {
-#if !defined(EWK_BRINGUP)
   web_cache_manager_->SetCacheModel(model);
-#endif
 }
 
 Cache_Model EWebContext::GetCacheModel() const {
