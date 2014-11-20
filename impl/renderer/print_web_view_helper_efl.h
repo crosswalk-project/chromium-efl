@@ -19,7 +19,7 @@ class WebFrame;
 }
 
 namespace printing {
-class Metafile;
+class PdfMetafileSkia;
 }
 
 struct PrintPagesParams;
@@ -35,7 +35,7 @@ class PrintWebViewHelperEfl {
   bool PrintPagesToPdf(blink::WebFrame* frame, int page_count,
       const gfx::Size& canvas_size);
   bool PrintPageInternal(const PrintPageParams& params,
-      const gfx::Size& canvas_size, blink::WebFrame* frame, printing::Metafile* metafile);
+      const gfx::Size& canvas_size, blink::WebFrame* frame, printing::PdfMetafileSkia* metafile);
   bool RenderPagesForPrint(blink::WebFrame* frame);
 
   scoped_ptr<PrintPagesParams> print_pages_params_;

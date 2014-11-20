@@ -186,7 +186,7 @@ bool PrintWebViewHelperEfl::PrintPageInternal(
     const PrintPageParams& params,
     const gfx::Size& canvas_size,
     blink::WebFrame* frame,
-    printing::Metafile* metafile) {
+    printing::PdfMetafileSkia* metafile) {
   PrintParams result;
   double scale_factor = 1.0f;
   gfx::Rect canvas_area(canvas_size);
