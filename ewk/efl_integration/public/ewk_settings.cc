@@ -7,7 +7,7 @@
 #include <tizen_webview/public/tw_webview.h>
 
 // TODO: remove dependency
-#include <ui/events/gestures/gesture_configuration.h>
+#include <ui/events/gesture_detection/gesture_configuration.h>
 #include <../impl/API/ewk_settings_private.h>
 // TODO: move non-ewk header file to other location
 #include "public/text_encoding_map_efl.h"

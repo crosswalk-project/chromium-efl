@@ -107,43 +107,10 @@ void ContentBrowserClientEfl::AllowCertificateError(
          resource_type, overridable, strict_enforcement, callback, result);
 }
 
-void ContentBrowserClientEfl::RequestDesktopNotificationPermission(
-    const GURL& source_origin,
-    content::RenderFrameHost* render_frame_host,
-    const base::Callback<void(blink::WebNotificationPermission)>& callback) {
-#if defined(ENABLE_NOTIFICATIONS) && !defined(EWK_BRINGUP)
-  WebContents* web_contents = WebContentsFromViewID(render_process_id,
-                                                    render_view_id);
-  if (!web_contents)
-    return;
-
-  WebContentsDelegateEfl* delegate =
-       static_cast<WebContentsDelegateEfl*>(web_contents->GetDelegate());
-  if (!delegate)
-    return;
-
-  BrowserContextEfl* browser_context =
-      static_cast<BrowserContextEfl*>(web_contents->GetBrowserContext());
-  NotificationPermissionRequest* notification_permission
-      = new NotificationPermissionRequest(delegate->web_view()->evas_object(),
-                                          callback_context,
-                                          tizen_webview::GetURL(source_origin));
-
-  delegate->web_view()->
-      SmartCallback<EWebViewCallbacks::NotificationPermissionRequest>()
-        .call(notification_permission);
-  // A smart callback cannot have ownership for data because the callback may
-  // not ever exist. Therefore new resource should be deleted in the call site.
-  // [sns.park] TODO: uncomment below if no side effect.
-  //delete notification_permission;
-#else
-  NOTIMPLEMENTED();
-#endif
-}
-
 void ContentBrowserClientEfl::ShowDesktopNotification(
       const content::ShowDesktopNotificationHostMsgParams& params,
-      content::RenderFrameHost* render_frame_host,
+      BrowserContext* browser_context,
+      int render_process_id,
       scoped_ptr<DesktopNotificationDelegate> delegate,
       base::Closure* cancel_callback) {
 #if defined(ENABLE_NOTIFICATIONS) && !defined(EWK_BRINGUP)

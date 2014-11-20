@@ -57,16 +57,12 @@ class ContentBrowserClientEfl: public ContentBrowserClient {
                                      const base::Callback<void(bool)>& callback,
                                      CertificateRequestResultType* result) override;
 
-  // Asks permission to show desktop notifications.
-  virtual void RequestDesktopNotificationPermission(const GURL& source_origin,
-      content::RenderFrameHost* render_frame_host,
-      const base::Callback<void(blink::WebNotificationPermission)>& callback) override;
-
   // Show a desktop notification.  If |worker| is true, the request came from an
   // HTML5 web worker, otherwise, it came from a renderer.
   virtual void ShowDesktopNotification(
       const content::ShowDesktopNotificationHostMsgParams& params,
-      content::RenderFrameHost* render_frame_host,
+      BrowserContext* browser_context,
+      int render_process_id,
       scoped_ptr<DesktopNotificationDelegate> delegate,
       base::Closure* cancel_callback) override;
 

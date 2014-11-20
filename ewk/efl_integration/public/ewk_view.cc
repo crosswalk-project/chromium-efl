@@ -26,7 +26,7 @@
 #include <tizen_webview/public/tw_webview.h>
 
 // TODO: remove dependency
-#include <ui/events/gestures/gesture_configuration.h>
+#include <ui/events/gesture_detection/gesture_configuration.h>
 #if !defined(EWK_BRINGUP)
 #include <webkit/common/webpreferences.h>
 #else

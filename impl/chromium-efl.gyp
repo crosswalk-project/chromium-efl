@@ -387,7 +387,7 @@
         'defines': [ 'EWK_BRINGUP=1' ],
         'defines!': [ 'TIZEN_CONTENTS_DETECTION=1' ],
       }],
-      ['enable_printing==0', {
+      ['enable_basic_printing==0 and enable_print_preview==0', {
         'sources!': [
           'renderer/print_pages_params.cc',
           'renderer/print_pages_params.h',
