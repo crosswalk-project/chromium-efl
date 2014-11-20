@@ -21,6 +21,10 @@ fi
 
 set -e
 
+if [ ! -e ${TOPDIR}/src/build/util/LASTCHANGE ]; then
+  ${TOPDIR}/src/build/util/lastchange.py -s ${TOPDIR}/src -o ${TOPDIR}/src/build/util/LASTCHANGE
+fi
+
 if [ ! -e ${TOPDIR}/src/build/util/LASTCHANGE.blink ]; then
   ${TOPDIR}/src/build/util/lastchange.py -s ${TOPDIR}/src/third_party/WebKit -o ${TOPDIR}/src/build/util/LASTCHANGE.blink
 fi
