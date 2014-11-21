@@ -575,46 +575,36 @@ void WebContentsDelegateEfl::OpenDateTimeDialog(
     double step,
     const std::vector<DateTimeSuggestion>& suggestions) {
   int inputPickerType;
-  std::string inputMethodHints;
 
   switch (dialog_type) {
     case ui::TEXT_INPUT_TYPE_DATE:
       inputPickerType = TW_INPUT_TYPE_DATE;
-      inputMethodHints = "date";
       break;
     case ui::TEXT_INPUT_TYPE_DATE_TIME:
       inputPickerType = TW_INPUT_TYPE_DATETIME;
-      inputMethodHints = "datetime";
       break;
     case ui::TEXT_INPUT_TYPE_DATE_TIME_LOCAL:
       inputPickerType = TW_INPUT_TYPE_DATETIMELOCAL;
-      inputMethodHints = "datetime-local";
       break;
     case ui::TEXT_INPUT_TYPE_TIME:
       inputPickerType = TW_INPUT_TYPE_TIME;
-      inputMethodHints = "time";
       break;
     case ui::TEXT_INPUT_TYPE_WEEK:
       inputPickerType = TW_INPUT_TYPE_WEEK;
-      inputMethodHints = "week";
       break;
     case ui::TEXT_INPUT_TYPE_CONTENT_EDITABLE:
       inputPickerType = TW_INPUT_TYPE_TEXT;
-      inputMethodHints = "date";
       break;
     case ui::TEXT_INPUT_TYPE_DATE_TIME_FIELD:
       inputPickerType = TW_INPUT_TYPE_DATETIME;
-      inputMethodHints = "datetime";
       break;
     case ui::TEXT_INPUT_TYPE_MONTH:
       inputPickerType = TW_INPUT_TYPE_MONTH;
-      inputMethodHints = "month";
       break;
     default:
       inputPickerType = TW_INPUT_TYPE_TEXT;
-      inputMethodHints = "";
       break;
   }
-  web_view_->InputPickerShow(static_cast<tizen_webview::Input_Type>(inputPickerType), inputMethodHints.c_str());
+  web_view_->InputPickerShow(static_cast<tizen_webview::Input_Type>(inputPickerType), dialog_value);
 }
 } //namespace content

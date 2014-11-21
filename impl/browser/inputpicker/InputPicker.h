@@ -20,47 +20,53 @@ class WebContentsDelegateEfl;
 
 class InputPicker {
   public:
-    InputPicker(EWebView&);
+    explicit InputPicker(EWebView& web_view_);
     ~InputPicker();
 
-    void show(tizen_webview::Input_Type, const char*);
-    void showColorPicker(int, int, int, int);
+    void showDatePicker(
+        tizen_webview::Input_Type input_type, double input_date);
+    void showColorPicker(int r, int g, int b, int alpha);
     void hideColorPicker();
-
-    void ewk_date_popup(const char*);
-    void ewk_time_popup(const char*);
-    void ewk_month_popup(const char*);
-    void ewk_week_popup(const char*);
-    void ewk_datetime_popup(const char*, bool);
-    void ewk_color_popup(int, int, int);
-    void removeDatetimePickerDelayed();
 
   private:
     struct Layout;
 
-    void createDatetimePopup(const char*, struct tm*);
-    void createDatetimePicker(struct tm*);
+    void showDatePopup(double input_date);
+    void showTimePopup(double input_date);
+    void showMonthPopup(double input_date);
+    void showWeekPopup(double input_date);
+    void showDatetimePopup(double input_date, bool datetimeLocal);
+    void removeDatetimePickerDelayed();
+    void createPopupLayout(const char* title, struct tm* currentTime);
     void deletePopupLayout();
-    void addColorRect(const char*, int, int, int, ColorPopupUserData*);
+    void addColorRect(
+        const char* part, int r, int g, int b, ColorPopupUserData* color_data);
 
-    static void _date_popup_response_cb(void*, Evas_Object*, void*);
-    static void _time_popup_response_cb(void*, Evas_Object*, void*);
-    static void _month_popup_response_cb(void*, Evas_Object*, void*);
-    static void _week_popup_response_cb(void*, Evas_Object*, void*);
-    static void _datetime_popup_response_cb(void*, Evas_Object*, void*);
-    static void _color_popup_response_cb(void*, Evas_Object*, void*);
-    static void _data_list_popup_response_cb(void*, Evas_Object*, void*);
-    static void _data_list_popup_response_cancel_cb(void*, Evas_Object*, void*);
-    static void _data_list_selected_cb(void*, Evas_Object*, void*);
-    static void _color_selected_cb(void*, Evas*, Evas_Object*, void*);
-    static void _edit_end_cb(void* data, Evas_Object* obj, void* event_info);
-    static void colorKeyDownCallback(void*, Evas*, Evas_Object*, void*);
-
-#ifdef OS_TIZEN_MOBILE
-    static void _color_back_cb(void*, Evas_Object*, void*);
-    static void _popup_back_cb(void*, Evas_Object*, void*);
+    static void datePopupCallback(
+        void* data, Evas_Object* obj, void* event_info);
+    static void timePopupCallback(
+        void* data, Evas_Object* obj, void* event_info);
+    static void monthPopupCallback(
+        void* data, Evas_Object* obj, void* event_info);
+    static void weekPopupCallback(
+        void* data, Evas_Object* obj, void* event_info);
+    static void datetimePopupCallback(
+        void* data, Evas_Object* obj, void* event_info);
+    static void endEditingCallback(
+        void* data, Evas_Object* obj, void* event_info);
+    static Eina_Bool removeDatetimePicker(void* data);
+    static void colorPickerCallback(
+        void* data, Evas_Object* obj, void* event_info);
+    static void selectedColorCallback(
+        void* data, Evas* evas, Evas_Object* obj, void* event_info);
+    static void keyDownColorPickerCallback(
+        void* data, Evas* evas, Evas_Object* obj, void* event_info);
+#if defined(OS_TIZEN_MOBILE)
+    static void handleBackKeyColorPicker(
+        void* data,  Evas_Object* obj, void* event_info);
+    static void handleBackKeyDatePicker(
+        void* data, Evas_Object* obj, void* event_info);
 #endif
-    static Eina_Bool removeDatetimePicker(void*);
 
     EWebView& web_view_;
     Evas_Object* ewk_view_;

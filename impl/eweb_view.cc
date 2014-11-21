@@ -1759,9 +1759,10 @@ bool EWebView::SetColorPickerColor(int r, int g, int b, int a) {
   return true;
 }
 
-void EWebView::InputPickerShow(tizen_webview::Input_Type inputType, const char* inputValue) {
+void EWebView::InputPickerShow(
+    tizen_webview::Input_Type input_type, double input_value) {
   inputPicker_.reset(new InputPicker(*this));
-  inputPicker_->show(inputType, inputValue);
+  inputPicker_->showDatePicker(input_type, input_value);
 }
 
 bool EWebView::IsIMEShow() {

@@ -377,7 +377,8 @@ class EWebView {
   void RequestColorPicker(int r, int g, int b, int a);
   void DismissColorPicker();
   bool SetColorPickerColor(int r, int g, int b, int a);
-  void InputPickerShow(tizen_webview::Input_Type inputType, const char* inputValue);
+  void InputPickerShow(
+      tizen_webview::Input_Type input_type, double input_value);
 
 #ifdef TIZEN_EDGE_EFFECT
   scoped_refptr<EdgeEffect> edgeEffect() { return edge_effect_; }
