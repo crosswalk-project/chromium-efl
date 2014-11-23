@@ -24,7 +24,7 @@
     'type': 'shared_library',
     'includes': [
       # NOTE: gyp includes need to be relative
-      '../src/skia/skia_common.gypi',
+      '../../skia/skia_common.gypi',
     ],
     'include_dirs': [
       '.',

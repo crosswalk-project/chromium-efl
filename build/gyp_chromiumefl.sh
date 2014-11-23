@@ -2,27 +2,28 @@
 
 SCRIPTDIR=$( cd $(dirname $0) ; pwd -P )
 TOPDIR=$( cd ${SCRIPTDIR}/.. ; pwd -P )
+SRCDIR=$( cd ${TOPDIR}/.. ; pwd -P )
 
 source ${SCRIPTDIR}/common.sh
 
 host_arch=$(getHostArch)
 target=desktop
 
-GYP_GENERATOR_OUTPUT=${TOPDIR}/"out.${host_arch}"
+export GYP_GENERATOR_OUTPUT=${SRCDIR}/"out.${host_arch}"
 
 if echo "$@" | grep -cq '\-\Dbuilding_for_tizen_mobile=1'; then
-  GYP_GENERATOR_OUTPUT=${TOPDIR}/"out.mobile.${host_arch}"
+  GYP_GENERATOR_OUTPUT=${SRCDIR}/"out.mobile.${host_arch}"
   target=mobile
 fi
 if echo "$@" | grep -cq '\-\Dbuilding_for_tizen_tv=1'; then
-  GYP_GENERATOR_OUTPUT=${TOPDIR}/"out.tv.${host_arch}"
+  GYP_GENERATOR_OUTPUT=${SRCDIR}/"out.tv.${host_arch}"
   target=tv
 fi
 
 set -e
 
-if [ ! -e ${TOPDIR}/src/build/util/LASTCHANGE.blink ]; then
-  ${TOPDIR}/src/build/util/lastchange.py -s ${TOPDIR}/src/third_party/WebKit -o ${TOPDIR}/src/build/util/LASTCHANGE.blink
+if [ ! -e ${SRCDIR}/build/util/LASTCHANGE.blink ]; then
+  ${SRCDIR}/build/util/lastchange.py -s ${SRCDIR}/third_party/WebKit -o ${SRCDIR}/build/util/LASTCHANGE.blink
 fi
 
 ORIGINAL_GYP_DEFINES="$GYP_DEFINES"
@@ -32,13 +33,13 @@ if [ "$ORIGINAL_GYP_DEFINES" != "$GYP_DEFINES" ]; then
     echo "Removing component=shared_library from GYP_DEFINES."
 fi
 
-COMMON_GYP_PARAMETERS="--depth=${TOPDIR}/src
+COMMON_GYP_PARAMETERS="--depth=${SRCDIR}
                       -I${TOPDIR}/impl/chromium-efl.gypi
                       --generator-output ${GYP_GENERATOR_OUTPUT}
                       --format=ninja
                       --check
                       -Goutput_dir=${GYP_GENERATOR_OUTPUT}
-                      -Dchrome_src_dir=${TOPDIR}/src
+                      -Dchrome_src_dir=${SRCDIR}
                       -Defl_impl_dir=${TOPDIR}/impl
                       -Duse_libjpeg_turbo=1
                       -Dproprietary_codecs=1
@@ -98,7 +99,7 @@ else
   fi
 
   #and replacing original files with correct ones according to $SYSTEM_DEPS
-  $TOPDIR/src/build/linux/unbundle/replace_gyp_files.py $SYSTEM_DEPS
+  $SRCDIR/build/linux/unbundle/replace_gyp_files.py $SYSTEM_DEPS
 
 fi
 
@@ -115,7 +116,7 @@ ret=$?
 
 if [ "$target" != "desktop" ]; then
   # Restore gyp files to their original states not to mess up the tree permanently.
-  $TOPDIR/src/build/linux/unbundle/replace_gyp_files.py --undo $SYSTEM_DEPS
+  $SRCDIR/build/linux/unbundle/replace_gyp_files.py --undo $SYSTEM_DEPS
 fi
 
 exit $ret

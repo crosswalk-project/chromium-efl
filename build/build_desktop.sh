@@ -2,12 +2,13 @@
 
 SCRIPTDIR=$( cd $(dirname $0) ; pwd -P )
 TOPDIR=$( cd ${SCRIPTDIR}/.. ; pwd -P )
+SRCDIR=$( cd ${TOPDIR}/.. ; pwd -P )
 
 source ${SCRIPTDIR}/common.sh
 
 host_arch=$(getHostArch)
 
-export GYP_GENERATOR_OUTPUT=${TOPDIR}/"out.${host_arch}"
+export GYP_GENERATOR_OUTPUT=${SRCDIR}/"out.${host_arch}"
 
 usage() {
 cat << EOF
