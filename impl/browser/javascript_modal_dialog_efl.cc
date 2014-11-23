@@ -2,11 +2,11 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-#include "base/strings/utf_string_conversions.h"
-#include "browser/javascript_modal_dialog_efl.h"
-#include "eweb_view.h"
-#include "base/path_service.h"
+#include "javascript_modal_dialog_efl.h"
 #include "base/files/file_path.h"
+#include "base/path_service.h"
+#include "base/strings/utf_string_conversions.h"
+#include "eweb_view.h"
 #include "paths_efl.h"
 
 #ifdef OS_TIZEN_MOBILE
@@ -185,12 +185,17 @@ bool JavaScriptModalDialogEfl::setLabelText(const char* message) {
   if (!message)
     return false;
 
-  std::string ret;
-  popupMessage_ = ("<color='#ffffff'>") + std::string(elm_entry_utf8_to_markup(message))  + ("</color>");
-  base::ReplaceChars(popupMessage_, "\n", "</br>", &ret);
-  popupMessage_ = ret;
-  elm_object_text_set(popup_, popupMessage_.c_str());
+  popupMessage_ = ("<color='#000000'>") +
+      std::string(elm_entry_utf8_to_markup(message)) + ("</color>");
+  base::ReplaceChars(popupMessage_, "\n", "</br>", &popupMessage_);
+
+  // Create label and put text to it. In case of resizing it will be reused in scroller.
+  Evas_Object* label = elm_label_add(popup_);
+  elm_label_line_wrap_set(label, ELM_WRAP_MIXED);
+  elm_object_text_set(label, popupMessage_.c_str());
+  evas_object_show(label);
   evas_object_event_callback_add(popup_, EVAS_CALLBACK_RESIZE, javascriptPopupResizeCallback, (void*)this);
+  elm_object_part_content_set(popup_, "default", label);
 
   return true;
 }
@@ -209,17 +214,32 @@ void JavaScriptModalDialogEfl::javascriptPopupResizeCallback(void *data, Evas *e
   if (!popup)
     return;
 
+  // Put label with displayed text to scroller in this case.
   if (popupHeight > (height / 2)) {
-    elm_object_text_set(popup->popup_, "");
+    Evas_Object* content = elm_object_part_content_get(
+        popup->popup_, "default");
+    if (!content)
+      return;
 
+    const char* type = elm_object_widget_type_get(content);
+    if (strcmp("elm_label", type))
+      return;
+
+    // Get label with text and remove it from content of popup.
+    Evas_Object* label = elm_object_part_content_unset(
+        popup->popup_, "default");
+
+    // Create scrollable layout.
     Evas_Object* layout = elm_layout_add(popup->popup_);
 
     base::FilePath edj_dir;
     base::FilePath javaScriptPopup_edj;
     PathService::Get(PathsEfl::EDJE_RESOURCE_DIR, &edj_dir);
-    javaScriptPopup_edj = edj_dir.Append(FILE_PATH_LITERAL("JavaScriptPopup.edj"));
+    javaScriptPopup_edj = edj_dir.Append(
+        FILE_PATH_LITERAL("JavaScriptPopup.edj"));
 
-    elm_layout_file_set(layout, javaScriptPopup_edj.AsUTF8Unsafe().c_str(), "scroll");
+    elm_layout_file_set(
+        layout, javaScriptPopup_edj.AsUTF8Unsafe().c_str(), "scroll");
     evas_object_show(layout);
 
     Evas_Object* scroller = elm_scroller_add(layout);
@@ -228,13 +248,12 @@ void JavaScriptModalDialogEfl::javascriptPopupResizeCallback(void *data, Evas *e
 
     evas_object_show(scroller);
     elm_object_part_content_set(layout, "scroll_container", scroller);
-    elm_object_content_set(popup->popup_, layout);
+    elm_object_part_content_set(popup->popup_, "default", layout);
 
-    Evas_Object* label = elm_label_add(popup->popup_);
-    elm_label_line_wrap_set(label, ELM_WRAP_MIXED);
-    elm_object_text_set(label, popup->popupMessage_.c_str());
-    evas_object_show(label);
+    evas_object_size_hint_weight_set(label, EVAS_HINT_EXPAND, EVAS_HINT_EXPAND);
+    evas_object_size_hint_weight_set(scroller, EVAS_HINT_EXPAND, EVAS_HINT_EXPAND);
 
+    // Put label with text to scroller.
     elm_object_content_set(scroller, label);
   }
 }

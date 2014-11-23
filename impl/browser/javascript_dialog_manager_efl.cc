@@ -68,12 +68,10 @@ JavaScriptModalCallbacksData* JavaScriptModalCallbacksData::CreateWithPromptDial
   return callback_data;
 }
 
-JavaScriptDialogManagerEfl::JavaScriptDialogManagerEfl()
-    : dialog_(NULL) {
+JavaScriptDialogManagerEfl::JavaScriptDialogManagerEfl() {
 }
 
-JavaScriptDialogManagerEfl::~JavaScriptDialogManagerEfl()
-{
+JavaScriptDialogManagerEfl::~JavaScriptDialogManagerEfl() {
 }
 
 void JavaScriptDialogManagerEfl::RunJavaScriptDialog(content::WebContents* web_contents,
@@ -120,13 +118,13 @@ void JavaScriptDialogManagerEfl::RunJavaScriptDialog(content::WebContents* web_c
     }
   }
 
-  dialog_ = JavaScriptModalDialogEfl::CreateDialog(web_contents,
-                                                   origin_url,
-                                                   accept_lang,
-                                                   type,
-                                                   message_text,
-                                                   default_prompt_text,
-                                                   callback);
+  dialog_.reset(JavaScriptModalDialogEfl::CreateDialog(web_contents,
+                                                       origin_url,
+                                                       accept_lang,
+                                                       type,
+                                                       message_text,
+                                                       default_prompt_text,
+                                                       callback));
 }
 
 void JavaScriptDialogManagerEfl::SetAlertCallback(tizen_webview::View_JavaScript_Alert_Callback callback, void* user_data)
@@ -149,7 +147,6 @@ void JavaScriptDialogManagerEfl::ExecuteDialogClosedCallBack(bool result, const 
   dialog_closed_callback_.Run(result, base::UTF8ToUTF16(prompt_data));
   if(dialog_) {
     dialog_->close();
-    delete dialog_;
   }
 }
 
@@ -164,12 +161,12 @@ void JavaScriptDialogManagerEfl::RunBeforeUnloadDialog(content::WebContents* web
       static_cast<content::WebContentsDelegateEfl*>(web_contents->GetDelegate());
   wcd->web_view()->SmartCallback<EWebViewCallbacks::PopupReplyWaitStart>().call(0);
 
-  dialog_ = JavaScriptModalDialogEfl::CreateDialog(
-    web_contents,
-    GURL(),
-    std::string(),
-    JavaScriptModalDialogEfl::NAVIGATION,
-    base::UTF8ToUTF16(std::string("Confirm Navigation")),
-    message_text,
-    callback);
+  dialog_.reset(JavaScriptModalDialogEfl::CreateDialog(
+      web_contents,
+      GURL(),
+      std::string(),
+      JavaScriptModalDialogEfl::NAVIGATION,
+      base::UTF8ToUTF16(std::string("Confirm Navigation")),
+      message_text,
+      callback));
 }

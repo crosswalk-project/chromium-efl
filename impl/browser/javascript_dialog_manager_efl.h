@@ -85,12 +85,13 @@ class JavaScriptDialogManagerEfl: public content::JavaScriptDialogManager {
   void ExecuteDialogClosedCallBack(bool result, const std::string prompt_data);
 
  private:
-  JavaScriptModalDialogEfl* dialog_;
+  scoped_ptr<JavaScriptModalDialogEfl> dialog_;
   scoped_ptr<JavaScriptModalCallbacksData> alert_callback_data_;
   scoped_ptr<JavaScriptModalCallbacksData> confirm_callback_data_;
   scoped_ptr<JavaScriptModalCallbacksData> prompt_callback_data_;
   DialogClosedCallback dialog_closed_callback_;
 
+  DISALLOW_COPY_AND_ASSIGN(JavaScriptDialogManagerEfl);
 };
 
 #endif /* JAVASCRIPT_DIALOG_MANAGER_EFL_H_ */
