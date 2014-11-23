@@ -7,7 +7,7 @@ popd > /dev/null
 export TOPDIR=$(readlink -f "${SCRIPTDIR}/..")
 if [[ -z "${CHROME_SRC}" ]]; then
   # If $CHROME_SRC was not set, assume src subfolder in project directory is CHROME_SRC.
-  export CHROME_SRC="${TOPDIR}/src"
+  export CHROME_SRC="${SRCDIR}"
 fi
 
 export CLANG_DIR="${TOPDIR}/src/third_party/llvm-build/Release+Asserts/"

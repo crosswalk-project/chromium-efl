@@ -30,7 +30,7 @@
     'type': '<(chromium_efl_library_type)',
     'includes': [
       # NOTE: gyp includes need to be relative
-      '../src/skia/skia_common.gypi',
+      '../../skia/skia_common.gypi',
     ],
     'include_dirs': [
       '.',

@@ -18,7 +18,7 @@ if not os.path.isdir(script_dir):
   print script_dir + " is not a valid directory"
   sys.exit(1)
 root_dir = top_dir
-impl_dir = os.path.join(top_dir, 'impl')
+impl_dir = impl_dir = os.path.join(top_dir, 'impl')
 
 sys.path.insert(0, script_dir)
 import gyp_helper
@@ -123,7 +123,7 @@ if __name__ == '__main__':
       break
 
   if not gyp_file_specified:
-      args.append(os.path.join(root_dir, 'impl', 'chromium-efl.gyp'))
+      args.append(os.path.join(impl_dir, 'chromium-efl.gyp'))
 
   args.extend(['-I' + i for i in additional_include_files(args)])
 

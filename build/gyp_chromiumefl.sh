@@ -4,8 +4,10 @@ source $(dirname $0)/common.sh
 trap 'error_report $0 $LINENO' ERR SIGINT SIGTERM SIGQUIT
 host_arch=$(getHostArch)
 
+SRCDIR=$( cd ${TOPDIR}/.. ; pwd -P )
+
 if [ -z "$GYP_GENERATOR_OUTPUT" ]; then
-  GYP_GENERATOR_OUTPUT=${TOPDIR}/"out.${host_arch}"
+  export GYP_GENERATOR_OUTPUT=${SRCDIR}/"out.${host_arch}"
 fi
 
 EXTRA_GYP_ARGS="$@"
@@ -17,9 +19,11 @@ if [ "$__GYP_CHROMIUMEFL_TARGET" == "desktop" ]; then
 elif echo "$@" | grep -cq '\-\Dbuilding_for_tizen_mobile=1'; then
   target=mobile
   buildType=gbs
+  GYP_GENERATOR_OUTPUT=${SRCDIR}/"out.mobile.${host_arch}"
 elif echo "$@" | grep -cq '\-\Dbuilding_for_tizen_tv=1'; then
   target=tv
   buildType=gbs
+  GYP_GENERATOR_OUTPUT=${SRCDIR}/"out.tv.${host_arch}"
 fi
 
 if [ "$__GYP_CHROMIUMEFL_TARGET" == "crosscompile" ]; then
@@ -152,7 +156,7 @@ else
   fi
   if [ "$SYSTEM_DEPS" != "" ]; then
     #replacing original files with correct ones according to $SYSTEM_DEPS
-    $TOPDIR/src/build/linux/unbundle/replace_gyp_files.py $SYSTEM_DEPS
+    $SRCDIR/build/linux/unbundle/replace_gyp_files.py $SYSTEM_DEPS
   fi
 fi
 
@@ -168,7 +172,7 @@ ret=$?
 
 if [ "$SYSTEM_DEPS" != "" ]; then
   # Restore gyp files to their original states not to mess up the tree permanently.
-  $TOPDIR/src/build/linux/unbundle/replace_gyp_files.py --undo $SYSTEM_DEPS
+  $SRCDIR/build/linux/unbundle/replace_gyp_files.py --undo $SYSTEM_DEPS
 fi
 
 exit $ret

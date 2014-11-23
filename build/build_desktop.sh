@@ -2,6 +2,7 @@
 
 SCRIPTDIR=$( cd $(dirname $0) ; pwd -P )
 TOPDIR=$( cd ${SCRIPTDIR}/.. ; pwd -P )
+SRCDIR=$( cd ${TOPDIR}/.. ; pwd -P )
 
 source ${SCRIPTDIR}/common.sh
 trap 'error_report $0 $LINENO' ERR SIGINT SIGTERM SIGQUIT
@@ -9,7 +10,7 @@ trap 'error_report $0 $LINENO' ERR SIGINT SIGTERM SIGQUIT
 host_arch=$(getHostArch)
 
 if [ -z "$GYP_GENERATOR_OUTPUT" ]; then
-  export GYP_GENERATOR_OUTPUT=${TOPDIR}/"out.${host_arch}"
+  export GYP_GENERATOR_OUTPUT=${SRCDIR}/"out.${host_arch}"
 fi
 
 parseHostBuildScriptParams desktop $@
