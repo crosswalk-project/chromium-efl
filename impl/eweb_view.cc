@@ -1246,10 +1246,9 @@ tizen_webview::Hit_Test* EWebView::RequestHitTestDataAt(int x, int y, tizen_webv
   return RequestHitTestDataAtBlinkCoords(x, y, mode);
 }
 
-Eina_Bool EWebView::AsyncRequestHitTestDataAt(int x, int y, tizen_webview::Hit_Test_Mode mode, tizen_webview::View_Hit_Test_Request_Callback callback, void* user_data)
-{
-  static int64_t request_id = 1;
-  DCHECK(BrowserThread::CurrentlyOn(BrowserThread::UI));
+Eina_Bool EWebView::AsyncRequestHitTestDataAt(
+    int x, int y, tizen_webview::Hit_Test_Mode mode,
+    tizen_webview::View_Hit_Test_Request_Callback callback, void* user_data) {
   // TODO: this calculations should be moved outside and reused everywhere it's required
   Evas_Coord tmpX, tmpY;
   evas_object_geometry_get(evas_object_, &tmpX, &tmpY, NULL, NULL);
@@ -1259,6 +1258,15 @@ Eina_Bool EWebView::AsyncRequestHitTestDataAt(int x, int y, tizen_webview::Hit_T
   view_x /= rwhv()->device_scale_factor();
   view_y /= rwhv()->device_scale_factor();
 
+  return AsyncRequestHitTestDataAtBlinkCoords(view_x, view_y, mode, callback, user_data);
+}
+
+Eina_Bool EWebView::AsyncRequestHitTestDataAtBlinkCoords(
+    int x, int y, tizen_webview::Hit_Test_Mode mode,
+    tizen_webview::View_Hit_Test_Request_Callback callback, void* user_data) {
+  static int64_t request_id = 1;
+  DCHECK(BrowserThread::CurrentlyOn(BrowserThread::UI));
+
   // WebViewBrowserMessageFilter requires RenderProcessHost to be already created.
   // In EWebView constructor we have no guarantee that related RenderProcessHost is already created
   // We do not destroy message_filter_ manualy as it is managed by RenderProcessHost after setting it as filter
@@ -1267,13 +1275,15 @@ Eina_Bool EWebView::AsyncRequestHitTestDataAt(int x, int y, tizen_webview::Hit_T
     message_filter_ = new WebViewBrowserMessageFilter(this);
   }
 
-  RenderViewHost* render_view_host = web_contents_->GetRenderViewHost();
-  CHECK(render_view_host);
+  RenderViewHost* rvh = web_contents_->GetRenderViewHost();
+  CHECK(rvh);
   content::RenderProcessHost* render_process_host = web_contents_->GetRenderProcessHost();
   CHECK(render_process_host);
 
-  render_view_host->Send(new EwkViewMsg_DoHitTestAsync(render_view_host->GetRoutingID(), view_x, view_y, mode, request_id));
-  m_pendingAsyncHitTests[request_id] = new AsyncHitTestRequest(x, y, mode, callback, user_data);
+  rvh->Send(new EwkViewMsg_DoHitTestAsync(
+      rvh->GetRoutingID(), x, y, mode, request_id));
+  m_pendingAsyncHitTests[request_id] = new AsyncHitTestRequest(
+      x, y, mode, callback, user_data);
   ++request_id;
   return EINA_TRUE;
 }

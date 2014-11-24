@@ -82,6 +82,7 @@
             'libdri2',
             'gles20',
             'ui-gadget-1',
+            'feedback',
           ],
         },
         'direct_dependent_settings': {

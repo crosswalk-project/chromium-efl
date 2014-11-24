@@ -247,6 +247,8 @@ class RenderWidgetHostViewEfl
   void OnDidChangePageScaleFactor(double);
   void OnDidChangePageScaleRange(double, double);
 
+  void HandleTapLink(ui::GestureEvent* event);
+
   SelectionControllerEfl* GetSelectionController();
 
   static void CopyFromCompositingSurfaceHasResultForVideo(

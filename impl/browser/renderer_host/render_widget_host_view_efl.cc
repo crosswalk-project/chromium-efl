@@ -19,6 +19,7 @@
 #include "browser/renderer_host/im_context_efl.h"
 #include "browser/renderer_host/scroll_detector.h"
 #include "browser/renderer_host/web_event_factory_efl.h"
+#include "browser/sound_effect.h"
 #include "content/browser/gpu/browser_gpu_channel_host_factory.h"
 #include "content/browser/renderer_host/render_widget_host_impl.h"
 #include "content/browser/renderer_host/ui_events_helper.h"
@@ -1217,6 +1218,25 @@ void RenderWidgetHostViewEfl::OnDidHandleKeyEvent(const blink::WebInputEvent* in
 }
 #endif
 
+namespace {
+
+void PlayTapSound(
+    Evas_Object* o, int x, int y, int ,
+    tizen_webview::Hit_Test* hit_test, void* data) {
+  if (hit_test && (hit_test->GetResultContext() &
+      tizen_webview::TW_HIT_TEST_RESULT_CONTEXT_LINK))
+    sound_effect::playLinkEffect();
+}
+
+} // namespace
+
+void RenderWidgetHostViewEfl::HandleTapLink(ui::GestureEvent* event) {
+  web_view_->AsyncRequestHitTestDataAtBlinkCoords(
+      event->x(), event->y(),
+      tizen_webview::TW_HIT_TEST_MODE_NODE_DATA,
+      PlayTapSound, NULL);
+}
+
 void RenderWidgetHostViewEfl::HandleGesture(ui::GestureEvent* event) {
   if ((event->type() == ui::ET_GESTURE_PINCH_BEGIN ||
        event->type() == ui::ET_GESTURE_PINCH_UPDATE ||
@@ -1228,6 +1248,11 @@ void RenderWidgetHostViewEfl::HandleGesture(ui::GestureEvent* event) {
 
   if (event->type() == ui::ET_GESTURE_PINCH_END) {
     eweb_view()->SmartCallback<EWebViewCallbacks::ZoomFinished>().call();
+  }
+
+  if (event->type() == ui::ET_GESTURE_TAP &&
+      web_view_->GetSettings()->linkEffectEnabled()) {
+    HandleTapLink(event);
   }
 
   blink::WebGestureEvent gesture = content::MakeWebGestureEventFromUIEvent(*event);
