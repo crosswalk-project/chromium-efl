@@ -35,6 +35,11 @@
       ['exclude', 'x11_types\\.cc$'],
     ],
     'conditions': [
+       ['use_efl==1', {
+         'defines': [
+           'USE_EFL=1',
+         ],
+       }],
        ['tizen_multimedia_support==1', {
          'defines': [
            'TIZEN_MULTIMEDIA_SUPPORT=1',

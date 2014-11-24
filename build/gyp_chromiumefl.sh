@@ -48,6 +48,7 @@ COMMON_GYP_PARAMETERS="--depth=${TOPDIR}/src
                       -Dproprietary_codecs=1
                       -Dclang=0
                       -Duse_aura=1
+                      -Duse_efl=1
                       -Dtizen_multimedia_support=1
                       "
 
