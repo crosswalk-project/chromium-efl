@@ -70,6 +70,7 @@ content::MainFunctionParams CommandLineEfl::GetDefaultPortParams() {
 
   // FIXME(Kapil) Will be removed after permission handling implementation.
   p_command_line->AppendSwitch(switches::kDisableWebSecurity);
+  p_command_line->AppendSwitch(switches::kForceAccelerated2dCanvas);
 #else
   p_command_line->AppendSwitch(switches::kIgnoreGpuBlacklist);
 #endif
