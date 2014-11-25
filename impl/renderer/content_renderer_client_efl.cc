@@ -101,6 +101,7 @@ bool ContentRendererClientEfl::HandleNavigation(content::RenderFrame* render_fra
   params.is_main_frame = (frame->view()->mainFrame() == frame);
   params.type = type;
   params.is_redirect = is_redirect;
+  params.cookie = request.httpHeaderField(blink::WebString::fromUTF8("Cookie")).utf8();
 
   blink::WebDataSource* ds = frame->provisionalDataSource();
   params.should_replace_current_entry = (ds ? ds->replacesCurrentHistoryItem() : false);

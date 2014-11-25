@@ -106,6 +106,7 @@ _Ewk_Policy_Decision::_Ewk_Policy_Decision(const NavigationPolicyParams &params,
   : new_window_policy_delegate_(NULL)
   , navigation_policy_handler_(new NavigationPolicyHandlerEfl(rvh, params))
   , frame_(new tizen_webview::Frame(params))
+  , cookie_(params.cookie)
   , httpMethod_(params.httpMethod)
   , responseHeaders_(NULL)
   , decisionType_(TW_POLICY_DECISION_USE)
@@ -277,7 +278,7 @@ void _Ewk_Policy_Decision::SetAuthorizationIfNecessary(const std::string request
 }
 
 const char* _Ewk_Policy_Decision::GetCookie() const {
-  return cookie_.empty() ? NULL : cookie_.c_str();
+  return cookie_.c_str();
 }
 
 const char* _Ewk_Policy_Decision::GetAuthUser() const {

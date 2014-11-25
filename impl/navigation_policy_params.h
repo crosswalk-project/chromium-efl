@@ -19,6 +19,7 @@ struct NavigationPolicyParams {
   blink::WebNavigationPolicy policy;
   blink::WebNavigationType type;
   blink::WebString auth;
+  std::string cookie;
   bool should_replace_current_entry;
   bool is_main_frame;
   bool is_redirect;
