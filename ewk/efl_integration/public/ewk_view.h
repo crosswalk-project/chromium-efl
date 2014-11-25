@@ -691,7 +691,7 @@ typedef Eina_Bool (*Ewk_View_Unfocus_Allow_Callback)(Evas_Object* o, Ewk_Unfocus
 EAPI void ewk_view_unfocus_allow_callback_set (Evas_Object *o, Ewk_View_Unfocus_Allow_Callback callback, void* user_data);
 //#endif
 
-Eina_Bool ewk_view_mode_set(Evas_Object* ewkView, Ewk_View_Mode view_mode);
+EAPI Eina_Bool ewk_view_mode_set(Evas_Object* ewkView, Ewk_View_Mode view_mode);
 
 /**
  * Gets the Ewk_Settings of this view.
