@@ -87,7 +87,7 @@ void EwkGlobalData::Ensure() {
       base::MessageLoop::InitMessagePumpForUIFactory(&MessagePumpFactory);
   DCHECK(message_pump_overridden);
 
-  content::InstallScreenInstance();
+  ui::InstallScreenInstance();
 
 	content::ContentMainParams params(new ContentMainDelegateEfl());
 	params.argc = CommandLineEfl::GetArgc();

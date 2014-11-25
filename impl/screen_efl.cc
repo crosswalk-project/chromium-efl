@@ -14,8 +14,19 @@
 #include "ui/gfx/screen.h"
 #include "ui/gfx/x/x11_types.h"
 #include "ui/views/view.h"
+#include "content/browser/renderer_host/dip_util.h"
 
 namespace ui {
+
+namespace {
+// TODO: Get default values from platform
+// http://107.108.218.239/bugzilla/show_bug.cgi?id=9662
+#if defined(OS_TIZEN_MOBILE)
+const float kDefaultDeviceScaleFactor = 2.0f;
+#else
+const float kDefaultDeviceScaleFactor = 1.0f;
+#endif
+} // namespace
 
 class EflScreen : public gfx::Screen {
  public:
@@ -75,21 +86,34 @@ class EflScreen : public gfx::Screen {
   }
 
   virtual gfx::Display GetPrimaryDisplay() const override {
-    static ::Screen* screen = DefaultScreenOfDisplay(gfx::GetXDisplay());
+    ::Screen* screen = DefaultScreenOfDisplay(gfx::GetXDisplay());
 
-    static gfx::Display display(0,
-        gfx::Rect(0, 0, WidthOfScreen(screen), HeightOfScreen(screen)));
+    const float device_scale_factor =
+        gfx::Display::HasForceDeviceScaleFactor() ?
+        gfx::Display::GetForcedDeviceScaleFactor() : kDefaultDeviceScaleFactor;
 
-    //TODO:remove hardcoding
-    if (!gfx::Display::HasForceDeviceScaleFactor())
-#if defined(OS_TIZEN_MOBILE)
-      display.set_device_scale_factor(2.0f);
-#else
-      display.set_device_scale_factor(1.0f);
-#endif
+    gfx::Display display(0);
+
     // TODO(Youngsoo Choi): If there's a way to get orientation
     // from platform not using saved value, it would be better.
     display.SetRotationAsDegree(EWebView::GetOrientation());
+
+    int width, height;
+    if (display.rotation() == gfx::Display::ROTATE_90 ||
+        display.rotation() == gfx::Display::ROTATE_270) {
+      width = HeightOfScreen(screen);
+      height = WidthOfScreen(screen);
+    } else {
+      width = WidthOfScreen(screen);
+      height = HeightOfScreen(screen);
+    }
+
+    const gfx::Rect bounds_in_pixels = gfx::Rect(width, height);
+    const gfx::Rect bounds_in_dip =
+        content::ConvertRectToDIP(device_scale_factor, bounds_in_pixels);
+
+    display.set_device_scale_factor(device_scale_factor);
+    display.set_bounds(bounds_in_dip);
 
     return display;
   }
@@ -104,9 +128,6 @@ class EflScreen : public gfx::Screen {
   DISALLOW_COPY_AND_ASSIGN(EflScreen);
 };
 
-}
-
-namespace content {
 void InstallScreenInstance()
 {
   static bool installed = false;
@@ -116,4 +137,4 @@ void InstallScreenInstance()
   }
 }
 
-}
+} // namespace ui

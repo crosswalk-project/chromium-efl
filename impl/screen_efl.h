@@ -7,7 +7,7 @@
 
 #include "ui/gfx/screen.h"
 
-namespace content {
+namespace ui {
 
 void InstallScreenInstance();
 

@@ -69,12 +69,10 @@
 
 namespace content {
 
-void RenderWidgetHostViewBase::GetDefaultScreenInfo(blink::WebScreenInfo* results) {
-  gfx::Screen* screen = gfx::Screen::GetNativeScreen();
-  if (!screen)
-    return;
+void RenderWidgetHostViewBase::GetDefaultScreenInfo(
+    blink::WebScreenInfo* results) {
+  const gfx::Display display = gfx::Screen::GetNativeScreen()->GetPrimaryDisplay();
 
-  const gfx::Display display = screen->GetPrimaryDisplay();
   results->rect = display.bounds();
   results->availableRect = display.work_area();
   results->deviceScaleFactor = display.device_scale_factor();
@@ -118,6 +116,9 @@ RenderWidgetHostViewEfl::RenderWidgetHostViewEfl(RenderWidgetHost* widget, EWebV
       is_hw_accelerated_ = false;
 #endif
 #endif
+
+  device_scale_factor_ = gfx::Screen::GetNativeScreen()->
+      GetPrimaryDisplay().device_scale_factor();
 
   set_eweb_view(eweb_view);
   host_->SetView(this);
@@ -1006,32 +1007,17 @@ bool RenderWidgetHostViewEfl::HasAcceleratedSurface(const gfx::Size&) {
 
 void RenderWidgetHostViewEfl::GetScreenInfo(
     blink::WebScreenInfo* results) {
-  gfx::Screen* screen = gfx::Screen::GetNativeScreen();
-  if (!screen)
-    return;
-
-  const gfx::Display display = screen->GetPrimaryDisplay();
-#if defined(OS_TIZEN_MOBILE)
-  results->rect = GetBoundsInRootWindow();
-#else
-  results->rect = display.bounds();
-#endif
-  results->availableRect = display.work_area();
-
-  device_scale_factor_ = display.device_scale_factor();
-  results->deviceScaleFactor = device_scale_factor_;
-  results->orientationAngle = display.rotation();
-
-  // TODO(derat|oshima): Don't hardcode this. Get this from display object.
-  results->depth = 24;
-  results->depthPerComponent = 8;
+  RenderWidgetHostViewBase::GetDefaultScreenInfo(results);
 }
 
 gfx::Rect RenderWidgetHostViewEfl::GetBoundsInRootWindow() {
   Ecore_Evas* ee = ecore_evas_ecore_evas_get(evas_);
   int x, y, w, h;
   ecore_evas_geometry_get(ee, &x, &y, &w, &h);
-  return gfx::Rect(x, y, w, h);
+  if (current_orientation_ == 90 || current_orientation_ == 270)
+    return ConvertRectToDIP(device_scale_factor_, gfx::Rect(x, y, h, w));
+
+  return ConvertRectToDIP(device_scale_factor_, gfx::Rect(x, y, w, h));
 }
 
 gfx::GLSurfaceHandle RenderWidgetHostViewEfl::GetCompositingSurface() {
