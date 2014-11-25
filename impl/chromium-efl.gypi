@@ -15,7 +15,6 @@
     'defines': [
       'COMPONENT_BUILD=1',
       'SKIA_DLL=1',
-      'TIZEN_ENGINE_SUPPORT=1',
       'TIZEN_EDGE_EFFECT=1',
       'BUILDING_V8_SHARED=1',
       'V8_SHARED=1',
