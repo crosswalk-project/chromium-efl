@@ -280,7 +280,7 @@ EWebView::EWebView(tizen_webview::WebView* owner, tizen_webview::WebContext* con
       renderer_crashed_(false),
 #endif
       is_initialized_(false) {
-  context->GetImpl()->Initialize(object);
+  context->GetImpl()->InitializeGLSharedContext(object);
 }
 
 void EWebView::Initialize() {

@@ -101,7 +101,7 @@ class EWebContext {
 
   void ClearCandidateData();
   void ClearPasswordData();
-  void Initialize(Evas_Object* object);
+  void InitializeGLSharedContext(Evas_Object* object);
 #if defined(OS_TIZEN_TV)
   FaviconDatabase* GetFaviconDatabase();
 #endif
