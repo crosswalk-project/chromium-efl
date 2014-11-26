@@ -369,16 +369,16 @@ const char* ewk_view_user_agent_get(const Evas_Object* ewkView)
 
 Eina_Bool ewk_view_application_name_for_user_agent_set(Evas_Object* ewkView, const char* application_name)
 {
-  EWK_VIEW_IMPL_GET_OR_RETURN(ewkView, impl, false);
-  EINA_SAFETY_ON_NULL_RETURN_VAL(application_name, false);
+  EWK_VIEW_IMPL_GET_OR_RETURN(ewkView, impl, EINA_FALSE);
+  EINA_SAFETY_ON_NULL_RETURN_VAL(application_name, EINA_FALSE);
   if (0 != strcmp(application_name, "")) //check for empty string
     return impl->SetUserAgentAppName(application_name);
-  return false;
+  return EINA_FALSE;
 }
 
 const char* ewk_view_application_name_for_user_agent_get(const Evas_Object* ewkView)
 {
-  EWK_VIEW_IMPL_GET_OR_RETURN(ewkView, impl, 0);
+  EWK_VIEW_IMPL_GET_OR_RETURN(ewkView, impl, NULL);
   return impl->GetUserAgentAppName();
 }
 
