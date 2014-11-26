@@ -25,7 +25,7 @@ function silentDeapply() {
 echo "$@" | grep -q "\-r" && REVERSE=1
 
 patchdir=${TOPDIR}/build/patches
-for patch in "$patchdir/*.diff"; do
+for patch in $(find $patchdir -name *.diff); do
   if [ -z "$REVERSE" ]; then
     silentApply $patch
   else
