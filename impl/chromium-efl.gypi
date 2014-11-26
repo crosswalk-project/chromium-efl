@@ -77,6 +77,7 @@
          ],
          'sources/': [
            ['exclude', 'browser/device_sensors/data_fetcher_shared_memory_default.cc$'],
+           ['exclude', 'battery_status_manager_linux\\.(h|cc)$'],
          ],
       }, { # building_for_tizen != 1
         'sources/': [
@@ -85,6 +86,7 @@
           ['exclude', 'browser/geolocation/location_provider_efl\\.(cc|h)$'],
           ['exclude', 'browser/motion/MotionUI\\.(h|cc)$'],
           ['exclude', 'browser/motion/wkext_motion\\.(h|cc)$'],
+          ['exclude', 'device/battery/battery_status_manager_tizen\\.(h|cc)$'],
           ['exclude', 'third_party/webrtc/system_wrappers/source/cpu_features_tizen.c'],
         ],
       }],

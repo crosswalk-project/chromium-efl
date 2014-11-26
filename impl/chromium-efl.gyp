@@ -237,6 +237,8 @@
       'context_menu_controller_efl.h',
       'cookie_manager.cc',
       'cookie_manager.h',
+      'device/battery/battery_status_manager_tizen.cc',
+      'device/battery/battery_status_manager_tizen.h',
       'devtools_delegate_efl.cc',
       'devtools_delegate_efl.h',
       'devtools_manager_delegate_efl.cc',
