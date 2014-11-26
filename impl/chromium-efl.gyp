@@ -41,6 +41,7 @@
     'dependencies': [
       'chromium-efl-deps.gyp:efl',
       'chromium-efl-deps.gyp:gstreamer',
+      'theme/theme.gyp:tizen_theme',
       '<(chrome_src_dir)/base/allocator/allocator.gyp:allocator',
       '<(chrome_src_dir)/content/content.gyp:content',
       '<(chrome_src_dir)/content/content.gyp:content_app_browser',

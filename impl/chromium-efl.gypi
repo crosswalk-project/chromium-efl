@@ -33,6 +33,15 @@
       ['exclude', 'x11_event_source_libevent\\.cc$'],
       ['exclude', 'x11_types\\.cc$'],
     ],
+    'target_conditions': [
+      ['_target_name=="webcore_rendering"', {
+        'sources/': [
+          # Have to exclude under target_conditions here because of multiple
+          # includes/excludes in core.gyp
+          ['exclude', 'rendering/RenderThemeChromiumDefault\\.cpp$'],
+        ],
+      }],
+    ],
     'conditions': [
        ['use_efl==1', {
          'defines': [
