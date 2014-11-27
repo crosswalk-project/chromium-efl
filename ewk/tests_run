@@ -1,0 +1,68 @@
+#!/bin/bash -x
+
+ewk_dir=`cd \`dirname $0\` && pwd`/
+efl_dir=$ewk_dir../
+rep_dir=~/GBS-ROOT-2.3-DEV/local/repos/tizenmb_v2.3/armv7l/RPMS/
+title=`cd ${efl_dir} && git log -n 1 --format=%s`
+dir=${ewk_dir}test_log/
+log=`echo $title | sed 's/[\/! #\"<>|:]/_/g'`
+
+cd $efl_dir && build/build_mobile.sh --include-all --incremental --define "build_ewk_unittest 1" --define "build_ewk_unittests 1" --define 'nodebug 1' --clean-repo || exit 1
+#cd $rep_dir && wget http://10.251.52.177/tizenrepo/tizen_dev_daily_build/m40_2202_0_141120_1/mobile/chromium-efl-40.2202.0.44-1.armv7l.rpm --no-clobber
+
+timeout 5 sdb root on && sdb shell change-booting-mode.sh --update || exit 2
+sdb shell ulimit -c 1000000
+sdb shell 'rpm -qa | grep chromium-e | while read pakiet ; do rpm -e \$pakiet --nodeps ; done '
+
+sdb push ${ewk_dir}thirdparty/nss3.15/* /usr/lib/ ; sdb push ${ewk_dir}thirdparty/nss3.15/* /lib/
+sdb push ${ewk_dir}thirdparty/eglibc-2.18-rpm/eglibc-2.18-5.1.armv7l.rpm /opt/usr/media/Downloads/ && sdb shell rpm -i /opt/usr/media/Downloads/eglibc-2.18-5.1.armv7l.rpm --nodeps --force
+#cd ~/Pobrane && wget http://10.251.52.177/tizenrepo/jpn-dcm/Redwood8974JPNDCM_20131218.006/repos/slp-release/armv7l/packages/armv7l/gconf-dbus-2.16.0-1.4.redwood8974om.armv7l.rpm --no-clobber
+sdb push ~/Pobrane/gconf-dbus-2.16.0-1.4.redwood8974om.armv7l.rpm /opt/usr/media/Downloads/ && sdb shell rpm -i /opt/usr/media/Downloads/gconf-dbus-2.16.0-1.4.redwood8974om.armv7l.rpm
+sdb push ~/Pobrane/gtest-1.3.0.0-3.1.redwood8974om.armv7l.rpm /opt/usr/media/Downloads/ && sdb shell rpm -i /opt/usr/media/Downloads/gtest-1.3.0.0-3.1.redwood8974om.armv7l.rpm
+
+sdb shell  mkdir -p /opt/usr/eglibc-2.18/lib/
+sdb shell cp /lib/ld-linux.so.3 /opt/usr/eglibc-2.18/lib/
+
+for rpm in ${rep_dir}*efl-40*.rpm ; do
+  sdb push $rpm /opt/usr/media/Downloads/ && sdb shell rpm -i /opt/usr/media/Downloads/`basename ${rpm}` --nodeps || exit 3
+done
+
+for rpm in ${rep_dir}*ewktest*.rpm ; do
+  sdb push $rpm /opt/usr/media/Downloads/ && sdb shell rpm -i /opt/usr/media/Downloads/`basename ${rpm}` --nodeps || exit 4
+done
+sdb shell chmod a+x /opt/usr/utc_exec/ewk_unittest*
+
+mkdir -p ${dir}
+mkdir -p ${dir}${log}/
+
+echo "<html><head><title>${title}</title></head><body><hr/></body></html>" > ${dir}${log}.htm
+ln -f -s ${dir}${log}.htm ${dir}log.htm
+
+function log {
+  if [ ! -e ${dir}${2}.htm ]; then echo '<html><head><title>$2</title></head><body><hr/></body></html>' > ${dir}${2}.htm ; fi
+  if [ $1 -gt 0 ]
+  then
+    sed -i "s/<body>/<body>\n<a href=${log}\/${2}.log>FAIL<\/a>\t$3\t<a href=${log}.htm>${title}<\/a><br>/" ${dir}${2}.htm
+    sed -i "s/<hr\/>/\n<a href=${log}\/${2}.log>FAIL<\/a>\t$3\t<a href=${2}.htm>${2}<\/a><br><hr\/>/" ${dir}${log}.htm
+  else
+    sed -i "s/<body>/<body>\n<a href=${log}\/${2}.log>PASS<\/a>\t$3\t<a href=${log}.htm>${title}<\/a><br>/" ${dir}${2}.htm
+    sed -i "s/<\/body>/<a href=${log}\/${2}.log>PASS<\/a>\t$3\t<a href=${2}.htm>${2}<\/a><br>\n<\/body>/" ${dir}${log}.htm
+  fi
+}
+
+#restart at 50 tests
+count=1
+grep -o -e "'utc_blink_\w*.cpp'" ${ewk_dir}unittest/ewk-tests.gypi | grep -o -E '\w{4,}' | sed 's/_func$//g' | while read test ; do
+  count=$[1+$count]
+  if [ $count -gt 50 ]; then
+    timeout 70 sdb shell reboot
+    while ! sdb root on ; do sdb kill-server ; sleep 70 ; done
+    sdb shell change-booting-mode.sh --update
+    count=1 ;
+  fi
+  timeout 65 sdb shell "df -k /opt/usr ; /opt/usr/utc_exec/ewk_unittests --gtest_filter=${test}.* ; echo exit:\$?; exit " > ${dir}${log}/${test}.log
+  grep '\[  PASSED  \]' ${dir}${log}/${test}.log | grep -v '0 test' && ! grep '\[  FAILED  \]' ${dir}${log}/${test}.log
+  log $? ${test} UT
+done
+
+exit 0

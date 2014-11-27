@@ -1,5 +1,6 @@
 #!/bin/bash
 
+export ICECC=no
 SCRIPTDIR=$(cd $(dirname $0); pwd -P)
 
 # source common functions and vars

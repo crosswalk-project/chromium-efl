@@ -5,3 +5,4 @@
 *.swp
 /packaging/*.tar.gz
 /build/TARGET
+/ewk/test_log
