@@ -235,7 +235,6 @@
       'components/editing/content/renderer/editorclient_agent.h',
       'content_browser_client_efl.cc',
       'content_browser_client_efl.h',
-
       'autofill_popup_view_efl.h',
       'autofill_popup_view_efl.cc',
       'content_main_delegate_efl.cc',
@@ -399,7 +398,26 @@
         ],
       }],
       ['building_for_tizen==1', {
+        'sources': [
+          'content/common/gpu/client/gpu_memory_buffer_impl_efl.cc',
+          'content/common/gpu/client/gpu_memory_buffer_impl_efl_pixmap.cc',
+          'content/common/gpu/client/gpu_memory_buffer_impl_efl_pixmap.h',
+          'content/common/gpu/gpu_memory_buffer_factory_efl.cc',
+          'content/common/gpu/gpu_memory_buffer_factory_efl_pixmap.cc',
+          'content/common/gpu/gpu_memory_buffer_factory_efl_pixmap.h',
+          'ui/gl/gl_image_efl_pixmap.cc',
+          'ui/gl/gl_image_efl_pixmap.h',
+          'ui/gl/efl_pixmap.cc',
+          'ui/gl/efl_pixmap.h',
+        ],
         'dependencies': [ 'chromium-efl-deps.gyp:tizen' ],
+        'link_settings': {
+          'libraries': [
+            '-ldrm',
+            '-lEGL',
+            '-lGLESv2',
+          ],
+        },
       }],
       ['ewk_bringup==1', {
         'defines': [ 'EWK_BRINGUP=1' ],
