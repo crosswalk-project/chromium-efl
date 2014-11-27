@@ -1046,6 +1046,7 @@ void RenderWidgetHostViewEfl::HandleFocusOut() {
 
   host_->SetActive(false);
   host_->LostCapture();
+  Blur();
 }
 
 void RenderWidgetHostViewEfl::set_magnifier(bool status) {
