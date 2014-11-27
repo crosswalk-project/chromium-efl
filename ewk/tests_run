@@ -7,6 +7,8 @@ title=`cd ${efl_dir} && git log -n 1 --format=%s`
 dir=${ewk_dir}test_log/
 log=`echo $title | sed 's/[\/! #\"<>|:]/_/g'`
 
+sed -i 's/(20\*1024\*1024)/20971520/' ${efl_dir}src/skia/skia_common.gypi
+
 cd $efl_dir && build/build_mobile.sh --include-all --incremental --define "build_ewk_unittest 1" --define "build_ewk_unittests 1" --define 'nodebug 1' --clean-repo || exit 1
 #cd $rep_dir && wget http://10.251.52.177/tizenrepo/tizen_dev_daily_build/m40_2202_0_141120_1/mobile/chromium-efl-40.2202.0.44-1.armv7l.rpm --no-clobber
 
@@ -31,6 +33,45 @@ for rpm in ${rep_dir}*ewktest*.rpm ; do
   sdb push $rpm /opt/usr/media/Downloads/ && sdb shell rpm -i /opt/usr/media/Downloads/`basename ${rpm}` --nodeps || exit 4
 done
 sdb shell chmod a+x /opt/usr/utc_exec/ewk_unittest*
+
+#http://suprem.sec.samsung.net/confluence/display/CBWEBVIEWC/Guide+for+TCT
+sed -i 's/\/GBS-ROOT-2.3\//\/GBS-ROOT-2.3-DEV\//' ~/core-api/scripts/tcbuild.sh
+sed -i 's/\/GBS-ROOT-2.3\//\/GBS-ROOT-2.3-DEV\//' ~/core-api-se/scripts/tcbuild.sh
+
+while [ ! -e ${rep_dir}*webkit2-tests*.rpm ]; do
+  cd ~/core-api/ && ./tcbuild build webkit2
+done
+
+while [ ! -e ${rep_dir}*webkit-efl-itc*.rpm ]; do
+  cd ~/core-api-se/ && ./tcbuild build webkit-efl
+done
+
+sdb shell << EOF
+echo "core-webkit2-tests system::vconf_misc rl" | smackload
+echo "core-webkit2-tests system::vconf_inhouse rw" | smackload
+echo "core-webkit2-tests system::vconf_system rw" | smackload
+echo "core-webkit2-tests chromium-efl rwxl" | smackload
+echo "core-webkit2-tests com.samsung.browser rwx" | smackload
+echo "core-webkit2-tests core-webkit-efl-itc rwx" | smackload
+echo "core-webkit2-tests launchpad x" | smackload
+echo "core-webkit2-tests device::sys_logging w" | smackload
+echo "core-webkit2-tests _ w" | smackload
+echo "core-webkit2-tests system::use_internet w" | smackload
+echo "core-webkit2-tests sdbd x" | smackload
+echo "core-webkit-efl-itc com.samsung.browser rwxa" | smackload
+echo "core-webkit-efl-itc core-webkit2-tests rwxa" | smackload
+echo "core-webkit-efl-itc chromium-efl rwxa" | smackload
+echo "core-webkit-efl-itc system::vconf_system rwxa" | smackload
+echo "core-webkit-efl-itc system::vconf_inhouse rwxa" | smackload
+echo "core-webkit-efl-itc system::vconf_misc rwxa" | smackload
+echo "core-webkit-efl-itc launchpad rwxa" | smackload
+echo "core-webkit-efl-itc device::sys_logging rwxa" | smackload
+echo "com.samsung.browser core-webkit2-tests rw" | smackload
+echo "core-webkit-efl-itc system::use_internet w" | smackload
+echo "system::use_internet core-webkit-efl-itc w" | smackload
+echo "core-webkit-efl-itc Chrome_IOThread x" | smackload
+exit
+EOF
 
 mkdir -p ${dir}
 mkdir -p ${dir}${log}/
@@ -64,5 +105,26 @@ grep -o -e "'utc_blink_\w*.cpp'" ${ewk_dir}unittest/ewk-tests.gypi | grep -o -E 
   grep '\[  PASSED  \]' ${dir}${log}/${test}.log | grep -v '0 test' && ! grep '\[  FAILED  \]' ${dir}${log}/${test}.log
   log $? ${test} UT
 done
+
+function it {
+  sdb push ${rep_dir}${2}-0.1-0.armv7l.rpm /opt/usr/media/Downloads/ && sdb shell pkgcmd -i -t rpm -q -p /opt/usr/media/Downloads/${2}-0.1-0.armv7l.rpm || exit 7
+  while read test ; do
+    echo /opt/usr/apps/${2}/bin/tct-${3}-core ${test}
+    timeout 65 sdb shell > ${dir}${log}/${test}.log <<EOF
+export CHROMIUM_EFL_OVERRIDE_UA_STRING="Mozilla/5.0 (Linux; Tizen 2.2; SAMSUNG SM-Z910F) AppleWebKit/537.3 (KHTML, like Gecko) Version/2.2 Mobile Safari/537.3"
+rm -f $5
+df -k /opt/usr
+/opt/usr/apps/${2}/bin/tct-${3}-core ${test} ;
+echo "exit: \$? \`cat ${5}\`"
+exit
+EOF
+    grep -x $'exit: 0 0\r' ${dir}${log}/${test}.log
+    log $? ${test} $3
+  done < $4
+  sdb shell "rpm -e ${2}-0.1-0.armv7l"
+}
+
+it ~/core-api/    'core-webkit2-tests'  'webkit2'     ~/core-api/src/webkit2/list.txt 		/tmp/utcresult
+it ~/core-api-se/ 'core-webkit-efl-itc' 'webkit-efl'  ~/core-api-se/src/webkit-efl/list.txt	/tmp/tcresult
 
 exit 0
