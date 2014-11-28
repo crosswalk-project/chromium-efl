@@ -107,7 +107,7 @@ class EWebContext {
 #endif
 
  private:
-  EWebContext();
+  EWebContext(bool incognito);
   ~EWebContext();
   friend class tizen_webview::WebContext;
 
@@ -121,6 +121,7 @@ class EWebContext {
   scoped_ptr<EwkDidStartDownloadCallback> start_download_callback_;
   int m_pixmap;
   bool initialized_;
+  bool incognito_;
 };
 
 #endif

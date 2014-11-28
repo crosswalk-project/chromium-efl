@@ -32,7 +32,7 @@ class URL;
 struct WebContext : public tizen_webview::RefCounted<WebContext> {
  public:
   static WebContext* DefaultContext();
-  static WebContext* Create();
+  static WebContext* Create(bool incognito = false);
   static void Delete(WebContext*);
 
   // Get related class
@@ -132,7 +132,7 @@ struct WebContext : public tizen_webview::RefCounted<WebContext> {
  private:
   EWebContext* impl;
 
-  WebContext();
+  WebContext(bool incognito);
   ~WebContext();
   friend class tizen_webview::RefCounted<WebContext>;
 

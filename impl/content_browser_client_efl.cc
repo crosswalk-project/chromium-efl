@@ -54,11 +54,6 @@ net::URLRequestContextGetter* ContentBrowserClientEfl::CreateRequestContext(
       BrowserContext* browser_context,
       ProtocolHandlerMap* protocol_handlers,
       URLRequestInterceptorScopedVector request_interceptors) {
-  if (browser_context->IsOffTheRecord()) {
-    LOG(ERROR) << "off the record browser context not implemented";
-    return NULL;
-  }
-
   return static_cast<BrowserContextEfl*>(browser_context)->
       CreateRequestContext(protocol_handlers, request_interceptors.Pass());
 }

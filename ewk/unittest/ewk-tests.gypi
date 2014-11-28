@@ -249,6 +249,7 @@
         'utc_blink_ewk_user_media_permission_request_set_func.cpp',
         'utc_blink_ewk_user_media_permission_request_suspend_func.cpp',
         'utc_blink_ewk_view_add_func.cpp',
+        'utc_blink_ewk_view_add_in_incognito_mode_func.cpp',
         'utc_blink_ewk_view_add_with_context_func.cpp',
         'utc_blink_ewk_view_add_with_session_data_func.cpp',
         'utc_blink_ewk_view_app_name_user_agent_get_func.cpp',

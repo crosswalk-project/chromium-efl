@@ -28,10 +28,10 @@ class BrowserContextEfl
   : public BrowserContext,
     public visitedlink::VisitedLinkDelegate {
  public:
-  BrowserContextEfl(EWebContext*);
+  BrowserContextEfl(EWebContext*, bool incognito = false);
   ~BrowserContextEfl();
 
-  virtual bool IsOffTheRecord() const override { return false; }
+  virtual bool IsOffTheRecord() const override { return incognito_; }
   virtual net::URLRequestContextGetter* GetRequestContext() override;
   URLRequestContextGetterEfl* GetRequestContextEfl()
   { return request_context_getter_.get(); }
@@ -109,6 +109,7 @@ class BrowserContextEfl
   DownloadManagerDelegateEfl download_manager_delegate_;
   base::ScopedTempDir temp_dir_;
   bool temp_dir_creation_attempted_;
+  const bool incognito_;
 
   DISALLOW_COPY_AND_ASSIGN(BrowserContextEfl);
 };

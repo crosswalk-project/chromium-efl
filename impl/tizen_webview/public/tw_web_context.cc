@@ -13,7 +13,8 @@ static WebContext* default_context_ = NULL;
 // static
 WebContext* WebContext::DefaultContext() {
   if (!default_context_) {
-    default_context_ = new WebContext;
+    // default context is not incognito
+    default_context_ = new WebContext(false);
     default_context_->AddRef();
   }
 
@@ -21,8 +22,8 @@ WebContext* WebContext::DefaultContext() {
 }
 
 // static
-WebContext* WebContext::Create() {
-  WebContext* context = new WebContext;
+WebContext* WebContext::Create(bool incognito) {
+  WebContext* context = new WebContext(incognito);
   context->AddRef();
   return context;
 }
@@ -41,7 +42,7 @@ void WebContext::Delete(WebContext* context) {
   }
 }
 
-WebContext::WebContext() : impl (new EWebContext) {
+WebContext::WebContext(bool incognito) : impl(new EWebContext(incognito)) {
 }
 
 WebContext::~WebContext() {
