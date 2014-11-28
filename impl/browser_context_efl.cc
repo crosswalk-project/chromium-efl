@@ -46,13 +46,14 @@ void BrowserContextEfl::ResourceContextEfl::set_url_request_context_getter(
   getter_ = getter;
 }
 
-BrowserContextEfl::BrowserContextEfl(EWebContext* web_context)
+BrowserContextEfl::BrowserContextEfl(EWebContext* web_context, bool incognito)
   : resource_context_(NULL),
     web_context_(web_context),
 #if defined(ENABLE_NOTIFICATIONS)
     notification_controllerefl_(new NotificationControllerEfl()),
 #endif
-    temp_dir_creation_attempted_(false) {
+    temp_dir_creation_attempted_(false),
+    incognito_(incognito) {
   InitVisitedLinkMaster();
 }
 
@@ -68,6 +69,13 @@ ResourceContext* BrowserContextEfl::GetResourceContext() {
 }
 
 base::FilePath BrowserContextEfl::GetPath() const {
+  if (IsOffTheRecord()) {
+    // Empty path indicates in memory storage. All data that would be persistent
+    // are stored in memory and are gone when closing browser, what is a
+    // requirement for the incognito mode (being off the record)
+    return base::FilePath();
+  }
+
   // TODO: Figure out something better for data storage.
 
   static base::FilePath path;
@@ -136,20 +144,26 @@ void BrowserContextEfl::ReadCertificateAndAdd(base::FilePath* file_path) {
 }
 
 void BrowserContextEfl::InitVisitedLinkMaster() {
-  visitedlink_master_.reset(new visitedlink::VisitedLinkMaster(this, this, false));
-  visitedlink_master_->Init();
+  if (!IsOffTheRecord()) {
+    visitedlink_master_.reset(new visitedlink::VisitedLinkMaster(this, this, false));
+    visitedlink_master_->Init();
+  }
 }
 
 void BrowserContextEfl::AddVisitedURLs(const std::vector<GURL>& urls) {
-  DCHECK(visitedlink_master_);
-  visitedlink_master_->AddURLs(urls);
+  if (!IsOffTheRecord()) {
+    DCHECK(visitedlink_master_);
+    visitedlink_master_->AddURLs(urls);
+  }
 }
 
 void BrowserContextEfl::RebuildTable(const scoped_refptr<URLEnumerator>& enumerator) {
-  // WebView rebuilds from WebChromeClient.getVisitedHistory. The client
-  // can change in the lifetime of this WebView and may not yet be set here.
-  // Therefore this initialization path is not used.
-  enumerator->OnComplete(true);
+  if (!IsOffTheRecord()) {
+    // WebView rebuilds from WebChromeClient.getVisitedHistory. The client
+    // can change in the lifetime of this WebView and may not yet be set here.
+    // Therefore this initialization path is not used.
+    enumerator->OnComplete(true);
+  }
 }
 
 SSLHostStateDelegate* BrowserContextEfl::GetSSLHostStateDelegate() {

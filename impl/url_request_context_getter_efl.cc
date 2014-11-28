@@ -129,16 +129,26 @@ net::URLRequestContext* URLRequestContextGetterEfl::GetURLRequestContext() {
         scoped_ptr<net::HttpServerProperties>(
             new net::HttpServerPropertiesImpl()));
 
-    base::FilePath cache_path = base_path_.Append(FILE_PATH_LITERAL("Cache"));
-    net::HttpCache::DefaultBackend* main_backend =
-        new net::HttpCache::DefaultBackend(
-            net::DISK_CACHE,
-            net::CACHE_BACKEND_DEFAULT,
-            cache_path,
-            0,
-            BrowserThread::GetMessageLoopProxyForThread(BrowserThread::CACHE)
-                .get());
+    net::HttpCache::DefaultBackend* main_backend = NULL;
+    scoped_refptr<base::MessageLoopProxy> message_loop_proxy =
+        BrowserThread::GetMessageLoopProxyForThread(BrowserThread::CACHE);
+    if (base_path_.empty()) {
+      main_backend = new net::HttpCache::DefaultBackend(
+          net::MEMORY_CACHE,
+          net::CACHE_BACKEND_DEFAULT,
+          base::FilePath(),
+          0,
+          message_loop_proxy.get());
+    } else {
+      base::FilePath cache_path = base_path_.Append(FILE_PATH_LITERAL("Cache"));
 
+      main_backend = new net::HttpCache::DefaultBackend(
+          net::DISK_CACHE,
+          net::CACHE_BACKEND_DEFAULT,
+          cache_path,
+          0,
+          message_loop_proxy.get());
+    }
     net::HttpNetworkSession::Params network_session_params;
     network_session_params.cert_verifier =
         url_request_context_->cert_verifier();

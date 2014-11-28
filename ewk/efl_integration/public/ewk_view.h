@@ -443,6 +443,15 @@ EAPI Evas_Object* ewk_view_add_with_session_data(Evas *e, const char *data, unsi
 EAPI Evas_Object *ewk_view_add(Evas *e);
 
 /**
+ * Creates a new EFL web view object in incognito mode.
+ *
+ * @param e canvas object where to create the view object
+ *
+ * @return view object on success or @c NULL on failure
+ */
+EAPI Evas_Object *ewk_view_add_in_incognito_mode(Evas *e);
+
+/**
  * Creates a new EFL WebKit view object based on specific Ewk_Context.
  *
  * @param e canvas object where to create the view object

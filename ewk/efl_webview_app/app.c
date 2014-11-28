@@ -387,13 +387,14 @@ int main(int argc, char** argv)
     ECORE_GETOPT_VALUE_NONE,
   };
 
-
+  Eina_Bool incognito = EINA_FALSE;
   int idx = ecore_getopt_parse(&options, values, argc, argv);
   for (; idx < argc; ++idx) {
     // Treat first argument not starting with - as the url to load
     if (argv[idx][0] != '-') {
       start_url = strdup(argv[idx]);
-      break;
+    } else if (strcmp(argv[idx], "--incognito") == 0) {
+      incognito = EINA_TRUE;
     }
   }
 
@@ -423,8 +424,18 @@ int main(int argc, char** argv)
     ecore_evas_size_base_set(ee, width, height);
   }
 
-  Ewk_Context* context = ewk_context_default_get();
-  view = ewk_view_add_with_context(e, context);
+  Ewk_Context* context = NULL;
+
+  if (incognito == EINA_TRUE) {
+    fprintf(stderr, "Creating incognito web view\n");
+    view = ewk_view_add_in_incognito_mode(e);
+    context = ewk_view_context_get(view);
+  } else {
+    fprintf(stderr, "Creating normal web view\n");
+    context = ewk_context_default_get();
+    view = ewk_view_add_with_context(e, context);
+  }
+
   evas_object_resize(view, width, height);
 
   ecore_evas_callback_resize_set(ee, &on_evas_resize);

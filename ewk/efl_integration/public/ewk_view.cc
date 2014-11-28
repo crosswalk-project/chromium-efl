@@ -98,6 +98,13 @@ Evas_Object* ewk_view_add(Evas* e)
   return ewk_view_add_with_context(e, context);
 }
 
+Evas_Object* ewk_view_add_in_incognito_mode(Evas* e)
+{
+  Ewk_Context* context = static_cast<Ewk_Context*>(WebContext::Create(true));
+  EINA_SAFETY_ON_NULL_RETURN_VAL(context, NULL);
+  return ewk_view_add_with_context(e, context);
+}
+
 Ewk_Context *ewk_view_context_get(const Evas_Object *view)
 {
   EWK_VIEW_IMPL_GET_OR_RETURN(view, impl, 0);
