@@ -11,6 +11,7 @@
 #include "devtools_manager_delegate_efl.h"
 #include "browser/web_contents/web_contents_view_efl.h"
 #include "browser/geolocation/access_token_store_efl.h"
+#include "browser/geolocation/geolocation_permission_context_efl.h"
 #include "browser/renderer_host/render_message_filter_efl.h"
 #include "browser/resource_dispatcher_host_delegate_efl.h"
 #include "browser/vibration/vibration_message_filter.h"
@@ -222,6 +223,47 @@ void ContentBrowserClientEfl::RenderProcessWillLaunch(
   host->AddFilter(new RenderMessageFilterEfl(host->GetID()));
   host->AddFilter(new VibrationMessageFilter());
   host->AddFilter(new editing::EditorClientObserver(host->GetID()));
+}
+
+void ContentBrowserClientEfl::RequestPermission(
+    content::PermissionType permission,
+    content::WebContents* web_contents,
+    int bridge_id,
+    const GURL& requesting_frame,
+    bool user_gesture,
+    const base::Callback<void(bool)>& result_callback) {
+  int render_process_id = web_contents->GetRenderProcessHost()->GetID();
+  int render_view_id = web_contents->GetRenderViewHost()->GetRoutingID();
+
+  GURL origin = requesting_frame.GetOrigin();
+  BrowserContextEfl* browser_context =
+      static_cast<BrowserContextEfl*>(web_contents->GetBrowserContext());
+  const GeolocationPermissionContextEfl& geolocation_permission_context =
+      browser_context->GetGeolocationPermissionContext();
+
+  switch (permission) {
+    case content::PERMISSION_GEOLOCATION:
+      if (!browser_context) {
+        LOG(ERROR) << "Dropping GeolocationPermission request";
+        result_callback.Run(false);
+        return;
+      }
+
+      geolocation_permission_context.RequestPermission(render_process_id,
+                                                       render_view_id,
+                                                       requesting_frame,
+                                                       result_callback);
+      break;
+    case content::PERMISSION_PROTECTED_MEDIA:
+    case content::PERMISSION_MIDI_SYSEX:
+    case content::PERMISSION_NOTIFICATIONS:
+    case content::PERMISSION_PUSH_MESSAGING:
+      NOTIMPLEMENTED() << "RequestPermission not implemented for "
+                       << permission;
+      break;
+    default:
+      NOTREACHED() << "Invalid RequestPermission for " << permission;
+  }
 }
 
 content::DevToolsManagerDelegate* ContentBrowserClientEfl::GetDevToolsManagerDelegate() {

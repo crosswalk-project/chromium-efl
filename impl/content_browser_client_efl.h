@@ -87,6 +87,14 @@ class ContentBrowserClientEfl: public ContentBrowserClient {
 
   virtual void RenderProcessWillLaunch(content::RenderProcessHost* host) override;
 
+  void RequestPermission(
+      content::PermissionType permission,
+      content::WebContents* web_contents,
+      int bridge_id,
+      const GURL& requesting_frame,
+      bool user_gesture,
+      const base::Callback<void(bool)>& result_callback) override;
+
   content::DevToolsManagerDelegate* GetDevToolsManagerDelegate() override;
 
  private:

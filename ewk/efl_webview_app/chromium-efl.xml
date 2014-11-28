@@ -8,4 +8,9 @@
         <label>Chromium-efl MiniBrowser</label>
         <label xml:lang="en-us">Chromium-efl MiniBrowser</label>
     </ui-application>
+    <privileges>
+      <privilege>http://tizen.org/privilege/location</privilege>
+      <privilege>http://tizen.org/privilege/internet</privilege>
+      <privilege>http://tizen.org/privilege/network.get</privilege>
+    </privileges>
 </manifest>

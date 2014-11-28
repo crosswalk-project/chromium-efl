@@ -1,4 +1,4 @@
-// Copyright 2013 Samsung Electronics. All rights reserved.
+// Copyright 2014 Samsung Electronics. All rights reserved.
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
@@ -15,12 +15,16 @@ using web_contents_utils::WebContentsFromViewID;
 
 namespace content {
 
-void GeolocationPermissionContextEfl::RequestGeolocationPermissionOnUIThread(int render_process_id,
-                                                                             int render_view_id,
-                                                                             int /*bridge_id*/,
-                                                                             const GURL& requesting_frame,
-                                                                             base::Callback<void(bool)> callback) {
-  CHECK(content::BrowserThread::CurrentlyOn(content::BrowserThread::UI));
+GeolocationPermissionContextEfl::GeolocationPermissionContextEfl()
+    : weak_ptr_factory_(this) {
+}
+
+void GeolocationPermissionContextEfl::RequestPermissionOnUIThread(
+    int render_process_id,
+    int render_view_id,
+    const GURL& requesting_frame,
+    base::Callback<void(bool)> callback) const {
+  DCHECK(content::BrowserThread::CurrentlyOn(content::BrowserThread::UI));
   WebContents* web_contents = WebContentsFromViewID(render_process_id, render_view_id);
   if (!web_contents)
     return;
@@ -75,28 +79,31 @@ void GeolocationPermissionContextEfl::RequestGeolocationPermissionOnUIThread(int
   callback.Run(false);
 }
 
-void GeolocationPermissionContextEfl::RequestGeolocationPermission(int render_process_id,
-                                                                   int render_view_id,
-                                                                   int bridge_id,
-                                                                   const GURL& requesting_frame,
-                                                                   base::Callback<void(bool)> callback) {
-  content::BrowserThread::PostTask(content::BrowserThread::UI,
-                                   FROM_HERE,
-                                   base::Bind(&GeolocationPermissionContextEfl::RequestGeolocationPermissionOnUIThread,
-                                              base::Unretained(this),
-                                              render_process_id,
-                                              render_view_id,
-                                              bridge_id,
-                                              requesting_frame,
-                                              callback));
+void GeolocationPermissionContextEfl::RequestPermission(
+    int render_process_id,
+    int render_view_id,
+    const GURL& requesting_frame,
+    base::Callback<void(bool)> callback) const {
+  content::BrowserThread::PostTask(
+      content::BrowserThread::UI,
+      FROM_HERE,
+      base::Bind(
+          &GeolocationPermissionContextEfl::RequestPermissionOnUIThread,
+          weak_ptr_factory_.GetWeakPtr(),
+          render_process_id,
+          render_view_id,
+          requesting_frame,
+          callback));
 }
 
-void GeolocationPermissionContextEfl::CancelGeolocationPermissionRequest(int /*render_process_id*/,
-                                                                         int /*render_view_id*/,
-                                                                         int /*bridge_id*/,
-                                                                         const GURL& /*requesting_frame*/) {
-  // There is currently no mechanism to inform the application that a permission request should be canceled.
+void GeolocationPermissionContextEfl::CancelPermissionRequest(
+    int /*render_process_id*/,
+    int /*render_view_id*/,
+    int /*bridge_id*/,
+    const GURL& /*requesting_frame*/) const {
+  // There is currently no mechanism to inform the application
+  // that a permission request should be canceled.
   // To be implemented in the future.
 }
 
-}//namespace
+}  // namespace content

@@ -9,6 +9,9 @@
 
 #include "base/memory/scoped_ptr.h"
 #include "base/files/scoped_temp_dir.h"
+#include "browser/download_manager_delegate_efl.h"
+#include "browser/geolocation/geolocation_permission_context_efl.h"
+#include "browser/notification/notification_controller_efl.h"
 #include "components/visitedlink/browser/visitedlink_delegate.h"
 #include "components/visitedlink/browser/visitedlink_master.h"
 #include "content/public/browser/content_browser_client.h"
@@ -16,8 +19,7 @@
 #include "content/public/browser/storage_partition.h"
 #include "content/public/browser/resource_context.h"
 #include "url_request_context_getter_efl.h"
-#include "browser/notification/notification_controller_efl.h"
-#include "browser/download_manager_delegate_efl.h"
+
 #include "net/url_request/url_request_context.h"
 
 class EWebContext;
@@ -67,6 +69,9 @@ class BrowserContextEfl
   virtual PushMessagingService* GetPushMessagingService() override
   { return 0; }
 
+  virtual const GeolocationPermissionContextEfl&
+      GetGeolocationPermissionContext() const;
+
   virtual base::FilePath GetPath() const override;
 
   net::URLRequestContextGetter* CreateRequestContext(
@@ -98,7 +103,8 @@ class BrowserContextEfl
  private:
   static void ReadCertificateAndAdd(base::FilePath* file_path);
   virtual SSLHostStateDelegate* GetSSLHostStateDelegate() override;
-
+  mutable scoped_ptr<GeolocationPermissionContextEfl>
+      geolocation_permission_context_;
   scoped_ptr<visitedlink::VisitedLinkMaster> visitedlink_master_;
   ResourceContextEfl* resource_context_;
   scoped_refptr<URLRequestContextGetterEfl> request_context_getter_;

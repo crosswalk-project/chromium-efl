@@ -7,6 +7,7 @@
 #include "base/bind.h"
 #include "base/files/file_util.h"
 #include "base/path_service.h"
+#include "browser/geolocation/geolocation_permission_context_efl.h"
 #include "components/visitedlink/browser/visitedlink_master.h"
 #include "content/public/browser/browser_thread.h"
 #include "content/public/browser/render_view_host.h"
@@ -170,6 +171,16 @@ SSLHostStateDelegate* BrowserContextEfl::GetSSLHostStateDelegate() {
   // SSLHostStateDelegate may be left unimplemented to use a default strategy of
   // not remembering certificate decisions at all.
   return NULL;
+}
+
+const GeolocationPermissionContextEfl&
+    BrowserContextEfl::GetGeolocationPermissionContext() const {
+  if (!geolocation_permission_context_.get()) {
+    geolocation_permission_context_.reset(
+        new GeolocationPermissionContextEfl());
+  }
+
+  return *(geolocation_permission_context_.get());
 }
 
 }
