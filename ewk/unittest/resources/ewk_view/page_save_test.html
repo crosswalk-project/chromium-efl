@@ -1,0 +1,33 @@
+<html>
+    <head>
+        <title>
+            Test-page
+        </title>
+        <script>
+            function formSubmit()
+            {
+                document.getElementById("frm1").submit();
+            }
+        </script>
+    </head>
+    <body>
+        <form id="frm1">
+First Name : 
+<input type="text" id="fNameID" name ="fName" ></input>
+<br>
+Last Name : 
+<input type="text" name = "lName"></input>
+<br>
+Age : 
+<input type="number" name="age"></input>
+<br>
+Email Id :
+<input type="email" name="emailId"></input>
+<br>
+WebSite :
+<input type="url" name="website"></input>
+<br>
+<input type="submit" onclick = "formSubmit()"/>
+</form>
+</body>
+</html>

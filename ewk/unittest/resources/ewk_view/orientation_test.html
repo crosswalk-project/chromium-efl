@@ -1,0 +1,19 @@
+<html>
+    <head>
+        <title>Orientation Test</title>
+        <script type="text/javascript">
+            function onLoad() { 
+              window.addEventListener("orientationchange", updateOrientation);
+            } 
+
+            function updateOrientation()
+            {
+              console.log(window.orientation);
+              alert(window.orientation);
+            }
+        </script>
+    </head>
+    <body onload="onLoad();">
+    <h1>Orientation Test Page</h1>
+    </body>
+</html>

@@ -1,0 +1,23 @@
+<html>
+<head>
+<title>No reply yet</title>
+</head>
+<body>
+<script>
+
+function successCB(amount)
+{
+  console.debug("success");
+  document.title = "" + amount
+}
+
+function errorCB(e)
+{
+  console.debug("error");
+  document.title = "" + e
+}
+navigator.webkitPersistentStorage.requestQuota(10000, successCB, errorCB);
+
+</script>
+</body>
+</html>

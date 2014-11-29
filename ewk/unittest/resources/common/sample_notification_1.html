@@ -1,0 +1,33 @@
+<html>
+<head>
+<title>EWK Notifications</title>
+</head>
+<body onload="testNotifications()">
+
+<h1>Sample Page</h1>
+
+<p id="notificationTest">This is a sample page to test EWK Notification APIs.</p>
+
+<script type="text/javascript">
+	
+function testNotifications()
+{
+    if (window.webkitNotifications.checkPermission() == 0)
+    {
+        var icon  = 'logo.png';
+        var title = 'Notification Title';
+        var body   = 'Notification body content';
+
+        var notification_test = window.webkitNotifications.createNotification(icon, title, body);
+        notification_test.show();
+    }
+    else
+    {
+        window.webkitNotifications.requestPermission(testNotifications);
+    }
+}
+
+</script>
+
+</body>
+</html>

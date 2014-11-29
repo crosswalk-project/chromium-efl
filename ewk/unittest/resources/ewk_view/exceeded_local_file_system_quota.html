@@ -1,0 +1,43 @@
+<html>
+  <head>
+  <script>
+    window.requestFileSystem = window.requestFileSystem || window.webkitRequestFileSystem;
+    var stringTable = "c";
+    var limit = 1024 * 1024 * 32
+    while(stringTable.length < limit)
+        stringTable = stringTable.concat(stringTable)
+
+    function perform(iteration) {
+        document.title = "";
+        function errorHandler(e) {
+            document.title = "FAIL";
+        }
+
+        function onFsInit(fs) {
+            function onFileWriter(fileWriter) {
+                fileWriter.onwrite = function(e) {
+                    document.title = "OK";
+                    perform(++iteration)
+                }
+
+                fileWriter.onerror = errorHandler
+
+                var blobObject = new Blob([stringTable], {type : 'text/plain'});
+
+                fileWriter.write(blobObject);
+            }
+
+            fs.root.getFile('local_file_system_sample' + iteration + '.txt', {create: true}, function(fileEntry) {
+                fileEntry.createWriter(onFileWriter, errorHandler)
+            }, errorHandler);
+        }
+
+        window.requestFileSystem(window.PERSISTENT, 10, onFsInit, errorHandler)
+    }
+  </script>
+  </head>
+  <body onload="perform(0)">
+    <h2>Sample for ewk_view_exceeded_local_file_system_quota* apis</h2>
+  </body>
+</html>
+

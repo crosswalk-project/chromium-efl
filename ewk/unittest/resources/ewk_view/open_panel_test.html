@@ -1,0 +1,24 @@
+<html>
+    <head>
+        <script language="javascript">
+        function perform() {
+            var file_chooser = document.getElementById("file_chooser");
+            file_chooser.click();
+        }
+        </script>
+        <style>
+        #clickable_area {
+            position: absolute;
+            top: 0px;
+            left: 0px;
+            width: 1000px;
+            height: 1000px;
+            background: #F00;
+        };
+        </style>
+    </head>
+    <body>
+        <input id="file_chooser" type="file"/>
+        <div id="clickable_area" onclick="perform()" />
+    </body>
+</html>

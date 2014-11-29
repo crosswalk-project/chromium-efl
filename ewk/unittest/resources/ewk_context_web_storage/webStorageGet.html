@@ -1,0 +1,18 @@
+<html>
+<head>
+<script>
+function titleChanged() {
+  // Retrieve item "StorageTest" value and set document title
+  if (localStorage.getItem("StorageTest") == null) {
+        document.title = "EMPTY";
+  } else {
+        document.title=localStorage.getItem("StorageTest");
+  }
+}
+</script>
+</head>
+<body onload="titleChanged();">
+
+</body>
+</html>
+

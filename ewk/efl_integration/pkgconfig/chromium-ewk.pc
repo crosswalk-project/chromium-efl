@@ -1,0 +1,11 @@
+prefix=/usr
+exec_prefix=${prefix}
+libdir=${prefix}/lib
+includedir=${prefix}/include
+
+Name: chromium-ewk
+Description: EWK API based on chromium-efl engine
+Version: 34.1847.76.35-1
+Requires: chromium-efl
+Libs: -L${libdir} -lchromium-ewk
+Cflags: -I${includedir}/chromium-ewk

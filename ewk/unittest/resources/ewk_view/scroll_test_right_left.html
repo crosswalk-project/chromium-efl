@@ -1,0 +1,48 @@
+<!--
+This test file is common file and can be used for testing EWK Edge and Scroll notifications
+-->
+<head>
+<title>Test file</title>
+<script>
+var i = 0;
+function pageScroll1() {
+i++;
+window.scrollBy(50,0);
+if (i==3)
+pageScroll2();
+else
+setTimeout('pageScroll1()',500);
+}
+function pageScroll2() {
+window.scrollBy(-50,0);
+setTimeout('pageScroll2()',500);
+}
+</script>
+</head>
+<body onload="pageScroll1();">
+<div id="bodyDiv" style="solid black;background-color:lightblue;"></div>
+<h1>Sample HTML</h1>
+<p>This is sample html page to be used for testing Edge and Scroll Notifications.</p>
+<span style="white-space:nowrap;">
+SCROLL SCROLL SCROLL SCROLL SCROLL SCROLL SCROLL SCROLL SCROLL SCROLLSCROLL SCROLL SCROLL SCROLL SCROLL SCROLL SCROLL SCROLLSCROLL SCROLL SCROLL SCROLL SCROLL
+</span>
+<br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br>
+<br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br>
+<br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br>
+<br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br>
+<br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br>
+<br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br>
+<br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br>
+<br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br>
+<div id="middle">Middle</div>
+<br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br>
+<br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br>
+<br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br>
+<br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br>
+<br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br>
+<br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br>
+<br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br>
+<br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br>
+Bottom
+</body>
+</html>

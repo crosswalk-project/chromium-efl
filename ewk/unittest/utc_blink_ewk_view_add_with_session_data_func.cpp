@@ -1,0 +1,124 @@
+/*
+ * chromium EFL
+ *
+ * Copyright (c) 2014 Samsung Electronics Co., Ltd.
+ *
+ * This library is free software; you can redistribute it and/or modify it under
+ * the terms of the GNU Lesser General Public License as published by the
+ * Free Software Foundation; either version 2.1 of the License, or (at your option)
+ * any later version.
+ *
+ * This library is distributed in the hope that it will be useful, but WITHOUT ANY
+ * WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public
+ * License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public License
+ * along with this library; if not, write to the Free Software Foundation, Inc., 51
+ * Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
+ *
+ */
+
+#include "utc_blink_ewk_base.h"
+
+class utc_blink_ewk_view_add_with_session_data_func : public utc_blink_ewk_base
+{
+protected:
+  std::string firstPage;
+  std::string testUrl;
+  std::string lastPage;
+
+  const char *sessionData;
+  Evas_Object *otherWebview;
+
+  void PreSetUp()
+  {
+    firstPage = GetResourceUrl("common/sample.html");
+    testUrl   = GetResourceUrl("common/sample_1.html");
+    lastPage  = GetResourceUrl("common/sample_2.html");
+
+    otherWebview = NULL;
+    sessionData = NULL;
+  }
+
+  void LoadFinished(Evas_Object*)
+  {
+    EventLoopStop(Success);
+  }
+
+  void PostTearDown()
+  {
+    if (otherWebview)
+      evas_object_del(otherWebview);
+    if (sessionData)
+    free(const_cast<char *>(sessionData));
+  }
+};
+
+
+/**
+ * @brief Tests if returns valid webview when called with correct Evas object.
+ */
+TEST_F(utc_blink_ewk_view_add_with_session_data_func, POS_TEST)
+{
+  ewk_view_url_set(GetEwkWebView(), firstPage.c_str());
+  ASSERT_EQ(EventLoopStart(), Success);
+  ewk_view_url_set(GetEwkWebView(), testUrl.c_str());
+  ASSERT_EQ(EventLoopStart(), Success);
+  ewk_view_url_set(GetEwkWebView(), lastPage.c_str());
+  ASSERT_EQ(EventLoopStart(), Success);
+  ewk_view_back(GetEwkWebView());
+  ASSERT_EQ(EventLoopStart(), Success);
+
+  ASSERT_TRUE(ewk_view_forward_possible(GetEwkWebView()) && "before");
+  ASSERT_TRUE(ewk_view_back_possible(GetEwkWebView()) && "before");
+
+  unsigned length = 0;
+  ewk_view_session_data_get(GetEwkWebView(), &sessionData, &length);
+
+  ASSERT_TRUE(sessionData);
+  ASSERT_NE(length, 0);
+
+  otherWebview = ewk_view_add_with_session_data(GetEwkEvas(), sessionData, length);
+  ASSERT_TRUE(otherWebview);
+
+  ASSERT_STREQ(testUrl.c_str(), ewk_view_url_get(otherWebview));
+  ASSERT_TRUE(ewk_view_forward_possible(otherWebview) && "after");
+  ASSERT_TRUE(ewk_view_back_possible(otherWebview) && "after");
+}
+
+/**
+ * @brief Tests if returns NULL when called with NULL Evas object.
+ */
+TEST_F(utc_blink_ewk_view_add_with_session_data_func, NEG_TEST_NULL_EVAS)
+{
+  ewk_view_url_set(GetEwkWebView(), firstPage.c_str());
+  ASSERT_EQ(EventLoopStart(), Success);
+
+  const char *data;
+  unsigned length;
+  ewk_view_session_data_get(GetEwkWebView(), &data, &length);
+
+  ewk_view_add_with_session_data(NULL, data, length);
+}
+
+/**
+ * @brief Tests if returns NULL when called with NULL data.
+ */
+TEST_F(utc_blink_ewk_view_add_with_session_data_func, NEG_TEST_NULL_DATA)
+{
+  const char *data = NULL;
+  unsigned length = 0;
+  ASSERT_FALSE(ewk_view_add_with_session_data(GetEwkEvas(), data, length));
+}
+
+/**
+ * @brief Tests if returns NULL when called with invalid data.
+ */
+TEST_F(utc_blink_ewk_view_add_with_session_data_func, NEG_TEST_INVALID_DATA)
+{
+  const char data[] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+  unsigned length = sizeof(data) / sizeof(data[0]);
+
+  ASSERT_FALSE(ewk_view_add_with_session_data(GetEwkEvas(), data, length));
+}

@@ -1,0 +1,34 @@
+<html>
+  <head>
+    <title>Sample for ewk_context_local_file_system_* apis</title>
+  </head>
+  <script>
+      window.requestFileSystem  = window.requestFileSystem || window.webkitRequestFileSystem;
+
+      function errorHandler(e) {
+          document.title = "file_not_found";
+      }
+
+      function onFsInit(fs) {
+          fs.root.getFile('./local_file_system_sample.txt', {create: false}, function(fileEntry) {
+              fileEntry.file(function(file) {
+                  var reader = new FileReader();
+
+                  reader.onloadend = function(e) {
+                      document.title = this.result;
+                  };
+
+                  reader.readAsText(file);
+              }, errorHandler);
+
+          }, errorHandler);
+      }
+
+      function f(){
+          window.requestFileSystem(TEMPORARY, 1024*1024, onFsInit, errorHandler);
+      }
+  </script>
+  <body onload="f();">
+    <h2>Sample for ewk_context_local_file_system_* apis</h2>
+  </body>
+</html>

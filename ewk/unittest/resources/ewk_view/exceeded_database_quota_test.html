@@ -1,0 +1,19 @@
+<html>
+  <head>
+    <script>
+      function createDb() {
+          var time = (new Date()).getTime();
+          db = openDatabase('test_db' + time, '1.0', 'test database', 6 * 1024 * 1024);
+          if (db) {
+              document.title = 'Test';
+          }
+          db.transaction(function(tx) {
+              tx.executeSql('CREATE TABLE tbl(id INTEGER)');
+              tx.executeSql('INSERT INTO tbl(id) VALUES(1)');
+          });
+      }
+    </script>
+  </head>
+  <body onload="createDb()">
+  </body>
+</html>
