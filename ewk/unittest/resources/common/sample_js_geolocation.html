@@ -1,0 +1,46 @@
+<html>
+<head>
+<title>EWK Geolocation NORESULT</title>
+</head>
+<body onload="testGeolocation()">
+
+<h1>EWK Geolocation Sample</h1>
+<p>Website created to ewk_geolocation_permission_request_suspend method test purpose</p>
+
+<script type="text/javascript">
+// Geolocation successCallback
+function successCallback(position) {
+    document.title = "EWK Geolocation SUCCESS";
+}
+
+// Geolocation errorCallback
+function errorCallback(error) {
+    switch (error.code) {
+        case error.PERMISSION_DENIED:
+        document.title = "EWK Geolocation PERMISSION_DENIED";
+        break;
+    case error.POSITION_UNAVAILABLE:
+        document.title = "EWK Geolocation POSITION_UNAVAILABLE";
+        break;
+    case error.TIMEOUT:
+        document.title = "EWK Geolocation TIMEOUT";
+        break;
+    default:
+        document.title = "EWK Geolocation UNKNOWN_ERROR";
+        break;
+    }
+}
+
+// Get current geolocation position
+function testGeolocation()
+{
+    if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition(successCallback, errorCallback);
+    } else {
+        document.title = "EWK Geolocation UNRESOLVED";
+    }
+}
+</script>
+
+</body>
+</html>

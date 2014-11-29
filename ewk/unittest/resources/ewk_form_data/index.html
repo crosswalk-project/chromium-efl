@@ -1,0 +1,18 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<title>Form Submit Test Page</title>
+<body onload ="myfunc()">
+<h1>Form Submit Test Page</h1>
+<form name="input" action="http://www.webkit.org" method="get" id="foo">
+Username: <input type="text" name="user" />
+<input type="submit" value="Submit" />
+</form>
+<script type="text/javascript">
+function myfunc() {
+var frm=document.getElementById("foo");
+frm.submit();
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,15 @@
+<html>
+    <head>
+        <meta http-equiv="pragma" content="no-cache">
+        <title>PASS</title>
+    </head>
+    <script type="text/javascript">
+        function tryExec(){
+            document.title = "FAIL";
+        }
+    </script>
+    <body onload="tryExec();">
+        <h1>Content Security Policy test</h1>
+        <p>Title text content should be set to 'PASS' if csp works.</p>
+    </body>
+</html>

@@ -1,0 +1,13 @@
+<html>
+ <head>
+  <script>
+    function noti() {
+      window.webkitNotifications.requestPermission();
+      console.log("Notifications are supported!1");
+    }
+  </script>
+ </head>
+<body>
+  <input type="button" value="Open Window" onclick="noti()">
+</body>
+</html>

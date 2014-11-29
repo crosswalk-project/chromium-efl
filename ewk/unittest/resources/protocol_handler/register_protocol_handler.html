@@ -1,0 +1,13 @@
+<html>
+<head>
+  <script>
+    window.onload = function() {
+      navigator.registerProtocolHandler("mailto",
+                                        "file:///opt/usr/resources/protocol_handler/handler.html?url=%s",
+                                        "EFL-Mail");
+    }
+  </script>
+</head>
+<body>
+register protocol handler
+</body>

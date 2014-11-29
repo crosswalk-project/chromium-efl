@@ -1,0 +1,17 @@
+<html>
+    <head>
+        <title>FullScreen</title>
+    </head>
+    <body>
+    <video controls id="video">
+      <source src="http://www.youtube.com/watch?v=2SKx3sh4RzA"></source>
+    </video>    </body>
+    <script>
+    console.debug("Normal->maximize");
+    var elem = document.getElementById("video");
+    if (elem.requestFullscreen) {
+      elem.requestFullscreen();
+    }
+    console.debug("normal->Maximize");
+    </script>
+</html>
