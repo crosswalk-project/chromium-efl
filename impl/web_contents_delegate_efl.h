@@ -127,7 +127,10 @@ class WebContentsDelegateEfl
   virtual void DidStartLoading(RenderViewHost* render_view_host) override;
   virtual void DidUpdateFaviconURL(const std::vector<FaviconURL>& candidates) override;
   virtual void DidDownloadFavicon(bool success, const GURL& icon_url, const SkBitmap& bitmap);
-
+#if defined(XWALK_EFL)
+  void LoadURL(const GURL& url);
+  content::RenderProcessHost* GetRenderProcessHost();
+#endif
   void OnFormSubmit(const GURL&);
   void SetContentSecurityPolicy(const std::string& policy, tizen_webview::ContentSecurityPolicyType header_type);
   void ShowPopupMenu(const gfx::Rect& rect, blink::TextDirection textDirection, double pageScaleFactor, const std::vector<MenuItem>& items, int data, int selectedIndex, bool multiple);

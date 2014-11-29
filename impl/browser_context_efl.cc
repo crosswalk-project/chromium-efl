@@ -13,6 +13,10 @@
 #include "content/public/browser/web_contents.h"
 #include "eweb_context.h"
 
+#if defined(XWALK_EFL)
+#include "xwalk_runner_efl.h"
+#endif
+
 namespace content {
 
 BrowserContextEfl::ResourceContextEfl::ResourceContextEfl(BrowserContextEfl *ctx)
@@ -55,6 +59,11 @@ BrowserContextEfl::BrowserContextEfl(EWebContext* web_context, bool incognito)
     temp_dir_creation_attempted_(false),
     incognito_(incognito) {
   InitVisitedLinkMaster();
+
+#if defined(XWALK_EFL)
+  DCHECK(xwalk::XWalkRunnerEfl::GetInstance());
+  xwalk::XWalkRunnerEfl::GetInstance()->SetBrowserContext(this);
+#endif // XWALK_EFL
 }
 
 net::URLRequestContextGetter* BrowserContextEfl::GetRequestContext() {
@@ -171,5 +180,26 @@ SSLHostStateDelegate* BrowserContextEfl::GetSSLHostStateDelegate() {
   // not remembering certificate decisions at all.
   return NULL;
 }
+
+#if defined(XWALK_EFL)
+xwalk::RuntimeURLRequestContextGetter* BrowserContextEfl::GetURLRequestContextGetterById(
+  const std::string& pkg_id) {
+#warning "FIXME:Inherrit RuntimeURLRequestContextGetter for EFL";
+  return reinterpret_cast<xwalk::RuntimeURLRequestContextGetter*>(request_context_getter_.get());
+}
+
+net::URLRequestContextGetter* BrowserContextEfl::CreateRequestContextForStoragePartition(
+    const base::FilePath& partition_path, bool in_memory,
+    content::ProtocolHandlerMap* protocol_handlers,
+    content::URLRequestInterceptorScopedVector request_interceptors) {
+  return request_context_getter_.get();
+}
+
+void BrowserContextEfl::InitWhileIOAllowed() {
+  // TODO: Check, if we need to implement this?
+  // Check: xwalk/runtime/browser/xwalk_browser_context.h
+  NOTIMPLEMENTED();
+}
+#endif // XWALK_EFL
 
 }

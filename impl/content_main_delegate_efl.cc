@@ -47,7 +47,12 @@ void ContentMainDelegateEfl::PreSandboxStartup() {
 }
 
 ContentBrowserClient* ContentMainDelegateEfl::CreateContentBrowserClient() {
+#if defined(XWALK_EFL)
+  runner_efl_ = xwalk::XWalkRunner::Create();
+  client_.reset(runner_efl_->GetContentBrowserClient());
+#else
   client_.reset(new ContentBrowserClientEfl);
+#endif
   return client_.get();
 }
 

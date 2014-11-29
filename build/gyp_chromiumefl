@@ -18,7 +18,7 @@ if not os.path.isdir(script_dir):
   print script_dir + " is not a valid directory"
   sys.exit(1)
 root_dir = top_dir
-impl_dir = impl_dir = os.path.join(top_dir, 'impl')
+impl_dir = os.path.join(top_dir, 'impl')
 
 sys.path.insert(0, script_dir)
 import gyp_helper
@@ -57,6 +57,17 @@ sys.path.insert(1, os.path.join(chrome_src, 'third_party', 'WebKit',
     'Source', 'build', 'scripts'))
 sys.path.insert(1, os.path.join(chrome_src, 'chrome', 'tools', 'build'))
 
+build_target = os.environ.get('BUILD_TARGET')
+if 'xwalk' in build_target:
+  sys.path.insert(1, os.path.join(chrome_src, 'tools'))
+  sys.path.insert(1, os.path.join(chrome_src, 'chromecast', 'tools', 'build'))
+  sys.path.insert(1, os.path.join(chrome_src, 'native_client', 'build'))
+  sys.path.insert(1, os.path.join(chrome_src, 'native_client_sdk', 'src',
+    'build_tools'))
+  sys.path.insert(1, os.path.join(chrome_src, 'remoting', 'tools', 'build'))
+  sys.path.insert(1, os.path.join(chrome_src, 'third_party', 'liblouis'))
+
+
 import repack_locales
 
 def additional_include_files(args=[]):
@@ -82,7 +93,11 @@ def additional_include_files(args=[]):
   AddInclude(os.path.join(script_dir, 'common.gypi'))
 
   # Used for additional build tweaks such as file exclusions
-  AddInclude(os.path.join(top_dir, 'impl', 'chromium-efl.gypi'))
+  AddInclude(os.path.join(impl_dir, 'chromium-efl.gypi'))
+
+  if 'xwalk' in build_target:
+    xwalk_dir_ = os.path.abspath(os.path.join(chrome_src, 'xwalk'))
+    AddInclude(os.path.join(xwalk_dir_, 'build', 'common.gypi'))
 
   # Optionally add supplemental .gypi files if present.
   supplements = glob.glob(os.path.join(chrome_src, '*', 'supplement.gypi'))

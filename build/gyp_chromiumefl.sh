@@ -47,6 +47,16 @@ COMMON_GYP_PARAMETERS="--depth=${SRCDIR}
                       -Duse_aura=1
                       "
 
+if [ "${BUILD_TARGET}" == "chromium-efl" ]; then
+  CHROMIUM_GYP_FILE="${TOPDIR}/ewk/chromium-ewk.gyp"
+  ADDITIONAL_GYP_PARAMETERS+="-Dxwalk_efl=0
+                             "
+elif [ "${BUILD_TARGET}" == "xwalk" ]; then
+  CHROMIUM_GYP_FILE="${SRCDIR}/xwalk/xwalk.gyp"
+  ADDITIONAL_GYP_PARAMETERS+="-Dxwalk_efl=1
+                             "
+fi
+
 if [ "$target" == "desktop" ]; then
   ADDITIONAL_GYP_PARAMETERS+="-Dbuilding_for_tizen=0
                               -Dbuilding_for_tizen_mobile=0
@@ -110,7 +120,7 @@ ${TOPDIR}/build/gyp_chromiumefl \
                                  $SYSTEM_DEPS \
                                  $ADDITIONAL_GYP_PARAMETERS \
                                  $@ \
-                                 ${TOPDIR}/ewk/chromium-ewk.gyp
+                                 ${CHROMIUM_GYP_FILE}
 
 ret=$?
 

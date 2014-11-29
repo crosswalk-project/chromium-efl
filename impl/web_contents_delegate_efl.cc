@@ -45,6 +45,10 @@ using autofill::AutofillManager;
 using autofill::AutofillManagerDelegateEfl;
 #endif
 
+#if defined(XWALK_EFL)
+#include "xwalk_runner_efl.h"
+#endif
+
 using base::string16;
 using namespace tizen_webview;
 using namespace ui;
@@ -79,6 +83,11 @@ WebContentsDelegateEfl::WebContentsDelegateEfl(EWebView* view)
     autofill_manager, EWebView::GetPlatformLocale(), AutofillManager::DISABLE_AUTOFILL_DOWNLOAD_MANAGER);
   PasswordManagerClientEfl::CreateForWebContents(&web_contents_);
 #endif
+
+#if defined(XWALK_EFL)
+  DCHECK(xwalk::XWalkRunnerEfl::GetInstance());
+  xwalk::XWalkRunnerEfl::GetInstance()->SetDelegate(this);
+#endif // XWALK_EFL
 }
 
 WebContentsDelegateEfl::~WebContentsDelegateEfl() {
@@ -607,4 +616,19 @@ void WebContentsDelegateEfl::OpenDateTimeDialog(
   }
   web_view_->InputPickerShow(static_cast<tizen_webview::Input_Type>(inputPickerType), inputMethodHints.c_str());
 }
+
+#if defined(XWALK_EFL)
+void WebContentsDelegateEfl::LoadURL(const GURL& url) {
+    content::NavigationController::LoadURLParams params(url);
+    params.transition_type = ui::PageTransitionFromInt(
+        ui::PAGE_TRANSITION_TYPED |
+        ui::PAGE_TRANSITION_FROM_ADDRESS_BAR);
+    web_contents_.GetController().LoadURLWithParams(params);
+    web_contents_.Focus();
+}
+
+content::RenderProcessHost* WebContentsDelegateEfl::GetRenderProcessHost() {
+    return web_contents_.GetRenderProcessHost();
+}
+#endif
 } //namespace content

@@ -11,6 +11,10 @@
 #include "content/public/browser/content_browser_client.h"
 #include "common/content_client_efl.h"
 
+#if defined(XWALK_EFL)
+#include "xwalk_runner_efl.h"
+#endif
+
 class EWebContext;
 
 namespace content {
@@ -29,6 +33,9 @@ class ContentMainDelegateEfl
   virtual ContentBrowserClient* CreateContentBrowserClient() override;
 
  private:
+#if defined(XWALK_EFL)
+  scoped_ptr<xwalk::XWalkRunner> runner_efl_;
+#endif
   scoped_ptr<ContentBrowserClient> client_;
   ContentClientEfl content_client_;
   DISALLOW_COPY_AND_ASSIGN(ContentMainDelegateEfl);

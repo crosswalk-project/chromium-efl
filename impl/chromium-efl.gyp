@@ -6,6 +6,11 @@
     'locale_dir%': '/usr/share/chromium-efl/locale/',
     'webdb_dir%': '/usr/share/chromium-efl/db/',
     'edje_compiler%': 'edje_cc',
+    'conditions': [
+      ['xwalk_efl==1', {
+        'disable_nacl': 1,
+      }],
+    ],
   },
   'target_defaults': {
     'conditions': [
@@ -381,6 +386,20 @@
     'conditions': [
       ['building_for_tizen==1', {
         'dependencies': [ 'chromium-efl-deps.gyp:tizen' ],
+      }],
+      ['xwalk_efl==1', {
+        'includes': [
+          '../../xwalk/xwalk_runtime_features.gypi',
+        ],
+        'dependencies': [
+          '<(chrome_src_dir)/xwalk/xwalk.gyp:xwalk_application_lib',
+          '<(chrome_src_dir)/xwalk/extensions/extensions.gyp:xwalk_extensions',
+          '<(chrome_src_dir)/xwalk/sysapps/sysapps.gyp:sysapps',
+        ],
+        'sources': [
+          'xwalk_runner_efl.cc',
+          'xwalk_runner_efl.h',
+        ],
       }],
       ['ewk_bringup==1', {
         'defines': [ 'EWK_BRINGUP=1' ],

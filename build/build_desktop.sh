@@ -9,6 +9,7 @@ source ${SCRIPTDIR}/common.sh
 host_arch=$(getHostArch)
 
 export GYP_GENERATOR_OUTPUT=${SRCDIR}/"out.${host_arch}"
+export BUILD_TARGET="chromium-efl"
 
 usage() {
 cat << EOF
@@ -84,6 +85,10 @@ if echo "$@" | grep -cq '\-\-debug'; then
   BUILD_SUBDIRECTORY=Debug
 fi
 
+if echo "$@" | grep -cq '\-\-xwalk'; then
+  export BUILD_TARGET="xwalk"
+fi
+
 # Will be empty string if -j not specified or ill-formatted, otherwise -j and the number argument together.
 # \grep because folks often alias grep but we want the vanilla behavior.
 JOBS=$(echo "$@" | \grep -Eo '\-j\s*[1-9]([0-9]*)')
@@ -121,6 +126,10 @@ if [ "$SKIP_NINJA" == "0" ]; then
   export PATH="${JHBUILD_DEPS}/bin:$PATH"
 
   TARGETS="chromium-efl efl_webprocess chromium-ewk efl_webview_app"
+
+  if [ "${BUILD_TARGET}" == "xwalk" ]; then
+    TARGETS="$TARGETS xwalk"
+  fi
   if [ "$BUILD_EWK_UNITTESTS" == "1" ]; then
     TARGETS = "$TARGETS ewk_unittests"
   fi

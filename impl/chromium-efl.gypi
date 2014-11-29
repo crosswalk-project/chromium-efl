@@ -80,6 +80,11 @@
           'OS_TIZEN_TV=1'
         ],
       }],
+      ['xwalk_efl==1', {
+       'defines': [
+          'XWALK_EFL=1'
+        ],
+      }],
       ['host_arch=="arm"', {
         'target_conditions': [
           ['_toolset=="host"', {

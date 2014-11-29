@@ -20,13 +20,21 @@
 #include "browser/download_manager_delegate_efl.h"
 #include "net/url_request/url_request_context.h"
 
+#if defined(XWALK_EFL)
+#include "xwalk/runtime/browser/xwalk_browser_context.h"
+#endif
+
 class EWebContext;
 
 namespace content {
 
 class BrowserContextEfl
-  : public BrowserContext,
-    public visitedlink::VisitedLinkDelegate {
+#if defined(XWALK_EFL)
+  : public xwalk::XWalkBrowserContext
+#else
+  : public BrowserContext
+#endif
+  , public visitedlink::VisitedLinkDelegate {
  public:
   BrowserContextEfl(EWebContext*, bool incognito = false);
   ~BrowserContextEfl();
@@ -66,6 +74,17 @@ class BrowserContextEfl
 
   virtual PushMessagingService* GetPushMessagingService() override
   { return 0; }
+
+#if defined(XWALK_EFL)
+  virtual xwalk::RuntimeURLRequestContextGetter* GetURLRequestContextGetterById(
+      const std::string& pkg_id) override;
+  virtual net::URLRequestContextGetter* CreateRequestContextForStoragePartition(
+      const base::FilePath& partition_path,
+      bool in_memory,
+      content::ProtocolHandlerMap* protocol_handlers,
+      content::URLRequestInterceptorScopedVector request_interceptors) override;
+  virtual void InitWhileIOAllowed() override;
+#endif // XWALK_EFL
 
   virtual base::FilePath GetPath() const override;
 
