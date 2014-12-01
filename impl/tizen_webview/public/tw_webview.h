@@ -134,6 +134,7 @@ class WebView {
   void GetScrollSize(int* w, int* h); // TODO: rename to GetPossibleScrollSize
   // > View Orientation
   void SendOrientationChangeEventIfNeeded(int orientation);
+  void SetOrientation(int orientation);
   void SetOrientationLockCallback(Orientation_Lock_Cb func, void* data);
   // > View mode
   void SetViewMode(tizen_webview::View_Mode view_mode);

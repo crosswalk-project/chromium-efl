@@ -79,6 +79,8 @@ namespace content {
 
 namespace {
 
+int screen_orientation_ = 0;
+
 inline void SetDefaultStringIfNull(const char*& variable,
                                    const char* default_string) {
   if (!variable) {
@@ -537,6 +539,19 @@ void EWebView::SendOrientationChangeEventIfNeeded(int orientation) {
     }
   }
 #endif
+}
+
+void EWebView::SetOrientation(int orientation) {
+  // For backward compatibility, a value in range of [0, 360] is used
+  // instead of [-90, 180] because the class gfx::Display, containing
+  // orientaion value, supports the former range.
+  if (orientation == -90)
+    orientation = 270;
+  screen_orientation_ = orientation;
+}
+
+int EWebView::GetOrientation() {
+  return screen_orientation_;
 }
 
 void EWebView::SetOrientationLockCallback(tizen_webview::Orientation_Lock_Cb func, void* data) {

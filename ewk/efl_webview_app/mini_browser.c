@@ -552,14 +552,14 @@ static void __br_rotate_cb(void *data, Evas_Object *obj, void *event)
   int main_window_width  = 0, main_window_height = 0;
   get_main_window_size(&changed_ang, &main_window_width, &main_window_height);
 
-  evas_object_resize(ad->webview, main_window_width, main_window_height - TOOL_BOX_HEIGHT);
-  evas_object_resize(ad->tool_box, main_window_width, TOOL_BOX_HEIGHT);
-  evas_object_move(ad->tool_box, 0, main_window_height - TOOL_BOX_HEIGHT);
-
   // ewk_view_orientation_send expects angles: 0, 90, -90, 180.
   if (changed_ang == 270)
     changed_ang = -90;
   ewk_view_orientation_send(ad->webview, changed_ang);
+
+  evas_object_resize(ad->webview, main_window_width, main_window_height - TOOL_BOX_HEIGHT);
+  evas_object_resize(ad->tool_box, main_window_width, TOOL_BOX_HEIGHT);
+  evas_object_move(ad->tool_box, 0, main_window_height - TOOL_BOX_HEIGHT);
 }
 
 static void _register_rotate_callback(Evas_Object *main_window, void *user_data)

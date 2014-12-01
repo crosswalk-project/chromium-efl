@@ -78,6 +78,7 @@ void RenderWidgetHostViewBase::GetDefaultScreenInfo(blink::WebScreenInfo* result
   results->rect = display.bounds();
   results->availableRect = display.work_area();
   results->deviceScaleFactor = display.device_scale_factor();
+  results->orientationAngle = display.rotation();
   // TODO(derat|oshima): Don't hardcode this. Get this from display object.
   results->depth = 24;
   results->depthPerComponent = 8;
@@ -1007,11 +1008,16 @@ void RenderWidgetHostViewEfl::GetScreenInfo(
     return;
 
   const gfx::Display display = screen->GetPrimaryDisplay();
+#if defined(OS_TIZEN_MOBILE)
+  results->rect = GetBoundsInRootWindow();
+#else
   results->rect = display.bounds();
+#endif
   results->availableRect = display.work_area();
 
   device_scale_factor_ = display.device_scale_factor();
   results->deviceScaleFactor = device_scale_factor_;
+  results->orientationAngle = display.rotation();
 
   // TODO(derat|oshima): Don't hardcode this. Get this from display object.
   results->depth = 24;
@@ -1053,7 +1059,8 @@ void RenderWidgetHostViewEfl::HandleHide() {
 }
 
 void RenderWidgetHostViewEfl::HandleResize(int width, int height) {
-// Have to use  UpdateScreenInfo(GetNativeView()); when real native surface is used.
+  // Have to use UpdateScreenInfo(GetNativeView()); when real native surface is used.
+  UpdateScreenInfo(GetNativeView());
   host_->WasResized();
 }
 

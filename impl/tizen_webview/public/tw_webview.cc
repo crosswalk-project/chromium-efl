@@ -285,6 +285,10 @@ void WebView::SendOrientationChangeEventIfNeeded(int orientation) {
   return impl_->SendOrientationChangeEventIfNeeded(orientation);
 }
 
+void WebView::SetOrientation(int orientation) {
+  return impl_->SetOrientation(orientation);
+}
+
 void WebView::SetOrientationLockCallback(Orientation_Lock_Cb func, void* data) {
   return impl_->SetOrientationLockCallback(func, data);
 }

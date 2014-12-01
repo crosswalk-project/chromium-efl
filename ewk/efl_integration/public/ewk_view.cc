@@ -705,8 +705,7 @@ Eina_Bool ewk_view_popup_menu_multiple_select(Evas_Object* ewkView, Eina_Inarray
 void ewk_view_orientation_send(Evas_Object* ewkView, int orientation)
 {
   EWK_VIEW_IMPL_GET_OR_RETURN(ewkView, impl);
-  //send to webview
-  impl->SendOrientationChangeEventIfNeeded(orientation);
+  impl->SetOrientation(orientation);
 }
 
 void ewk_view_encoding_custom_set(Evas_Object* ewkView, const char* encoding)

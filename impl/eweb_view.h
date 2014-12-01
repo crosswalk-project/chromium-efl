@@ -191,6 +191,8 @@ class WebViewGeolocationPermissionCallback;
 class EWebView {
  public:
   static EWebView* FromEvasObject(Evas_Object* eo);
+  static void SetOrientation(int orientation);
+  static int GetOrientation();
 
   // initialize data members and activate event handlers.
   // call this once after created and before use

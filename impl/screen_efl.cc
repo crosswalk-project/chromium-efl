@@ -3,6 +3,7 @@
 // found in the LICENSE file.
 
 #include "screen_efl.h"
+#include "eweb_view.h"
 
 #include <X11/Xlib.h>
 
@@ -86,6 +87,9 @@ class EflScreen : public gfx::Screen {
 #else
       display.set_device_scale_factor(1.0f);
 #endif
+    // TODO(Youngsoo Choi): If there's a way to get orientation
+    // from platform not using saved value, it would be better.
+    display.SetRotationAsDegree(EWebView::GetOrientation());
 
     return display;
   }
