@@ -15,6 +15,7 @@
 #include "public/ewk_text_style.h"
 #include "public/ewk_cookie_manager.h"
 #include "public/ewk_console_message.h"
+#include "public/ewk_user_media.h"
 
 #include <Ecore.h>
 #include <Ecore_Evas.h>
@@ -100,6 +101,7 @@ static void __auth_challenge_cb(void* data, Evas_Object *obj, void *event_info);
 static void __policy_response_decide_cb(void *data, Evas_Object *obj, void *event_info);
 static void __customize_context_menu_cb(void* data, Evas_Object *obj, void *event_info);
 static void __customize_context_menu_item_selected_cb(void* data, Evas_Object *obj, void *event_info);
+static void __usermedia_permission_request_cb(void *data, Evas_Object *obj, void *event_info);
 static void __navigation_policy_decide_cb(void *data, Evas_Object *obj, void *event_info);
 static void __text_found_cb(void *data, Evas_Object *obj, void *event_info);
 static void __newwindow_policy_cb(void *data, Evas_Object *obj, void* policy);
@@ -454,6 +456,7 @@ int main(int argc, char** argv)
   evas_object_smart_callback_add(view, "load,finished", __load_finished_cb, context);
   evas_object_smart_callback_add(view, "load,error", __load_error_cb, 0);
   evas_object_smart_callback_add(view, "url,changed", __uri_changed_cb,0);
+  evas_object_smart_callback_add(view, "usermedia,permission,request", __usermedia_permission_request_cb, NULL);
   evas_object_smart_callback_add(view, "title,changed", __title_changed_cb,0);
   evas_object_smart_callback_add(view, "load,progress", __load_progress_cb,0);
   evas_object_smart_callback_add(view, "load,progress,started", __load_progress_started_cb,0);
@@ -896,6 +899,16 @@ void __search_unfocused_cb(void *data, Evas_Object *obj, void *event_info)
   Evas_Object* entry = data;
   if (strcmp("", elm_entry_entry_get(entry)) == 0)
     elm_entry_entry_set(entry, "input search text");
+}
+
+// Callback for showing permission request for media request
+void __usermedia_permission_request_cb(void *data, Evas_Object *obj, void *event_info)
+{
+  Ewk_User_Media_Permission_Request* permissionRequest=
+      (Ewk_User_Media_Permission_Request*)event_info;
+  // Simulating the User Pemission request for Allowing the media request.
+  ewk_user_media_permission_request_set(permissionRequest,EINA_TRUE);
+  printf("APP.C __usermedia_permission_request_cb Allowed User Media Request: \n");
 }
 
 void __search_focused_cb(void *data, Evas_Object *obj, void *event_info)
