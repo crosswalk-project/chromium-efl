@@ -156,6 +156,9 @@
       'efl_integration/public/text_encoding_map_efl.cc',
       'efl_integration/public/text_encoding_map_efl.h',
     ],
+    'defines': [
+      'HAVE_ECORE_X=<!(if pkg-config ecore-x; then echo 1; fi)',
+    ],
     'conditions': [
       ['gcc_4_6_x==1', {
         'defines': [

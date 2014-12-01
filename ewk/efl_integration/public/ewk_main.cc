@@ -29,7 +29,7 @@
 #include <Eina.h>
 #include <Evas.h>
 
-#ifdef HAVE_ECORE_X
+#if defined(HAVE_ECORE_X)
 #include <Ecore_X.h>
 #endif
 
@@ -92,7 +92,7 @@ int ewk_init(void)
       goto error_ecore_imf;
   }
 
-#ifdef HAVE_ECORE_X
+#if defined(HAVE_ECORE_X)
   if (!ecore_x_init(0)) {
       CRITICAL("could not init ecore_x.");
       goto error_ecore_x;
@@ -120,12 +120,11 @@ int ewk_init(void)
   return ++_ewkInitCount;
 
 error_edje:
-#ifdef HAVE_ECORE_X
+#if defined(HAVE_ECORE_X)
   ecore_x_shutdown();
 error_ecore_x:
-#else
-  ecore_imf_shutdown();
 #endif
+  ecore_imf_shutdown();
 error_ecore_imf:
   ecore_evas_shutdown();
 error_ecore_evas:
@@ -149,7 +148,7 @@ int ewk_shutdown(void)
   _ewk_shutdown_web_engine();
 
   edje_shutdown();
-#ifdef HAVE_ECORE_X
+#if defined(HAVE_ECORE_X)
   ecore_x_shutdown();
 #endif
   ecore_imf_shutdown();
