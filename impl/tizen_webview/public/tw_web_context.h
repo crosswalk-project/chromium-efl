@@ -116,6 +116,10 @@ struct WebContext : public tizen_webview::RefCounted<WebContext> {
   // Password
   void ClearPasswordData();
 
+  // MemorySampler
+  void StartMemorySampler(double timerInterval) const;
+  void StopMemorySampler() const;
+
   // Set MIME override callback
   static void SetMimeOverrideCallback(Mime_Override_Callback callback);
 
