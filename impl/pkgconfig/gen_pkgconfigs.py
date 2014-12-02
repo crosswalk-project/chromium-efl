@@ -42,9 +42,8 @@ def gen_pkgconfig_file(path, version, defines):
     out.write("Name: chromium-efl\n")
     out.write("Description: Chromium EFL port\n")
     out.write("Version: " + version + "\n\n")
-    out.write("Libs: -L${libdir} -Wl,-rpath-link=${libdir} -lchromium-ewk\n")
-    out.write("Cflags: -I${includedir}/chromium-ewk " + defines + "\n")
-
+    out.write("Libs: -L${libdir} -Wl,-rpath-link=${libdir} -lchromium-efl -lchromium-ewk\n")
+    out.write("Cflags: -I${includedir}/chromium-ewk -I/usr/include/v8 " + defines + "\n")
 
     out.close()
 
