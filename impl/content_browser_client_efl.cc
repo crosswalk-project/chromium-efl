@@ -194,6 +194,19 @@ bool ContentBrowserClientEfl::AllowSetCookie(const GURL& url,
                                         options);
 }
 
+void ContentBrowserClientEfl::OverrideWebkitPrefs(
+    content::RenderViewHost* render_view_host,
+    const GURL& url,
+    content::WebPreferences* prefs) {
+  // TODO(dennis.oh): See http://107.108.218.239/bugzilla/show_bug.cgi?id=9507
+  //                  This pref should be set to false again someday.
+  // This pref is set to true by default
+  // because some content providers such as YouTube use plain http requests
+  // to retrieve media data chunks while running in a https page. This pref
+  // should be disabled once all the content providers are no longer doing that.
+  prefs->allow_running_insecure_content = true;
+}
+
 void ContentBrowserClientEfl::RenderProcessWillLaunch(
     content::RenderProcessHost* host) {
 

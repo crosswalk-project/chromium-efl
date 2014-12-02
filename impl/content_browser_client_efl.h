@@ -81,6 +81,10 @@ class ContentBrowserClientEfl: public ContentBrowserClient {
                               int render_frame_id,
                               net::CookieOptions* options) override;
 
+  virtual void OverrideWebkitPrefs(content::RenderViewHost* render_view_host,
+                                   const GURL& url,
+                                   content::WebPreferences* prefs) override;
+
   virtual void RenderProcessWillLaunch(content::RenderProcessHost* host) override;
 
   content::DevToolsManagerDelegate* GetDevToolsManagerDelegate() override;
