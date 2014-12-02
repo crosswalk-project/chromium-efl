@@ -51,9 +51,6 @@ content::MainFunctionParams CommandLineEfl::GetDefaultPortParams() {
   p_command_line->AppendSwitch(switches::kNoSandbox);
   p_command_line->AppendSwitch(switches::kDisablePlugins);
   p_command_line->AppendSwitch(switches::kInProcessGPU);
-
-  p_command_line->AppendSwitch(switches::kEnableViewportMeta);
-
   p_command_line->AppendSwitchASCII(switches::kUseGL, gfx::kGLImplementationEGLName);
   p_command_line->AppendSwitch(switches::kDisableDelegatedRenderer);
 
@@ -79,6 +76,7 @@ content::MainFunctionParams CommandLineEfl::GetDefaultPortParams() {
 
 #if defined(OS_TIZEN_MOBILE)
   p_command_line->AppendSwitch(switches::kUseMobileUserAgent);
+  p_command_line->AppendSwitch(switches::kEnableViewportMeta);
 #endif
 
 #warning "[M37] Investigae removed command line switches, are they still needed, do they have a replacement?"
