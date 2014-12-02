@@ -227,6 +227,7 @@ install -d "%{buildroot}"%{_sysconfdir}/smack/accesses2.d
 install -d "%{buildroot}"%{_bindir}
 install -d "%{buildroot}"%{_libdir}/pkgconfig
 install -d "%{buildroot}"%{_includedir}/chromium-ewk
+install -d "%{buildroot}"%{_includedir}/v8
 install -d "%{buildroot}%{CHROMIUM_EXE_DIR}"
 install -d "%{buildroot}%{CHROMIUM_DATA_DIR}"/themes
 install -d "%{buildroot}%{CHROMIUM_DATA_DIR}"/locale
@@ -252,6 +253,7 @@ install -m 0755 "%{OUTPUT_FOLDER}"/mini_browser      "%{buildroot}"%{_bindir}
 
 install -m 0644 "%{OUTPUT_FOLDER}"/pkgconfig/*.pc    "%{buildroot}"%{_libdir}/pkgconfig/
 install -m 0644 ewk/efl_integration/public/*.h                  "%{buildroot}"%{_includedir}/chromium-ewk/
+install -m 0644 src/v8/include/*.h "%{buildroot}"%{_includedir}/v8/
 
 install -d "%{buildroot}"/opt/share/packages
 install -m 0644 ewk/efl_webview_app/chromium-efl.xml "%{buildroot}"/opt/share/packages
@@ -330,6 +332,7 @@ fi
 %defattr(-,root,root,-)
 %{_includedir}/chromium-ewk/*.h
 %{_libdir}/pkgconfig/*.pc
+%{_includedir}/v8/*
 
 %if 0%{?_enable_unittests}
 %files unittests
