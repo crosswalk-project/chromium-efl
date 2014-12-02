@@ -63,8 +63,8 @@ TEST_F(utc_blink_cb_unfocus_direction, Unfocus_direction_backward)
 {
   const char htmlDocument[] =
         "<html><body><form>"
-        "<input type='text' id='test1' autofocus\><br\>"
-        "<input type='text' id='test2'\><br\>"
+        "<input type='text' id='test1' autofocus/><br/>"
+        "<input type='text' id='test2'/><br/>"
         "</form></body></html>";
 
   ASSERT_EQ(EINA_TRUE, ewk_view_html_string_load(GetEwkWebView(), htmlDocument, 0, 0));
