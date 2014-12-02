@@ -496,6 +496,14 @@ Evas_Object *EWebContext::AddFaviconObject(const char* uri, Evas* canvas) const 
   return favicon;
 }
 
+void EWebContext::StartMemorySampler(double timerInterval) const {
+  LOG(INFO) << "Memory Sampler deprecated";
+}
+
+void EWebContext::StopMemorySampler() const {
+  LOG(INFO) << "Memory Sampler deprecated";
+}
+
 void EWebContext::ClearCandidateData() {
 #ifdef TIZEN_AUTOFILL_SUPPORT
   WebDataServiceFactory* webDataServiceInstance = WebDataServiceFactory::GetInstance();

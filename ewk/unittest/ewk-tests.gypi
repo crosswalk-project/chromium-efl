@@ -98,6 +98,8 @@
         'utc_blink_ewk_context_icon_database_path_set_func.cpp',
         'utc_blink_ewk_context_local_file_system_all_delete_func.cpp',
         'utc_blink_ewk_context_local_file_system_delete_func.cpp',
+        'utc_blink_ewk_context_memory_sampler_start_func.cpp',
+        'utc_blink_ewk_context_memory_sampler_stop_func.cpp',
         'utc_blink_ewk_context_menu.h',
         'utc_blink_ewk_context_menu_item_append_as_action_func.cpp',
         'utc_blink_ewk_context_menu_item_append_func.cpp',

@@ -209,4 +209,12 @@ void WebContext::ClearPasswordData() {
   impl->ClearPasswordData();
 }
 
+void WebContext::StartMemorySampler(double timerInterval) const {
+  impl->StartMemorySampler(timerInterval);
+}
+
+void WebContext::StopMemorySampler() const {
+  impl->StopMemorySampler();
+}
+
 } // namespace tizen_webview
