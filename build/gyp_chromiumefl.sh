@@ -59,6 +59,8 @@ add_desktop_flags() {
                               -Dclang=${USE_CLANG}
                               -Dmake_clang_dir=${CLANG_DIR}
                               -Dtizen_multimedia_use_capi_for_me=0
+                              -Dwerror=
+                              -Ddisable_fatal_linker_warnings=
                              "
 }
 
