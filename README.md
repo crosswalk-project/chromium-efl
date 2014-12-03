@@ -17,12 +17,13 @@ supposed to be completely source and binary compatible with EFL-WebKit2.
     of the same script in xwalk repository).
  * fetch-deps: actually fetches all depedencies in .gclient-xwalk.
 
-## Precedure
+## Procedure
 
 1. create .gclient file (as below)
+```
 solutions = [
   { "name"        : "src/tizen_src",
-    "url"         : "http://github.com/crosswalk-project/crosswalk-efl.git",
+    "url"         : "http://github.com/crosswalk-project/chromium-efl.git",
     "managed"     : True,
     "custom_hooks": [
       {
@@ -52,7 +53,7 @@ solutions = [
   },
 ]
 cache_dir = None
-
+```
 2. gclient sync
 
 ## Building
@@ -68,4 +69,4 @@ For public headers we follow efl style.
 
 ## License
 
-Crosswalk-efl's code uses the BSD license, see our `LICENSE` file.
+chromium-efl's code uses the BSD license, see our `LICENSE` file.
