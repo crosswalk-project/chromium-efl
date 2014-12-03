@@ -50,6 +50,8 @@ if [ "$target" == "desktop" ]; then
   ADDITIONAL_GYP_PARAMETERS+="-Dbuilding_for_tizen=0
                               -Dbuilding_for_tizen_mobile=0
                               -Dbuilding_for_tizen_tv=0
+                              -Dwerror=
+                              -Ddisable_fatal_linker_warnings=
                              "
 else
   ADDITIONAL_GYP_PARAMETERS+="-Dbuilding_for_tizen=1
