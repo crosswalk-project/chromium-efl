@@ -56,6 +56,8 @@ content::MainFunctionParams CommandLineEfl::GetDefaultPortParams() {
 
   // (prashant.n): New mechanism supports drawing frame to mailbox only.
   p_command_line->AppendSwitch(cc::switches::kCompositeToMailbox);
+  // Enables glFinish call
+  p_command_line->AppendSwitch(switches::kWaitForFrameComplete);
 
 #if defined(OS_TIZEN)
   p_command_line->AppendSwitch(switches::kEnableOverscrollNotifications);
