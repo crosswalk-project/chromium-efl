@@ -36,6 +36,7 @@
 #include "public/ewk_log.h"
 #include "private/webview_delegate_ewk.h"
 #include "private/ewk_private.h"
+#include "private/ewk_main_private.h"
 
 // TODO: remove dependency
 #include <../impl/command_line_efl.h>
@@ -48,6 +49,8 @@ static int _ewkInitCount = 0;
 //private function declaration here
 static void _ewk_init_web_engine(void);
 static void _ewk_shutdown_web_engine(void);
+
+extern std::string g_homeDirectory;
 
 /**
  * \var     _ewk_log_dom
@@ -167,7 +170,10 @@ void ewk_set_arguments(int argc, char** argv)
 
 void ewk_home_directory_set(const char* path)
 {
-  LOG_EWK_API_MOCKUP();
+  if (!path)
+    g_homeDirectory.clear();
+  else
+    g_homeDirectory = path;
 }
 
 /////////////////////////////////////////////////////////////////////////////////////////////

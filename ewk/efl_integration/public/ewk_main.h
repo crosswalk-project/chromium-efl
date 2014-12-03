@@ -59,9 +59,13 @@ EAPI int ewk_shutdown(void);
  */
 EAPI void ewk_set_arguments(int argc, char** argv);
 
-// #if ENABLE(TIZEN_WEBKIT2_SET_HOME_DIRECTORY)
+/**
+* Set home directory.
+*
+* If new path is NULL or empty string, home directory is considered as not set.
+*
+*/
 EAPI void ewk_home_directory_set(const char* path);
-// #endif
 
 #ifdef __cplusplus
 }

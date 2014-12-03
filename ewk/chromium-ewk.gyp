@@ -133,6 +133,8 @@
       'efl_integration/private/ewk_frame_private.h',
       'efl_integration/private/ewk_hit_test_private.h',
       'efl_integration/private/ewk_hit_test_private.cc',
+      'efl_integration/private/ewk_main_private.h',
+      'efl_integration/private/ewk_main_private.cc',
       'efl_integration/private/ewk_notification_private.h',
       'efl_integration/private/ewk_notification_private.cc',
       'efl_integration/private/ewk_policy_decision_private.cc',

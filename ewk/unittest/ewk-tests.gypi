@@ -158,6 +158,8 @@
         'utc_blink_ewk_hit_test_node_value_get_func.cpp',
         'utc_blink_ewk_hit_test_result_context_get_func.cpp',
         'utc_blink_ewk_hit_test_tag_name_get_func.cpp',
+        'utc_blink_ewk_home_directory_get_func.cpp',
+        'utc_blink_ewk_home_directory_set_func.cpp',
         'utc_blink_ewk_notification_body_get_func.cpp',
         'utc_blink_ewk_notification_clicked_func.cpp',
         'utc_blink_ewk_notification_icon_url_get_func.cpp',
