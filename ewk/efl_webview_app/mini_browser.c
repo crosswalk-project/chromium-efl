@@ -104,6 +104,11 @@ typedef struct
   Evas_Object *gobtn;
   Evas_Object *stopbtn;
 
+  Evas_Object *findbtn;
+  Evas_Object *clearbtn;
+  Evas_Object *zoominbtn;
+  Evas_Object *zoomoutbtn;
+
   Evas_Object *bg_tool_box; //background under the toolbox
 
   Evas_Object *progress_bar;
@@ -137,6 +142,15 @@ typedef enum _custom_context_menu_item_tag {
 	CUSTOM_CONTEXT_MENU_ITEM_SEND_EMAIL,
 	CUSTOM_CONTEXT_MENU_ITEM_SEND_ADD_TO_CONTACT,
 } custom_context_menu_item_tag;
+
+static void mini_find_word(const char *word, Eina_Bool forward, Evas_Smart_Cb found_cb, void *data);
+static void find_hit_cb(void *data, Evas_Object *obj, void *event_info);
+static void clear_hit_cb(void *data, Evas_Object *obj, void *event_info);
+static void __text_found_cb(void *data, Evas_Object *obj, void *event_info);
+static void mini_find_word_clear(void *data);
+static void zoomin_hit_cb(void *data, Evas_Object *obj, void *event_info);
+static void zoomout_hit_cb(void *data, Evas_Object *obj, void *event_info);
+static double scale_factor = 1.0;
 
 static void __load_started_cb          (void *data, Evas_Object *obj, void *event_info);
 static void __load_finished_cb         (void *data, Evas_Object *obj, void *event_info);
@@ -450,8 +464,32 @@ Evas_Object* _create_button_bar(Evas_Object *parent , app_data *data)
   elm_object_text_set(data->gobtn, "GO");
   elm_box_pack_end(data->button_box,data->gobtn);
   evas_object_show(data->gobtn);
-
   evas_object_smart_callback_add(data->gobtn, "clicked", url_hit_cb, data);
+
+  data->findbtn=elm_button_add(data->button_box);
+  elm_object_text_set(data->findbtn, "FD");
+  elm_box_pack_end(data->button_box,data->findbtn);
+  evas_object_show(data->findbtn);
+  evas_object_smart_callback_add(data->findbtn, "clicked", find_hit_cb, data);
+
+  data->clearbtn=elm_button_add(data->button_box);
+  elm_object_text_set(data->clearbtn, "CL");
+  elm_box_pack_end(data->button_box,data->clearbtn);
+  evas_object_show(data->clearbtn);
+  evas_object_smart_callback_add(data->clearbtn, "clicked", clear_hit_cb, data);
+
+  data->zoomoutbtn=elm_button_add(data->button_box);
+  elm_object_text_set(data->zoomoutbtn, " - ");
+  elm_box_pack_end(data->button_box,data->zoomoutbtn);
+  evas_object_show(data->zoomoutbtn);
+  evas_object_smart_callback_add(data->zoomoutbtn, "clicked", zoomout_hit_cb, data);
+
+  data->zoominbtn=elm_button_add(data->button_box);
+  elm_object_text_set(data->zoominbtn, " + ");
+  elm_box_pack_end(data->button_box,data->zoominbtn);
+  evas_object_show(data->zoominbtn);
+  evas_object_smart_callback_add(data->zoominbtn, "clicked", zoomin_hit_cb, data);
+
   return data->button_box;
 }
 
@@ -955,6 +993,49 @@ void url_hit_cb(void *data, Evas_Object *obj, void *event_info)
   evas_object_focus_set(ad->webview, EINA_TRUE);
 }
 
+void find_hit_cb(void *data, Evas_Object *obj, void *event_info)
+{
+  LOGD("Find word\n");
+  app_data *ad = (app_data*) data;
+  mini_find_word("google", EINA_TRUE,  __text_found_cb, data);
+  hide_imf_panel(ad);
+}
+
+void clear_hit_cb(void *data, Evas_Object *obj, void *event_info)
+{
+  LOGD("Clear word\n");
+  mini_find_word_clear(data);
+  mini_find_word("", EINA_FALSE,  __text_found_cb, data);
+  app_data *ad = (app_data*) data;
+  hide_imf_panel(ad);
+}
+
+void zoomin_hit_cb(void *data, Evas_Object *obj, void *event_info)
+{
+  app_data *ad = (app_data*)data;
+  LOGD("Zoom in\n");
+  if(scale_factor >= 1 && scale_factor < 4) {
+    printf("11 scale_factor = %f\n", scale_factor);
+    scale_factor += 0.1;
+    ewk_view_scale_set(ad->webview, scale_factor, 0, 0);
+    printf("22 scale_factor = %f\n", scale_factor);
+  }
+  hide_imf_panel(ad);
+}
+
+void zoomout_hit_cb(void *data, Evas_Object *obj, void *event_info)
+{
+  app_data *ad = (app_data*)data;
+  LOGD("Zoom out\n");
+  if(scale_factor > 1 && scale_factor <= 4) {
+    printf("11 scale_factor = %f\n", scale_factor);
+    scale_factor -= 0.1;
+    printf("22 scale_factor = %f\n", scale_factor);
+    ewk_view_scale_set(ad->webview, scale_factor, 0, 0);
+  }
+  hide_imf_panel(ad);
+}
+
 #if defined(OS_TIZEN_TV)
 /* On Click to Urlbar need to move Toolbar top of SIP
  * so that SIP and toolbar should not overlap
@@ -1442,5 +1523,33 @@ void __vibration_off_cb(void *data)
     s_haptic_handle = NULL;
   }
 }
-
 #endif // #if caluse of #if defined(OS_TIZEN_MOBILE)...
+
+void mini_find_word(const char *word, Eina_Bool forward, Evas_Smart_Cb found_cb, void *data)
+{
+  app_data *ad = (app_data*) data;
+
+  evas_object_smart_callback_del(ad->webview, "text,found", found_cb);
+  evas_object_smart_callback_add(ad->webview, "text,found", found_cb, data);
+
+  Ewk_Find_Options find_option = (Ewk_Find_Options)(EWK_FIND_OPTIONS_CASE_INSENSITIVE |
+                                                    EWK_FIND_OPTIONS_WRAP_AROUND |
+                                                    EWK_FIND_OPTIONS_SHOW_FIND_INDICATOR |
+                                                    EWK_FIND_OPTIONS_SHOW_HIGHLIGHT);
+
+  if (!forward)
+    find_option = (Ewk_Find_Options)(find_option | EWK_FIND_OPTIONS_BACKWARDS);
+
+  ewk_view_text_find(ad->webview, word, find_option, 10000);
+}
+
+void mini_find_word_clear(void *data)
+{
+  app_data *ad = (app_data*) data;
+  ewk_view_text_find_highlight_clear(ad->webview);
+}
+
+void __text_found_cb(void *data, Evas_Object *obj, void *event_info)
+{
+  printf("text found : %u\n", *((unsigned int*)(event_info)));
+}
