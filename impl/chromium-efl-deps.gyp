@@ -79,6 +79,7 @@
             'capi-location-manager',
             'capi-media-audio-io',
             'capi-media-camera',
+            'capi-media-player',
             'vconf',
             'libtbm',
             'libdri2',

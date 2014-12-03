@@ -67,6 +67,7 @@
                                      # omxSP_FFTInv_CCSToR_F32_vfp in src/third_party/openmax_dl/dl/sp/api/omxSP.h:2558 .
                                      # Remove this line after a more proper solution is found.
            'TIZEN_MULTIMEDIA_PIXMAP_SUPPORT=1',
+           'TIZEN_CAPI_PLAYER_SUPPORT=1',
          ],
          'conditions': [
            ['chromium_efl_tizen_version=="2.3"', {
