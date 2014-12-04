@@ -42,6 +42,7 @@
 #include "public/ewk_enums.h"
 #include "public/ewk_settings.h"
 #include "private/ewk_context_private.h"
+#include "private/ewk_frame_private.h"
 #include "private/ewk_hit_test_private.h"
 #include "private/ewk_notification_private.h"
 #include "private/ewk_private.h"
@@ -798,7 +799,7 @@ Eina_Bool ewk_view_touch_events_enabled_get(const Evas_Object *view)
 Ewk_Frame_Ref ewk_view_main_frame_get(Evas_Object* o)
 {
   EWK_VIEW_IMPL_GET_OR_RETURN(o, impl, NULL);
-  return impl->GetMainFrame();
+  return static_cast<Ewk_Frame_Ref>(impl->GetMainFrame());
 }
 
 Eina_Bool ewk_view_main_frame_scrollbar_visible_set(Evas_Object* ewkView, Eina_Bool visible)

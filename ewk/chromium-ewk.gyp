@@ -130,6 +130,7 @@
       'efl_integration/private/ewk_back_forward_list_private.cc',
       'efl_integration/private/ewk_context_private.cc',
       'efl_integration/private/ewk_context_private.h',
+      'efl_integration/private/ewk_frame_private.h',
       'efl_integration/private/ewk_hit_test_private.h',
       'efl_integration/private/ewk_hit_test_private.cc',
       'efl_integration/private/ewk_notification_private.h',

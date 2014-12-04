@@ -12,7 +12,8 @@
 extern "C" {
 #endif
 
-typedef void* Ewk_Frame_Ref;
+typedef struct _Ewk_Frame _Ewk_Frame;
+typedef _Ewk_Frame* Ewk_Frame_Ref;
 
 /**
  * Callback for ewk_frame_source_get

@@ -4,21 +4,8 @@
 
 #include "ewk_frame.h"
 
-#if !defined(EWK_BRINGUP)
-// TODO: remove dependency
-#include <tizen_webview/public/tw_frame.h>
-#endif
-
+#include "private/ewk_frame_private.h"
 #include "private/ewk_private.h"
-
-namespace {
-#if !defined(EWK_BRINGUP)
-tizen_webview::Frame* ToImpl(void* data)
-{
-  return static_cast<tizen_webview::Frame*>(data);
-}
-#endif
-} // namespace
 
 Eina_Bool ewk_frame_can_show_mime_type(Ewk_Frame_Ref frame, char* mimeType)
 {
@@ -29,10 +16,5 @@ Eina_Bool ewk_frame_can_show_mime_type(Ewk_Frame_Ref frame, char* mimeType)
 Eina_Bool ewk_frame_is_main_frame(Ewk_Frame_Ref frame)
 {
   EINA_SAFETY_ON_NULL_RETURN_VAL(frame, EINA_FALSE);
-#if !defined(EWK_BRINGUP)
-  return ToImpl(frame)->IsMainFrame() ? EINA_TRUE : EINA_FALSE;
-#else
-  LOG_EWK_API_MOCKUP();
-  return EINA_FALSE;
-#endif
+  return frame->IsMainFrame() ? EINA_TRUE : EINA_FALSE;
 }

@@ -4,13 +4,11 @@
 
 #include "ewk_policy_decision.h"
 
-#if !defined(EWK_BRINGUP)
-#include <tizen_webview/public/tw_frame.h>
-#endif
 // TODO: remove dependency
 #include <../impl/web_contents_delegate_efl.h>
 
 #include "private/chromium_glue.h"
+#include "private/ewk_frame_private.h"
 #include "private/ewk_policy_decision_private.h"
 #include "private/ewk_private.h"
 
