@@ -757,7 +757,8 @@ bool RenderWidgetHostViewEfl::CanDispatchToConsumer(ui::GestureConsumer* consume
 void RenderWidgetHostViewEfl::DispatchCancelTouchEvent(ui::TouchEvent* event) {
 }
 
-void RenderWidgetHostViewEfl::DispatchGestureEvent(ui::GestureEvent*) {
+void RenderWidgetHostViewEfl::DispatchGestureEvent(ui::GestureEvent* event) {
+  HandleGesture(event);
 }
 
 #ifdef OS_TIZEN
