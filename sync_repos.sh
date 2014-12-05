@@ -4,13 +4,13 @@ SCRIPTDIR=$( cd $(dirname $0) ; pwd -P )
 TOPDIR=$( cd ${SCRIPTDIR}/../.. ; pwd -P )
 
 BRANCH=efl/crosswalk-10/39.0.2171.19
-BRANCH_XWALK=master
+BRANCH_XWALK=efl/crosswalk-10/39.0.2171.19
 
 URLBASE='git://github.com/crosswalk-project'
 
 REPOS=( "src|$URLBASE/chromium-crosswalk-efl.git|$BRANCH" \
         "src/third_party/WebKit|$URLBASE/blink-crosswalk-efl.git|$BRANCH" \
-        "src/xwalk|$URLBASE/crosswalk.git|$BRANCH_XWALK" \
+        "src/xwalk|$URLBASE/crosswalk-efl.git|$BRANCH_XWALK" \
       )
 
 pushd $TOPDIR 2>&1 > /dev/null
