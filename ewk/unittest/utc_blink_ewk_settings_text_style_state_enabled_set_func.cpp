@@ -4,14 +4,14 @@
 
 #include "utc_blink_ewk_base.h"
 
-class utc_blink_ewk_settings_text_style_state_enabled : public utc_blink_ewk_base {
+class utc_blink_ewk_settings_text_style_state_enabled_set : public utc_blink_ewk_base {
 };
 
 /**
  * @brief Tests if returns TRUE when initiated with a correct webview and
  * enabled text selection set to TRUE.
  */
-TEST_F(utc_blink_ewk_settings_text_style_state_enabled, POS_TEST1)
+TEST_F(utc_blink_ewk_settings_text_style_state_enabled_set, POS_TEST1)
 {
   Ewk_Settings* settings = ewk_view_settings_get(GetEwkWebView());
   if (!settings) {
@@ -30,7 +30,7 @@ TEST_F(utc_blink_ewk_settings_text_style_state_enabled, POS_TEST1)
  * @brief Tests if returns TRUE when initiated with a correct webview and
  * enabled text selection set to FALSE.
  */
-TEST_F(utc_blink_ewk_settings_text_style_state_enabled, POS_TEST2)
+TEST_F(utc_blink_ewk_settings_text_style_state_enabled_set, POS_TEST2)
 {
   Ewk_Settings* settings = ewk_view_settings_get(GetEwkWebView());
   if (!settings) {
@@ -48,7 +48,7 @@ TEST_F(utc_blink_ewk_settings_text_style_state_enabled, POS_TEST2)
 /**
  * @brief Tests if returns FALSE when initiated with NULL webview.
  */
-TEST_F(utc_blink_ewk_settings_text_style_state_enabled, NEG_TEST)
+TEST_F(utc_blink_ewk_settings_text_style_state_enabled_set, NEG_TEST)
 {
   ewk_settings_text_style_state_enabled_set(NULL, EINA_FALSE);
   SUCCEED();

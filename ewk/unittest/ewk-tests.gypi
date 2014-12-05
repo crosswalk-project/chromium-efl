@@ -231,7 +231,7 @@
         'utc_blink_ewk_settings_text_autosizing_enabled_set_func.cpp',
         'utc_blink_ewk_settings_text_autosizing_font_scale_factor_set_func.cpp',
         'utc_blink_ewk_settings_text_selection_enabled_set_func.cpp',
-        'utc_blink_ewk_settings_text_style_state_enabled_func.cpp',
+        'utc_blink_ewk_settings_text_style_state_enabled_set_func.cpp',
         'utc_blink_ewk_settings_text_zoom_enabled_set_func.cpp',
         'utc_blink_ewk_settings_uses_encoding_detector_set_func.cpp',
         'utc_blink_ewk_settings_uses_keypad_without_user_action_set_func.cpp',
