@@ -133,7 +133,9 @@ RenderWidgetHostViewEfl::RenderWidgetHostViewEfl(RenderWidgetHost* widget, EWebV
 
   gesture_recognizer_->AddGestureEventHelper(this);
 
+#if defined(OS_TIZEN_MOBILE)
   disambiguation_popup_.reset(new DisambiguationPopupEfl(content_image_, this));
+#endif
 }
 
 RenderWidgetHostViewEfl::~RenderWidgetHostViewEfl() {
@@ -732,7 +734,8 @@ void RenderWidgetHostViewEfl::DidStopFlinging() {
 }
 
 void RenderWidgetHostViewEfl::ShowDisambiguationPopup(const gfx::Rect& rect_pixels, const SkBitmap& zoomed_bitmap) {
-  disambiguation_popup_->Show(rect_pixels, zoomed_bitmap);
+  if (disambiguation_popup_)
+    disambiguation_popup_->Show(rect_pixels, zoomed_bitmap);
 }
 
 bool RenderWidgetHostViewEfl::CanDispatchToConsumer(ui::GestureConsumer* consumer) {
