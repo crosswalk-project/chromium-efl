@@ -25,6 +25,7 @@
 #include "base/logging.h"
 #include "base/strings/utf_string_conversions.h"
 #include "content/common/view_messages.h"
+#include "content/common/frame_messages.h"
 #include "content/browser/renderer_host/ui_events_helper.h"
 #include "content/browser/renderer_host/render_view_host_impl.h"
 #include "content/browser/web_contents/web_contents_view.h"
@@ -1839,63 +1840,11 @@ gfx::Rect EWebView::GetIMERect() {
   return gfx::Rect();
 }
 
-std::string EWebView::GetErrorPage(const std::string& invalidUrl) {
-  base::string16 url16;
-  url16.assign(invalidUrl.begin(), invalidUrl.end());
-
-
-#if defined(EWK_BRINGUP)
-  std::string errorHead = "This webpage is not available";
-  std::string errorMessage = "The server at <ph name=\"" + invalidUrl + "\">&lt;strong&gt;$1&lt;/strong&gt;</ph> can't be found, because the DNS lookup failed.";
-#else
-  // Those strings were removed form webkit_strings.grd
-  // They exist in chrome/app/generated_resources.grd, but it is part of chrome that we don't use currently.
-  std::string errorHead = l10n_util::GetStringUTF8(IDS_ERRORPAGES_HEADING_NOT_AVAILABLE);
-  std::string errorMessage = l10n_util::GetStringFUTF8(IDS_ERRORPAGES_SUMMARY_NAME_NOT_RESOLVED, url16);
-#endif
-
-  std::string html =
-    "<html>"
-      "<head>"
-        "<meta name='viewport' content='width=device-width, initial-scale=1.0, user-scalable=no'>"
-        "<meta http-equiv='Content-Type' content='text/html; charset=UTF-8'>"
-        "<title>";
-  html += invalidUrl;
-  html +=
-        "</title>"
-        "<style type=text/css>"
-        "#body"
-        "{"
-        " background-color: #fff;"
-        " margin: 0;"
-        " padding: 0;"
-        "}"
-        "#Box"
-        "{"
-        " background: #fff;"
-        " width: 80%%;"
-        " min-width: 150px;"
-        " max-width: 750px;"
-        " margin: auto;"
-        " padding: 5px;"
-        " border: 1px solid #BFA3A3;"
-        " border-radius: 1px;"
-        " word-wrap:break-word"
-        "}"
-        "</style>"
-      "</head>"
-      "<body bgcolor=\"#CFCFCF\">"
-      "<div id=Box>"
-      "<h2 align=\"center\">";
-    html += errorHead;
-    html += "</h2></br>";
-    html += errorMessage;
-    html +=
-      "</div>"
-      "</body>"
-    "</html>"
-    ;
-   return html;
+void EWebView::LoadNotFoundErrorPage(const std::string& invalidUrl) {
+  RenderViewHost* render_view_host = web_contents_->GetRenderViewHost();
+  if (render_view_host)
+    render_view_host->Send(new FrameHostMsg_LoadNotFoundErrorPage(
+      render_view_host->GetRoutingID(), invalidUrl));
 }
 
 std::string EWebView::GetPlatformLocale() {

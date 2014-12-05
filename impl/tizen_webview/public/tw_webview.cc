@@ -152,8 +152,8 @@ void WebView::UrlRequestSet(const char* url,
   return impl_->UrlRequestSet(url, loadtype, headers, body);
 }
 
-std::string WebView::GetErrorPage(const std::string& invalidUrl) {
-  return impl_->GetErrorPage(invalidUrl);
+void WebView::LoadNotFoundErrorPage(const std::string& invalidUrl) {
+  return impl_->LoadNotFoundErrorPage(invalidUrl);
 }
 
 bool WebView::GoBack() {

@@ -263,9 +263,7 @@ Eina_Bool ewk_view_text_zoom_set(Evas_Object* view, double text_zoom_level)
 void ewk_view_not_found_error_page_load(Evas_Object* ewkView, const char* errorUrl)
 {
   EWK_VIEW_IMPL_GET_OR_RETURN(ewkView, impl);
-  std::string errorhtml = impl->GetErrorPage(std::string(errorUrl));
-
-   ewk_view_html_string_load(ewkView, errorhtml.c_str(), errorUrl, errorUrl);
+  impl->LoadNotFoundErrorPage(std::string(errorUrl));
 }
 
 void ewk_view_scale_range_get(Evas_Object* view, double* min_scale, double* max_scale)

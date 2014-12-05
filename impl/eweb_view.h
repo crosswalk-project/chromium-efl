@@ -413,7 +413,7 @@ class EWebView {
   int StartInspectorServer(int port = 0);
   bool StopInspectorServer();
 
-  std::string GetErrorPage(const std::string& invalidUrl);
+  void LoadNotFoundErrorPage(const std::string& invalidUrl);
   static std::string GetPlatformLocale();
   void UpdateMagnifierScreen(const SkBitmap& bitmap);
   bool GetLinkMagnifierEnabled() const;

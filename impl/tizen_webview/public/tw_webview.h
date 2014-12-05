@@ -92,7 +92,7 @@ class WebView {
       content::NavigationController::LoadURLType loadtype,
       Eina_Hash* headers,
       const char* body);
-  std::string GetErrorPage(const std::string& invalidUrl);
+  void LoadNotFoundErrorPage(const std::string& invalidUrl);
 
   // ---- Navigation
   bool GoBack();
