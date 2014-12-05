@@ -54,7 +54,7 @@ if echo "$@" | grep -cq '\-\-ccache'; then
   USE_CCACHE=1
 fi
 
-if echo "$@" | grep -cq '\-\-build_ewk_unittests'; then
+if echo "$@" | grep -cq '\-\-build-ewk-unittests'; then
   BUILD_EWK_UNITTESTS=1
 fi
 
@@ -121,7 +121,7 @@ if [ "$SKIP_NINJA" == "0" ]; then
 
   TARGETS="chromium-efl efl_webprocess chromium-ewk efl_webview_app"
   if [ "$BUILD_EWK_UNITTESTS" == "1" ]; then
-    TARGETS = "$TARGETS ewk_unittests"
+    TARGETS="$TARGETS ewk_unittests"
   fi
 
   ninja -C ${GYP_GENERATOR_OUTPUT}/${BUILD_SUBDIRECTORY} ${JOBS} ${TARGETS}
