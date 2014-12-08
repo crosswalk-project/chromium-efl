@@ -21,14 +21,6 @@ fi
 
 set -e
 
-if [ ! -e ${TOPDIR}/src/build/util/LASTCHANGE ]; then
-  ${TOPDIR}/src/build/util/lastchange.py -s ${TOPDIR}/src -o ${TOPDIR}/src/build/util/LASTCHANGE
-fi
-
-if [ ! -e ${TOPDIR}/src/build/util/LASTCHANGE.blink ]; then
-  ${TOPDIR}/src/build/util/lastchange.py -s ${TOPDIR}/src/third_party/WebKit -o ${TOPDIR}/src/build/util/LASTCHANGE.blink
-fi
-
 ORIGINAL_GYP_DEFINES="$GYP_DEFINES"
 export GYP_DEFINES=$(echo "$GYP_DEFINES" | sed -e 's/component\s*=\s*shared_library//g')
 if [ "$ORIGINAL_GYP_DEFINES" != "$GYP_DEFINES" ]; then
