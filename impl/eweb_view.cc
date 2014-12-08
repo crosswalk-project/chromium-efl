@@ -295,9 +295,6 @@ void EWebView::Initialize() {
 
   evas_event_handler_ = new tizen_webview::WebViewEvasEventHandler(public_webview_);
   selection_controller_.reset(new content::SelectionControllerEfl(this));
-#ifdef TIZEN_EDGE_EFFECT
-  edge_effect_ = EdgeEffect::create(evas_object_);
-#endif
 
   if (contents_for_new_window_) {
      web_contents_.reset(contents_for_new_window_);
@@ -312,6 +309,9 @@ void EWebView::Initialize() {
   }
   web_contents_delegate_.reset(new WebContentsDelegateEfl(this));
   web_contents_->SetDelegate(web_contents_delegate_.get());
+#ifdef TIZEN_EDGE_EFFECT
+  edge_effect_ = EdgeEffect::create(evas_object_);
+#endif
   back_forward_list_.reset(new tizen_webview::BackForwardList(
       web_contents_->GetController()));
 

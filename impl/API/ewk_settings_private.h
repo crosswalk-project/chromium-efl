@@ -56,7 +56,7 @@ class Ewk_Settings {
     bool autoSelectWord() const { return m_autoSelectWord; }
     void setAutoSelectWord(bool enable) { m_autoSelectWord = enable; }
     bool edgeEffectEnabled() const { return m_edgeEffectEnabled; }
-    void setEdgeEffectEnabled(bool enable) { m_edgeEffectEnabled = enable; }
+    void setEdgeEffectEnabled(bool enable);
     void setTextZoomEnabled(bool enable) { m_textZoomEnabled = enable; }
     bool textZoomEnabled() const { return m_textZoomEnabled; }
     void setLoadRemoteImages(bool loadRemoteImages) { m_loadRemoteImages = loadRemoteImages; }
