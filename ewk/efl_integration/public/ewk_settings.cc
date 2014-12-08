@@ -470,7 +470,7 @@ Eina_Bool ewk_settings_clear_text_selection_automatically_get(const Ewk_Settings
 Eina_Bool ewk_settings_text_autosizing_enabled_set(Ewk_Settings* settings, Eina_Bool enable)
 {
   EINA_SAFETY_ON_NULL_RETURN_VAL(settings, false);
-#if defined(OS_TIZEN_MOBILE) && !defined(EWK_BRINGUP)
+#if defined(OS_TIZEN_MOBILE)
   settings->getPreferences().text_autosizing_enabled = enable;
   ewkUpdateWebkitPreferences(settings->getEvasObject());
   return true;
@@ -483,7 +483,7 @@ Eina_Bool ewk_settings_text_autosizing_enabled_set(Ewk_Settings* settings, Eina_
 Eina_Bool ewk_settings_text_autosizing_enabled_get(const Ewk_Settings* settings)
 {
   EINA_SAFETY_ON_NULL_RETURN_VAL(settings, false);
-#if defined(OS_TIZEN_MOBILE) && !defined(EWK_BRINGUP)
+#if defined(OS_TIZEN_MOBILE)
   return settings->getPreferences().text_autosizing_enabled;
 #else
   LOG_EWK_API_MOCKUP("Only for Tizen Mobile Browser");
@@ -494,9 +494,7 @@ Eina_Bool ewk_settings_text_autosizing_enabled_get(const Ewk_Settings* settings)
 Eina_Bool ewk_settings_text_autosizing_font_scale_factor_set(Ewk_Settings* settings, double factor)
 {
   EINA_SAFETY_ON_NULL_RETURN_VAL(settings, false);
-#if !defined(EWK_BRINGUP)
   settings->getPreferences().font_scale_factor = factor;
-#endif
   ewkUpdateWebkitPreferences(settings->getEvasObject());
   return true;
 }
@@ -504,11 +502,7 @@ Eina_Bool ewk_settings_text_autosizing_font_scale_factor_set(Ewk_Settings* setti
 double ewk_settings_text_autosizing_font_scale_factor_get(const Ewk_Settings* settings)
 {
   EINA_SAFETY_ON_NULL_RETURN_VAL(settings, -1.0);
-#if !defined(EWK_BRINGUP)
   return settings->getPreferences().font_scale_factor;
-#else
-  return false;
-#endif
 }
 
 Eina_Bool ewk_settings_edge_effect_enabled_set(Ewk_Settings* settings, Eina_Bool enable)
