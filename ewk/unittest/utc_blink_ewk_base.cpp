@@ -133,7 +133,7 @@ void utc_blink_ewk_base::SetUp()
     evas_object_smart_callback_add(ewk_webview, "load,progress", load_progress_cb, this);
     evas_object_smart_callback_add(ewk_webview, "load,progress,started", load_progress_started_cb, this);
     evas_object_smart_callback_add(ewk_webview, "load,progress,finished", load_progress_finished_cb, this);
-    evas_object_smart_callback_add(ewk_webview, "console,message", console_message_logger_cb, this);
+    evas_object_smart_callback_add(ewk_webview, "console,message", ToSmartCallback(console_message_cb), this);
 
     PostSetUp();
 }
@@ -148,7 +148,7 @@ void utc_blink_ewk_base::TearDown()
     evas_object_smart_callback_del(ewk_webview, "load,progress", load_progress_cb);
     evas_object_smart_callback_del(ewk_webview, "load,progress,started", load_progress_started_cb);
     evas_object_smart_callback_del(ewk_webview, "load,progress,finished", load_progress_finished_cb);
-    evas_object_smart_callback_del(ewk_webview, "console,message", console_message_logger_cb);
+    evas_object_smart_callback_del(ewk_webview, "console,message", ToSmartCallback(console_message_cb));
 
     EwkDeinit();
 
@@ -207,22 +207,17 @@ void utc_blink_ewk_base::load_progress_finished_cb(void* data, Evas_Object* webv
     ut->LoadProgressFinished(webview);
 }
 
-void utc_blink_ewk_base::console_message_logger_cb(void* data, Evas_Object* webview, void* event_info)
+void utc_blink_ewk_base::ConsoleMessage(Evas_Object*webview, const Ewk_Console_Message* msg)
 {
-  if (data && event_info) {
-    utc_blink_ewk_base* owner = static_cast<utc_blink_ewk_base*>(data);
+  EXPECT_EQ(ewk_webview, webview);
+  if (log_javascript)
+    utc_message("JavaScript::console (%p):\t\"%s\"", webview, ewk_console_message_text_get(msg));
+}
 
-    if (owner->log_javascript && owner->ewk_webview == webview) {
-      Ewk_Console_Message* console = static_cast<Ewk_Console_Message*>(event_info);
-      const char *msg = ewk_console_message_text_get(console);
-
-      if (msg) {
-        utc_message("JavaScript::console (%p): %s", webview, msg);
-      } else {
-        utc_message("JavaScript::console (%p) ERROR: NULL messsage", webview);
-      }
-    }
-  }
+void utc_blink_ewk_base::console_message_cb(utc_blink_ewk_base* owner, Evas_Object* webview, Ewk_Console_Message* console)
+{
+  ASSERT_TRUE(owner);
+  owner->ConsoleMessage(webview, console);
 }
 
 Eina_Bool utc_blink_ewk_base::timeout_cb(void *data)

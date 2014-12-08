@@ -240,6 +240,11 @@ protected:
     virtual void LoadProgressFinished(Evas_Object* webview) {}
 
     /**
+     * Override this method if you need to handle "console,message" ewk callback.
+     */
+    virtual void ConsoleMessage(Evas_Object* webview, const Ewk_Console_Message*);
+
+    /**
      * Performs unit test setup. It calls PreSetUp before default initialization
      * and PostSetUp after default initialization.
      *
@@ -314,9 +319,9 @@ private:
     static void load_progress_finished_cb(void* data, Evas_Object* webview, void* event_info);
 
     /**
-     * Default "console,message" event callback, logs message to console using utc_message
+     * Default "console,message" event callback, will call ConsoleMessage method
      */
-    static void console_message_logger_cb(void* data, Evas_Object* webview, void* event_info);
+    static void console_message_cb(utc_blink_ewk_base*, Evas_Object*, Ewk_Console_Message*);
 
     /**
      * Default event loop timeout callback, will call TimeOut method
