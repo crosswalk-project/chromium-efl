@@ -294,6 +294,7 @@
       'resource/Edge.edc',
       'resource/Magnifier.edc',
       'resource/control.edc',
+      'resource/DisambiguationPopup.edc',
 
       'screen_efl.cc',
       'screen_efl.h',
