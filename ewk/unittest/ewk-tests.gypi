@@ -280,6 +280,7 @@
         'utc_blink_ewk_view_hit_test_new_func.cpp',
         'utc_blink_ewk_view_hit_test_request_func.cpp',
         'utc_blink_ewk_view_html_contents_set_func.cpp',
+        'utc_blink_ewk_view_html_string_load_func.cpp',
         'utc_blink_ewk_view_inspector_server_stop_func.cpp',
         'utc_blink_ewk_view_javascript_confirm_reply_func.cpp',
         'utc_blink_ewk_view_load_progress_get_func.cpp',
