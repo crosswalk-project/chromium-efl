@@ -18,7 +18,14 @@
          '-Wl,--dynamic-linker=<(custom_libc_dir)/ld-linux.so.3',
        ],
      }],
-  ]},
+    ],
+    'defines': [
+      'DATA_DIR="<(data_dir)"',
+      'EXE_DIR="<(exe_dir)"',
+      'EDJE_DIR="<(edje_dir)"',
+      'WEBDB_DIR="<(webdb_dir)"',
+    ],
+  },
   'targets': [{
     'target_name': 'chromium-efl',
     'type': 'shared_library',
@@ -60,11 +67,7 @@
     'defines': [
       'CHROMIUMCORE_IMPLEMENTATION=1',
       'TIZEN_WEBVIEW_IMPLEMENTATION=1',
-      'DATA_DIR="<(data_dir)"',
-      'EXE_DIR="<(exe_dir)"',
-      'EDJE_DIR="<(edje_dir)"',
       'LOCALE_DIR="<(locale_dir)"',
-      'WEBDB_DIR="<(webdb_dir)"',
     ],
     'sources': [
       'API/ewk_auth_challenge_private.h',
@@ -453,12 +456,6 @@
   },
   {
     'target_name': 'efl_webprocess',
-    'defines': [
-      'DATA_DIR="<(data_dir)"',
-      'EXE_DIR="<(exe_dir)"',
-      'EDJE_DIR="<(edje_dir)"',
-      'WEBDB_DIR="<(webdb_dir)"',
-    ],
     'type': 'executable',
     'include_dirs': [
       '.',
