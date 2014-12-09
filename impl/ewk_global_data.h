@@ -5,6 +5,8 @@
 #ifndef EWK_GLOBAL_DATA_H_
 #define EWK_GLOBAL_DATA_H_
 
+#include <base/macros.h>
+
 namespace content {
   class BrowserMainRunner;
   class ContentMainRunner;
@@ -12,21 +14,20 @@ namespace content {
 
 class EwkGlobalData
 {
-public:
-  ~EwkGlobalData();
-
+ public:
   static EwkGlobalData* GetInstance();
   static void Delete();
-  static void Ensure();
 
-private:
+ private:
   EwkGlobalData();
+  ~EwkGlobalData();
 
-private:
   static EwkGlobalData* instance_;
 
   content::ContentMainRunner* content_main_runner_;
   content::BrowserMainRunner* browser_main_runner_;
+
+  DISALLOW_COPY_AND_ASSIGN(EwkGlobalData);
 };
 
 #endif // EWK_GLOBAL_DATA_H_

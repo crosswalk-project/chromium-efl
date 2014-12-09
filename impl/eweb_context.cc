@@ -231,7 +231,7 @@ bool EWebContext::ShouldOverrideMimeForURL(
 EWebContext::EWebContext(bool incognito)
     : m_pixmap(0),
       incognito_(incognito) {
-  EwkGlobalData::Ensure();
+  CHECK(EwkGlobalData::GetInstance());
 
   browser_context_.reset(new BrowserContextEfl(this));
   // Notification Service gets init in BrowserMainRunner init,

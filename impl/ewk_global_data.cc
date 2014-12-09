@@ -59,27 +59,20 @@ EwkGlobalData::EwkGlobalData()
 }
 
 EwkGlobalData::~EwkGlobalData() {
-    DCHECK(BrowserThread::CurrentlyOn(BrowserThread::UI));
-    // We need to pretend that message loop was stopped so chromium unwinds correctly
-    MessageLoop *loop = MessageLoop::current();
-    loop->QuitNow();
-    // browser_main_runner must be deleted first as it depends on content_main_runner
-    delete browser_main_runner_;
-    delete content_main_runner_;
+  DCHECK(BrowserThread::CurrentlyOn(BrowserThread::UI));
+  // We need to pretend that message loop was stopped so chromium unwinds correctly
+  MessageLoop *loop = MessageLoop::current();
+  loop->QuitNow();
+  // browser_main_runner must be deleted first as it depends on content_main_runner
+  delete browser_main_runner_;
+  delete content_main_runner_;
 }
 
 EwkGlobalData* EwkGlobalData::GetInstance() {
-  return instance_;
-}
-
-void EwkGlobalData::Delete() {
-  delete instance_;
-  instance_ = NULL;
-}
-
-void EwkGlobalData::Ensure() {
-  if (instance_)
-    return;
+  if (instance_) {
+    CHECK(content::BrowserThread::CurrentlyOn(content::BrowserThread::UI));
+    return instance_;
+  }
 
   // Workaround for cpu info logging asserting if executed on the wrong thread
   // during cpu info lazy instance initialization.
@@ -94,15 +87,15 @@ void EwkGlobalData::Ensure() {
 
   ui::InstallScreenInstance();
 
-	content::ContentMainParams params(new ContentMainDelegateEfl());
-	params.argc = CommandLineEfl::GetArgc();
-	params.argv = CommandLineEfl::GetArgv();
+  content::ContentMainParams params(new ContentMainDelegateEfl());
+  params.argc = CommandLineEfl::GetArgc();
+  params.argv = CommandLineEfl::GetArgv();
 
   // Call to CommandLineEfl::GetDefaultPortParams() should be before content
   // main runner initialization in order to pass command line parameters
   // for current process that are used in content main runner initialization.
   content::MainFunctionParams main_funtion_params =
-    CommandLineEfl::GetDefaultPortParams();
+      CommandLineEfl::GetDefaultPortParams();
 
   instance_->content_main_runner_->Initialize(params);
   instance_->browser_main_runner_->Initialize(main_funtion_params);
@@ -135,4 +128,12 @@ void EwkGlobalData::Ensure() {
   if (!EflAssistHandle)
     EflAssistHandle = dlopen("/usr/lib/libefl-assist.so.0", RTLD_LAZY);
 #endif
+
+  return instance_;
+}
+
+void EwkGlobalData::Delete()
+{
+  delete instance_;
+  instance_ = NULL;
 }
