@@ -25,6 +25,7 @@ Requires(post): xkeyboard-config
 Requires(postun): /sbin/ldconfig
 BuildRequires: which, vi, python, python-xml, bison, flex, gperf, gettext, perl, edje-tools
 BuildRequires: libjpeg-turbo-devel, expat-devel, libhaptic, libcap-devel
+BuildRequires: pkgconfig(tts)
 BuildRequires: pkgconfig(glesv2)
 BuildRequires: pkgconfig(libpulse)
 BuildRequires: pkgconfig(recordproto)

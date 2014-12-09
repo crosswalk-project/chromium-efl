@@ -7,3 +7,6 @@
 
 #include "common/render_messages_efl.h"
 #include "components/editing/content/common/editing_messages.h"
+#if defined(OS_TIZEN_MOBILE)
+#include "common/tts_messages_efl.h"
+#endif

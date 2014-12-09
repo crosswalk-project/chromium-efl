@@ -91,6 +91,9 @@ class ContentRendererClientEfl : public content::ContentRendererClient
   bool IsLinkVisited(unsigned long long link_hash) override;
   void SetWebViewSettings(const tizen_webview::Settings& settings) { m_settings = settings; }
 
+  blink::WebSpeechSynthesizer* OverrideSpeechSynthesizer(
+      blink::WebSpeechSynthesizerClient* client) override;
+
  private:
   scoped_ptr<WrtWidget> wrt_widget_;
   scoped_ptr<RenderProcessObserverEfl> render_process_observer_;
