@@ -275,6 +275,7 @@
         'utc_blink_ewk_view_forward_func.cpp',
         'utc_blink_ewk_view_forward_possible_func.cpp',
         'utc_blink_ewk_view_fullscreen_exit_func.cpp',
+        'utc_blink_ewk_view_geolocation_permission_callback_set_func.cpp',
         'utc_blink_ewk_view_get_cookies_for_url_func.cpp',
         'utc_blink_ewk_view_history_get_func.cpp',
         'utc_blink_ewk_view_hit_test_new_func.cpp',
