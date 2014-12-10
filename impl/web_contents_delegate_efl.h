@@ -140,6 +140,7 @@ class WebContentsDelegateEfl
   virtual void DidDownloadFavicon(bool success, const GURL& icon_url, const SkBitmap& bitmap);
 
   void OnFormSubmit(const GURL&);
+  void OnUpdateSettings(const Ewk_Settings *settings);
   void SetContentSecurityPolicy(const std::string& policy, tizen_webview::ContentSecurityPolicyType header_type);
   void ShowPopupMenu(RenderFrameHost* render_frame_host,
                      const gfx::Rect& rect,

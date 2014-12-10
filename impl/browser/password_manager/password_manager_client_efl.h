@@ -38,8 +38,11 @@ class PasswordManagerClientEfl
   virtual base::FieldTrial::Probability GetProbabilityForExperiment(const std::string& experiment_name) override;
   virtual bool IsPasswordSyncEnabled() override;
 
-  bool IsPasswordManagerEnabled();
-  void SetPasswordManagerEnabled(bool enabled);
+  bool IsPasswordManagerSavingEnabled();
+  void SetPasswordManagerSavingEnabled(bool enabled);
+
+  bool IsPasswordManagerFillingEnabled();
+  void SetPasswordManagerFillingEnabled(bool enabled);
 
   // Convenience method to allow //chrome code easy access to a PasswordManager
   // from a WebContents instance.

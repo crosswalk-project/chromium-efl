@@ -124,6 +124,10 @@ void AutofillManagerDelegateEfl::SetAutocompleteEnabled(bool enable) {
   is_autofill_enabled_ = enable;
 }
 
+bool AutofillManagerDelegateEfl::IsAutocompleteSavingEnabled() {
+  return webview_->GetSettings()->formCandidateData();
+}
+
 void AutofillManagerDelegateEfl::HideRequestAutocompleteDialog() {
   NOTIMPLEMENTED();
 }

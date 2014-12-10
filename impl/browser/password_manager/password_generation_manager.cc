@@ -66,7 +66,7 @@ void PasswordGenerationManager::DetectAccountCreationForms(
 // (2) Password saving is enabled.
 bool PasswordGenerationManager::IsGenerationEnabled() const
 {
-  if (!driver_->GetPasswordManager()->IsPasswordManagerEnabled()) {
+  if (!driver_->GetPasswordManager()->IsPasswordManagerSavingEnabled()) {
     DVLOG(2) << "Generation disabled because password saving is disabled";
     return false;
   }

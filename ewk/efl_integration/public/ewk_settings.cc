@@ -371,6 +371,7 @@ Eina_Bool ewk_settings_autofill_password_form_enabled_set(Ewk_Settings* settings
 {
   EINA_SAFETY_ON_NULL_RETURN_VAL(settings, false);
   settings->setAutofillPasswordForm(enable);
+  ewkUpdateWebkitPreferences(settings->getEvasObject());
   return true;
 }
 
@@ -397,6 +398,7 @@ Eina_Bool ewk_settings_form_profile_data_enabled_set(Ewk_Settings *settings, Ein
 {
   EINA_SAFETY_ON_NULL_RETURN_VAL(settings, false);
   settings->setAutofillProfileForm(enable);
+  ewkUpdateWebkitPreferences(settings->getEvasObject());
   return true;
 }
 

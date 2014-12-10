@@ -57,10 +57,13 @@ class PasswordManager : public LoginModel {
   void AddSubmissionCallback(const PasswordSubmittedCallback& callback);
 
   // Is password manager enabled for autofill password
-  bool IsPasswordManagerEnabled() const;
+  bool IsPasswordManagerSavingEnabled() const;
 
   // Set password manager enabled for autofill password
-  void SetPasswordManagerEnabled(bool enabled);
+  void SetPasswordManagerSavingEnabled(bool enabled);
+
+  bool IsPasswordManagerFillingEnabled() const;
+  void SetPasswordManagerFillingEnabled(bool enabled);
 
   // Called by a PasswordFormManager when it decides a form can be autofilled
   // on the page.
@@ -166,7 +169,9 @@ class PasswordManager : public LoginModel {
 
   // Set to false to disable the password manager (will no longer ask if you
   // want to save passwords but will continue to fill passwords).
-  bool password_manager_enabled_;
+  bool password_manager_saving_enabled_;
+
+  bool password_manager_filling_enabled_;
 
   // Observers to be notified of LoginModel events.  This is mutable to allow
   // notification in const member functions.

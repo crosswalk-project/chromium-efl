@@ -889,6 +889,7 @@ void EWebView::UpdateWebKitPreferences() {
   if (!render_view_host)
     return;
 
+  web_contents_delegate_->OnUpdateSettings(settings_.get());
   render_view_host->UpdateWebkitPreferences(settings_->getPreferences());
   render_view_host->Send(
       new EflViewMsg_UpdateSettings(render_view_host->GetRoutingID(),

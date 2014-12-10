@@ -69,14 +69,24 @@ bool PasswordManagerClientEfl::IsPasswordSyncEnabled()
   return false;
 }
 
-bool PasswordManagerClientEfl::IsPasswordManagerEnabled()
+bool PasswordManagerClientEfl::IsPasswordManagerSavingEnabled()
 {
-  return GetDriver()->GetPasswordManager()->IsPasswordManagerEnabled();
+  return GetDriver()->GetPasswordManager()->IsPasswordManagerSavingEnabled();
 }
 
-void PasswordManagerClientEfl::SetPasswordManagerEnabled(bool enabled)
+void PasswordManagerClientEfl::SetPasswordManagerSavingEnabled(bool enabled)
 {
-  GetDriver()->GetPasswordManager()->SetPasswordManagerEnabled(enabled);
+  GetDriver()->GetPasswordManager()->SetPasswordManagerSavingEnabled(enabled);
+}
+
+bool PasswordManagerClientEfl::IsPasswordManagerFillingEnabled()
+{
+  return GetDriver()->GetPasswordManager()->IsPasswordManagerFillingEnabled();
+}
+
+void PasswordManagerClientEfl::SetPasswordManagerFillingEnabled(bool enabled)
+{
+  GetDriver()->GetPasswordManager()->SetPasswordManagerFillingEnabled(enabled);
 }
 
 // static

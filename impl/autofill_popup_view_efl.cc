@@ -190,8 +190,13 @@ void AutofillPopupViewEfl::InitFormData(
           base::WeakPtr<AutofillPopupDelegate> delegate){
   values_ = values;
   for (size_t i = 0; i < values_.size(); ++i) {
-    std::string label = UTF16ToUTF8(values_[i]);
-    snprintf(labels_[i], sizeof(labels_[i]), "%s", label.c_str());
+    std::string value = UTF16ToUTF8(values_[i]);
+    std::string label = UTF16ToUTF8(labels[i]);
+    if(!label.empty())
+      snprintf(labels_[i], sizeof(labels_[i]), "%s (%s)", value.c_str(),
+          label.c_str());
+    else
+      snprintf(labels_[i], sizeof(labels_[i]), "%s", value.c_str());
   }
   icons_ = icons;
   identifiers_ = identifiers;

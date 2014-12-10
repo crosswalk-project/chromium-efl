@@ -55,6 +55,7 @@ class AutofillManagerDelegateEfl
   virtual void UpdateAutofillPopupDataListValues(const std::vector<base::string16>& values, const std::vector<base::string16>& labels) override;
   virtual void HideAutofillPopup() override;
   virtual bool IsAutocompleteEnabled() override;
+  virtual bool IsAutocompleteSavingEnabled() override;
   virtual void DetectAccountCreationForms(const std::vector<autofill::FormStructure*>& forms) override;
   // content::WebContentsObserver implementation.
   virtual void DidNavigateMainFrame(const content::LoadCommittedDetails& details, const content::FrameNavigateParams& params) override;

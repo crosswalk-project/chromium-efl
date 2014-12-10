@@ -61,7 +61,8 @@ PasswordManager::PasswordManager(PasswordManagerClient* client)
     : client_(client), driver_(client->GetDriver()) {
   DCHECK(client_);
   DCHECK(driver_);
-  password_manager_enabled_ = true;
+  password_manager_saving_enabled_ = true;
+  password_manager_filling_enabled_ = true;
 }
 
 PasswordManager::~PasswordManager()
@@ -90,19 +91,29 @@ void PasswordManager::SetFormHasGeneratedPassword(const PasswordForm& form) {
   manager->SetHasGeneratedPassword();
 }
 
-bool PasswordManager::IsPasswordManagerEnabled() const
+bool PasswordManager::IsPasswordManagerSavingEnabled() const
 {
-  return password_manager_enabled_ && !driver_->IsOffTheRecord();
+  return password_manager_saving_enabled_ && !driver_->IsOffTheRecord();
 }
 
-void PasswordManager::SetPasswordManagerEnabled(bool enabled)
+void PasswordManager::SetPasswordManagerSavingEnabled(bool enabled)
 {
-  password_manager_enabled_ = enabled;
+  password_manager_saving_enabled_ = enabled;
+}
+
+bool PasswordManager::IsPasswordManagerFillingEnabled() const
+{
+  return password_manager_filling_enabled_ && !driver_->IsOffTheRecord();
+}
+
+void PasswordManager::SetPasswordManagerFillingEnabled(bool enabled)
+{
+  password_manager_filling_enabled_ = enabled;
 }
 
 void PasswordManager::ProvisionallySavePassword(const PasswordForm& form)
 {
-  if (!IsPasswordManagerEnabled()) {
+  if (!IsPasswordManagerSavingEnabled()) {
     RecordFailure(SAVING_DISABLED, form.origin.host());
     return;
   }
@@ -221,7 +232,7 @@ void PasswordManager::OnPasswordFormSubmitted(
 
 void PasswordManager::OnPasswordFormsParsed(
     const std::vector<PasswordForm>& forms) {
-  if(!IsPasswordManagerEnabled()) {
+  if(!IsPasswordManagerFillingEnabled()) {
     return;
   }
   // Ask the SSLManager for current security.
@@ -242,7 +253,7 @@ void PasswordManager::OnPasswordFormsParsed(
     // Avoid prompting the user for access to a password if they don't have
     // password saving enabled.
     PasswordStore::AuthorizationPromptPolicy prompt_policy =
-        password_manager_enabled_ ? PasswordStore::ALLOW_PROMPT
+        password_manager_saving_enabled_ ? PasswordStore::ALLOW_PROMPT
                                    : PasswordStore::DISALLOW_PROMPT;
 
     manager->FetchMatchingLoginsFromPasswordStore(prompt_policy);
@@ -257,7 +268,7 @@ bool PasswordManager::ShouldPromptUserToSavePassword() const {
 
 void PasswordManager::OnPasswordFormsRendered(
     const std::vector<PasswordForm>& visible_forms) {
-  if(!IsPasswordManagerEnabled()) {
+  if(!IsPasswordManagerFillingEnabled()) {
     return;
   }
 

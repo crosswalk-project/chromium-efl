@@ -470,6 +470,17 @@ JavaScriptDialogManager* WebContentsDelegateEfl::GetJavaScriptDialogManager() {
   return dialog_manager_;
 }
 
+void WebContentsDelegateEfl::OnUpdateSettings(const Ewk_Settings *settings) {
+#ifdef TIZEN_AUTOFILL_SUPPORT
+  PasswordManagerClientEfl *client =
+      PasswordManagerClientEfl::FromWebContents(&web_contents_);
+  if(client) {
+    client->SetPasswordManagerSavingEnabled(settings->autofillPasswordForm());
+    client->SetPasswordManagerFillingEnabled(settings->autofillProfileForm());
+  }
+#endif
+}
+
 bool WebContentsDelegateEfl::OnMessageReceived(const IPC::Message& message) {
   bool handled = true;
   IPC_BEGIN_MESSAGE_MAP(WebContentsDelegateEfl, message)
