@@ -16,6 +16,7 @@ public:
   ~EwkGlobalData();
 
   static EwkGlobalData* GetInstance();
+  static void Delete();
   static void Ensure();
 
 private:

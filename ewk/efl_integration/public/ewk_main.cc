@@ -143,7 +143,7 @@ error_eina:
 
 int ewk_shutdown(void)
 {
-  if (--_ewkInitCount)
+  if (!_ewkInitCount || --_ewkInitCount)
       return _ewkInitCount;
 
   _ewk_shutdown_web_engine();
@@ -190,10 +190,8 @@ void _ewk_init_web_engine()
 
 void _ewk_shutdown_web_engine(void)
 {
-    //TODO: any web engine destroy to be done here
-    CommandLineEfl::Shutdown();
-    if (EwkGlobalData::GetInstance()) {
-      delete EwkGlobalData::GetInstance();
-    }
+  //TODO: any web engine destroy to be done here
+  CommandLineEfl::Shutdown();
+  EwkGlobalData::Delete();
 }
 

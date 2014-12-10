@@ -92,6 +92,7 @@ Evas_Object* ewk_view_add_with_context(Evas* e, Ewk_Context* context)
 
 Evas_Object* ewk_view_add(Evas* e)
 {
+  EINA_SAFETY_ON_NULL_RETURN_VAL(e, NULL);
   // TODO: shouldn't this function create new EWebContext for each new EWebView?
   // when using default context like that it makes unclear who should release
   // default web context. It won't be released by destroyed eweb_view because

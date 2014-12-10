@@ -72,6 +72,11 @@ EwkGlobalData* EwkGlobalData::GetInstance() {
   return instance_;
 }
 
+void EwkGlobalData::Delete() {
+  delete instance_;
+  instance_ = NULL;
+}
+
 void EwkGlobalData::Ensure() {
   if (instance_)
     return;
