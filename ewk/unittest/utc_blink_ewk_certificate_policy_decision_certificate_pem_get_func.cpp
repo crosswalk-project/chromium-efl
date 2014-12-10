@@ -8,7 +8,7 @@
 
 #define URL "https://www.pcwebshop.co.uk"
 
-class utc_blink_ewk_certificate_pem_get : public utc_blink_ewk_base
+class utc_blink_ewk_certificate_policy_decision_certificate_pem_get : public utc_blink_ewk_base
 {
 
 protected:
@@ -31,7 +31,7 @@ protected:
   static void policy_decision(void* data, Evas_Object* webview, void* event_info)
   {
     utc_message("[policy decision] :: \n");
-    utc_blink_ewk_certificate_pem_get *owner = static_cast<utc_blink_ewk_certificate_pem_get*>(data);
+    utc_blink_ewk_certificate_policy_decision_certificate_pem_get *owner = static_cast<utc_blink_ewk_certificate_policy_decision_certificate_pem_get*>(data);
 
     Ewk_Certificate_Policy_Decision* policy = (Ewk_Certificate_Policy_Decision*)event_info;
 
@@ -44,7 +44,7 @@ protected:
 /**
 * @brief Checking whether certification request confirmation works properly.
 */
-TEST_F(utc_blink_ewk_certificate_pem_get, POS_TEST)
+TEST_F(utc_blink_ewk_certificate_policy_decision_certificate_pem_get, POS_TEST)
 {
   Eina_Bool result = ewk_view_url_set(GetEwkWebView(), URL);
 
@@ -64,7 +64,7 @@ TEST_F(utc_blink_ewk_certificate_pem_get, POS_TEST)
 * @brief Checking whether function works properly in case of NULL of a webview.
 */
 /*  To be implemented
-TEST_F(utc_blink_ewk_certificate_pem_get, NEG_TEST)
+TEST_F(utc_blink_ewk_certificate_policy_decision_certificate_pem_get, NEG_TEST)
 {
   is_failed = EINA_FALSE;
   is_Accepted = EINA_FALSE;

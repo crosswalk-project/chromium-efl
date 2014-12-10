@@ -4,14 +4,14 @@
 
 #include "utc_blink_ewk_base.h"
 
-class utc_blink_ewk_settings_load_images_automatically_set : public utc_blink_ewk_base {
+class utc_blink_ewk_settings_loads_images_automatically_set : public utc_blink_ewk_base {
 };
 
 
 /**
  * @brief Tests if returns TRUE when initiated with a correct webview and set to TRUE.
  */
-TEST_F(utc_blink_ewk_settings_load_images_automatically_set, POS_TEST1)
+TEST_F(utc_blink_ewk_settings_loads_images_automatically_set, POS_TEST1)
 {
   Ewk_Settings* settings = ewk_view_settings_get(GetEwkWebView());
   if (!settings) {
@@ -29,7 +29,7 @@ TEST_F(utc_blink_ewk_settings_load_images_automatically_set, POS_TEST1)
 /**
  * @brief Tests if returns FALSE when initiated with a correct webview and set to FALSE.
  */
-TEST_F(utc_blink_ewk_settings_load_images_automatically_set, POS_TEST2)
+TEST_F(utc_blink_ewk_settings_loads_images_automatically_set, POS_TEST2)
 {
   Ewk_Settings* settings = ewk_view_settings_get(GetEwkWebView());
   if (!settings) {
@@ -47,7 +47,7 @@ TEST_F(utc_blink_ewk_settings_load_images_automatically_set, POS_TEST2)
 /**
  * @brief Tests if returns FALSE when initiated with NULL webview.
  */
-TEST_F(utc_blink_ewk_settings_load_images_automatically_set, NEG_TEST)
+TEST_F(utc_blink_ewk_settings_loads_images_automatically_set, NEG_TEST)
 {
   Eina_Bool result = ewk_settings_loads_images_automatically_set(NULL, EINA_TRUE);
   EXPECT_EQ(result, EINA_FALSE);

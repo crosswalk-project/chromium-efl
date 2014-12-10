@@ -4,7 +4,7 @@
 
 #include "utc_blink_ewk_base.h"
 
-class utc_blink_ewk_view_back_forward_n_back_items_copy : public utc_blink_ewk_base
+class utc_blink_ewk_back_forward_list_n_back_items_copy : public utc_blink_ewk_base
 {
 protected:
   void LoadFinished(Evas_Object *) {
@@ -17,11 +17,11 @@ protected:
   static const char* const TEST_URL3;
 };
 
-const char* const utc_blink_ewk_view_back_forward_n_back_items_copy::TEST_URL1 = "ewk_history/page1.html";
-const char* const utc_blink_ewk_view_back_forward_n_back_items_copy::TEST_URL2 = "ewk_history/page2.html";
-const char* const utc_blink_ewk_view_back_forward_n_back_items_copy::TEST_URL3 = "ewk_history/page3.html";
+const char* const utc_blink_ewk_back_forward_list_n_back_items_copy::TEST_URL1 = "ewk_history/page1.html";
+const char* const utc_blink_ewk_back_forward_list_n_back_items_copy::TEST_URL2 = "ewk_history/page2.html";
+const char* const utc_blink_ewk_back_forward_list_n_back_items_copy::TEST_URL3 = "ewk_history/page3.html";
 
-TEST_F(utc_blink_ewk_view_back_forward_n_back_items_copy, LESS_ITEMS_TEST)
+TEST_F(utc_blink_ewk_back_forward_list_n_back_items_copy, LESS_ITEMS_TEST)
 {
   // load 3 pages to get some interesting history
   ASSERT_EQ(EINA_TRUE, ewk_view_url_set(GetEwkWebView(), GetResourceUrl(TEST_URL1).c_str()));
@@ -50,7 +50,7 @@ TEST_F(utc_blink_ewk_view_back_forward_n_back_items_copy, LESS_ITEMS_TEST)
   eina_list_free(back_list);
 }
 
-TEST_F(utc_blink_ewk_view_back_forward_n_back_items_copy, EQUAL_ITEMS_TEST)
+TEST_F(utc_blink_ewk_back_forward_list_n_back_items_copy, EQUAL_ITEMS_TEST)
 {
   // load 3 pages to get some interesting history
   ASSERT_EQ(EINA_TRUE, ewk_view_url_set(GetEwkWebView(), GetResourceUrl(TEST_URL1).c_str()));
@@ -107,7 +107,7 @@ TEST_F(utc_blink_ewk_view_back_forward_n_back_items_copy, EQUAL_ITEMS_TEST)
   eina_list_free(back_list);
 }
 
-TEST_F(utc_blink_ewk_view_back_forward_n_back_items_copy, MORE_ITEMS_TEST)
+TEST_F(utc_blink_ewk_back_forward_list_n_back_items_copy, MORE_ITEMS_TEST)
 {
   // load 3 pages to get some interesting history
   ASSERT_EQ(EINA_TRUE, ewk_view_url_set(GetEwkWebView(), GetResourceUrl(TEST_URL1).c_str()));
@@ -144,7 +144,7 @@ TEST_F(utc_blink_ewk_view_back_forward_n_back_items_copy, MORE_ITEMS_TEST)
   eina_list_free(back_list);
 }
 
-TEST_F(utc_blink_ewk_view_back_forward_n_back_items_copy, EMPTY_TEST)
+TEST_F(utc_blink_ewk_back_forward_list_n_back_items_copy, EMPTY_TEST)
 {
   Ewk_Back_Forward_List *list = ewk_view_back_forward_list_get(GetEwkWebView());
   ASSERT_TRUE(list);
@@ -152,7 +152,7 @@ TEST_F(utc_blink_ewk_view_back_forward_n_back_items_copy, EMPTY_TEST)
   ASSERT_EQ(0, eina_list_count(back_list));
 }
 
-TEST_F(utc_blink_ewk_view_back_forward_n_back_items_copy, NULL_TEST)
+TEST_F(utc_blink_ewk_back_forward_list_n_back_items_copy, NULL_TEST)
 {
   ASSERT_FALSE(ewk_back_forward_list_n_back_items_copy(NULL, -1));
 }

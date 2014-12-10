@@ -4,7 +4,7 @@
 
 #include "utc_blink_ewk_base.h"
 
-class utc_blink_ewk_context_cache_disabled : public utc_blink_ewk_base
+class utc_blink_ewk_context_cache_disabled_set : public utc_blink_ewk_base
 {
 protected:
 };
@@ -12,7 +12,7 @@ protected:
 /**
  * @brief Checking whether cache is cleared.
  */
-TEST_F(utc_blink_ewk_context_cache_disabled, POS_TEST1)
+TEST_F(utc_blink_ewk_context_cache_disabled_set, POS_TEST1)
 {
   Ewk_Context* context = ewk_context_default_get();
   if (!context) {
@@ -25,7 +25,7 @@ TEST_F(utc_blink_ewk_context_cache_disabled, POS_TEST1)
   EXPECT_EQ(result, EINA_TRUE);
 }
 
-TEST_F(utc_blink_ewk_context_cache_disabled, POS_TEST2)
+TEST_F(utc_blink_ewk_context_cache_disabled_set, POS_TEST2)
 {
   Eina_Bool result = ewk_context_cache_disabled_set(ewk_context_default_get(), false);
   if (!result) {
@@ -36,7 +36,7 @@ TEST_F(utc_blink_ewk_context_cache_disabled, POS_TEST2)
 /**
  * @brief Checking whether function works properly in case of NULL of a context.
  */
-TEST_F(utc_blink_ewk_context_cache_disabled, NEG_TEST)
+TEST_F(utc_blink_ewk_context_cache_disabled_set, NEG_TEST)
 {
   Eina_Bool result = ewk_context_cache_disabled_set(NULL, true);
   if (result) {

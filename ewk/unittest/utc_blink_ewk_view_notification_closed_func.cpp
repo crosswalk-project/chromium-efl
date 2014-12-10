@@ -4,7 +4,7 @@
 
 #include "utc_blink_ewk_base.h"
 
-class utc_blink_ewk_notification_closed : public utc_blink_ewk_base
+class utc_blink_ewk_view_notification_closed : public utc_blink_ewk_base
 {
  protected:
   /* Callback for "notification,permission,request" */
@@ -23,7 +23,7 @@ class utc_blink_ewk_notification_closed : public utc_blink_ewk_base
     utc_message("[notificationShow] :: \n");
     if(!data)
       utc_fail();
-    utc_blink_ewk_notification_closed* owner=static_cast<utc_blink_ewk_notification_closed*>(data);
+    utc_blink_ewk_view_notification_closed* owner=static_cast<utc_blink_ewk_view_notification_closed*>(data);
 
     Ewk_Context* context = ewk_view_context_get(webview);
     if (!event_info || !context)
@@ -55,12 +55,12 @@ protected:
   Ewk_Notification* old_notification;
 };
 
-const char*const utc_blink_ewk_notification_closed::sample="common/sample_notification_1.html";
+const char*const utc_blink_ewk_view_notification_closed::sample="common/sample_notification_1.html";
 
 /**
 * @brief Positive test case for ewk_notification_showed()
 */
-TEST_F(utc_blink_ewk_notification_closed, POS_TEST)
+TEST_F(utc_blink_ewk_view_notification_closed, POS_TEST)
 {
   if(!ewk_view_url_set(GetEwkWebView(), GetResourceUrl(sample).c_str()))
     utc_fail();
@@ -77,9 +77,9 @@ TEST_F(utc_blink_ewk_notification_closed, POS_TEST)
 /**
 * @brief Checking whether function works properly in case of NULL value pass
 */
-TEST_F(utc_blink_ewk_notification_closed, NEG_TEST)
+TEST_F(utc_blink_ewk_view_notification_closed, NEG_TEST)
 {
-  ewk_notification_showed(NULL, 0);
+  ewk_view_notification_closed(NULL, 0);
   /* If NULL argument passing won't give segmentation fault negative test case will pass */
   utc_pass();
 }

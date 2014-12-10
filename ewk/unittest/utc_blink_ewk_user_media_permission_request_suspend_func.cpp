@@ -4,7 +4,7 @@
 
 #include "utc_blink_ewk_base.h"
 
-class utc_blink_ewk_user_media_permission_suspend : public utc_blink_ewk_base
+class utc_blink_ewk_user_media_permission_request_suspend : public utc_blink_ewk_base
 {
 protected:
   void PostSetUp()
@@ -22,7 +22,7 @@ protected:
     utc_message("[media permission handler] ::");
     if(data)
     {
-      utc_blink_ewk_user_media_permission_suspend *owner= static_cast<utc_blink_ewk_user_media_permission_suspend*>(data);
+      utc_blink_ewk_user_media_permission_request_suspend *owner= static_cast<utc_blink_ewk_user_media_permission_request_suspend*>(data);
       Ewk_User_Media_Permission_Request* media_permission_request = static_cast<Ewk_User_Media_Permission_Request*>(event_info);
       if (!media_permission_request) {
         owner->EventLoopStop(Failure);
@@ -37,7 +37,7 @@ protected:
 /**
   * @brief Checking whether sending cancellation notification for authentication challenge works properly.
   */
-TEST_F(utc_blink_ewk_user_media_permission_suspend, POS_TEST)
+TEST_F(utc_blink_ewk_user_media_permission_request_suspend, POS_TEST)
 {
   if( !ewk_view_url_set(GetEwkWebView(), "http://shinydemos.com/explode/"))
     utc_fail();
@@ -52,7 +52,7 @@ TEST_F(utc_blink_ewk_user_media_permission_suspend, POS_TEST)
 /**
   * @brief Checking whether function works properly in case of NULL of a webview.
   */
-TEST_F(utc_blink_ewk_user_media_permission_suspend, NEG_TEST)
+TEST_F(utc_blink_ewk_user_media_permission_request_suspend, NEG_TEST)
 {
   Eina_Bool result = ewk_view_url_set(NULL, "http://shinydemos.com/explode/");
   if (result)
