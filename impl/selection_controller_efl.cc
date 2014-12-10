@@ -195,15 +195,12 @@ void SelectionControllerEfl::ShowHandleAndContextMenuIfRequired(
         && !(hit_test->GetResultContext() & tizen_webview::TW_HIT_TEST_RESULT_CONTEXT_EDITABLE))
       return;
 
-    gfx::Rect left = selection_data_->GetLeftRect();
     input_handle_->SetBasePosition(gfx::Point(left.x(), left.y()));
     input_handle_->Move(left.bottom_right());
     input_handle_->Show();
     start_handle_->Hide();
     end_handle_->Hide();
 
-    if (!mouse_press_)
-      parent_view_->ShowContextMenu(*(selection_data_->GetContextMenuParams()), MENU_TYPE_SELECTION);
     parent_view_->QuerySelectionStyle();
     return;
   } else {
@@ -311,6 +308,8 @@ void SelectionControllerEfl::OnMouseUp(const gfx::Point& touch_point) {
   start_handle_->SetBasePosition(selection_data_->GetLeftRect().bottom_left());
   end_handle_->SetBasePosition(selection_data_->GetRightRect().bottom_right());
   ShowHandleAndContextMenuIfRequired();
+
+  parent_view_->ShowContextMenu(*(selection_data_->GetContextMenuParams()), MENU_TYPE_SELECTION);
 }
 
 void SelectionControllerEfl::GetSelectionBounds(gfx::Rect* left, gfx::Rect* right) {
