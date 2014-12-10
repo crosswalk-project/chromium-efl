@@ -300,24 +300,6 @@ bool EWebContext::GetNetworkCacheEnable() const {
   return (http_cache->mode() != net::HttpCache::DISABLE);
 }
 
-bool EWebContext::HTTPCustomHeaderAdd(const char* name, const char* value) {
-  pair<map<string, string>::iterator,bool> ret;
-  ret = http_custom_headers_.insert(std::make_pair(string(name), string(value)));
-  return ret.second;
-}
-
-bool EWebContext::HTTPCustomHeaderRemove(const char* name) {
-  return http_custom_headers_.erase(string(name));
-}
-
-void EWebContext::HTTPCustomHeaderClear() {
-  http_custom_headers_.clear();
-}
-
-const HTTPCustomHeadersEflMap& EWebContext::GetHTTPCustomHeadersEflMap() const {
-  return http_custom_headers_;
-}
-
 void EWebContext::AddExtraPluginDir(const char *path) {
 #if defined(ENABLE_PLUGINS)
   content::PluginList::Singleton()->AddExtraPluginDir(base::FilePath(path));

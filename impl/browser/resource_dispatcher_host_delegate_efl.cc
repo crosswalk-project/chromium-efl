@@ -3,6 +3,7 @@
 // found in the LICENSE file.
 
 #include "resource_dispatcher_host_delegate_efl.h"
+#include "resource_throttle_efl.h"
 
 #include "content/public/browser/browser_thread.h"
 #include "content/public/browser/web_contents.h"
@@ -14,21 +15,23 @@
 #include "common/web_contents_utils.h"
 #include "eweb_context.h"
 
-using web_contents_utils::WebContentsFromFrameID;
+using web_contents_utils::WebContentsFromViewID;
 
 namespace content {
 
 namespace {
 
 void TriggerNewDownloadStartCallbackOnUIThread(
-    int render_process_id, int render_frame_id,
+    int render_process_id,
+    int render_view_id,
     const GURL& url,
     const std::string& /*user_agent*/,
     const std::string& /*content_disposition*/,
     const std::string& /*mime_type*/,
     int64 /*content_length*/) {
-  WebContents* web_contents = WebContentsFromFrameID(
-      render_process_id, render_frame_id);
+  WebContents* web_contents = WebContentsFromViewID(
+    render_process_id, render_view_id);
+
   if (!web_contents)
     return;
 
@@ -54,22 +57,22 @@ void ResourceDispatcherHostDelegateEfl::RequestBeginning(
     AppCacheService* appcache_service,
     ResourceType resource_type,
     ScopedVector<ResourceThrottle>* throttles) {
-  BrowserContextEfl::ResourceContextEfl *resource_context_efl =
-      static_cast<BrowserContextEfl::ResourceContextEfl*>(resource_context);
-  if (!resource_context_efl)
-    return;
 
-  BrowserContextEfl *browser_context = resource_context_efl->getBrowserContext();
-  if (!browser_context)
-    return;
+  // policy response and custom headers should be probably only for HTTP and HTTPs
+  if (request->url().SchemeIsHTTPOrHTTPS()) {
+    throttles->push_back(new ResourceThrottleEfl(*request, resource_type));
 
-  EWebContext* eweb_context = browser_context->WebContext();
-  if (!eweb_context)
-    return;
+    BrowserContextEfl::ResourceContextEfl *resource_context_efl =
+        static_cast<BrowserContextEfl::ResourceContextEfl*>(resource_context);
+    if (!resource_context_efl)
+      return;
 
-  HTTPCustomHeadersEflMap header_map = eweb_context->GetHTTPCustomHeadersEflMap();
-  for (HTTPCustomHeadersEflMap::iterator it = header_map.begin(); it != header_map.end(); ++it)
-    request->SetExtraRequestHeaderByName(it->first, it->second, true);
+    HTTPCustomHeadersEflMap header_map =
+        resource_context_efl->GetHTTPCustomHeadersEflMap();
+    for (HTTPCustomHeadersEflMap::iterator it = header_map.begin();
+        it != header_map.end(); ++it)
+      request->SetExtraRequestHeaderByName(it->first, it->second, true);
+  }
 }
 
 ResourceDispatcherHostLoginDelegate*
@@ -110,7 +113,9 @@ void ResourceDispatcherHostDelegateEfl::DownloadStarting(
                 user_agent,
                 content_disposition,
                 mime_type,
-                content_length);
+                content_length,
+                child_id,
+                route_id);
   }
 }
 
@@ -119,16 +124,10 @@ void ResourceDispatcherHostDelegateEfl::TriggerNewDownloadStartCallback(
     const std::string& user_agent,
     const std::string& content_disposition,
     const std::string& mime_type,
-    int64 content_length) {
+    int64 content_length,
+    int render_process_id,
+    int render_view_id) {
   DCHECK(BrowserThread::CurrentlyOn(BrowserThread::IO));
-  int render_process_id = -1;
-  int render_frame_id = -1;
-  if (!ResourceRequestInfo::GetRenderFrameForRequest(
-      request, &render_process_id, &render_frame_id))
-    return;
-
-  if (render_process_id == -1 || render_frame_id == -1)
-    return;
 
   // Since called by IO thread callback trigger needs to
   // be posted to UI thread so that IO thread is unblocked
@@ -136,7 +135,7 @@ void ResourceDispatcherHostDelegateEfl::TriggerNewDownloadStartCallback(
     BrowserThread::UI, FROM_HERE,
     base::Bind(TriggerNewDownloadStartCallbackOnUIThread,
                render_process_id,
-               render_frame_id,
+               render_view_id,
                request->url(),
                user_agent,
                content_disposition,

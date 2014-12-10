@@ -7,8 +7,10 @@
 
 #include <vector>
 
-#include "base/memory/scoped_ptr.h"
+#include "url_request_context_getter_efl.h"
 #include "base/files/scoped_temp_dir.h"
+#include "base/memory/scoped_ptr.h"
+#include "base/synchronization/lock.h"
 #include "browser/download_manager_delegate_efl.h"
 #include "browser/geolocation/geolocation_permission_context_efl.h"
 #include "browser/notification/notification_controller_efl.h"
@@ -18,11 +20,15 @@
 #include "content/public/browser/browser_context.h"
 #include "content/public/browser/storage_partition.h"
 #include "content/public/browser/resource_context.h"
-#include "url_request_context_getter_efl.h"
-
 #include "net/url_request/url_request_context.h"
 
 class EWebContext;
+
+namespace visitedlink {
+class VisitedLinkMaster;
+}
+
+typedef std::map<std::string, std::string> HTTPCustomHeadersEflMap;
 
 namespace content {
 
@@ -30,6 +36,31 @@ class BrowserContextEfl
   : public BrowserContext,
     public visitedlink::VisitedLinkDelegate {
  public:
+  class ResourceContextEfl : public ResourceContext {
+   public:
+    ResourceContextEfl();
+    virtual ~ResourceContextEfl();
+
+    bool HTTPCustomHeaderAdd(const char* name, const char* value);
+    bool HTTPCustomHeaderRemove(const char* name);
+    void HTTPCustomHeaderClear();
+    const HTTPCustomHeadersEflMap GetHTTPCustomHeadersEflMap() const;
+
+
+    virtual net::HostResolver* GetHostResolver() override;
+    virtual net::URLRequestContext* GetRequestContext() override;
+
+    void set_url_request_context_getter(
+        scoped_refptr<URLRequestContextGetterEfl> getter);
+
+   private:
+    scoped_refptr<URLRequestContextGetterEfl> getter_;
+    HTTPCustomHeadersEflMap http_custom_headers_;
+    mutable base::Lock http_custom_headers_lock_;
+
+    DISALLOW_COPY_AND_ASSIGN(ResourceContextEfl);
+  };
+
   BrowserContextEfl(EWebContext*, bool incognito = false);
   ~BrowserContextEfl();
 
@@ -62,6 +93,7 @@ class BrowserContextEfl
 
   virtual BrowserPluginGuestManager* GetGuestManager() override
   { return 0; }
+  virtual ResourceContextEfl* GetResourceContextEfl();
 
   virtual storage::SpecialStoragePolicy* GetSpecialStoragePolicy() override
   { return 0; }
@@ -82,23 +114,6 @@ class BrowserContextEfl
   { return web_context_; }
 
   content::NotificationControllerEfl* GetNotificationController() const;
-
-  class ResourceContextEfl : public ResourceContext {
-   public:
-    ResourceContextEfl(BrowserContextEfl*);
-    virtual ~ResourceContextEfl();
-
-    virtual net::HostResolver* GetHostResolver() override;
-    virtual net::URLRequestContext* GetRequestContext() override;
-    void set_url_request_context_getter(URLRequestContextGetterEfl* getter);
-    BrowserContextEfl* getBrowserContext() { return browser_context_; };
-
-   private:
-    URLRequestContextGetterEfl* getter_;
-    BrowserContextEfl *browser_context_;
-
-    DISALLOW_COPY_AND_ASSIGN(ResourceContextEfl);
-  };
 
  private:
   static void ReadCertificateAndAdd(base::FilePath* file_path);

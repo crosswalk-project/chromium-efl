@@ -3,10 +3,28 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-#include "tw_web_context.h"
+#include "browser_context_efl.h"
 #include "eweb_context.h"
+#include "tw_web_context.h"
+
+using content::BrowserContextEfl;
 
 namespace tizen_webview {
+
+namespace {
+BrowserContextEfl::ResourceContextEfl* GetResourceContextEfl(
+    EWebContext* ctx) {
+  BrowserContextEfl::ResourceContextEfl* retval = NULL;
+
+  if (ctx) {
+    BrowserContextEfl* browser_context = ctx->browser_context();
+
+    if (browser_context)
+      retval = browser_context->GetResourceContextEfl();
+  }
+  return retval;
+}
+}
 
 static WebContext* default_context_ = NULL;
 
@@ -88,15 +106,28 @@ void WebContext::NotifyLowMemory() {
 }
 
 bool WebContext::HTTPCustomHeaderAdd(const char* name, const char* value) {
-  return impl->HTTPCustomHeaderAdd(name, value);
+  BrowserContextEfl::ResourceContextEfl* rc = GetResourceContextEfl(impl);
+
+  if (rc)
+    return rc->HTTPCustomHeaderAdd(name, value);
+
+  return false;
 }
 
 bool WebContext::HTTPCustomHeaderRemove(const char* name) {
-  return impl->HTTPCustomHeaderRemove(name);
+  BrowserContextEfl::ResourceContextEfl* rc = GetResourceContextEfl(impl);
+
+  if (rc)
+    return rc->HTTPCustomHeaderRemove(name);
+
+  return false;
 }
 
 void WebContext::HTTPCustomHeaderClear() {
-  impl->HTTPCustomHeaderClear();
+  BrowserContextEfl::ResourceContextEfl* rc = GetResourceContextEfl(impl);
+
+  if (rc)
+    rc->HTTPCustomHeaderClear();
 }
 
 void WebContext::SetCacheModel(tizen_webview::Cache_Model cm) {

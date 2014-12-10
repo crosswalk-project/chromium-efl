@@ -20,6 +20,7 @@
 
 struct NavigationPolicyParams;
 
+#include "content/public/common/resource_type.h"
 #include "tizen_webview/public/tw_policy_decision.h"
 
 // Basic type of authorization - 'type username:password'
@@ -27,6 +28,9 @@ struct NavigationPolicyParams;
 
 struct NavigationPolicyParams;
 
+namespace net {
+class URLRequest;
+}
 
 namespace content {
 class WebContentsDelegateEfl;
@@ -38,7 +42,10 @@ class _Ewk_Policy_Decision {
  /**
   * Constructs _Ewk_Policy_Decision with navigation type POLICY_RESPONSE
   */
-  explicit _Ewk_Policy_Decision(const GURL& request_url, const net::HttpResponseHeaders* response_headers, PolicyResponseDelegateEfl* delegate);
+  explicit _Ewk_Policy_Decision(const GURL& request_url,
+                                net::URLRequest* request,
+                                content::ResourceType resource_type,
+                                PolicyResponseDelegateEfl* delegate);
 
  /**
   * Constructs _Ewk_Policy_Decision with navigation type POLICY_NAVIGATION

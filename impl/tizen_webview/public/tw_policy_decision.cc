@@ -12,9 +12,10 @@ namespace tizen_webview {
 
 PolicyDecision::PolicyDecision(
     const GURL& request_url,
-    const net::HttpResponseHeaders* response_headers,
+    net::URLRequest* request,
+    content::ResourceType resource_type,
     PolicyResponseDelegateEfl* delegate)
-    : impl_(new Impl(request_url, response_headers, delegate)) {
+    : impl_(new Impl(request_url, request, resource_type, delegate)) {
 }
 
 PolicyDecision::PolicyDecision(

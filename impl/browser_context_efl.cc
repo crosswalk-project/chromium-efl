@@ -14,11 +14,12 @@
 #include "content/public/browser/web_contents.h"
 #include "eweb_context.h"
 
+using std::pair;
+
 namespace content {
 
-BrowserContextEfl::ResourceContextEfl::ResourceContextEfl(BrowserContextEfl *ctx)
-    : getter_(NULL),
-      browser_context_(ctx) {
+BrowserContextEfl::ResourceContextEfl::ResourceContextEfl()
+    : getter_(NULL) {
 }
 
 BrowserContextEfl::~BrowserContextEfl() {
@@ -32,18 +33,54 @@ BrowserContextEfl::~BrowserContextEfl() {
 BrowserContextEfl::ResourceContextEfl::~ResourceContextEfl() {
 }
 
+bool BrowserContextEfl::ResourceContextEfl::HTTPCustomHeaderAdd(
+    const char* name, const char* value) {
+  if (!name)
+    return false;
+
+  std::string name_string(name);
+  if (name_string.empty())
+    return false;
+
+  std::string value_string;
+  if (value)
+    value_string.assign(value);
+
+  base::AutoLock locker(http_custom_headers_lock_);
+  return http_custom_headers_.insert(
+      std::make_pair(name_string, value_string)).second;
+}
+
+bool BrowserContextEfl::ResourceContextEfl::HTTPCustomHeaderRemove(
+    const char* name) {
+  base::AutoLock locker(http_custom_headers_lock_);
+  return http_custom_headers_.erase(string(name));
+}
+
+void BrowserContextEfl::ResourceContextEfl::HTTPCustomHeaderClear() {
+  base::AutoLock locker(http_custom_headers_lock_);
+  http_custom_headers_.clear();
+}
+
+const HTTPCustomHeadersEflMap
+    BrowserContextEfl::ResourceContextEfl::GetHTTPCustomHeadersEflMap() const {
+  base::AutoLock locker(http_custom_headers_lock_);
+  return http_custom_headers_;
+}
+
+
 net::HostResolver* BrowserContextEfl::ResourceContextEfl::GetHostResolver() {
-  CHECK(getter_);
+  CHECK(getter_.get());
   return getter_->host_resolver();
 }
 
 net::URLRequestContext* BrowserContextEfl::ResourceContextEfl::GetRequestContext() {
-  CHECK(getter_);
+  CHECK(getter_.get());
   return getter_->GetURLRequestContext();
 }
 
 void BrowserContextEfl::ResourceContextEfl::set_url_request_context_getter(
-    URLRequestContextGetterEfl* getter) {
+    scoped_refptr<URLRequestContextGetterEfl> getter) {
   getter_ = getter;
 }
 
@@ -64,8 +101,13 @@ net::URLRequestContextGetter* BrowserContextEfl::GetRequestContext() {
 
 ResourceContext* BrowserContextEfl::GetResourceContext() {
   if (!resource_context_)
-    resource_context_ = new ResourceContextEfl(this);
+    resource_context_ = new ResourceContextEfl();
 
+  return resource_context_;
+}
+
+BrowserContextEfl::ResourceContextEfl* BrowserContextEfl::GetResourceContextEfl() {
+  GetResourceContext();
   return resource_context_;
 }
 

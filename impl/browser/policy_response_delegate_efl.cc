@@ -4,7 +4,7 @@
 
 #include "browser/policy_response_delegate_efl.h"
 
-#include "API/ewk_policy_decision_private.h"
+#include "browser/resource_throttle_efl.h"
 #include "content/public/browser/browser_thread.h"
 #include "content/public/browser/render_view_host.h"
 #include "content/public/browser/render_frame_host.h"
@@ -12,6 +12,7 @@
 #include "content/public/browser/resource_request_info.h"
 #include "content/public/browser/web_contents.h"
 
+#include "API/ewk_policy_decision_private.h"
 #include "web_contents_delegate_efl.h"
 #include "common/web_contents_utils.h"
 
@@ -21,6 +22,7 @@ using content::RenderFrameHost;
 using content::ResourceDispatcherHost;
 using content::ResourceRequestInfo;
 using content::WebContents;
+using content::ResourceController;
 
 using web_contents_utils::WebContentsFromFrameID;
 
@@ -36,15 +38,18 @@ static content::WebContentsDelegateEfl* WebContentsDelegateFromFrameId(int rende
 
 }
 
-PolicyResponseDelegateEfl::PolicyResponseDelegateEfl(net::URLRequest* request,
-    const net::CompletionCallback& callback,
-    const net::HttpResponseHeaders* original_response_headers)
-    : policy_decision_(new tizen_webview::PolicyDecision(request->url(), original_response_headers, this)),
-      callback_(callback),
+PolicyResponseDelegateEfl::PolicyResponseDelegateEfl(
+    net::URLRequest* request,
+    content::ResourceType resource_type,
+    ResourceThrottleEfl* throttle)
+    : policy_decision_(new tizen_webview::PolicyDecision(request->url(),
+                                                         request,
+                                                         resource_type,
+                                                         this)),
+      throttle_(throttle),
       render_process_id_(0),
       render_frame_id_(0),
-      render_view_id_(0),
-      processed_(false) {
+      render_view_id_(0) {
   DCHECK(BrowserThread::CurrentlyOn(BrowserThread::IO));
 
   const ResourceRequestInfo* info = ResourceRequestInfo::ForRequest(request);
@@ -86,7 +91,7 @@ void PolicyResponseDelegateEfl::HandlePolicyResponseOnUIThread() {
 void PolicyResponseDelegateEfl::UseResponse() {
   DCHECK(BrowserThread::CurrentlyOn(BrowserThread::UI));
   BrowserThread::PostTask(BrowserThread::IO, FROM_HERE,
-        base::Bind(&PolicyResponseDelegateEfl::UseResponseOnIOThread, this));
+      base::Bind(&PolicyResponseDelegateEfl::UseResponseOnIOThread, this));
 }
 
 void PolicyResponseDelegateEfl::IgnoreResponse() {
@@ -97,24 +102,24 @@ void PolicyResponseDelegateEfl::IgnoreResponse() {
 
 void PolicyResponseDelegateEfl::UseResponseOnIOThread() {
   DCHECK(BrowserThread::CurrentlyOn(BrowserThread::IO));
-  if (processed_)
-    return;
-
-  callback_.Run(net::OK);
-  processed_ = true;
+  if (throttle_) {
+    throttle_->Resume();
+    // decision is already taken so there is no need to use throttle anymore.
+    throttle_ = NULL;
+  }
 }
 
 void PolicyResponseDelegateEfl::IgnoreResponseOnIOThread() {
   DCHECK(BrowserThread::CurrentlyOn(BrowserThread::IO));
-  if (processed_)
-    return;
+  if (throttle_) {
+    throttle_->Ignore();
+    throttle_ = NULL;
 
-  callback_.Run(net::ERR_BLOCKED_BY_CLIENT);
-  processed_ = true;
+  }
 }
 
-void PolicyResponseDelegateEfl::HandleURLRequestDestroyedOnIOThread() {
+void PolicyResponseDelegateEfl::ThrottleDestroyed(){
   DCHECK(BrowserThread::CurrentlyOn(BrowserThread::IO));
-  // The request has gone so don't try to do anything about it further.
-  processed_ = true;
+   // The throttle has gone so don't try to do anything about it further.
+  throttle_ = NULL;
 }

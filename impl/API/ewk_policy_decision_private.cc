@@ -20,41 +20,12 @@ namespace {
   void FreeStringShare(void *data) {
     eina_stringshare_del(static_cast<char*>(data));
   }
-
-  // If the MIME type, |mime_type| is "application/octet-stream",
-  // and if a URL, |request_url| has a webfont extension,
-  // Let's set the policy decision type as "USE."
-  tizen_webview::Policy_Decision_Type GetSanitizedDecisionTypeForWebFontIfNeeded(
-    const GURL &request_url,
-    const std::string& mime_type,
-    tizen_webview::Policy_Decision_Type default_value) {
-
-    const char* kWoff = ".woff";
-    const char* kEot = ".eot";
-    const char* kOtf = ".otf";
-    const char* kApplicationOctetStream = "application/octet-stream";
-
-    tizen_webview::Policy_Decision_Type return_value = default_value;
-
-    if (request_url.is_empty() || !request_url.is_valid())
-      return return_value;
-
-    if (mime_type == kApplicationOctetStream) {
-      std::string file_name = request_url.ExtractFileName();
-      if (!file_name.empty()) {
-        size_t pos = file_name.rfind('.');
-        if (pos != std::string::npos) {
-          std::string ext = file_name.substr(pos); // Extension
-          if (ext == kWoff || ext == kEot || ext == kOtf)
-            return_value = TW_POLICY_DECISION_USE;
-        }
-      }
-    }
-    return return_value;
-  }
 }
 
-_Ewk_Policy_Decision::_Ewk_Policy_Decision(const GURL &request_url, const net::HttpResponseHeaders* response_headers, PolicyResponseDelegateEfl* delegate)
+_Ewk_Policy_Decision::_Ewk_Policy_Decision(const GURL &request_url,
+                                           net::URLRequest* request,
+                                           content::ResourceType resource_type,
+                                           PolicyResponseDelegateEfl* delegate)
   : new_window_policy_delegate_(NULL)
   , policy_response_delegate_(delegate)
   , responseHeaders_(NULL)
@@ -64,25 +35,24 @@ _Ewk_Policy_Decision::_Ewk_Policy_Decision(const GURL &request_url, const net::H
   , isSuspended_(false)
   , responseStatusCode_(0)
   , type_(POLICY_RESPONSE) {
-  DCHECK(response_headers);
   DCHECK(delegate);
+  DCHECK(request);
+
+  net::HttpResponseHeaders* response_headers = request->response_headers();
+  DCHECK(response_headers);
 
   ParseUrl(request_url);
-
   if (response_headers) {
     responseStatusCode_ = response_headers->response_code();
 
     std::string mime_type;
 
-    if (response_headers->GetMimeType(&mime_type)) {
-      responseMime_ = mime_type;
+    request->GetMimeType(&mime_type);
+    responseMime_ = mime_type;
 
-      if (!net::IsSupportedMimeType(mime_type))
-        decisionType_ = TW_POLICY_DECISION_DOWNLOAD;
-
-      // Fallback to TW_POLICY_DECISION_USE if it is a webfont.
-      decisionType_ = GetSanitizedDecisionTypeForWebFontIfNeeded(
-        request_url, mime_type, decisionType_);
+    if (!content::IsResourceTypeFrame(resource_type) &&
+        !resource_type == content::RESOURCE_TYPE_FAVICON) {
+      decisionType_ = TW_POLICY_DECISION_DOWNLOAD;
     }
 
     if (request_url.has_password() && request_url.has_username())

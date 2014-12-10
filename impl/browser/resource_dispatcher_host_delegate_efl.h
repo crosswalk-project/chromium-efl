@@ -59,7 +59,9 @@ class ResourceDispatcherHostDelegateEfl
       const std::string& user_agent,
       const std::string& content_disposition,
       const std::string& mime_type,
-      int64 content_length);
+      int64 content_length,
+      int render_process_id,
+      int render_view_id);
 };
 
 } // namespace net

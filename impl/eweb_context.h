@@ -17,8 +17,6 @@ class WebContext;
 class WrtIpcMessageData;
 }
 
-typedef std::map<std::string, std::string> HTTPCustomHeadersEflMap;
-
 class CookieManager;
 #if defined(OS_TIZEN_TV)
 class FaviconDatabase;
@@ -53,10 +51,6 @@ class EWebContext {
   tizen_webview::Cache_Model GetCacheModel() const;
   void SetNetworkCacheEnable(bool enable);
   bool GetNetworkCacheEnable() const;
-  bool HTTPCustomHeaderAdd(const char* name, const char* value);
-  bool HTTPCustomHeaderRemove(const char* name);
-  void HTTPCustomHeaderClear();
-  const HTTPCustomHeadersEflMap& GetHTTPCustomHeadersEflMap() const;
 
   void NotifyLowMemory();
   Ewk_Cookie_Manager* ewkCookieManager();
@@ -115,7 +109,6 @@ class EWebContext {
   static tizen_webview::Mime_Override_Callback mime_override_callback_;
   scoped_ptr<WebCacheManagerEfl> web_cache_manager_;
   scoped_ptr<content::BrowserContextEfl> browser_context_;
-  HTTPCustomHeadersEflMap http_custom_headers_;
   scoped_ptr<Ewk_Cookie_Manager> ewk_cookie_manager_;
   std::string proxy_uri_;
   scoped_ptr<EwkDidStartDownloadCallback> start_download_callback_;

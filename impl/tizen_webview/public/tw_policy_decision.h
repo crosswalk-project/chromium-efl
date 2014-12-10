@@ -9,6 +9,8 @@
 #include <Eina.h>
 #include <tizen_webview/public/tw_macro.h>
 
+#include "content/public/common/resource_type.h"
+
 // TODO: break below dependency
 namespace content {
 class WebContentsDelegateEfl;
@@ -18,6 +20,7 @@ class RenderViewHost;
 // TODO: break below dependency
 namespace net  {
 class HttpResponseHeaders;
+class URLRequest;
 }
 
 // TODO: break below dependency
@@ -51,7 +54,10 @@ enum Policy_Navigation_Type {
 class PolicyDecision {
  public:
   // for type POLICY_RESPONSE
-  PolicyDecision(const GURL& request_url, const net::HttpResponseHeaders* response_headers, PolicyResponseDelegateEfl* delegate);
+  PolicyDecision(const GURL& request_url,
+                 net::URLRequest* request,
+                 content::ResourceType resource_type,
+                 PolicyResponseDelegateEfl* delegate);
   // for POLICY_NAVIGATION
   PolicyDecision(const NavigationPolicyParams &params, content::RenderViewHost* rvh);
   // for POLICY_NEWWINDOW
