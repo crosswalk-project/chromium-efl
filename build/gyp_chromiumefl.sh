@@ -28,13 +28,7 @@ if [ "$ORIGINAL_GYP_DEFINES" != "$GYP_DEFINES" ]; then
     echo "Removing component=shared_library from GYP_DEFINES."
 fi
 
-COMMON_GYP_PARAMETERS="--depth=${TOPDIR}/src
-                      --generator-output ${GYP_GENERATOR_OUTPUT}
-                      --format=ninja
-                      --check
-                      -Goutput_dir=${GYP_GENERATOR_OUTPUT}
-                      -Dchrome_src_dir=${TOPDIR}/src
-                      -Defl_impl_dir=${TOPDIR}/impl
+COMMON_GYP_PARAMETERS="
                       -Duse_libjpeg_turbo=1
                       -Dproprietary_codecs=1
                       -Dclang=0
