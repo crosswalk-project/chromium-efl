@@ -280,6 +280,9 @@ class EWebView {
   void SetContentSecurityPolicy(const char* policy, tizen_webview::ContentSecurityPolicyType type);
   void ShowPopupMenu(const gfx::Rect& rect, blink::TextDirection textDirection, double pageScaleFactor, const std::vector<content::MenuItem>& items, int data, int selectedIndex, bool multiple);
   Eina_Bool HidePopupMenu();
+  void UpdateFormNavigation(int formElementCount, int currentNodeIndex,
+      bool prevState, bool nextState);
+  void FormNavigate(bool direction);
   bool IsSelectPickerShown() const;
   void CloseSelectPicker();
   bool FormIsNavigating() const { return formIsNavigating_; }
@@ -484,12 +487,13 @@ class EWebView {
   Popup_Picker* popupPicker_;
 #endif
   bool formIsNavigating_;
-  struct {
+  typedef struct {
     int count;
     int position;
     bool prevState;
     bool nextState;
   } formNavigation;
+  formNavigation formNavigation_;
   scoped_ptr<content::ContextMenuControllerEfl> context_menu_;
   scoped_ptr<content::FileChooserControllerEfl> file_chooser_;
 #ifdef TIZEN_CONTENTS_DETECTION

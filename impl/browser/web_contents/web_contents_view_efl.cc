@@ -206,4 +206,14 @@ EWebView* WebContentsViewEfl::GetEWebView() const {
   return NULL;
 }
 
+void WebContentsViewEfl::UpdateFormNavigation(int formElementCount,
+    int currentNodeIndex, bool prevState, bool nextState) {
+  WebContentsDelegateEfl* delegate = static_cast<WebContentsDelegateEfl*>(
+      web_contents_->GetDelegate());
+  if (delegate) {
+    delegate->UpdateFormNavigation(formElementCount, currentNodeIndex,
+        prevState, nextState);
+  }
+}
+
 } // namespace content

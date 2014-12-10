@@ -6,12 +6,14 @@
 
 #include "content/common/frame_messages.h"
 #include "content/public/renderer/render_frame.h"
+#include "content/public/renderer/render_view.h"
 #include "content/renderer/render_frame_impl.h"
 #include "content/renderer/external_popup_menu.h"
 #include "common/render_messages_efl.h"
 #include "third_party/WebKit/public/web/WebDocument.h"
 #include "third_party/WebKit/public/web/WebElement.h"
 #include "third_party/WebKit/public/web/WebLocalFrame.h"
+#include "third_party/WebKit/public/web/WebView.h"
 
 #include "base/logging.h"
 
@@ -58,6 +60,8 @@ bool RenderFrameObserverEfl::OnMessageReceived(const IPC::Message& message) {
     IPC_MESSAGE_HANDLER(FrameMsg_SelectPopupMenuItems, OnSelectPopupMenuItems)
     IPC_MESSAGE_HANDLER(FrameMsg_ClosePopupMenu, OnClosePopupMenu)
 #endif
+    IPC_MESSAGE_HANDLER(FrameMsg_MoveToPreviousSelectElement, OnMovePreviousSelectElement)
+    IPC_MESSAGE_HANDLER(FrameMsg_MoveToNextSelectElement, OnMoveNextSelectElement)
     IPC_MESSAGE_UNHANDLED(handled = false)
   IPC_END_MESSAGE_MAP()
   return handled;
@@ -90,5 +94,15 @@ void RenderFrameObserverEfl::OnClosePopupMenu() {
   render_frame_impl_->DidHideExternalPopupMenu();
 }
 #endif
+
+void RenderFrameObserverEfl::OnMoveNextSelectElement() {
+  content::RenderView* render_view_ = render_frame()->GetRenderView();
+  render_view_->GetWebView()->moveSelectElementToNext();
+}
+
+void RenderFrameObserverEfl::OnMovePreviousSelectElement() {
+  content::RenderView* render_view_ = render_frame()->GetRenderView();
+  render_view_->GetWebView()->moveSelectElementToPrevious();
+}
 
 } // namespace content

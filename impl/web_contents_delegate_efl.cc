@@ -446,6 +446,12 @@ void WebContentsDelegateEfl::HidePopupMenu() {
   web_view_->HidePopupMenu();
 }
 
+void WebContentsDelegateEfl::UpdateFormNavigation(int formElementCount,
+    int currentNodeIndex, bool prevState, bool nextState) {
+  web_view_->UpdateFormNavigation(formElementCount, currentNodeIndex,
+      prevState, nextState);
+}
+
 void WebContentsDelegateEfl::FindReply(WebContents* web_contents,
                                        int request_id,
                                        int number_of_matches,

@@ -31,6 +31,9 @@ class RenderFrameObserverEfl : public RenderFrameObserver {
                               const std::vector<int>& selected_indices);
   void OnClosePopupMenu();
 #endif
+
+  void OnMovePreviousSelectElement();
+  void OnMoveNextSelectElement();
 };
 
 } // namespace content

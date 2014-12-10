@@ -63,6 +63,9 @@ class WebContentsViewEfl
 #endif
   void UpdateDragDest(RenderViewHost* host);
 
+  virtual void UpdateFormNavigation(int formElementCount, int currentNodeIndex,
+      bool prevState, bool nextState) override;
+
 private:
   EWebView* GetEWebView() const;
 

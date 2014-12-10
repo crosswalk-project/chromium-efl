@@ -150,6 +150,8 @@ class WebContentsDelegateEfl
                      int selectedIndex,
                      bool multiple);
   void HidePopupMenu();
+  void UpdateFormNavigation(int formElementCount, int currentNodeIndex,
+      bool prevState, bool nextState);
 
   void set_new_window_policy(bool policy) { should_open_new_window_ = policy; }
   bool get_new_window_policy() const { return should_open_new_window_; }

@@ -158,16 +158,16 @@ void listClosed(void* data, Evas_Object* obj, const char* emission, const char* 
 
 void navigateToNext(void *data, Evas_Object *obj, const char *emission, const char *source)
 {
-  //Popup_Picker* picker = static_cast<Popup_Picker*>(data);
-  // DJKim : FIXME
-  //ewk_view_form_navigate(picker->parent, true);
+  Popup_Picker* picker = static_cast<Popup_Picker*>(data);
+  elm_genlist_clear(picker->popupList);
+  picker->web_view_->FormNavigate(true);
 }
 
 void navigateToPrev(void *data, Evas_Object *obj, const char *emission, const char *source)
 {
-  //Popup_Picker* picker = static_cast<Popup_Picker*>(data);
-  // DJKim : FIXME
-  //ewk_view_form_navigate(picker->parent, false);
+  Popup_Picker* picker = static_cast<Popup_Picker*>(data);
+  elm_genlist_clear(picker->popupList);
+  picker->web_view_->FormNavigate(false);
 }
 
 static char* _listLabelGet(void* data, Evas_Object* obj, const char* part)

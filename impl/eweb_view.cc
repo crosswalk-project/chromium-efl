@@ -342,6 +342,11 @@ void EWebView::Initialize() {
 #if defined(OS_TIZEN)
   popupMenuItems_ = 0;
   popupPicker_ = 0;
+
+  formNavigation_.count = 1;
+  formNavigation_.position = 0;
+  formNavigation_.prevState = false;
+  formNavigation_.nextState = false;
 #endif
   //allow this object and its children to get a focus
   elm_object_tree_focus_allow_set (evas_object_, EINA_TRUE);
@@ -367,6 +372,11 @@ EWebView::~EWebView()
 
   if (popupPicker_)
     popup_picker_del(popupPicker_);
+
+  formNavigation_.count = 1;
+  formNavigation_.position = 0;
+  formNavigation_.prevState = false;
+  formNavigation_.nextState = false;
 #endif
 //  evas_object_del(evas_object());
   delete evas_event_handler_;
@@ -937,15 +947,13 @@ void EWebView::ShowPopupMenu(const gfx::Rect& rect, blink::TextDirection textDir
   ReleasePopupMenuList();
   popupMenuItems_ = popupItems;
 
-  // DJKim : FIXME
-#if 0 //ENABLE(TIZEN_WEBKIT2_FORM_NAVIGATION)
   if (popupPicker_ && FormIsNavigating()) {
     popupPicker_->multiSelect = multiple;
     PopupMenuUpdate(popupMenuItems_, selectedIndex);
     SetFormIsNavigating(false);
     return;
   }
-#endif
+
   if (popupPicker_)
     popup_picker_del(popupPicker_);
   popupPicker_ = 0;
@@ -954,8 +962,8 @@ void EWebView::ShowPopupMenu(const gfx::Rect& rect, blink::TextDirection textDir
     popupPicker_ = popup_picker_new(this, evas_object(), popupMenuItems_, 0, multiple);
   else
     popupPicker_ = popup_picker_new(this, evas_object(), popupMenuItems_, selectedIndex, multiple);
-  // DJKim : FIXME
-  //popup_picker_buttons_update(popupPicker_, formNavigation.position, formNavigation.count, false);
+
+  popup_picker_buttons_update(popupPicker_, formNavigation_.position, formNavigation_.count, false);
 #endif
 }
 
@@ -964,15 +972,21 @@ Eina_Bool EWebView::HidePopupMenu() {
   if (!popupPicker_)
     return false;
 
-  // DJKim : FIXME
-  //if (impl->pageProxy->formIsNavigating())
-  //if (FormIsNavigating())
-    //return true;
+  if (FormIsNavigating())
+    return true;
 
   popup_picker_del(popupPicker_);
   popupPicker_ = 0;
 #endif
   return true;
+}
+
+void EWebView::UpdateFormNavigation(int formElementCount, int currentNodeIndex,
+    bool prevState, bool nextState) {
+  formNavigation_.count = formElementCount;
+  formNavigation_.position = currentNodeIndex;
+  formNavigation_.prevState = prevState;
+  formNavigation_.nextState = nextState;
 }
 
 bool EWebView::IsSelectPickerShown() const {
@@ -997,14 +1011,30 @@ void EWebView::SetFormIsNavigating(bool formIsNavigating) {
 
 Eina_Bool EWebView::PopupMenuUpdate(Eina_List* items, int selectedIndex) {
 #if defined(OS_TIZEN)
-  if (popupPicker_)
+  if (!popupPicker_)
     return false;
 
   popup_picker_update(evas_object(), popupPicker_, items, selectedIndex);
-  // DJKim : FIXME
-  //popup_picker_buttons_update(popupPicker_, formIsNavigating_.position, formIsNavigating_.count, false);
+  popup_picker_buttons_update(popupPicker_, formNavigation_.position, formNavigation_.count, false);
 #endif
   return true;
+}
+
+void EWebView::FormNavigate(bool direction) {
+#if defined(OS_TIZEN)
+  RenderFrameHostImpl* render_frame_host = static_cast<RenderFrameHostImpl*>(
+      web_contents_->GetMainFrame());
+  if (!render_frame_host)
+    return;
+
+  popup_picker_buttons_update(popupPicker_, formNavigation_.position, formNavigation_.count, true);
+
+  if ((direction && formNavigation_.nextState) || (!direction && formNavigation_.prevState))
+    SetFormIsNavigating(true);
+
+  listClosed(popupPicker_, 0, 0, 0);
+  render_frame_host->MoveSelectElement(direction);
+#endif
 }
 
 Eina_Bool EWebView::DidSelectPopupMenuItem(int selectedIndex) {
