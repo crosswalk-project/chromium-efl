@@ -48,8 +48,8 @@ else
                               -Dpython_ver=$(getPythonVersion)
                               -Dtarget_arch=$host_arch
                               -Dhost_arch=$host_arch
-                              -Denable_basic_printing=0
-                              -Denable_print_preview=0
+                              -Denable_basic_printing=1
+                              -Denable_print_preview=1
                               -Duse_kerberos=0
                               -Duse_gconf=0
                               -Dlinux_use_bundled_gold=0
