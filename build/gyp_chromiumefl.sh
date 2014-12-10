@@ -29,7 +29,6 @@ if [ "$ORIGINAL_GYP_DEFINES" != "$GYP_DEFINES" ]; then
 fi
 
 COMMON_GYP_PARAMETERS="--depth=${TOPDIR}/src
-                      -I${TOPDIR}/impl/chromium-efl.gypi
                       --generator-output ${GYP_GENERATOR_OUTPUT}
                       --format=ninja
                       --check
