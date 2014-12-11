@@ -59,8 +59,6 @@ content::MainFunctionParams CommandLineEfl::GetDefaultPortParams() {
 
 #if defined(OS_TIZEN)
   p_command_line->AppendSwitch(switches::kEnableOverscrollNotifications);
-  p_command_line->AppendSwitch(switches::kTouchEvents);
-  p_command_line->AppendSwitch(switches::kEnablePinch);
 #if !defined(EWK_BRINGUP)
   p_command_line->AppendSwitch(switches::kEnableGestureTapHighlight);
 #endif
@@ -73,6 +71,8 @@ content::MainFunctionParams CommandLineEfl::GetDefaultPortParams() {
 #endif
 
 #if defined(OS_TIZEN_MOBILE)
+  p_command_line->AppendSwitch(switches::kTouchEvents);
+  p_command_line->AppendSwitch(switches::kEnablePinch);
   p_command_line->AppendSwitch(switches::kUseMobileUserAgent);
   p_command_line->AppendSwitch(switches::kEnableViewportMeta);
 #endif
