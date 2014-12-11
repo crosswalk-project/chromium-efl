@@ -2,10 +2,11 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
+#include "base/files/file_util.h"
+#include "base/synchronization/lock.h"
 #include "browser/favicon/favicon_service.h"
 #include "browser/favicon/favicon_database.h"
 #include "browser/favicon/favicon_database_p.h"
-#include "base/synchronization/lock.h"
 
 #define CHECK_OPEN if (!m_database->Open()) {\
                      return;\
@@ -20,6 +21,10 @@ FaviconService::FaviconService()
 }
 
 bool FaviconService::SetDatabasePath(const std::string& path) {
+  base::FilePath filePath(path);
+  base::FilePath dir = filePath.DirName();
+  if (!base::DirectoryExists(dir) && !base::CreateDirectory(dir))
+    return false;
   return m_database->SetPath(path);
 }
 
@@ -46,12 +51,14 @@ SkBitmap FaviconService::GetBitmapForFaviconURL(const GURL& iconUrl) const {
   return m_database->GetBitmapForFaviconURL(iconUrl);
 }
 
-void FaviconService::SetFaviconURLForPageURL(const GURL& iconUrl, const GURL& pageUrl) {
+void FaviconService::SetFaviconURLForPageURL(const GURL& iconUrl,
+                                             const GURL& pageUrl) {
   CHECK_OPEN;
   m_database->SetFaviconURLForPageURL(iconUrl, pageUrl);
 }
 
-void FaviconService::SetBitmapForFaviconURL(const SkBitmap& bitmap, const GURL& iconUrl) {
+void FaviconService::SetBitmapForFaviconURL(const SkBitmap& bitmap,
+                                            const GURL& iconUrl) {
   CHECK_OPEN;
   m_database->SetBitmapForFaviconURL(bitmap, iconUrl);
 }
