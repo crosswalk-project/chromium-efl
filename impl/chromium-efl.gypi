@@ -39,6 +39,7 @@
           # Have to exclude under target_conditions here because of multiple
           # includes/excludes in core.gyp
           ['exclude', 'rendering/RenderThemeChromiumDefault\\.cpp$'],
+          ['exclude', 'rendering/RenderThemeChromiumLinux\\.cpp$'],
         ],
       }],
     ],
