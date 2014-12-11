@@ -667,7 +667,6 @@ namespace {
 
 #define EWK_EXTRA_FEATURE(NAME, VALNAME) {NAME, Ewk_Extra_Feature_Set_## VALNAME, Ewk_Extra_Feature_Get_ ## VALNAME}
 
-#if !defined(EWK_BRINGUP)
   EXTRA_FEATURE_FUNCTIONS(LongPress)
   EXTRA_FEATURE_FUNCTIONS(LinkMagnifier)
   EXTRA_FEATURE_FUNCTIONS(DetectContents)
@@ -677,7 +676,6 @@ namespace {
   EXTRA_FEATURE_FUNCTIONS(OpenPanel)
   EXTRA_FEATURE_FUNCTIONS(AllowRestrictedURL)
   EXTRA_FEATURE_FUNCTIONS(URLBarHide)
-#endif
 
   typedef struct {
     const char* name;
@@ -686,7 +684,6 @@ namespace {
   } Ewk_Extra_Feature;
 
   static Ewk_Extra_Feature extra_features[] = {
-#if !defined(EWK_BRINGUP)
     EWK_EXTRA_FEATURE("longpress,enable", LongPress),
     EWK_EXTRA_FEATURE("link,magnifier", LinkMagnifier),
     EWK_EXTRA_FEATURE("detect,contents", DetectContents),
@@ -696,7 +693,6 @@ namespace {
     EWK_EXTRA_FEATURE("openpanel,enable", OpenPanel),
     EWK_EXTRA_FEATURE("allow,restrictedurl", AllowRestrictedURL),
     EWK_EXTRA_FEATURE("urlbar,hide", URLBarHide),
-#endif
     {NULL, NULL, NULL}
   };
 

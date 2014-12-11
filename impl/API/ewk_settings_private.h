@@ -37,6 +37,15 @@ class Ewk_Settings {
 #if defined(OS_TIZEN_TV)
         , m_cacheBuilderEnabled(false)
 #endif
+        , m_longPressEnabled(true)
+        , m_linkMagnifierEnabled(false)
+        , m_detectContentsEnabled(false)
+        , m_webLoginEnabled(false)
+        , m_doubleTapEnabled(true)
+        , m_zoomEnabled(true)
+        , m_openPanelEnabled(true)
+        , m_allowRestrictedURL(true)
+        , m_URLBarHide(false)
     { }
 
     const char* defaultTextEncoding() const {
@@ -88,6 +97,26 @@ class Ewk_Settings {
     void setCacheBuilderEnabled(bool enable) { m_cacheBuilderEnabled = enable; }
 #endif
 
+    /* ewk_extra_features related */
+    void setLongPressEnabled(bool enable) { m_longPressEnabled = enable; }
+    bool getLongPressEnabled() const { return m_longPressEnabled; }
+    void setLinkMagnifierEnabled(bool enable) { m_linkMagnifierEnabled = enable; }
+    bool getLinkMagnifierEnabled() const { return m_linkMagnifierEnabled; }
+    void setDetectContentsEnabled(bool enable) { m_detectContentsEnabled = enable; }
+    bool getDetectContentsEnabled() const { return m_detectContentsEnabled; }
+    void setWebLoginEnabled(bool enable) { m_webLoginEnabled = enable; }
+    bool getWebLoginEnabled() const { return m_webLoginEnabled; }
+    void setDoubleTapEnabled(bool enable) { m_doubleTapEnabled = enable; }
+    bool getDoubleTapEnabled() const { return m_doubleTapEnabled; }
+    void setZoomEnabled(bool enable) { m_zoomEnabled = enable; }
+    bool getZoomEnabled() const { return m_zoomEnabled; }
+    void setOpenPanelEnabled(bool enable) { m_openPanelEnabled = enable; }
+    bool getOpenPanelEnabled() const { return m_openPanelEnabled; }
+    void setAllowRestrictedURLEnabled(bool enable) { m_allowRestrictedURL = enable; }
+    bool getAllowRestrictedURLEnabled() const { return m_allowRestrictedURL; }
+    void setURLBarHideEnabled(bool enable) { m_URLBarHide = enable; }
+    bool getURLBarHideEnabled() const { return m_URLBarHide; }
+
   private:
     content::WebPreferences m_preferences;
     tizen_webview::Settings m_settings;
@@ -108,10 +137,22 @@ class Ewk_Settings {
     bool m_autoFitting;
     bool m_linkEffectEnabled;
     bool m_detectContentsAutomatically;
+
     Evas_Object* m_evas_object;
 #if defined(OS_TIZEN_TV)
     bool m_cacheBuilderEnabled;
 #endif
+
+    /* ewk_extra_features related */
+    bool m_longPressEnabled;
+    bool m_linkMagnifierEnabled;
+    bool m_detectContentsEnabled;
+    bool m_webLoginEnabled;
+    bool m_doubleTapEnabled;
+    bool m_zoomEnabled;
+    bool m_openPanelEnabled;
+    bool m_allowRestrictedURL;
+    bool m_URLBarHide;
 };
 
 #endif // ewk_settings_private_h
