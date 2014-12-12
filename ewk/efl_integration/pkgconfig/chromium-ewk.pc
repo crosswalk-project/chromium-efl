@@ -5,7 +5,7 @@ includedir=${prefix}/include
 
 Name: chromium-ewk
 Description: EWK API based on chromium-efl engine
-Version: 40.2214.0.47-1
+Version: 40.2214.38.51-1
 Requires: chromium-efl
 Libs: -L${libdir} -lchromium-ewk
 Cflags: -I${includedir}/chromium-ewk

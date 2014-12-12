@@ -10,8 +10,8 @@
 Name: chromium-efl
 Summary: Chromium EFL
 # Set by by scripts/update-chromium-version.sh
-%define ChromiumVersion 40.2214.0
-%define Week 47
+%define ChromiumVersion 40.2214.38
+%define Week 51
 Version: %{ChromiumVersion}.%{Week}
 Release: 1
 Group: Applications/Internet

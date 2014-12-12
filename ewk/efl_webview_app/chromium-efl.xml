@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<manifest xmlns="http://tizen.org/ns/packages" package="chromium-efl" version="40.2214.0.47">
+<manifest xmlns="http://tizen.org/ns/packages" package="chromium-efl" version="40.2214.38.51">
     <label> mini browser application for chromium-efl package </label>
     <author href="www.samsung.com" email="sns.park@samsung.com">SWC</author>
     <description> mini browser application based on chromium-efl </description>
