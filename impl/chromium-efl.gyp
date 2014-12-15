@@ -388,10 +388,8 @@
         'dependencies': [ 'chromium-efl-deps.gyp:tizen' ],
       }],
       ['xwalk_efl==1', {
-        'includes': [
-          '../../xwalk/xwalk_runtime_features.gypi',
-        ],
         'dependencies': [
+          '<(chrome_src_dir)/xwalk/xwalk.gyp:xwalk_runtime_base',
           '<(chrome_src_dir)/xwalk/xwalk.gyp:xwalk_application_lib',
           '<(chrome_src_dir)/xwalk/extensions/extensions.gyp:xwalk_extensions',
           '<(chrome_src_dir)/xwalk/sysapps/sysapps.gyp:sysapps',
