@@ -1,15 +1,11 @@
 ## Introduction
 
-chromium-efl is a Chromium/Blink engine port to tizen/efl platform. The port
-implements Chromium/Blink platform APIs.
+chromium-efl is a Chromium/Blink engine port to Tizen/EFL platform. It implements Chromium/Blink platform APIs, and exposes an embedding layer that is source and binary compatible with EFL-WebKit2.
 
-It also exposes a webview API implementation based on chromium-efl port. It is
-supposed to be completely source and binary compatible with EFL-WebKit2.
+## Fetch the source
 
-## Details
-
-1. gclient pulls chromium-efl into "src/tizen_src".
-2. The it runs 2 hooks in order to get the rest of the source:
+* gclient pulls chromium-efl into "src/tizen_src".
+* Then it runs 2 hooks in order to get the rest of the source:
 
 ```
 * generate-gclient-xwalk: .gclient-xwalk is created by running
@@ -19,26 +15,30 @@ supposed to be completely source and binary compatible with EFL-WebKit2.
     xwalk pull procedure. It actually fetches all depedencies based on .gclient-xwalk.
 ```
 
-## Procedure
-
-1. create .gclient file (as below)
+1) Create a source directory
 
 ```
-solutions = [
-  { "name"        : "src/tizen_src",
-    "url"         : "https://github.com/crosswalk-project/chromium-efl.git@efl/crosswalk-10/39.0.2171.19",
-  },
-]
+$ mkdir xwalk-efl
+$ cd xwalk-efl
 ```
 
-2. gclient sync
+2) Auto-generate gclient's configuration file (.gclient):
+
+```
+gclient config --name=src/tizen_src \
+    https://github.com/crosswalk-project/chromium-efl.git@efl/crosswalk-10/39.0.2171.19
+```
+
+3) gclient sync
 
 ## Building
 
 * For Desktop build
 
-    $ ./build/build_desktop.sh [-h|--help] [--skip-gyp] [--skip-ninja] [--ccache] [--debug]
-
+```
+$ cd src/tizen_src/
+$ ./build/build_desktop.sh [-h|--help] [--skip-gyp] [--skip-ninja] [--ccache] [--debug]
+```
 ## Coding style
 
 Internally we use the chromium coding style: http://www.chromium.org/developers/coding-style.
