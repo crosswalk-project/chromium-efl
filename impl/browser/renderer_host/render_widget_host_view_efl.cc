@@ -667,11 +667,10 @@ void RenderWidgetHostViewEfl::OnTextInputStateChanged(
     if (web_view_)
       web_view_->QuerySelectionStyle();
 
-    // Obsolete TextInputTypeChanged was doing it in similar code block
-    // Probably also required here
-    // Make Empty Rect for inputFieldZoom Gesture
-    // Finally, the empty rect is not used.
-    // host_->ScrollFocusedEditableNodeIntoRect(gfx::Rect(0, 0, 0, 0));}
+    // The empty rect is not used as long as
+    // m_autoZoomFocusedNodeToLegibleScale in WebSettingsImpl
+    // is turned on
+    host_->ScrollFocusedEditableNodeIntoRect(gfx::Rect(0, 0, 0, 0));
   }
 
   if (GetSelectionController()) {
