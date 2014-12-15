@@ -9,11 +9,9 @@ supposed to be completely source and binary compatible with EFL-WebKit2.
 ## Details
 
 1. gclient pulls chromium-efl into "src/tizen_src".
-2. The it runs 3 custom hooks in order to get the rest of the source:
+2. The it runs 2 custom hooks in order to get the rest of the source:
 
 ```
-* fetch-src-blink: src/tizen_src/sync_repos.sh is called and
-    pulls in src and src/third_party/WebKit from a pre-defined locations.
 * generate-gclient-xwalk: .gclient-xwalk is created by running
     src/tizen_src/scripts/xwalkgenerate_gclient-xwalk.py (this is a fork
     of the same script in xwalk repository).
@@ -27,33 +25,34 @@ supposed to be completely source and binary compatible with EFL-WebKit2.
 ```
 solutions = [
   { "name"        : "src/tizen_src",
-    "url"         : "git@github.com:crosswalk-project/chromium-efl.git@efl/crosswalk-10/39.0.2171.19",
+    "url"         : "https://github.com/crosswalk-project/chromium-efl.git@efl/crosswalk-10/39.0.2171.19",
     "managed"     : True,
     "custom_hooks": [
       {
-        # fetch custom src and blink repositories.
-        "name": "fetch-src-blink",
-        "pattern": ".",
-        "action": ["src/tizen_src/sync_repos.sh"],
-      },
-      {
-        # Generate .gclient-xwalk for Crosswalk's dependencies.
+        # Generate .gclient-xwalk for Crosswalk's dependencies, including
+        # custom chromium and WebKit repositories.
         "name": "generate-gclient-xwalk",
         "pattern": ".",
         "action": ["python", "src/tizen_src/scripts/xwalk/generate_gclient-xwalk.py"],
       },
+    ],
+    "safesync_url": "",
+  },
+  { "name": "src/xwalk",
+    "url": "https://github.com/crosswalk-project/crosswalk-efl.git@efl/crosswalk-10/39.0.2171.19",
+    "custom_hooks": [
       {
-        # Fetch Crosswalk dependencies.
-        "name": "fetch-deps",
-        "pattern": ".",
-        "action": ["python", "src/xwalk/tools/fetch_deps.py", "-v"],
+        # Override xwalk's creation of .gclient-xwalk since chromium-efl
+        # use its own generator.
+        "name": "generate-gclient-xwalk",
       },
+      # The hook named fetch-deps is called as part of xwalk's
+      # pull solution, and does not need to be explicitly invoked here.
       {
         # At some point, we will integrate to gyp_xwalk. Not now...
         "name": "gyp-xwalk",
       }
     ],
-    "safesync_url": "",
   },
 ]
 cache_dir = None
