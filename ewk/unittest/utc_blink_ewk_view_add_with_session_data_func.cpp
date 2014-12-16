@@ -53,8 +53,8 @@ TEST_F(utc_blink_ewk_view_add_with_session_data_func, POS_TEST)
   ewk_view_back(GetEwkWebView());
   ASSERT_EQ(EventLoopStart(), Success);
 
-  ASSERT_TRUE(ewk_view_forward_possible(GetEwkWebView()) && "before");
-  ASSERT_TRUE(ewk_view_back_possible(GetEwkWebView()) && "before");
+  ASSERT_TRUE(ewk_view_forward_possible(GetEwkWebView())) << "before";
+  ASSERT_TRUE(ewk_view_back_possible(GetEwkWebView())) << "before";
 
   unsigned length = 0;
   ewk_view_session_data_get(GetEwkWebView(), &sessionData, &length);
@@ -66,8 +66,8 @@ TEST_F(utc_blink_ewk_view_add_with_session_data_func, POS_TEST)
   ASSERT_TRUE(otherWebview);
 
   ASSERT_STREQ(testUrl.c_str(), ewk_view_url_get(otherWebview));
-  ASSERT_TRUE(ewk_view_forward_possible(otherWebview) && "after");
-  ASSERT_TRUE(ewk_view_back_possible(otherWebview) && "after");
+  ASSERT_TRUE(ewk_view_forward_possible(otherWebview)) << "after";
+  ASSERT_TRUE(ewk_view_back_possible(otherWebview)) << "after";
 }
 
 /**
@@ -88,11 +88,11 @@ TEST_F(utc_blink_ewk_view_add_with_session_data_func, NEG_TEST_NULL_EVAS)
 /**
  * @brief Tests if returns NULL when called with NULL data.
  */
-TEST_F(utc_blink_ewk_view_add_with_session_data_func, NEG_TEST_NULL_DATA)
+TEST_F(utc_blink_ewk_view_add_with_session_data_func, POS_TEST_NULL_DATA)
 {
   const char *data = NULL;
   unsigned length = 0;
-  ASSERT_FALSE(ewk_view_add_with_session_data(GetEwkEvas(), data, length));
+  ASSERT_TRUE(ewk_view_add_with_session_data(GetEwkEvas(), data, length) != NULL);
 }
 
 /**
