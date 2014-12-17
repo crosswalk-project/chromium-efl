@@ -317,6 +317,9 @@ bool RenderViewObserverEfl::DoHitTest(int view_x, int view_y, tizen_webview::Hit
       render_view()->GetWebView()->hitTestResultAt(
           blink::WebPoint(view_x, view_y));
 
+  if (web_hit_test_result.node().isNull())
+    return false;
+
   hit_test_result->mode = mode;
 
   PopulateEwkHitTestData(web_hit_test_result, hit_test_result);
