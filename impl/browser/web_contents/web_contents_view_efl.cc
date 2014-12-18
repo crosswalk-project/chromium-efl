@@ -53,10 +53,12 @@ RenderWidgetHostViewBase* WebContentsViewEfl::CreateViewForWidget(
   view->Init(native_view_);
   view->Show();
 
- if (view_mode_ != tizen_webview::TW_VIEW_MODE_WINDOWED) {
+  if (view_mode_ != tizen_webview::TW_VIEW_MODE_WINDOWED) {
     view->SetViewMode(view_mode_);
- }
- 
+  }
+
+  GetEWebView()->SetOrientation(EWebView::GetOrientation());
+
   return view;
 }
 

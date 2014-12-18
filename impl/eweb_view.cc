@@ -34,6 +34,7 @@
 #include "content/public/browser/navigation_controller.h"
 #include "content/public/browser/navigation_entry.h"
 #include "content/public/browser/resource_dispatcher_host.h"
+#include "content/public/browser/screen_orientation_dispatcher_host.h"
 #include "content/public/common/content_client.h"
 #include "content/public/common/user_agent.h"
 #include "content/public/browser/browser_thread.h"
@@ -543,6 +544,30 @@ void EWebView::SetOrientation(int orientation) {
   if (orientation == -90)
     orientation = 270;
   screen_orientation_ = orientation;
+
+  RenderWidgetHostViewEfl* view = rwhv();
+  if (view && (
+      screen_orientation_ == 0   ||
+      screen_orientation_ == 90  ||
+      screen_orientation_ == 180 ||
+      screen_orientation_ == 270
+      )
+     ) {
+    RenderWidgetHost* rwh = view->GetRenderWidgetHost();
+
+    blink::WebScreenInfo screen_info;
+    rwh->GetWebScreenInfo(&screen_info);
+    screen_info.orientationAngle = screen_orientation_;
+
+    ViewMsg_Resize_Params params;
+    params.screen_info = screen_info;
+
+    rwh->Send(new ViewMsg_Resize(rwh->GetRoutingID(), params));
+    view->UpdateScreenInfo(view->GetNativeView());
+
+    WebContentsImpl& contents_impl = static_cast<WebContentsImpl&>(web_contents());
+    contents_impl.screen_orientation_dispatcher_host()->OnOrientationChange();
+  }
 }
 
 int EWebView::GetOrientation() {

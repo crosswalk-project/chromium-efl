@@ -207,7 +207,6 @@ class WebViewGeolocationPermissionCallback;
 class EWebView {
  public:
   static EWebView* FromEvasObject(Evas_Object* eo);
-  static void SetOrientation(int orientation);
   static int GetOrientation();
 
   // initialize data members and activate event handlers.
@@ -253,6 +252,7 @@ class EWebView {
   double GetTextZoomFactor() const;
   void SetTextZoomFactor(double text_zoom_factor);
   void ExecuteEditCommand(const char* command, const char* value);
+  void SetOrientation(int orientation);
   void SendOrientationChangeEventIfNeeded(int orientation);
   void SetOrientationLockCallback(tizen_webview::Orientation_Lock_Cb func, void* data);
   bool TouchEventsEnabled() const;

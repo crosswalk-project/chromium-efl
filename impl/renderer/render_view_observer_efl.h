@@ -48,7 +48,6 @@ class RenderViewObserverEfl: public content::RenderViewObserver {
   void DidChangeScrollOffset(blink::WebLocalFrame* frame) override;
   bool OnMessageReceived(const IPC::Message& message) override;
   virtual void DidCreateDocumentElement(blink::WebLocalFrame* frame) override;
-  virtual void OrientationChangeEvent() override;
 #if !defined(EWK_BRINGUP)
   virtual void DidChangePageScaleFactor() override;
 #endif

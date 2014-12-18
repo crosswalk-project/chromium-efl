@@ -31,6 +31,7 @@
 #include "content/common/gpu/client/gl_helper.h"
 #include "content/common/input/did_overscroll_params.h"
 #include "content/public/browser/render_widget_host_view_frame_subscriber.h"
+#include "content/public/browser/screen_orientation_dispatcher_host.h"
 #include "content/public/common/content_switches.h"
 #include "content/common/view_messages.h"
 #include "content/common/gpu/gpu_messages.h"
@@ -78,7 +79,15 @@ void RenderWidgetHostViewBase::GetDefaultScreenInfo(
   results->rect = display.bounds();
   results->availableRect = display.work_area();
   results->deviceScaleFactor = display.device_scale_factor();
-  results->orientationAngle = display.rotation();
+  results->orientationAngle = display.RotationAsDegree();
+#if defined(OS_TIZEN_MOBILE)
+  results->orientationType =
+      RenderWidgetHostViewBase::GetOrientationTypeForMobile(display);
+#else
+  results->orientationType =
+      RenderWidgetHostViewBase::GetOrientationTypeForDesktop(display);
+#endif
+
   // TODO(derat|oshima): Don't hardcode this. Get this from display object.
   results->depth = 24;
   results->depthPerComponent = 8;
@@ -422,7 +431,6 @@ bool RenderWidgetHostViewEfl::OnMessageReceived(const IPC::Message& message) {
     IPC_MESSAGE_HANDLER(EwkHostMsg_WebAppIconUrlsGet, OnWebAppIconUrlsGet)
     IPC_MESSAGE_HANDLER(EwkHostMsg_WebAppCapableGet, OnWebAppCapableGet)
     IPC_MESSAGE_HANDLER(EwkHostMsg_DidChangeContentsSize, OnDidChangeContentsSize)
-    IPC_MESSAGE_HANDLER(EwkHostMsg_OrientationChangeEvent, OnOrientationChangeEvent)
     IPC_MESSAGE_HANDLER(EwkViewMsg_SelectionTextStyleState, OnSelectionTextStyleState)
     IPC_MESSAGE_HANDLER(EwkHostMsg_DidChangeMaxScrollOffset, OnDidChangeMaxScrollOffset)
     IPC_MESSAGE_HANDLER(EwkHostMsg_DidChangeScrollOffset, OnDidChangeScrollOffset)

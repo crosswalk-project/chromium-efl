@@ -4,6 +4,8 @@
 
 #include "utc_blink_ewk_base.h"
 
+#define URL  ("ewk_view/orientation_test.html")
+
 class utc_blink_ewk_view_orientation_send : public utc_blink_ewk_base
 {
 protected:
@@ -15,46 +17,28 @@ protected:
 
   void LoadFinished(Evas_Object* webview)
   {
+    g_orientation = atol(ewk_view_title_get(GetEwkWebView()));
     EventLoopStop(utc_blink_ewk_base::Success);
   }
 
-  static Eina_Bool alert_callback(Evas_Object* webview ,const char* alert_text, void* user_data)
+
+  void ConsoleMessage(Evas_Object* webview, const Ewk_Console_Message* msg)
   {
-    if (user_data) {
-      utc_blink_ewk_view_orientation_send* owner = NULL;
-      OwnerFromVoid(user_data, &owner);
+    utc_blink_ewk_base::ConsoleMessage(webview, msg);
 
-      long int orientation = strtol(alert_text, NULL, 10);
-      // TODO: check errno
+    const char* message_text = ewk_console_message_text_get(msg);
+    long int orientation = atol(message_text);
 
-      fprintf(stderr,"[alert_callback] :: %ld\n", orientation);
-      switch (orientation) {
-      case -90:
-      case 0:
-      case 90:
-      case 180:
-        owner->g_orientation = orientation;
-        break;
-      }
-
-      owner->EventLoopStop(Success);
-      utc_message("[alert_callback] :: going out");
+    switch (orientation) {
+    case -90:
+    case 0:
+    case 90:
+    case 180:
+      g_orientation = orientation;
+      break;
     }
 
-    // behave like dialog was closed
-    return EINA_FALSE;
-  }
-
-  /* Startup function */
-  void PostSetUp()
-  {
-    ewk_view_javascript_alert_callback_set(GetEwkWebView(), alert_callback, this);
-
-    // All TCs require same page to load
-    std::string full_path = GetResourceUrl("ewk_view/orientation_test.html");
-    ASSERT_FALSE(full_path.empty());
-    ASSERT_EQ(EINA_TRUE, ewk_view_url_set(GetEwkWebView(), full_path.c_str()));
-    ASSERT_EQ(Success, EventLoopStart());
+    EventLoopStop(utc_blink_ewk_base::Success);
   }
 
 protected:
@@ -66,6 +50,11 @@ protected:
  */
 TEST_F(utc_blink_ewk_view_orientation_send, TEST_90DG)
 {
+  std::string full_path = GetResourceUrl(URL);
+  ASSERT_FALSE(full_path.empty());
+  ASSERT_EQ(EINA_TRUE, ewk_view_url_set(GetEwkWebView(), full_path.c_str()));
+  ASSERT_EQ(Success, EventLoopStart());
+
   utc_message("[utc_blink_ewk_view_orientation_send TEST_90DG] :: ewk_view_orientation_send");
   ewk_view_orientation_send(GetEwkWebView(), 90);
 
@@ -78,6 +67,11 @@ TEST_F(utc_blink_ewk_view_orientation_send, TEST_90DG)
  */
 TEST_F(utc_blink_ewk_view_orientation_send, TEST_180DG)
 {
+  std::string full_path = GetResourceUrl(URL);
+  ASSERT_FALSE(full_path.empty());
+  ASSERT_EQ(EINA_TRUE, ewk_view_url_set(GetEwkWebView(), full_path.c_str()));
+  ASSERT_EQ(Success, EventLoopStart());
+
   utc_message("[utc_blink_ewk_view_orientation_send TEST_180DG] :: ewk_view_orientation_send");
   ewk_view_orientation_send(GetEwkWebView(), 180);
 
@@ -90,6 +84,11 @@ TEST_F(utc_blink_ewk_view_orientation_send, TEST_180DG)
  */
 TEST_F(utc_blink_ewk_view_orientation_send, TEST_0DG)
 {
+  std::string full_path = GetResourceUrl(URL);
+  ASSERT_FALSE(full_path.empty());
+  ASSERT_EQ(EINA_TRUE, ewk_view_url_set(GetEwkWebView(), full_path.c_str()));
+  ASSERT_EQ(Success, EventLoopStart());
+
   utc_message("[utc_blink_ewk_view_orientation_send TEST_0DG] :: ewk_view_orientation_send");
   ewk_view_orientation_send(GetEwkWebView(), 0);
 
@@ -102,6 +101,11 @@ TEST_F(utc_blink_ewk_view_orientation_send, TEST_0DG)
  */
 TEST_F(utc_blink_ewk_view_orientation_send, TEST_MINUS90DG)
 {
+  std::string full_path = GetResourceUrl(URL);
+  ASSERT_FALSE(full_path.empty());
+  ASSERT_EQ(EINA_TRUE, ewk_view_url_set(GetEwkWebView(), full_path.c_str()));
+  ASSERT_EQ(Success, EventLoopStart());
+
   utc_message("[utc_blink_ewk_view_orientation_send TEST_MINUS90DG] :: ewk_view_orientation_send");
   ewk_view_orientation_send(GetEwkWebView(), -90);
 
@@ -114,9 +118,31 @@ TEST_F(utc_blink_ewk_view_orientation_send, TEST_MINUS90DG)
  */
 TEST_F(utc_blink_ewk_view_orientation_send, INVALID_ARGS)
 {
+  std::string full_path = GetResourceUrl(URL);
+  ASSERT_FALSE(full_path.empty());
+  ASSERT_EQ(EINA_TRUE, ewk_view_url_set(GetEwkWebView(), full_path.c_str()));
+  ASSERT_EQ(Success, EventLoopStart());
+
   ewk_view_orientation_send(NULL, EWK_SCREEN_ORIENTATION_PORTRAIT_PRIMARY);
-  EXPECT_EQ(Failure, EventLoopStart(5.0));
+  EXPECT_EQ(Timeout, EventLoopStart(2.0));
 
   ewk_view_orientation_send(GetEwkWebView(), 22);
-  EXPECT_EQ(Failure, EventLoopStart(5.0));
+  EXPECT_EQ(Timeout, EventLoopStart(2.0));
+}
+
+/**
+ * @brief Checking whether function works properly in case of no render widget
+ *        host view object, that is if information about the orientation set
+ *        is not lost when function is called before setting the url.
+ */
+TEST_F(utc_blink_ewk_view_orientation_send, BEFOREURLSET)
+{
+  std::string full_path = GetResourceUrl(URL);
+  ASSERT_FALSE(full_path.empty());
+
+  ewk_view_orientation_send(GetEwkWebView(), 90);
+
+  ASSERT_EQ(EINA_TRUE, ewk_view_url_set(GetEwkWebView(), full_path.c_str()));
+  EXPECT_EQ(Success, EventLoopStart());
+  ASSERT_EQ(g_orientation, 90);
 }

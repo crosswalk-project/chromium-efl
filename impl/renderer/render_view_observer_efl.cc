@@ -572,16 +572,6 @@ void RenderViewObserverEfl::OnWebAppCapableGet(int callback_id) {
   Send(new EwkHostMsg_WebAppCapableGet(render_view()->GetRoutingID(), capable, callback_id));
 }
 
-void RenderViewObserverEfl::OrientationChangeEvent()
-{
-#if !defined(EWK_BRINGUP)
-  // Previosly OrientationChangeEvent() had orientation parameter.
-  // Now it was removed. Thanks Mounir.
-  // Need to figure out how to get orientation.
-  Send(new EwkHostMsg_OrientationChangeEvent(render_view()->GetRoutingID(), orientation));
-#endif
-}
-
 void RenderViewObserverEfl::WillSubmitForm(blink::WebLocalFrame* frame, const blink::WebFormElement& form)
 {
   GURL url(form.action());
