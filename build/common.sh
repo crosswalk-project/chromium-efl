@@ -52,14 +52,14 @@ usage: $1 [OPTIONS]
 Build non gbs version of chromium-efl
 
 OPTIONS:
-   -h, --help    Show this message
-   --skip-gyp    Skip restore_gyp, jhbuild and gyp_chromium steps
-   --ccache      configure ccache installed in your system
-   --content-shell Build content_shell application
-   --skip-ninja  Skip ninja step
-   --build-ewk-unittests  build ewk unittests
-   --debug       build debug version of chromium-efl (in $GYP_GENERATOR_OUTPUT/Debug instead of default $GYP_GENERATOR_OUTPUT/Release)
-   -jN           set number of jobs, just like with make or ninja
+   -h, --help            Show this message
+   --build-ewk-unittests Build ewk unittests
+   --ccache              Configure ccache installed in your system
+   --content-shell       Build content_shell application
+   --debug               Build debug version of chromium-efl (out.${host_arch}/Debug instead of out.${host_arch}/Release)
+   -jN                   Set number of jobs, just like with make or ninja
+   --skip-gyp            Skip restore_gyp, jhbuild and gyp_chromium steps
+   --skip-ninja          Skip ninja step
 
 examples:
 $0 --skip-gyp
@@ -73,56 +73,68 @@ function parseHostBuildScriptParams() {
 
   export SKIP_GYP=0
   export USE_CCACHE=0
+  export FORCE_JHBUILD=0
   export SKIP_NINJA=0
+  export BUILD_EWK_UNITTESTS=0
+  export BUILD_CONTENT_SHELL=0
   export BUILD_SUBDIRECTORY=Release
 
-  if echo "$@" | grep -cq '\(\(\-\-help\)\|\(\-h\)\)'; then
-    hostBuldScriptUsage ${0}
-  fi
+  local platform="$1"
+  shift
 
-  if echo "$@" | grep -cq '\-\-skip-gyp'; then
-    export SKIP_GYP=1
-  fi
-
-  if echo "$@" | grep -cq '\-\-skip-ninja'; then
-    export SKIP_NINJA=1
-  fi
-
-  if echo "$@" | grep -cq '\-\-content_shell'; then
-    export BUILD_CONTENT_SHELL=1
-  fi
-
-  if echo "$@" | grep -cq '\-\-ccache'; then
-    export USE_CCACHE=1
-    echo using ccache
-    source $TOPDIR/build/ccache_env.sh ${1}
-  fi
-
-  if echo "$@" | grep -cq '\-\-build-ewk-unittests'; then
-    export BUILD_EWK_UNITTESTS=1
-  fi
-  if echo "$@" | grep -cq '\-\-debug'; then
-    export BUILD_SUBDIRECTORY=Debug
-  fi
-  # Will be empty string if -j not specified or ill-formatted, otherwise -j and the number argument together.
-  # \grep because folks often alias grep but we want the vanilla behavior.
-  export JOBS=$(echo "$@" | \grep -Eo '\-j\s*[1-9]([0-9]*)')
-
+  while [[ $# > 0 ]]; do
+    case "$1" in
+      -h|--help)
+        hostBuldScriptUsage ${0}
+        ;;
+      --skip-gyp)
+        export SKIP_GYP=1
+        ;;
+      --ccache)
+        echo using ccache
+        export USE_CCACHE=1
+        source $TOPDIR/build/ccache_env.sh ${platform}
+        ;;
+      --content-shell)
+        export BUILD_CONTENT_SHELL=1
+        ;;
+      --force-jhbuild)
+        export FORCE_JHBUILD=1
+        ;;
+      --skip-ninja)
+        export SKIP_NINJA=1
+        ;;
+      --build-ewk-unittests)
+        export BUILD_EWK_UNITTESTS=1
+        ;;
+      --debug)
+        export BUILD_SUBDIRECTORY="Debug"
+        ;;
+      -j*)
+        export JOBS="$1"
+        ;;
+      *)
+        echo "Unknown argument: $1"
+        exit 1
+        ;;
+    esac
+    shift;
+  done
 }
 
 function hostGypChromiumEfl() {
-  if [ "$SKIP_GYP" == "0" ]; then
+  if [[ $SKIP_GYP == 0 ]]; then
     ${TOPDIR}/build/gyp_chromiumefl.sh $@
   fi
 }
 
 function hostNinja() {
-  if [ "$SKIP_NINJA" == "0" ]; then
+  if [[ $SKIP_NINJA == 0 ]]; then
     TARGETS="chromium-efl efl_webprocess chromium-ewk efl_webview_app"
-    if [ "$BUILD_EWK_UNITTESTS" == "1" ]; then
+    if [[ $BUILD_EWK_UNITTESTS == 1 ]]; then
       TARGETS="$TARGETS ewk_unittests"
     fi
-    if [ "$BUILD_CONTENT_SHELL" == "1" ]; then
+    if [[ $BUILD_CONTENT_SHELL == 1 ]]; then
       TARGETS="$TARGETS content_shell_efl"
     fi
     BUILDDIR=${GYP_GENERATOR_OUTPUT}/${BUILD_SUBDIRECTORY}

@@ -17,21 +17,15 @@ parseHostBuildScriptParams desktop $@
 JHBUILD_STAMPFILE="${GYP_GENERATOR_OUTPUT}/Dependencies/Root/jhbuild.stamp"
 
 shouldForceJHBuild() {
-  if echo "$@" | grep -cq '\-\-force-jhbuild'; then
+  if [[ $FORCE_JHBUILD == 1 ]]; then
     return 1
   fi
 
   # Check if anything in jhbuild is more recent than stamp file.
-  for i in $(find "$SCRIPTDIR/jhbuild"); do
-    if [ -f "$i" -a "$JHBUILD_STAMPFILE" -ot "$i" ]; then
-      return 1
-    fi
-  done
-
-  return 0
+  return $(find $SCRIPTDIR/jhbuild -type f -newer $JHBUILD_STAMPFILE -print | wc -l)
 }
 
-if [ "$(shouldForceJHBuild $@)" == "1" ]; then
+if [[ $(shouldForceJHBuild) > 0 ]]; then
   rm -f $JHBUILD_STAMPFILE
 fi
 
@@ -46,7 +40,7 @@ export PKG_CONFIG_PATH="${JHBUILD_DEPS}/${_LIBDIR}/pkgconfig"
 if [ ! -f "$JHBUILD_STAMPFILE" ]; then
   jhbuild --no-interact -f ${SCRIPTDIR}/jhbuild/jhbuildrc
 
-  if [ "$?" == "0" ]; then
+  if [[ $? == 0 ]]; then
     echo "Yay! jhbuild done!" > $JHBUILD_STAMPFILE
   fi
 fi
