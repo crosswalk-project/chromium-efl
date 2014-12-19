@@ -52,7 +52,13 @@ class utc_blink_ewk_view_contents_pdf_get : public utc_blink_ewk_base
  */
 TEST_F(utc_blink_ewk_view_contents_pdf_get, POS_TEST)
 {
-  bool result = ewk_view_url_set(GetEwkWebView(),"http://www.google.com");
+  char htmlBuffer[] = "<html>"
+                        "<head></head>"
+                        "<body>"
+                        "</body>"
+                      "</html>";
+
+  bool result = ewk_view_html_string_load(GetEwkWebView(), htmlBuffer, NULL, NULL);
   if (!result)
     utc_fail();
   if(Success!=EventLoopStart())
