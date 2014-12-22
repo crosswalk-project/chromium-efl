@@ -301,28 +301,6 @@ void WebContentsDelegateEfl::DidNavigateAnyFrame(RenderFrameHost* render_frame_h
   static_cast<BrowserContextEfl*>(web_contents_.GetBrowserContext())->AddVisitedURLs(params.redirects);
 }
 
-void WebContentsDelegateEfl::DidFailProvisionalLoad(RenderFrameHost* render_frame_host,
-                                                    const GURL& validated_url,
-                                                    int error_code,
-                                                    const string16& error_description) {
-  DidFailLoad(render_frame_host, validated_url, error_code, error_description);
-}
-void WebContentsDelegateEfl::DidFailLoad(RenderFrameHost* render_frame_host,
-                                         const GURL& validated_url,
-                                         int error_code,
-                                         const string16& error_description) {
-  if (render_frame_host->GetParent())
-    return;
-
-  scoped_ptr<_Ewk_Error> error(new _Ewk_Error(error_code,
-                                            validated_url.possibly_invalid_spec().c_str(),
-                                            error_description.empty() ?
-                                                net::ErrorToString(error_code).c_str() :
-                                                UTF16ToUTF8(error_description).c_str()));
-
-  web_view_->SmartCallback<EWebViewCallbacks::LoadError>().call(error.get());
-}
-
 void WebContentsDelegateEfl::DidFinishLoad(RenderFrameHost* render_frame_host,
                                            const GURL& validated_url) {
   if (render_frame_host->GetParent())

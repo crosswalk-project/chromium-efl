@@ -11,6 +11,8 @@
 #include "base/strings/string_number_conversions.h"
 #include "base/strings/string_split.h"
 #include "base/strings/string_util.h"
+#include "base/strings/utf_string_conversions.h"
+#include "content/public/renderer/content_renderer_client.h"
 #include "content/public/renderer/render_view.h"
 #include "common/render_messages_efl.h"
 #include "third_party/WebKit/public/platform/WebCString.h"
@@ -18,7 +20,10 @@
 #include "third_party/WebKit/public/platform/WebPoint.h"
 #include "third_party/WebKit/public/platform/WebSize.h"
 #include "third_party/WebKit/public/platform/WebString.h"
+#include "third_party/WebKit/public/platform/WebURLError.h"
+#include "third_party/WebKit/public/platform/WebURLRequest.h"
 #include "third_party/WebKit/public/web/WebDocument.h"
+#include "third_party/WebKit/public/web/WebDataSource.h"
 #include "third_party/WebKit/public/web/WebFormElement.h"
 #include "third_party/WebKit/public/web/WebFrame.h"
 #include "third_party/WebKit/public/web/WebHitTestResult.h"
@@ -33,6 +38,9 @@
 #include "third_party/WebKit/Source/platform/fonts/FontCache.h"
 
 using namespace tizen_webview;
+
+using blink::WebDataSource;
+using blink::WebURLRequest;
 
 namespace {
 
@@ -361,6 +369,35 @@ void RenderViewObserverEfl::DidChangePageScaleFactor()
   Send(new EwkHostMsg_DidChangePageScaleFactor(render_view()->GetRoutingID(), view->pageScaleFactor()));
 }
 #endif
+
+void RenderViewObserverEfl::DidFailLoad(blink::WebLocalFrame* frame,
+                                        const blink::WebURLError& error) {
+  if (error.isCancellation)
+    return;
+
+  WebDataSource* ds = frame->dataSource();
+  DCHECK(ds);
+
+  const WebURLRequest& failed_request = ds->request();
+  base::string16 error_description;
+
+  renderer_client_->GetNavigationErrorStrings(
+      render_view(),
+      frame,
+      failed_request,
+      error,
+      NULL,
+      &error_description);
+
+  tizen_webview::Error err;
+  err.url = error.unreachableURL;
+  err.is_main_frame = !frame->parent();
+  err.code = error.reason;
+  err.description = base::UTF16ToUTF8(error_description);
+  err.domain = error.domain.utf8();
+
+  Send(new EwkViewMsg_DidFailLoadWithError(routing_id(), err));
+}
 
 void RenderViewObserverEfl::DidUpdateLayout()
 {

@@ -3,16 +3,17 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-#include "base/logging.h"
-#include "base/strings/utf_string_conversions.h"
-#include "content/browser/web_contents/web_contents_impl.h"
-#include "browser/web_contents/web_contents_view_efl.h"
-#include "browser/renderer_host/render_widget_host_view_efl.h"
+#include "web_contents_view_efl.h"
+
 #include "eweb_context.h"
 #include "eweb_view.h"
-#include "gl/gl_shared_context_efl.h"
 #include "web_contents_delegate_efl.h"
+#include "base/logging.h"
+#include "base/strings/utf_string_conversions.h"
+#include "browser/renderer_host/render_widget_host_view_efl.h"
+#include "content/browser/web_contents/web_contents_impl.h"
 #include "content/public/browser/web_contents_view_delegate.h"
+#include "gl/gl_shared_context_efl.h"
 
 namespace content {
 
@@ -96,7 +97,8 @@ void WebContentsViewEfl::UpdateDragDest(RenderViewHost* host) {
 }
 
 void WebContentsViewEfl::RenderViewCreated(RenderViewHost* host) {
-  NOTIMPLEMENTED();
+  DCHECK(host->GetProcess());
+  DCHECK(web_contents_);
 }
 
 void WebContentsViewEfl::RenderViewSwappedIn(RenderViewHost* host) {

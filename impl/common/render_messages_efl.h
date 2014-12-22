@@ -22,6 +22,7 @@
 #include "url/gurl.h"
 
 #include "tizen_webview/public/tw_content_security_policy.h"
+#include "tizen_webview/public/tw_error.h"
 #include "tizen_webview/public/tw_hit_test.h"
 #include "tizen_webview/public/tw_settings.h"
 #include "tizen_webview/public/tw_view_mode.h"
@@ -143,6 +144,15 @@ IPC_STRUCT_TRAITS_BEGIN(tizen_webview::Settings)
   IPC_STRUCT_TRAITS_MEMBER(javascript_can_open_windows)
 IPC_STRUCT_TRAITS_END()
 
+IPC_STRUCT_TRAITS_BEGIN(tizen_webview::Error)
+  IPC_STRUCT_TRAITS_MEMBER(url)
+  IPC_STRUCT_TRAITS_MEMBER(is_main_frame)
+  IPC_STRUCT_TRAITS_MEMBER(code)
+  IPC_STRUCT_TRAITS_MEMBER(description)
+  IPC_STRUCT_TRAITS_MEMBER(domain)
+IPC_STRUCT_TRAITS_END()
+
+
 // Tells the renderer to clear the cache.
 IPC_MESSAGE_CONTROL0(EflViewMsg_ClearCache)
 IPC_MESSAGE_ROUTED0(EwkViewMsg_UseSettingsFont)
@@ -181,6 +191,9 @@ IPC_MESSAGE_ROUTED3(EwkViewMsg_DoHitTest,
                     int, /* horizontal position */
                     int, /* vertical position */
                     tizen_webview::Hit_Test_Mode /* mode */)
+
+IPC_MESSAGE_ROUTED1(EwkViewMsg_DidFailLoadWithError,
+                    tizen_webview::Error /* error */)
 
 IPC_MESSAGE_ROUTED4(EwkViewMsg_DoHitTestAsync,
                     int, /* horizontal position */

@@ -220,6 +220,8 @@
       'browser/web_contents/web_contents_view_efl.h',
       'browser/web_contents/web_drag_dest_efl.cc',
       'browser/web_contents/web_drag_dest_efl.h',
+      'browser/web_view_browser_message_filter.h',
+      'browser/web_view_browser_message_filter.cc',
       'browser/webdata/web_data_service.cc',
       'browser/webdata/web_data_service.h',
       'browser/webdata/web_data_service_factory.h',

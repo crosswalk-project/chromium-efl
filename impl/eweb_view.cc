@@ -117,73 +117,6 @@ void GetEinaRectFromGfxRect(const gfx::Rect& gfx_rect, Eina_Rectangle* eina_rect
 
 } // namespace
 
-class WebViewBrowserMessageFilter: public content::BrowserMessageFilter {
- public:
-  WebViewBrowserMessageFilter(EWebView* web_view)
-    : BrowserMessageFilter(ChromeMsgStart)
-    , web_view_(web_view) {
-    WebContents* web_contents = GetWebContents();
-    DCHECK(web_contents);
-
-    if (web_contents && web_contents->GetRenderProcessHost())
-      web_contents->GetRenderProcessHost()->AddFilter(this);
-  }
-
-  virtual void OverrideThreadForMessage(const IPC::Message& message, BrowserThread::ID* thread) override
-  {
-    if (message.type() == EwkViewHostMsg_HitTestAsyncReply::ID)
-      *thread = BrowserThread::UI;
-  }
-
-  virtual bool OnMessageReceived(const IPC::Message& message) override
-  {
-    bool handled = true;
-    IPC_BEGIN_MESSAGE_MAP(WebViewBrowserMessageFilter, message)
-      IPC_MESSAGE_HANDLER(EwkViewHostMsg_HitTestReply, OnReceivedHitTestData)
-      IPC_MESSAGE_HANDLER(EwkViewHostMsg_HitTestAsyncReply, OnReceivedHitTestAsyncData)
-      IPC_MESSAGE_UNHANDLED(handled = false)
-    IPC_END_MESSAGE_MAP()
-    return handled;
-  }
-
- private:
-  void OnReceivedHitTestData(int render_view, const _Ewk_Hit_Test& hit_test_data,
-      const NodeAttributesMap& node_attributes) {
-    DCHECK(BrowserThread::CurrentlyOn(BrowserThread::IO));
-
-    RenderViewHost* render_view_host= web_view_->web_contents().GetRenderViewHost();
-    CHECK(render_view_host);
-
-    if (render_view_host && render_view_host->GetRoutingID() == render_view)
-      web_view_->UpdateHitTestData(hit_test_data, node_attributes);
-  }
-
-  void OnReceivedHitTestAsyncData(int render_view, const _Ewk_Hit_Test& hit_test_data,
-                                  const NodeAttributesMap& node_attributes, int64_t request_id)
-  {
-    DCHECK(BrowserThread::CurrentlyOn(BrowserThread::UI));
-    WebContents* contents = GetWebContents();
-    CHECK(contents);
-
-    RenderViewHost* render_view_host= contents->GetRenderViewHost();
-    CHECK(render_view_host);
-
-    if (render_view_host->GetRoutingID() == render_view) {
-      web_view_->DispatchAsyncHitTestData(hit_test_data, node_attributes, request_id);
-    }
-  }
-
-  WebContents* GetWebContents() const {
-    if (web_view_)
-      return &(web_view_->web_contents());
-
-    return NULL;
-  }
-
-private:
-  EWebView* web_view_;
-};
-
 class AsyncHitTestRequest
 {
  public:
@@ -281,7 +214,6 @@ EWebView::EWebView(tizen_webview::WebView* owner, tizen_webview::WebContext* con
       min_page_scale_factor_(-1.0),
       max_page_scale_factor_(-1.0),
       inspector_server_(NULL),
-      message_filter_(NULL),
 #ifndef NDEBUG
       renderer_crashed_(false),
 #endif
@@ -937,6 +869,15 @@ void EWebView::LoadData(const char* data, size_t size, const char* mime_type, co
   web_contents_->GetController().LoadURLWithParams(data_params);
 }
 
+void EWebView::InvokeLoadError(const tizen_webview::Error &error) {
+  if (error.is_main_frame) {
+    scoped_ptr<_Ewk_Error> err(new _Ewk_Error(error.code,
+        error.url.possibly_invalid_spec().c_str(), error.description.c_str()));
+
+    SmartCallback<EWebViewCallbacks::LoadError>().call(err.get());
+  }
+}
+
 void EWebView::ShowPopupMenu(const gfx::Rect& rect, blink::TextDirection textDirection, double pageScaleFactor, const std::vector<content::MenuItem>& items, int data, int selectedIndex, bool multiple) {
 #if defined(OS_TIZEN)
   Eina_List* popupItems = 0;
@@ -1326,14 +1267,6 @@ Eina_Bool EWebView::AsyncRequestHitTestDataAtBlinkCoords(
   static int64_t request_id = 1;
   DCHECK(BrowserThread::CurrentlyOn(BrowserThread::UI));
 
-  // WebViewBrowserMessageFilter requires RenderProcessHost to be already created.
-  // In EWebView constructor we have no guarantee that related RenderProcessHost is already created
-  // We do not destroy message_filter_ manualy as it is managed by RenderProcessHost after setting it as filter
-  // TODO: this pointer should be set to NULL when WebProcess crash/quits
-  if (!message_filter_) {
-    message_filter_ = new WebViewBrowserMessageFilter(this);
-  }
-
   RenderViewHost* rvh = web_contents_->GetRenderViewHost();
   CHECK(rvh);
   content::RenderProcessHost* render_process_host = web_contents_->GetRenderProcessHost();
@@ -1364,14 +1297,6 @@ void EWebView::DispatchAsyncHitTestData(const _Ewk_Hit_Test& hit_test_data, cons
 
 tizen_webview::Hit_Test* EWebView::RequestHitTestDataAtBlinkCoords(int x, int y, tizen_webview::Hit_Test_Mode mode) {
   DCHECK(BrowserThread::CurrentlyOn(BrowserThread::UI));
-
-  // WebViewBrowserMessageFilter requires RenderProcessHost to be already created.
-  // In EWebView constructor we have no guarantee that related RenderProcessHost is already created
-  // We do not destroy message_filter_ manualy as it is managed by RenderProcessHost after setting it as filter
-  // TODO: this pointer should be set to NULL when WebProcess crash/quits
-  if (!message_filter_) {
-    message_filter_ = new WebViewBrowserMessageFilter(this);
-  }
 
   RenderViewHost* render_view_host = web_contents_->GetRenderViewHost();
   content::RenderProcessHost* render_process_host = web_contents_->GetRenderProcessHost();

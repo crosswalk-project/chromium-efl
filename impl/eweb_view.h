@@ -92,6 +92,7 @@ class WebView;
 class WebViewDelegate;
 class WebViewEvasEventHandler;
 class PolicyDecision;
+class Error;
 }
 
 class WebAppScreenshotCapturedCallback : public base::RefCounted<WebAppScreenshotCapturedCallback> {
@@ -201,7 +202,6 @@ class WebApplicationCapableGetCallback {
 
 class AsyncHitTestRequest;
 class JavaScriptDialogManagerEfl;
-class WebViewBrowserMessageFilter;
 class WebViewGeolocationPermissionCallback;
 
 class EWebView {
@@ -274,6 +274,7 @@ class EWebView {
   void LoadHTMLString(const char* html, const char* base_uri, const char* unreachable_uri);
   void LoadPlainTextString(const char* plain_text);
   void LoadData(const char* data, size_t size, const char* mime_type, const char* encoding, const char* base_uri, const char* unreachable_uri = NULL);
+  void InvokeLoadError(const tizen_webview::Error &error);
   void InvokeAuthCallback(LoginDelegateEfl* login_delegate, const GURL& url, const std::string& realm);
   void Find(const char* text, tizen_webview::Find_Options);
   void InvokeAuthCallbackOnUI(_Ewk_Auth_Challenge* auth_challenge);
@@ -524,7 +525,6 @@ class EWebView {
 #ifdef TIZEN_EDGE_EFFECT
   scoped_refptr<EdgeEffect> edge_effect_;
 #endif
-  WebViewBrowserMessageFilter* message_filter_;
 
 #ifndef NDEBUG
   bool renderer_crashed_;

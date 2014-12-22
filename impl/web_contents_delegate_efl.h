@@ -123,14 +123,6 @@ class WebContentsDelegateEfl
   void OnAuthRequired(net::URLRequest* request,
                       const std::string& realm,
                       LoginDelegateEfl* login_delegate);
-  virtual void DidFailProvisionalLoad(RenderFrameHost* render_frame_host,
-                                      const GURL& validated_url,
-                                      int error_code,
-                                      const base::string16& error_description) override;
-  virtual void DidFailLoad(RenderFrameHost* render_frame_host,
-                           const GURL& validated_url,
-                           int error_code,
-                           const base::string16& error_description) override;
 
   virtual void DidFinishLoad(RenderFrameHost* render_frame_host,
                              const GURL& validated_url) override;

@@ -15,6 +15,9 @@
 #include "browser/renderer_host/render_message_filter_efl.h"
 #include "browser/resource_dispatcher_host_delegate_efl.h"
 #include "browser/vibration/vibration_message_filter.h"
+#include "browser/web_view_browser_message_filter.h"
+#include "content/public/browser/render_widget_host.h"
+#include "content/public/browser/render_widget_host_iterator.h"
 #include "content/public/browser/resource_dispatcher_host.h"
 #include "content/public/browser/web_contents.h"
 #include "content/public/common/show_desktop_notification_params.h"
@@ -232,6 +235,25 @@ void ContentBrowserClientEfl::RenderProcessWillLaunch(
   if(tts_message_filter->Init())
     host->AddFilter(tts_message_filter);
 #endif
+
+  scoped_ptr<RenderWidgetHostIterator> widgets(RenderWidgetHost::GetRenderWidgetHosts());
+  RenderWidgetHost* widget = NULL;
+
+  while (widget = widgets->GetNextHost())
+    if (widget->GetProcess() == host)
+      break;
+
+  DCHECK(widget);
+  if (widget) {
+    RenderViewHost* vh = RenderViewHost::From(widget);
+    DCHECK(vh);
+    if (vh) {
+      WebContents* content = WebContents::FromRenderViewHost(vh);
+      DCHECK(content);
+      if (content)
+        host->AddFilter(new tizen_webview::WebViewBrowserMessageFilter(content));
+    }
+  }
 }
 
 void ContentBrowserClientEfl::RequestPermission(

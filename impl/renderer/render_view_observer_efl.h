@@ -24,6 +24,7 @@ class FilePath;
 }
 
 namespace content {
+class ContentRendererClient;
 class RenderView;
 }
 
@@ -51,6 +52,11 @@ class RenderViewObserverEfl: public content::RenderViewObserver {
 #if !defined(EWK_BRINGUP)
   virtual void DidChangePageScaleFactor() override;
 #endif
+  void DidFailLoad(blink::WebLocalFrame* frame,
+                   const blink::WebURLError& error) override;
+  void DidFailProvisionalLoad(blink::WebLocalFrame* frame,
+      const blink::WebURLError& error) override { DidFailLoad(frame, error); }
+
   //Changes in PageScaleFactorLimits are applied when layoutUpdated is called
   //So using this notification to update minimum and maximum page scale factor values
   virtual void DidUpdateLayout() override;
