@@ -9,6 +9,7 @@
 #include "browser/web_contents/web_drag_dest_efl.h"
 #include "content/browser/renderer_host/render_view_host_delegate_view.h"
 #include "content/browser/web_contents/web_contents_view.h"
+#include "tizen_webview/public/tw_view_mode.h"
 
 #include <Evas.h>
 
@@ -63,6 +64,8 @@ class WebContentsViewEfl
 #endif
   void UpdateDragDest(RenderViewHost* host);
 
+  void SetViewMode(tizen_webview::View_Mode mode);
+
   virtual void UpdateFormNavigation(int formElementCount, int currentNodeIndex,
       bool prevState, bool nextState) override;
 
@@ -85,6 +88,8 @@ private:
   scoped_ptr<WebDragDestEfl> drag_dest_;
 
   WebContents* web_contents_;
+
+  tizen_webview::View_Mode view_mode_;
 };
 
 }

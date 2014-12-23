@@ -10,6 +10,7 @@
 #include "browser/navigation_policy_handler_efl.h"
 #include "browser/renderer_host/render_widget_host_view_efl.h"
 #include "browser/renderer_host/web_event_factory_efl.h"
+#include "browser/web_contents/web_contents_view_efl.h"
 #include "common/content_client_efl.h"
 #include "common/render_messages_efl.h"
 #include "common/version_info.h"
@@ -1745,7 +1746,9 @@ void EWebView::ShowFileChooser(const content::FileChooserParams& params) {
 }
 
 void EWebView::SetViewMode(tizen_webview::View_Mode view_mode) {
-  rwhv()->SetViewMode(view_mode);
+  WebContentsImpl* web_contents = static_cast<WebContentsImpl*>(web_contents_.get());
+  WebContentsViewEfl *web_contents_view = static_cast<WebContentsViewEfl*>(web_contents->GetView());
+  web_contents_view->SetViewMode(view_mode);
 }
 
 #ifdef TIZEN_CONTENTS_DETECTION

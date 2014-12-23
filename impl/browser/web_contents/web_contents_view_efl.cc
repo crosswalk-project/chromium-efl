@@ -31,6 +31,7 @@ WebContentsViewEfl::WebContentsViewEfl(WebContents* contents,
     : delegate_(delegate)
     , native_view_(NULL)
     , drag_dest_delegate_(NULL)
+    , view_mode_(tizen_webview::TW_VIEW_MODE_WINDOWED) // default value for webkit
     , web_contents_(contents) {}
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -52,6 +53,10 @@ RenderWidgetHostViewBase* WebContentsViewEfl::CreateViewForWidget(
   view->Init(native_view_);
   view->Show();
 
+ if (view_mode_ != tizen_webview::TW_VIEW_MODE_WINDOWED) {
+    view->SetViewMode(view_mode_);
+ }
+ 
   return view;
 }
 
@@ -170,6 +175,15 @@ void WebContentsViewEfl::ShowContextMenu(RenderFrameHost* render_frame_host, con
   if (delegate_)
     delegate_->ShowContextMenu(render_frame_host, params);
 }
+
+void WebContentsViewEfl::SetViewMode(tizen_webview::View_Mode mode) {
+  view_mode_ = mode;
+  RenderWidgetHostViewEfl* view = static_cast<RenderWidgetHostViewEfl*>(
+                                    web_contents_->GetRenderWidgetHostView());
+  if (view)
+    view->SetViewMode(view_mode_);
+}
+
 
 #if defined(OS_MACOSX) || defined(OS_ANDROID) || defined(OS_TIZEN)
 void WebContentsViewEfl::ShowPopupMenu(RenderFrameHost* render_frame_host,
