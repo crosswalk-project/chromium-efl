@@ -9,20 +9,26 @@ class utc_blink_ewk_view_application_name_for_user_agent_set : public utc_blink_
 };
 
 /**
- * @brief Positive test case of ewk_view_user_agent_set()
+ * @brief Negative test case of ewk_view_application_name_for_user_agent_set
  */
-TEST_F(utc_blink_ewk_view_application_name_for_user_agent_set, POS_TEST)
+TEST_F(utc_blink_ewk_view_application_name_for_user_agent_set, NullArg)
 {
-  const char* testString = "TEST_STRING";
-  ASSERT_EQ(EINA_TRUE, ewk_view_application_name_for_user_agent_set(GetEwkWebView(), testString));
-  const char* userAgent = ewk_view_application_name_for_user_agent_get(GetEwkWebView());
-  EXPECT_EQ(strcmp(userAgent, testString), 0);
+  EXPECT_EQ(EINA_FALSE, ewk_view_application_name_for_user_agent_set(NULL, ""));
+  EXPECT_EQ(EINA_FALSE, ewk_view_application_name_for_user_agent_set(GetEwkWebView(), NULL));
 }
 
 /**
- * @brief Negative test case of ewk_view_user_agent_set()
+ * @brief Positive test case of ewk_view_application_name_for_user_agent_set
  */
-TEST_F(utc_blink_ewk_view_application_name_for_user_agent_set, NEG_TEST)
+TEST_F(utc_blink_ewk_view_application_name_for_user_agent_set, POS_TEST)
 {
-  EXPECT_EQ(EINA_FALSE, ewk_view_application_name_for_user_agent_set(GetEwkWebView(), ""));
+  ASSERT_EQ(EINA_TRUE, ewk_view_application_name_for_user_agent_set(GetEwkWebView(), "TEST"));
+  EXPECT_STREQ("TEST", ewk_view_application_name_for_user_agent_get(GetEwkWebView()));
+}
+
+TEST_F(utc_blink_ewk_view_application_name_for_user_agent_set, EmptyString)
+{
+  EXPECT_EQ(EINA_TRUE, ewk_view_application_name_for_user_agent_set(GetEwkWebView(), ""));
+  // if set empty string (not null) than assign PRODUCT_NAME (version_info_efl.h)
+  EXPECT_STREQ("efl-webengine", ewk_view_application_name_for_user_agent_get(GetEwkWebView()));
 }
