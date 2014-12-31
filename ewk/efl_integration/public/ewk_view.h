@@ -1153,6 +1153,7 @@ EAPI Eina_Bool ewk_view_mhtml_data_get(Evas_Object *o, Ewk_View_MHTML_Data_Get_C
 
 
 /**
+ * Deprecated - use async hit tests instead
  * Creates a new hit test for the given veiw object and point.
  *
  * The returned object should be freed by ewk_hit_test_free().
@@ -1164,7 +1165,7 @@ EAPI Eina_Bool ewk_view_mhtml_data_get(Evas_Object *o, Ewk_View_MHTML_Data_Get_C
  *
  * @return a newly allocated hit test on success, @c 0 otherwise
  */
-EAPI Ewk_Hit_Test* ewk_view_hit_test_new(Evas_Object* o, int x, int y, int hit_test_mode);
+EINA_DEPRECATED EAPI Ewk_Hit_Test* ewk_view_hit_test_new(Evas_Object* o, int x, int y, int hit_test_mode);
 
 typedef void (*Ewk_View_Hit_Test_Request_Callback)(Evas_Object* o, int x, int y, int hit_test_mode, Ewk_Hit_Test*, void* user_data);
 

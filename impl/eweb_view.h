@@ -336,16 +336,15 @@ class EWebView {
       NavigationPolicyParams params, bool* handled);
   void UseSettingsFont();
 
+  // Deprecated - use async hit tests instead
   tizen_webview::Hit_Test* RequestHitTestDataAt(
       int x, int y, tizen_webview::Hit_Test_Mode mode);
   Eina_Bool AsyncRequestHitTestDataAt(
       int x, int y, tizen_webview::Hit_Test_Mode mode,
-      tizen_webview::View_Hit_Test_Request_Callback, void* user_data);
-  tizen_webview::Hit_Test* RequestHitTestDataAtBlinkCoords(
-      int x, int y, tizen_webview::Hit_Test_Mode mode);
+      tizen_webview::View_Hit_Test_Request_Callback callback, void* user_data);
   Eina_Bool AsyncRequestHitTestDataAtBlinkCoords(
       int x, int y, tizen_webview::Hit_Test_Mode mode,
-      tizen_webview::View_Hit_Test_Request_Callback, void* user_data);
+      tizen_webview::View_Hit_Test_Request_Callback callback, void* user_data);
   void DispatchAsyncHitTestData(const _Ewk_Hit_Test& hit_test_data, const NodeAttributesMap& node_attributes, int64_t request_id);
   void UpdateHitTestData(const _Ewk_Hit_Test& hit_test_data, const NodeAttributesMap& node_attributes);
 
@@ -461,6 +460,8 @@ class EWebView {
   void ReleasePopupMenuList();
 #endif
 
+  void EvasToBlinkCords(int x, int y, int* view_x, int* view_y);
+
   // For popup windows the WebContents is created internally and we need to associate it with the
   // new view created by the embedder. We set this before calling the "create,window" callback and
   // use it for the new view. This is a hack! It would break if the first view the embedder creates
@@ -537,6 +538,10 @@ class EWebView {
   scoped_ptr<tizen_webview::BackForwardList> back_forward_list_;
 
 private:
+  Eina_Bool AsyncRequestHitTestPrivate(
+      int x, int y, tizen_webview::Hit_Test_Mode mode,
+      AsyncHitTestRequest* asyncHitTestRequest);
+
   gfx::Vector2d previous_scroll_position_;
 
   // only tizen_webview::WebView can create and delete this

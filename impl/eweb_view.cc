@@ -121,27 +121,44 @@ void GetEinaRectFromGfxRect(const gfx::Rect& gfx_rect, Eina_Rectangle* eina_rect
 
 } // namespace
 
-class AsyncHitTestRequest
-{
+class AsyncHitTestRequest {
  public:
-  AsyncHitTestRequest(int x, int y, tizen_webview::Hit_Test_Mode mode, tizen_webview::View_Hit_Test_Request_Callback callback, void* user_data)
-    : m_x(x)
-    , m_y(y)
-    , m_mode(mode)
-    , m_callback(callback)
-    , m_user_data(user_data)
-  { }
+  AsyncHitTestRequest(int x, int y, tizen_webview::Hit_Test_Mode mode)
+      : m_x(x),
+        m_y(y),
+        m_mode(mode) {}
+  virtual ~AsyncHitTestRequest() {}
 
-  void Run(tizen_webview::Hit_Test *hit_test, Evas_Object* web_view)
-  {
-    DCHECK(m_callback);
-    m_callback(web_view, m_x, m_y, m_mode, hit_test, m_user_data);
-  }
+  virtual void Run(tizen_webview::Hit_Test *hit_test, EWebView* web_view) = 0;
+
+ protected:
+  int GetX() const { return m_x; }
+  int GetY() const { return m_y; }
+  tizen_webview::Hit_Test_Mode GetMode() const { return m_mode; }
 
  private:
   int m_x;
   int m_y;
   tizen_webview::Hit_Test_Mode m_mode;
+};
+
+class AsyncHitTestRequestCallback : public AsyncHitTestRequest {
+ public:
+  AsyncHitTestRequestCallback(int x, int y,
+      tizen_webview::Hit_Test_Mode mode,
+      tizen_webview::View_Hit_Test_Request_Callback callback,
+      void* user_data)
+      : AsyncHitTestRequest(x, y, mode),
+        m_callback(callback),
+        m_user_data(user_data) {
+  }
+
+  virtual void Run(tizen_webview::Hit_Test *hit_test, EWebView* web_view) {
+    DCHECK(m_callback);
+    m_callback(web_view->evas_object(), GetX(), GetY(), GetMode(), hit_test, m_user_data);
+  }
+
+ private:
   tizen_webview::View_Hit_Test_Request_Callback m_callback;
   void* m_user_data;
 };
@@ -166,6 +183,28 @@ class WebViewGeolocationPermissionCallback {
   tizen_webview::View_Geolocation_Permission_Callback callback;
   void* user_data;
 };
+
+class WebViewAsyncRequestHitTestDataInternalCallback :
+    public AsyncHitTestRequest {
+ public:
+  typedef void (EWebView::*Callback)(int, int, tizen_webview::Hit_Test_Mode,
+                                     tizen_webview::Hit_Test*);
+
+  WebViewAsyncRequestHitTestDataInternalCallback(int x, int y,
+      tizen_webview::Hit_Test_Mode mode, Callback cb)
+      : AsyncHitTestRequest(x, y, mode),
+        m_callback(cb) {
+  }
+
+  void Run(tizen_webview::Hit_Test* hit_test, EWebView* web_view) {
+    DCHECK(m_callback);
+    (web_view->*m_callback)(GetX(), GetY(), GetMode(), hit_test);
+  }
+
+ private:
+  Callback m_callback;
+};
+
 
 WebContents* EWebView::contents_for_new_window_ = NULL;
 int EWebView::find_request_id_counter_ = 0;
@@ -279,8 +318,14 @@ void EWebView::Initialize() {
   is_initialized_ = true;
 }
 
-EWebView::~EWebView()
-{
+EWebView::~EWebView() {
+  std::map<int64_t, AsyncHitTestRequest*>::iterator it;
+  for (it = m_pendingAsyncHitTests.begin(); it != m_pendingAsyncHitTests.end();
+      it++) {
+    delete it->second;
+  }
+  m_pendingAsyncHitTests.clear();
+
   if (!is_initialized_) {
     return;
   }
@@ -1227,82 +1272,23 @@ bool EWebView::ClearSelection()
     return retval;
 }
 
-tizen_webview::Hit_Test* EWebView::RequestHitTestDataAt(int x, int y, tizen_webview::Hit_Test_Mode mode) {
-  // TODO: this calculations should be moved outside and reused everywhere it's required
-  Evas_Coord tmpX, tmpY;
-  evas_object_geometry_get(evas_object_, &tmpX, &tmpY, NULL, NULL);
-
-  x -= tmpX;
-  y -= tmpY;
-  x /= rwhv()->device_scale_factor();
-  y /= rwhv()->device_scale_factor();
-
-  return RequestHitTestDataAtBlinkCoords(x, y, mode);
-}
-
-Eina_Bool EWebView::AsyncRequestHitTestDataAt(
-    int x, int y, tizen_webview::Hit_Test_Mode mode,
-    tizen_webview::View_Hit_Test_Request_Callback callback, void* user_data) {
-  // TODO: this calculations should be moved outside and reused everywhere it's required
-  Evas_Coord tmpX, tmpY;
-  evas_object_geometry_get(evas_object_, &tmpX, &tmpY, NULL, NULL);
-
-  int view_x = x - tmpX;
-  int view_y = y - tmpY;
-  view_x /= rwhv()->device_scale_factor();
-  view_y /= rwhv()->device_scale_factor();
-
-  return AsyncRequestHitTestDataAtBlinkCoords(view_x, view_y, mode, callback, user_data);
-}
-
-Eina_Bool EWebView::AsyncRequestHitTestDataAtBlinkCoords(
-    int x, int y, tizen_webview::Hit_Test_Mode mode,
-    tizen_webview::View_Hit_Test_Request_Callback callback, void* user_data) {
-  static int64_t request_id = 1;
+tizen_webview::Hit_Test* EWebView::RequestHitTestDataAt(int x, int y,
+    tizen_webview::Hit_Test_Mode mode) {
   DCHECK(BrowserThread::CurrentlyOn(BrowserThread::UI));
 
-  RenderViewHost* rvh = web_contents_->GetRenderViewHost();
-  CHECK(rvh);
-  content::RenderProcessHost* render_process_host = web_contents_->GetRenderProcessHost();
-  CHECK(render_process_host);
-
-  rvh->Send(new EwkViewMsg_DoHitTestAsync(
-      rvh->GetRoutingID(), x, y, mode, request_id));
-  m_pendingAsyncHitTests[request_id] = new AsyncHitTestRequest(
-      x, y, mode, callback, user_data);
-  ++request_id;
-  return EINA_TRUE;
-}
-
-void EWebView::DispatchAsyncHitTestData(const _Ewk_Hit_Test& hit_test_data, const NodeAttributesMap& node_attributes, int64_t request_id)
-{
-  DCHECK(BrowserThread::CurrentlyOn(BrowserThread::UI));
-
-  std::map<int64_t, AsyncHitTestRequest*>::iterator it = m_pendingAsyncHitTests.find(request_id);
-  if (it == m_pendingAsyncHitTests.end())
-      return;
-
-  tizen_webview::Hit_Test data(hit_test_data);
-  data.impl->nodeData.PopulateNodeAtributes(node_attributes);
-  it->second->Run(&data, evas_object_);
-  delete it->second;
-  m_pendingAsyncHitTests.erase(it);
-}
-
-tizen_webview::Hit_Test* EWebView::RequestHitTestDataAtBlinkCoords(int x, int y, tizen_webview::Hit_Test_Mode mode) {
-  DCHECK(BrowserThread::CurrentlyOn(BrowserThread::UI));
+  int view_x, view_y;
+  EvasToBlinkCords(x, y, &view_x, &view_y);
 
   RenderViewHost* render_view_host = web_contents_->GetRenderViewHost();
-  content::RenderProcessHost* render_process_host = web_contents_->GetRenderProcessHost();
+  content::RenderProcessHost* render_process_host =
+      web_contents_->GetRenderProcessHost();
   DCHECK(render_view_host);
   DCHECK(render_process_host);
 
   if (render_view_host && render_process_host) {
+    render_view_host->Send(new EwkViewMsg_DoHitTest(
+        render_view_host->GetRoutingID(), view_x, view_y, mode));
     // We wait on UI thread till hit test data is updated.
-#if !defined(EWK_BRINGUP)
-    base::ThreadRestrictions::ScopedAllowWait allow_wait;
-#endif
-    render_view_host->Send(new EwkViewMsg_DoHitTest(render_view_host->GetRoutingID(), x, y, mode));
     hit_test_completion_.Wait();
     return new tizen_webview::Hit_Test(hit_test_data_);
   }
@@ -1310,7 +1296,83 @@ tizen_webview::Hit_Test* EWebView::RequestHitTestDataAtBlinkCoords(int x, int y,
   return NULL;
 }
 
-void EWebView::UpdateHitTestData(const _Ewk_Hit_Test& hit_test_data, const NodeAttributesMap& node_attributes) {
+Eina_Bool EWebView::AsyncRequestHitTestDataAt(int x, int y,
+    tizen_webview::Hit_Test_Mode mode,
+    tizen_webview::View_Hit_Test_Request_Callback callback, void* user_data) {
+  int view_x, view_y;
+  EvasToBlinkCords(x, y, &view_x, &view_y);
+  return AsyncRequestHitTestPrivate(view_x, view_y, mode,
+      new AsyncHitTestRequestCallback(x, y, mode, callback, user_data));
+}
+
+Eina_Bool EWebView::AsyncRequestHitTestDataAtBlinkCoords(int x, int y,
+    tizen_webview::Hit_Test_Mode mode,
+    tizen_webview::View_Hit_Test_Request_Callback callback,
+    void* user_data) {
+  return AsyncRequestHitTestPrivate(x, y, mode,
+      new AsyncHitTestRequestCallback(x, y, mode, callback, user_data));
+}
+
+Eina_Bool EWebView::AsyncRequestHitTestPrivate(
+    int x, int y, tizen_webview::Hit_Test_Mode mode,
+    AsyncHitTestRequest* asyncHitTestRequest) {
+  DCHECK(BrowserThread::CurrentlyOn(BrowserThread::UI));
+
+  static int64_t request_id = 1;
+  if (asyncHitTestRequest) {
+    RenderViewHost* render_view_host = web_contents_->GetRenderViewHost();
+    content::RenderProcessHost* render_process_host =
+        web_contents_->GetRenderProcessHost();
+    DCHECK(render_view_host);
+    DCHECK(render_process_host);
+
+    if (render_view_host && render_process_host) {
+      render_view_host->Send(new EwkViewMsg_DoHitTestAsync(
+          render_view_host->GetRoutingID(), x, y, mode, request_id));
+      m_pendingAsyncHitTests[request_id] = asyncHitTestRequest;
+      ++request_id;
+      return EINA_TRUE;
+    }
+  }
+
+  // if failed we delete callback as it is not needed anymore
+  delete asyncHitTestRequest;
+  return EINA_FALSE;
+}
+
+void EWebView::DispatchAsyncHitTestData(const _Ewk_Hit_Test& hit_test_data,
+    const NodeAttributesMap& node_attributes, int64_t request_id) {
+  DCHECK(BrowserThread::CurrentlyOn(BrowserThread::UI));
+
+  std::map<int64_t, AsyncHitTestRequest*>::iterator it =
+      m_pendingAsyncHitTests.find(request_id);
+  if (it == m_pendingAsyncHitTests.end())
+    return;
+
+  tizen_webview::Hit_Test data(hit_test_data);
+  data.impl->nodeData.PopulateNodeAtributes(node_attributes);
+  it->second->Run(&data, this);
+  delete it->second;
+  m_pendingAsyncHitTests.erase(it);
+}
+
+void EWebView::EvasToBlinkCords(int x, int y, int* view_x, int* view_y) {
+  Evas_Coord tmpX, tmpY;
+  evas_object_geometry_get(evas_object_, &tmpX, &tmpY, NULL, NULL);
+
+  if (view_x) {
+    *view_x = x - tmpX;
+    *view_x /= rwhv()->device_scale_factor();
+  }
+
+  if (view_y) {
+    *view_y = y - tmpY;
+    *view_y /= rwhv()->device_scale_factor();
+  }
+}
+
+void EWebView::UpdateHitTestData(const _Ewk_Hit_Test& hit_test_data,
+                                 const NodeAttributesMap& node_attributes) {
   DCHECK(content::BrowserThread::CurrentlyOn(content::BrowserThread::IO));
   hit_test_data_ = hit_test_data;
   hit_test_data_.nodeData.PopulateNodeAtributes(node_attributes);
