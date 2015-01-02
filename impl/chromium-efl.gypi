@@ -70,9 +70,6 @@
        ['building_for_tizen==1', {
          'defines': [
            'OS_TIZEN=1',
-           'DL_ARM_NEON_OPTIONAL=1', # TODO: Temporary fix for M40 build break due to wrong selection of
-                                     # omxSP_FFTInv_CCSToR_F32_vfp in src/third_party/openmax_dl/dl/sp/api/omxSP.h:2558 .
-                                     # Remove this line after a more proper solution is found.
            'TIZEN_MULTIMEDIA_PIXMAP_SUPPORT=1',
            'TIZEN_CAPI_PLAYER_SUPPORT=1',
          ],
