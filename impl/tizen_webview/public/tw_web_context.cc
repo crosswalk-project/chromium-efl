@@ -1,5 +1,5 @@
 // Copyright (c) 2014 The Chromium Authors. All rights reserved.
-// Copyright 2014 Samsung Electronics. All rights reserved.
+// Copyright 2014-2015 Samsung Electronics. All rights reserved.
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
@@ -238,14 +238,6 @@ void WebContext::ClearCandidateData() {
 
 void WebContext::ClearPasswordData() {
   impl->ClearPasswordData();
-}
-
-void WebContext::StartMemorySampler(double timerInterval) const {
-  impl->StartMemorySampler(timerInterval);
-}
-
-void WebContext::StopMemorySampler() const {
-  impl->StopMemorySampler();
 }
 
 unsigned int WebContext::InspectorServerStart(unsigned int port) const {

@@ -1,4 +1,4 @@
-// Copyright 2013 Samsung Electronics. All rights reserved.
+// Copyright 2013-2015 Samsung Electronics. All rights reserved.
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
@@ -341,14 +341,12 @@ void ewk_context_mime_override_callback_set(Ewk_Context_Override_Mime_For_Url_Ca
 
 void ewk_context_memory_sampler_start(Ewk_Context* context, double timerInterval)
 {
-  EINA_SAFETY_ON_NULL_RETURN(context);
-  context->StartMemorySampler(timerInterval);
+  LOG_EWK_API_MOCKUP();
 }
 
 void ewk_context_memory_sampler_stop(Ewk_Context* context)
 {
-  EINA_SAFETY_ON_NULL_RETURN(context);
-  context->StopMemorySampler();
+  LOG_EWK_API_MOCKUP();
 }
 
 Eina_Bool ewk_context_additional_plugin_path_set(Ewk_Context *context, const char *path)

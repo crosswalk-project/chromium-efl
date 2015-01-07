@@ -1,4 +1,4 @@
-// Copyright 2014 Samsung Electronics. All rights reserved.
+// Copyright 2014-2015 Samsung Electronics. All rights reserved.
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
@@ -466,14 +466,6 @@ Evas_Object *EWebContext::AddFaviconObject(const char* uri, Evas* canvas) const 
   }
 
   return favicon;
-}
-
-void EWebContext::StartMemorySampler(double timerInterval) const {
-  LOG(INFO) << "Memory Sampler deprecated";
-}
-
-void EWebContext::StopMemorySampler() const {
-  LOG(INFO) << "Memory Sampler deprecated";
 }
 
 void EWebContext::ClearCandidateData() {

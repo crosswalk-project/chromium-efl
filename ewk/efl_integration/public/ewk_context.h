@@ -1,4 +1,4 @@
-// Copyright 2013 Samsung Electronics. All rights reserved.
+// Copyright 2013-2015 Samsung Electronics. All rights reserved.
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
@@ -542,19 +542,21 @@ EAPI void ewk_context_did_start_download_callback_set(Ewk_Context* context, Ewk_
 EAPI void ewk_context_mime_override_callback_set(Ewk_Context_Override_Mime_For_Url_Callback callback);
 
 /**
- * start memory sampler.
+ * Deprecated, this function dose nothing, it's left to allow legacy applications to work with current builds
+ * Starts memory sampler.
  *
  * @param context context object
  * @param interval time gap to fire the timer
-*/
-EAPI void ewk_context_memory_sampler_start(Ewk_Context* context, double timer_interval);
+ */
+EINA_DEPRECATED EAPI void ewk_context_memory_sampler_start(Ewk_Context* context, double timer_interval);
 
 /**
-* stop memory sampler.
-*
-* @param context context object
-*/
-EAPI void ewk_context_memory_sampler_stop(Ewk_Context* context);
+ * Deprecated, this function dose nothing, it's left to allow legacy applications to work with current builds
+ * Stops memory sampler.
+ *
+ * @param context context object
+ */
+EINA_DEPRECATED EAPI void ewk_context_memory_sampler_stop(Ewk_Context* context);
 
 /**
  * @typedef Ewk_Vibration_Client_Vibrate_Cb Ewk_Vibration_Client_Vibrate_Cb
