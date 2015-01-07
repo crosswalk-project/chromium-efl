@@ -96,6 +96,8 @@
         'utc_blink_ewk_context_form_password_data_delete_all_func.cpp',
         'utc_blink_ewk_context_icon_database_icon_object_add_func.cpp',
         'utc_blink_ewk_context_icon_database_path_set_func.cpp',
+        'utc_blink_ewk_context_inspector_server_start_func.cpp',
+        'utc_blink_ewk_context_inspector_server_stop_func.cpp',
         'utc_blink_ewk_context_local_file_system_all_delete_func.cpp',
         'utc_blink_ewk_context_local_file_system_delete_func.cpp',
         'utc_blink_ewk_context_memory_sampler_start_func.cpp',

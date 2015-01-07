@@ -230,6 +230,7 @@ bool EWebContext::ShouldOverrideMimeForURL(
 
 EWebContext::EWebContext(bool incognito)
     : m_pixmap(0),
+      inspector_server_(NULL),
       incognito_(incognito) {
   CHECK(EwkGlobalData::GetInstance());
 
@@ -500,3 +501,17 @@ void EWebContext::ClearPasswordData() {
 #endif
 }
 
+unsigned int EWebContext::InspectorServerStart(unsigned int port) {
+  InspectorServerStop();
+  inspector_server_ = new content::DevToolsDelegateEfl(port);
+  return inspector_server_ ? inspector_server_->port() : 0;
+}
+
+bool EWebContext::InspectorServerStop() {
+  if (!inspector_server_)
+    return false;
+  // The call below destroys inspector_server_.
+  inspector_server_->Stop();
+  inspector_server_ = NULL;
+  return true;
+}

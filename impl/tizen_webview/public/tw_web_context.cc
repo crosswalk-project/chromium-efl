@@ -248,4 +248,12 @@ void WebContext::StopMemorySampler() const {
   impl->StopMemorySampler();
 }
 
+unsigned int WebContext::InspectorServerStart(unsigned int port) const {
+  return impl->InspectorServerStart(port);
+}
+
+bool WebContext::InspectorServerStop() const {
+  return impl->InspectorServerStop();
+}
+
 } // namespace tizen_webview

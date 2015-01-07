@@ -10,6 +10,7 @@
 #include "browser/renderer_host/web_cache_manager_efl.h"
 #include "tizen_webview/public/tw_cache_model.h"
 #include "tizen_webview/public/tw_callbacks.h"
+#include "devtools_delegate_efl.h"
 
 namespace tizen_webview {
 class URL;
@@ -99,6 +100,9 @@ class EWebContext {
   FaviconDatabase* GetFaviconDatabase();
 #endif
 
+  unsigned int InspectorServerStart(unsigned int port);
+  bool InspectorServerStop();
+
  private:
   EWebContext(bool incognito);
   ~EWebContext();
@@ -112,6 +116,7 @@ class EWebContext {
   std::string proxy_uri_;
   scoped_ptr<EwkDidStartDownloadCallback> start_download_callback_;
   int m_pixmap;
+  content::DevToolsDelegateEfl* inspector_server_;
   bool incognito_;
 };
 

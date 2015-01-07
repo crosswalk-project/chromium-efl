@@ -129,6 +129,9 @@ struct WebContext : public tizen_webview::RefCounted<WebContext> {
   FaviconDatabase* GetFaviconDatabase();
 #endif
 
+  unsigned int InspectorServerStart(unsigned int port) const;
+  bool InspectorServerStop() const;
+
  private:
   EWebContext* impl;
 

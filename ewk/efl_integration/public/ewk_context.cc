@@ -473,7 +473,7 @@ void ewk_context_vibration_client_callbacks_set(Ewk_Context* context,
 Eina_Bool ewk_context_tizen_extensible_api_string_set(Ewk_Context* ewkContext,  const char* extensibleAPI, Eina_Bool enable)
 {
   LOG_EWK_API_MOCKUP();
-  return NULL;
+  return EINA_FALSE;
 }
 
 Eina_Bool ewk_context_tizen_extensible_api_set(Ewk_Context * /*context*/, Ewk_Extensible_API /*extensibleAPI*/, Eina_Bool /*enable*/)
@@ -511,14 +511,14 @@ int ewk_context_pixmap_get(Ewk_Context *context)
 
 unsigned int ewk_context_inspector_server_start(Ewk_Context* ewkContext, unsigned int port)
 {
-  LOG_EWK_API_MOCKUP();
-  return NULL;
+  EINA_SAFETY_ON_NULL_RETURN_VAL(ewkContext, 0);
+  return ewkContext->InspectorServerStart(port);
 }
 
 Eina_Bool ewk_context_inspector_server_stop(Ewk_Context* ewkContext)
 {
-  LOG_EWK_API_MOCKUP();
-  return NULL;
+  EINA_SAFETY_ON_NULL_RETURN_VAL(ewkContext, EINA_FALSE);
+  return ewkContext->InspectorServerStop();
 }
 
 void ewk_send_widget_info(Ewk_Context *context,
