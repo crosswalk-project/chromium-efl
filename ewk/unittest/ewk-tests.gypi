@@ -288,6 +288,7 @@
         'utc_blink_ewk_view_inspector_server_stop_func.cpp',
         'utc_blink_ewk_view_javascript_confirm_reply_func.cpp',
         'utc_blink_ewk_view_load_progress_get_func.cpp',
+        'utc_blink_ewk_view_main_frame_get_func.cpp',
         'utc_blink_ewk_view_mhtml_data_get_func.cpp',
         'utc_blink_ewk_view_notification_closed_func.cpp',
         'utc_blink_ewk_view_orientation_lock_callback_set_func.cpp',
