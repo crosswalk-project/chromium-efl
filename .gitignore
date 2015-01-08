@@ -1,4 +1,5 @@
 *.o
+*.dwo
 *.orig
 /*.list
 /out.*

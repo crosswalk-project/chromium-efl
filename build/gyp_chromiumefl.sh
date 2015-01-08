@@ -40,7 +40,6 @@ fi
 COMMON_GYP_PARAMETERS="
                       -Duse_libjpeg_turbo=1
                       -Dproprietary_codecs=1
-                      -Dclang=0
                       -Dtizen_multimedia_support=1
                       -Duse_aura=0
                       -Duse_efl=1
@@ -52,7 +51,10 @@ if [[ $BUILD_CONTENT_SHELL == 1 ]]; then
 fi
 
 add_desktop_flags() {
-  ADDITIONAL_GYP_PARAMETERS+="-Dbuilding_for_tizen=0"
+  ADDITIONAL_GYP_PARAMETERS+="-Dbuilding_for_tizen=0
+                              -Dclang=${USE_CLANG}
+                              -Dmake_clang_dir=${CLANG_DIR}
+                             "
 }
 
 add_arm_flags() {
@@ -71,6 +73,7 @@ add_tizen_flags() {
                               -Duse_kerberos=0
                               -Duse_gconf=0
                               -Duse_alsa=0
+                              -Dclang=0
                               -Dlinux_use_bundled_gold=0
                               -Dlinux_use_bundled_binutils=0
                               -Dprebuilt_ld_gold_dir=${TOPDIR}/build/prebuild

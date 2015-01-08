@@ -10,6 +10,8 @@ if [[ -z "${CHROME_SRC}" ]]; then
   export CHROME_SRC="${TOPDIR}/src"
 fi
 
+export CLANG_DIR="${TOPDIR}/src/third_party/llvm-build/Release+Asserts/"
+
 function applyPatch {
   directory=$1
   shift
@@ -55,6 +57,7 @@ OPTIONS:
    -h, --help            Show this message
    --build-ewk-unittests Build ewk unittests
    --ccache              Configure ccache installed in your system
+   --clang               Use chromium's clang compiler to build the sources
    --content-shell       Build content_shell application
    --debug               Build debug version of chromium-efl (out.${host_arch}/Debug instead of out.${host_arch}/Release)
    -jN                   Set number of jobs, just like with make or ninja
@@ -73,6 +76,7 @@ function parseHostBuildScriptParams() {
 
   export SKIP_GYP=0
   export USE_CCACHE=0
+  export USE_CLANG=0
   export FORCE_JHBUILD=0
   export SKIP_NINJA=0
   export BUILD_EWK_UNITTESTS=0
@@ -94,6 +98,9 @@ function parseHostBuildScriptParams() {
         echo using ccache
         export USE_CCACHE=1
         source $TOPDIR/build/ccache_env.sh ${platform}
+        ;;
+      --clang)
+        export USE_CLANG=1
         ;;
       --content-shell)
         export BUILD_CONTENT_SHELL=1
