@@ -546,10 +546,7 @@ void WebContentsDelegateEfl::RenderProcessGone(base::TerminationStatus status) {
   if (status == base::TERMINATION_STATUS_ABNORMAL_TERMINATION
       || status == base::TERMINATION_STATUS_PROCESS_WAS_KILLED
       || status == base::TERMINATION_STATUS_PROCESS_CRASHED) {
-    bool unused = false;
-    web_view_->SmartCallback<EWebViewCallbacks::WebProcessCrashed>().call(&unused);
-    // A sane app would handle the callback and delete the view immediately.
-    // Otherwise, we will most probably crash when a method is called on |web_view_|.
+    web_view_->HandleRendererProcessCrash();
   }
 }
 

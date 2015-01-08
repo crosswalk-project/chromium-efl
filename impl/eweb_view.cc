@@ -83,6 +83,9 @@ namespace {
 
 int screen_orientation_ = 0;
 
+static const char* kRendererCrashedHTMLMessage =
+    "<html><body><h1>Renderer process has crashed!</h1></body></html>";
+
 inline void SetDefaultStringIfNull(const char*& variable,
                                    const char* default_string) {
   if (!variable) {
@@ -192,13 +195,6 @@ RenderWidgetHostViewEfl* EWebView::rwhv() const {
   return static_cast<RenderWidgetHostViewEfl*>(web_contents_->GetRenderWidgetHostView());
 }
 
-void EWebView::set_renderer_crashed() {
-#ifndef NDEBUG
-  DCHECK(!renderer_crashed_);
-  renderer_crashed_ = true;
-#endif
-}
-
 EWebView::EWebView(tizen_webview::WebView* owner, tizen_webview::WebContext* context, Evas_Object* object)
     : public_webview_(owner),
       evas_event_handler_(NULL),
@@ -214,9 +210,6 @@ EWebView::EWebView(tizen_webview::WebView* owner, tizen_webview::WebContext* con
       min_page_scale_factor_(-1.0),
       max_page_scale_factor_(-1.0),
       inspector_server_(NULL),
-#ifndef NDEBUG
-      renderer_crashed_(false),
-#endif
       is_initialized_(false) {
 }
 
@@ -1830,6 +1823,21 @@ bool EWebView::StopInspectorServer() {
   inspector_server_->Stop(); // Asynchronous releas inside Stop()
   inspector_server_ = NULL;
   return true;
+}
+
+void EWebView::HandleRendererProcessCrash() {
+  const char* last_url = GetURL();
+
+  WebContents::CreateParams params(context_->browser_context());
+  params.context = GetContentImageObject();
+  web_contents_.reset(WebContents::Create(params));
+  web_contents_delegate_.reset(new WebContentsDelegateEfl(this));
+  web_contents_->SetDelegate(web_contents_delegate_.get());
+
+  bool callback_handled = false;
+  SmartCallback<EWebViewCallbacks::WebProcessCrashed>().call(&callback_handled);
+  if (!callback_handled)
+    LoadHTMLString(kRendererCrashedHTMLMessage, NULL, last_url);
 }
 
 #if defined(OS_TIZEN_MOBILE) && !defined(EWK_BRINGUP)

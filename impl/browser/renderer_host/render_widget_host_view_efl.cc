@@ -1069,12 +1069,6 @@ void RenderWidgetHostViewEfl::ResizeCompositingSurface(const gfx::Size& size) {
 }
 
 void RenderWidgetHostViewEfl::RenderProcessGone(base::TerminationStatus, int error_code) {
-  // RenderWidgetHostImpl sets |view_| i.e. RenderWidgetHostViewEfl to NULL immediately after this call.
-  // It expects RenderWidgetHostView to delete itself.
-  // We only inform |web_view_| that renderer has crashed.
-  // and in "process,crashed" callback, app is expected to delete the view.
-  if (web_view_)
-    web_view_->set_renderer_crashed();
   Destroy();
 }
 

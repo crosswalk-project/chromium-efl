@@ -443,6 +443,8 @@ class EWebView {
   bool HandleGesture(ui::GestureEvent* event);
   bool HandleTouchEvent(ui::TouchEvent* event);
 
+  void HandleRendererProcessCrash();
+
  private:
 #if defined(OS_TIZEN_MOBILE) && !defined(EWK_BRINGUP)
   static void cameraResultCb(service_h request, service_h reply,
@@ -526,9 +528,6 @@ class EWebView {
   scoped_refptr<EdgeEffect> edge_effect_;
 #endif
 
-#ifndef NDEBUG
-  bool renderer_crashed_;
-#endif
 #if defined(OS_TIZEN_MOBILE)
   content::FileChooserParams::Mode filechooser_mode_;
 #endif

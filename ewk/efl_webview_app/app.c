@@ -1462,12 +1462,11 @@ Eina_Bool __ewk_view_javascript_prompt_cb(Evas_Object* o, const char* message, c
 void __webprocess_crashed_cb(void* data, Evas_Object* obj, void* event_info)
 {
   printf("APP.C callback __webprocess_crashed_cb \n");
+  const char* message = "<html><body><h1>The renderer process has crashed!</h1>"
+      "<a href=\"https://google.com\">Open google</a></body></html>";
+  ewk_view_html_string_load(view, message, 0, 0);
   Eina_Bool* handled = (Eina_Bool*)event_info;
   *handled = EINA_TRUE;
-  // EWebView (Evas_Object) on which this callback is triggered should be deleted immediately.
-  // It is not safe to call any method on it.
-  evas_object_del(obj);
-  exit(EXIT_FAILURE);
 }
 
 Eina_Bool __mime_override_cb(const char* url, const char *mime, char **new_mime)
