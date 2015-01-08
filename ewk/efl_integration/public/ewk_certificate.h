@@ -16,6 +16,8 @@ typedef struct _Ewk_Certificate_Policy_Decision Ewk_Certificate_Policy_Decision;
 
 /**
  * Set the variable to allow the site access about certificate error.
+ * After this function call Ewk_Certificate_Policy_Decision object becomes
+ * invalid.
  *
  * @param certificate_policy_decision certificate information data
  *
@@ -33,14 +35,15 @@ EAPI void ewk_certificate_policy_decision_allowed_set(Ewk_Certificate_Policy_Dec
  *
  * @return @c EINA_TRUE on success or @c EINA_FALSE on failure
  */
-EAPI void ewk_certificate_policy_decision_suspend(Ewk_Certificate_Policy_Decision* certificate_policy_decision);
+EAPI Eina_Bool ewk_certificate_policy_decision_suspend(Ewk_Certificate_Policy_Decision* certificate_policy_decision);
 
 /**
  * Get the variable url to check the site's url data about certificate error.
  *
  * @param certificate_policy_decision certificate information data
  *
- * @return @c url string on success or empty string on failure
+ * @return @c url string on success or empty string on failure. The string
+ * is only valid until related Ewk_Certificate_Policy_Decision object is valid.
  */
 EAPI Eina_Stringshare* ewk_certificate_policy_decision_url_get(Ewk_Certificate_Policy_Decision* certificate_policy_decision);
 
@@ -49,7 +52,9 @@ EAPI Eina_Stringshare* ewk_certificate_policy_decision_url_get(Ewk_Certificate_P
  *
  * @param certificate_policy_decision certificate information data
  *
- * @return @c certificate pem string on success or empty string on failure
+ * @return @c certificate pem string on success or empty string on failure.
+ * The string is only valid until related Ewk_Certificate_Policy_Decision
+ * object is valid.
  */
 EAPI Eina_Stringshare* ewk_certificate_policy_decision_certificate_pem_get(Ewk_Certificate_Policy_Decision* certificate_policy_decision);
 

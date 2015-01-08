@@ -12,34 +12,49 @@ class utc_blink_ewk_certificate_policy_decision_suspend  : public utc_blink_ewk_
 {
 protected:
 
-  void PostSetUp()
+  void PostSetUp() override
   {
     evas_object_smart_callback_add(GetEwkWebView(), "request,certificate,confirm", policy_decision, this);
   }
 
-  void PreTearDown()
+  void PreTearDown() override
   {
     evas_object_smart_callback_del(GetEwkWebView(), "request,certificate,confirm", policy_decision);
   }
 
-  void LoadFinished(Evas_Object* webview)
+  void LoadFinished(Evas_Object* webview) override
   {
-    EventLoopStop(utc_blink_ewk_base::Failure); // will noop if EventLoopStop was alraedy called
+    utc_message("[policy decision] :: Load finished for URL: %s\n", ewk_view_url_get(webview));
+
+    EventLoopStop(utc_blink_ewk_base::Failure);
   }
 
   static void policy_decision(void* data, Evas_Object* webview, void* event_info)
   {
     utc_message("[policy decision] :: \n");
-    utc_blink_ewk_certificate_policy_decision_suspend *owner = static_cast<utc_blink_ewk_certificate_policy_decision_suspend*>(data);
 
-    Ewk_Certificate_Policy_Decision* policy = (Ewk_Certificate_Policy_Decision*)event_info;
+    utc_blink_ewk_certificate_policy_decision_suspend *owner =
+            static_cast<utc_blink_ewk_certificate_policy_decision_suspend*>(data);
+    ASSERT_TRUE(owner) << "Event triggered with invalid data object";
 
-    if (policy) {
+    owner->certificate_policy_decision = static_cast<Ewk_Certificate_Policy_Decision*>(event_info);
 
-      ewk_certificate_policy_decision_suspend(policy);
-      owner->EventLoopStop(utc_blink_ewk_base::Success);
+    if (owner->certificate_policy_decision && !owner->policy_suspended) {
+      ewk_certificate_policy_decision_suspend(owner->certificate_policy_decision);
+      owner->policy_suspended = true;
     }
   }
+
+  bool TimeOut() override
+  {
+    EventLoopStop(policy_suspended ? Success : Failure);
+
+    return true;
+  }
+
+protected:
+  Ewk_Certificate_Policy_Decision *certificate_policy_decision = nullptr;
+  bool policy_suspended = false;
 };
 
 /**
@@ -47,37 +62,21 @@ protected:
 */
 TEST_F(utc_blink_ewk_certificate_policy_decision_suspend, POS_TEST)
 {
-  Eina_Bool result = ewk_view_url_set(GetEwkWebView(), URL);
+  ASSERT_EQ(EINA_TRUE, ewk_view_url_set(GetEwkWebView(), URL));
 
-  if (!result)
-    FAIL();
+  ASSERT_EQ(Success, EventLoopStart(5));
 
-  utc_blink_ewk_base::MainLoopResult main_result = EventLoopStart();
+  ASSERT_TRUE(policy_suspended);
+  ASSERT_NE(certificate_policy_decision, nullptr);
 
-  if (main_result != utc_blink_ewk_base::Success)
-    FAIL();
-
-  evas_object_show(GetEwkWebView());
-  evas_object_show(GetEwkWindow());
+  ewk_certificate_policy_decision_allowed_set(certificate_policy_decision, EINA_TRUE);
+  ASSERT_EQ(Failure, EventLoopStart(10));
 }
 
 /**
-* @brief Checking whether function works properly in case of NULL of a webview.
+* @brief Checking whether function works properly in case of NULL argument.
 */
-/*TODO
 TEST_F(utc_blink_ewk_certificate_policy_decision_suspend, NEG_TEST)
 {
-  is_failed = EINA_FALSE;
-  is_Accepted = EINA_FALSE;
-
-  Eina_Bool result = ewk_view_url_set(NULL, URL);
-  if (result)
-    utc_fail();
-
-  result = is_Accepted;
-
-  evas_object_show(test_view.webview);
-  evas_object_show(test_view.window);
-  utc_check_ne(result, EINA_TRUE);
+  ASSERT_EQ(EINA_FALSE, ewk_certificate_policy_decision_suspend(NULL));
 }
-*/

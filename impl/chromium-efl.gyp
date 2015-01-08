@@ -111,6 +111,8 @@
       'API/ewk_security_origin_private.h',
       'API/ewk_settings_private.cc',
       'API/ewk_settings_private.h',
+      'API/ewk_suspendable_object.cc',
+      'API/ewk_suspendable_object.h',
       'API/ewk_text_style_private.h',
       'API/ewk_user_media_private.h',
       'API/ewk_web_application_icon_data_private.h',

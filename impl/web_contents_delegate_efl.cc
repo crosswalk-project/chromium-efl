@@ -386,8 +386,12 @@ void WebContentsDelegateEfl::RequestCertificateConfirm(WebContents* /*web_conten
                                                                                          cert_error,
                                                                                          callback));
   web_view_->SmartCallback<EWebViewCallbacks::RequestCertificateConfirm>().call(policy.get());
-  if (!policy->isSuspended && !policy->isDecided)
-    callback.Run(true);
+
+  if (!policy->isSuspended())
+    policy->setDecision(true);
+  else
+    policy.release(); // if policy is suspended, the API takes over the policy object lifetime
+                      // and policy will be deleted after decision is made
 }
 
 void WebContentsDelegateEfl::SetContentSecurityPolicy(const std::string& policy, tizen_webview::ContentSecurityPolicyType header_type) {

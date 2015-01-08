@@ -6,38 +6,32 @@
 #define EWK_CERTIFICATE_PRIVATE_H_
 
 #include <string>
-#include "eina_stringshare.h"
 
-#include "base/callback.h"
+#include "ewk_suspendable_object.h"
 #include "url/gurl.h"
 
-struct _Ewk_Certificate_Policy_Decision {
+class _Ewk_Certificate_Policy_Decision : public Ewk_Suspendable_Object {
+ public:
   _Ewk_Certificate_Policy_Decision(const GURL& url, const std::string& cert, int error_code, const base::Callback<void(bool)>& result_callback)
-      : url(eina_stringshare_add(url.spec().c_str())),
-        certificatePem(eina_stringshare_add(cert.c_str())),
-        error(error_code),
-        isDecided(false),
-        isSuspended(false),
-        callback(result_callback) { }
-
-  _Ewk_Certificate_Policy_Decision()
-      : url(NULL),
-        certificatePem(NULL),
-        error(0),
-        isDecided(false),
-        isSuspended(false) { }
-
-  ~_Ewk_Certificate_Policy_Decision() {
-    eina_stringshare_del(url);
-    eina_stringshare_del(certificatePem);
+      : Ewk_Suspendable_Object(result_callback),
+        error_(error_code) {
+    url_ = eina_stringshare_add(url.spec().c_str());
+    certificatePem_ = eina_stringshare_add(cert.c_str());
   }
 
-  const char* url;
-  const char* certificatePem;
-  int error;
-  bool isDecided;
-  bool isSuspended;
-  base::Callback<void(bool)> callback; //run when policy is set by app
+  ~_Ewk_Certificate_Policy_Decision() {
+    eina_stringshare_del(url_);
+    eina_stringshare_del(certificatePem_);
+  }
+
+  Eina_Stringshare* url() const { return url_; }
+  Eina_Stringshare* certificatePem() const { return certificatePem_; }
+  int error() const { return error_; }
+
+ private:
+  Eina_Stringshare* url_ = nullptr;
+  Eina_Stringshare* certificatePem_ = nullptr;
+  int error_;
 };
 
 #endif /* EWK_CERTIFICATE_PRIVATE_H_ */

@@ -10,17 +10,17 @@
 
 class utc_blink_ewk_certificate_policy_decision_certificate_pem_get : public utc_blink_ewk_base
 {
-
 protected:
-
   void PostSetUp()
   {
+    pem = NULL;
     evas_object_smart_callback_add(GetEwkWebView(), "request,certificate,confirm", policy_decision, this);
   }
 
   void PreTearDown()
   {
     evas_object_smart_callback_del(GetEwkWebView(), "request,certificate,confirm", policy_decision);
+    eina_stringshare_del(pem);
   }
 
   void LoadFinished(Evas_Object* webview)
@@ -31,52 +31,37 @@ protected:
   static void policy_decision(void* data, Evas_Object* webview, void* event_info)
   {
     utc_message("[policy decision] :: \n");
-    utc_blink_ewk_certificate_policy_decision_certificate_pem_get *owner = static_cast<utc_blink_ewk_certificate_policy_decision_certificate_pem_get*>(data);
+    utc_blink_ewk_certificate_policy_decision_certificate_pem_get *owner =
+        static_cast<utc_blink_ewk_certificate_policy_decision_certificate_pem_get*>(data);
 
     Ewk_Certificate_Policy_Decision* policy = (Ewk_Certificate_Policy_Decision*)event_info;
 
-    if (policy && ewk_certificate_policy_decision_certificate_pem_get(policy)) {
+    owner->pem = eina_stringshare_add(ewk_certificate_policy_decision_certificate_pem_get(policy));
+    if (policy && owner->pem) {
+      utc_message("[policy decision] :: pem: %s\n", owner->pem);
       owner->EventLoopStop(utc_blink_ewk_base::Success);
     }
   }
+
+protected:
+  Eina_Stringshare* pem;
 };
 
 /**
-* @brief Checking whether certification request confirmation works properly.
+* @brief Checking whether ewk_certificate_policy_decision_certificate_pem_get
+* returns not empty string.
 */
 TEST_F(utc_blink_ewk_certificate_policy_decision_certificate_pem_get, POS_TEST)
 {
-  Eina_Bool result = ewk_view_url_set(GetEwkWebView(), URL);
-
-  if (!result)
-    FAIL();
-
-  utc_blink_ewk_base::MainLoopResult main_result = EventLoopStart();
-
-  if (main_result != utc_blink_ewk_base::Success)
-    FAIL();
-
-  evas_object_show(GetEwkWebView());
-  evas_object_show(GetEwkWindow());
+  ASSERT_EQ(EINA_TRUE, ewk_view_url_set(GetEwkWebView(), URL));
+  ASSERT_EQ(Success, EventLoopStart());
+  ASSERT_STRNE("", pem);
 }
 
 /**
-* @brief Checking whether function works properly in case of NULL of a webview.
+* @brief Checking whether function works properly in case of NULL argument.
 */
-/*  To be implemented
 TEST_F(utc_blink_ewk_certificate_policy_decision_certificate_pem_get, NEG_TEST)
 {
-  is_failed = EINA_FALSE;
-  is_Accepted = EINA_FALSE;
-
-  Eina_Bool result = ewk_view_url_set(NULL, URL);
-  if (result)
-    utc_fail();
-
-  result = is_Accepted;
-
-  evas_object_show(test_view.webview);
-  evas_object_show(test_view.window);
-  utc_check_ne(result, EINA_TRUE);
+  ASSERT_STREQ("", ewk_certificate_policy_decision_certificate_pem_get(NULL));
 }
-*/

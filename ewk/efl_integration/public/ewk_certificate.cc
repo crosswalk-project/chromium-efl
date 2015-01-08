@@ -13,30 +13,29 @@
 void ewk_certificate_policy_decision_allowed_set(Ewk_Certificate_Policy_Decision* certificatePolicyDecision, Eina_Bool allowed)
 {
   EINA_SAFETY_ON_NULL_RETURN(certificatePolicyDecision);
-  certificatePolicyDecision->isDecided = true;
-  certificatePolicyDecision->callback.Run(allowed);
+  certificatePolicyDecision->setDecision(allowed == EINA_TRUE);
 }
 
-void ewk_certificate_policy_decision_suspend(Ewk_Certificate_Policy_Decision* certificatePolicyDecision)
+Eina_Bool ewk_certificate_policy_decision_suspend(Ewk_Certificate_Policy_Decision* certificatePolicyDecision)
 {
-  EINA_SAFETY_ON_NULL_RETURN(certificatePolicyDecision);
-  certificatePolicyDecision->isSuspended = true;
+  EINA_SAFETY_ON_NULL_RETURN_VAL(certificatePolicyDecision, EINA_FALSE);
+  return certificatePolicyDecision->suspend();
 }
 
 Eina_Stringshare* ewk_certificate_policy_decision_url_get(Ewk_Certificate_Policy_Decision* certificatePolicyDecision)
 {
-  EINA_SAFETY_ON_NULL_RETURN_VAL(certificatePolicyDecision, 0);
-  return certificatePolicyDecision->url;
+  EINA_SAFETY_ON_NULL_RETURN_VAL(certificatePolicyDecision, "");
+  return certificatePolicyDecision->url();
 }
 
 Eina_Stringshare* ewk_certificate_policy_decision_certificate_pem_get(Ewk_Certificate_Policy_Decision* certificatePolicyDecision)
 {
-  EINA_SAFETY_ON_NULL_RETURN_VAL(certificatePolicyDecision, 0);
-  return certificatePolicyDecision->certificatePem;
+  EINA_SAFETY_ON_NULL_RETURN_VAL(certificatePolicyDecision, "");
+  return certificatePolicyDecision->certificatePem();
 }
 
 int ewk_certificate_policy_decision_error_get(Ewk_Certificate_Policy_Decision* certificatePolicyDecision)
 {
   EINA_SAFETY_ON_NULL_RETURN_VAL(certificatePolicyDecision, 0);
-  return certificatePolicyDecision->error;
+  return certificatePolicyDecision->error();
 }
