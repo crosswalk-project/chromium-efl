@@ -48,6 +48,7 @@
         'utc_blink_ewk_autofill_profile_data_get_func.cpp',
         'utc_blink_ewk_autofill_profile_data_set_func.cpp',
         'utc_blink_ewk_autofill_profile_delete_func.cpp',
+        'utc_blink_ewk_autofill_profile_id_get_func.cpp',
         'utc_blink_ewk_autofill_profile_new_func.cpp',
         'utc_blink_ewk_back_forward_list_count_func.cpp',
         'utc_blink_ewk_back_forward_list_current_item_get_func.cpp',
