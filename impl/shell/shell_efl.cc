@@ -13,6 +13,7 @@
 #include "content/public/browser/web_contents.h"
 #include "content/public/common/content_switches.h"
 #include "content/public/browser/render_view_host.h"
+#include "content/shell/common/shell_switches.h"
 #include "ui/gl/gl_switches.h"
 #include "cc/base/switches.h"
 
@@ -27,8 +28,6 @@ class Shell::Impl {
       : url_bar_(NULL), web_view_(NULL)
       , refresh_btn_(NULL), stop_btn_(NULL), back_btn_(NULL)
       , forward_btn_(NULL), exit_handler_(NULL), shell_(NULL) {
-    Evas_Object *icon = NULL;
-
     elm_policy_set(ELM_POLICY_QUIT, ELM_POLICY_QUIT_LAST_WINDOW_CLOSED);
     elm_config_preferred_engine_set("opengl_x11");
     window_ = elm_win_util_standard_add(
@@ -39,9 +38,27 @@ class Shell::Impl {
     Evas_Object *box = elm_box_add(window_);
     evas_object_size_hint_align_set(box, EVAS_HINT_FILL, EVAS_HINT_FILL);
     evas_object_size_hint_weight_set(box, EVAS_HINT_EXPAND, EVAS_HINT_EXPAND);
-    //elm_box_padding_set(box, 20, 20);
     elm_win_resize_object_add(window_, box);
     evas_object_show(box);
+
+    if (!CommandLine::ForCurrentProcess()->HasSwitch(switches::kDumpRenderTree))
+      CreateURLBar(box);
+
+    Evas* evas = evas_object_evas_get(window_);
+    web_view_ = evas_object_image_filled_add(evas);
+    evas_object_image_size_set(web_view_, size.width(), size.height());
+    evas_object_size_hint_align_set(web_view_, EVAS_HINT_FILL, EVAS_HINT_FILL);
+    evas_object_size_hint_weight_set(web_view_, EVAS_HINT_EXPAND, EVAS_HINT_EXPAND);
+    elm_box_pack_end(box, web_view_);
+    evas_object_show(web_view_);
+
+    evas_object_event_callback_add(web_view_, EVAS_CALLBACK_RESIZE, OnResize, this);
+    exit_handler_ = ecore_event_handler_add(ECORE_EVENT_SIGNAL_EXIT, &OnExit, this);
+    evas_object_smart_callback_add(window_, "delete,request", OnWindowDelRequest, this);
+  }
+
+  void CreateURLBar(Evas_Object* box) {
+    Evas_Object *icon = NULL;
 
     url_bar_ = elm_entry_add(box);
     elm_entry_single_line_set(url_bar_, EINA_TRUE);
@@ -97,18 +114,6 @@ class Shell::Impl {
 
     evas_object_show(button_box);
     elm_object_part_content_set(url_bar_, "icon", button_box);
-
-    Evas* evas = evas_object_evas_get(window_);
-    web_view_ = evas_object_image_filled_add(evas);
-    evas_object_image_size_set(web_view_, size.width(), size.height());
-    evas_object_size_hint_align_set(web_view_, EVAS_HINT_FILL, EVAS_HINT_FILL);
-    evas_object_size_hint_weight_set(web_view_, EVAS_HINT_EXPAND, EVAS_HINT_EXPAND);
-    elm_box_pack_end(box, web_view_);
-    evas_object_show(web_view_);
-
-    evas_object_event_callback_add(web_view_, EVAS_CALLBACK_RESIZE, OnResize, this);
-    exit_handler_ = ecore_event_handler_add(ECORE_EVENT_SIGNAL_EXIT, &OnExit, this);
-    evas_object_smart_callback_add(window_, "delete,request", OnWindowDelRequest, this);
   }
 
   void SetAddressBarURL(const char* url) {
