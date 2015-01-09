@@ -445,6 +445,8 @@ class EWebView {
   void HandleRendererProcessCrash();
 
  private:
+   void InitializeContent();
+
 #if defined(OS_TIZEN_MOBILE) && !defined(EWK_BRINGUP)
   static void cameraResultCb(service_h request, service_h reply,
     service_result_e result, void* data);

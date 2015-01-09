@@ -269,9 +269,7 @@ void EWebView::Initialize() {
     // the result of the callback is the first one that has been created.
     contents_for_new_window_ = NULL;
   } else {
-    WebContents::CreateParams params(context_->browser_context());
-    params.context = GetContentImageObject();
-    web_contents_.reset(WebContents::Create(params));
+    InitializeContent();
   }
   web_contents_delegate_.reset(new WebContentsDelegateEfl(this));
   web_contents_->SetDelegate(web_contents_delegate_.get());
@@ -1916,18 +1914,37 @@ bool EWebView::StopInspectorServer() {
 }
 
 void EWebView::HandleRendererProcessCrash() {
-  const char* last_url = GetURL();
+  InitializeContent();
+}
+
+void EWebView::InitializeContent() {
+  int width, height;
+  evas_object_geometry_get(evas_object_, 0, 0, &width, &height);
+
+  if (width == 0 || height == 0) {
+    // The evas_object_ may not be part of the EFL/Elementary layout tree.
+    // As a result we may not know it's size, yet. In such case use window
+    // size instead. RenderWidgetHostViewEfl can already handle native view
+    // resizes, so when the final size of the widget is known it'll resize
+    // itself. In the meantime use window size to make sure the view can be
+    // initialized properly.
+    Evas* evas = evas_object_evas_get(evas_object_);
+    Ecore_Evas* ee = ecore_evas_ecore_evas_get(evas);
+    ecore_evas_geometry_get(ee, 0, 0, &width, &height);
+    CHECK(width > 0 && height > 0);
+  }
 
   WebContents::CreateParams params(context_->browser_context());
   params.context = GetContentImageObject();
+  params.initial_size = gfx::Size(width, height);
   web_contents_.reset(WebContents::Create(params));
   web_contents_delegate_.reset(new WebContentsDelegateEfl(this));
   web_contents_->SetDelegate(web_contents_delegate_.get());
 
-  bool callback_handled = false;
-  SmartCallback<EWebViewCallbacks::WebProcessCrashed>().call(&callback_handled);
-  if (!callback_handled)
-    LoadHTMLString(kRendererCrashedHTMLMessage, NULL, last_url);
+  back_forward_list_.reset(
+    new tizen_webview::BackForwardList(web_contents_->GetController()));
+
+  LOG(INFO) << "Initial WebContents size: " << params.initial_size.ToString();
 }
 
 #if defined(OS_TIZEN_MOBILE) && !defined(EWK_BRINGUP)

@@ -187,7 +187,7 @@ class RenderWidgetHostViewEfl
   void set_magnifier(bool status);
 
   void Init_EvasGL(int width, int height);
-  void Init(Evas_Object* view);
+  void Init(Evas_Object* view, const gfx::Size& size);
 
   void set_eweb_view(EWebView* webview) { web_view_ = webview; }
   EWebView* eweb_view() const { return web_view_; }
@@ -233,7 +233,7 @@ class RenderWidgetHostViewEfl
 
   void SetComposition(const ui::CompositionText& composition_text);
   void ConfirmComposition(base::string16& text);
-  
+
   bool IsScrollOffsetChanged() const { return scroll_offset_changed_; }
   void SetScrollOffsetChanged() { scroll_offset_changed_ = true; }
 

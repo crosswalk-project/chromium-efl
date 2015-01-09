@@ -50,7 +50,7 @@ void WebContentsViewEfl::CreateView(const gfx::Size& initial_size,
 RenderWidgetHostViewBase* WebContentsViewEfl::CreateViewForWidget(
     RenderWidgetHost* render_widget_host, bool is_guest_view_hack) {
   RenderWidgetHostViewEfl* view = new RenderWidgetHostViewEfl(render_widget_host, GetEWebView());
-  view->Init(native_view_);
+  view->Init(native_view_, requested_size_);
   view->Show();
 
   if (view_mode_ != tizen_webview::TW_VIEW_MODE_WINDOWED) {

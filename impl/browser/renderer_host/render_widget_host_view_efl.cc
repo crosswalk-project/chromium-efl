@@ -146,7 +146,7 @@ RenderWidgetHostViewEfl::RenderWidgetHostViewEfl(RenderWidgetHost* widget, EWebV
   gesture_recognizer_->AddGestureEventHelper(this);
 }
 
-void RenderWidgetHostViewEfl::Init(Evas_Object* view) {
+void RenderWidgetHostViewEfl::Init(Evas_Object* view, const gfx::Size& size) {
   DCHECK(view);
   content_image_ = view;
   evas_ = evas_object_evas_get(view);
@@ -156,14 +156,8 @@ void RenderWidgetHostViewEfl::Init(Evas_Object* view) {
   im_context_ = IMContextEfl::Create(this);
 
   if (is_hw_accelerated_) {
-    gfx::Rect bounds = GetViewBoundsInPix();
-    if (!bounds.IsEmpty()) {
-      Init_EvasGL(bounds.width(), bounds.height());
-    } else {
-      int w, h;
-      evas_object_image_size_get(content_image_, &w, &h);
-      Init_EvasGL(w, h);
-    }
+    DCHECK(!size.IsEmpty());
+    Init_EvasGL(size.width(), size.height());
   }
 
 #if defined(OS_TIZEN_MOBILE)
