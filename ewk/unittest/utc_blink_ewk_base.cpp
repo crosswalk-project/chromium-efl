@@ -60,6 +60,7 @@ std::string utc_blink_ewk_base::GetResourceUrl(const char* resource_path) const
 {
     std::string retval("file://");
     retval.append(GetResourcePath(resource_path));
+    utc_message("Resource:\t\"%s\"",retval.c_str());
     return retval;
 }
 

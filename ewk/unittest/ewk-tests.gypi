@@ -137,6 +137,7 @@
         'utc_blink_ewk_error_type_get_func.cpp',
         'utc_blink_ewk_error_url_get_func.cpp',
         'utc_blink_ewk_frame_is_main_frame_func.cpp',
+        'utc_blink_ewk_geolocation_permission_reply_func.cpp',
         'utc_blink_ewk_geolocation_permission_request_origin_get_func.cpp',
         'utc_blink_ewk_geolocation_permission_request_set_func.cpp',
         'utc_blink_ewk_geolocation_permission_request_suspend_func.cpp',

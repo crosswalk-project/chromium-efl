@@ -10,23 +10,28 @@
 <script type="text/javascript">
 // Geolocation successCallback
 function successCallback(position) {
-    document.title = "EWK Geolocation SUCCESS";
+    document.title = 'EWK Geolocation SUCCESS';
+    console.log('EWK Geolocation SUCCESS');
 }
 
 // Geolocation errorCallback
 function errorCallback(error) {
     switch (error.code) {
-        case error.PERMISSION_DENIED:
-        document.title = "EWK Geolocation PERMISSION_DENIED";
+    case error.PERMISSION_DENIED:
+        document.title = 'EWK Geolocation PERMISSION_DENIED';
+        console.log('EWK Geolocation PERMISSION_DENIED');
         break;
     case error.POSITION_UNAVAILABLE:
-        document.title = "EWK Geolocation POSITION_UNAVAILABLE";
+        document.title = 'EWK Geolocation POSITION_UNAVAILABLE';
+        console.log('EWK Geolocation POSITION_UNAVAILABLE');
         break;
     case error.TIMEOUT:
-        document.title = "EWK Geolocation TIMEOUT";
+        document.title = 'EWK Geolocation TIMEOUT';
+        console.log('EWK Geolocation TIMEOUT');
         break;
     default:
-        document.title = "EWK Geolocation UNKNOWN_ERROR";
+        document.title = 'EWK Geolocation UNKNOWN_ERROR';
+        console.log('EWK Geolocation UNKNOWN_ERROR');
         break;
     }
 }
@@ -35,9 +40,10 @@ function errorCallback(error) {
 function testGeolocation()
 {
     if (navigator.geolocation) {
-        navigator.geolocation.getCurrentPosition(successCallback, errorCallback);
+        navigator.geolocation.getCurrentPosition(successCallback, errorCallback, {timeout:20000});
     } else {
-        document.title = "EWK Geolocation UNRESOLVED";
+        document.title = 'EWK Geolocation UNRESOLVED';
+        console.log('EWK Geolocation UNRESOLVED');
     }
 }
 </script>
