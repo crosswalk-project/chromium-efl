@@ -6,6 +6,7 @@
     'locale_dir%': '/usr/share/chromium-efl/locale/',
     'webdb_dir%': '/usr/share/chromium-efl/db/',
     'edje_compiler%': 'edje_cc',
+    'chromium_efl_library_type%': 'shared_library',
   },
   'target_defaults': {
     'conditions': [
@@ -28,7 +29,7 @@
   },
   'targets': [{
     'target_name': 'chromium-efl',
-    'type': 'shared_library',
+    'type': '<(chromium_efl_library_type)',
     'includes': [
       # NOTE: gyp includes need to be relative
       '../src/skia/skia_common.gypi',

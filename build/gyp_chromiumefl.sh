@@ -47,6 +47,9 @@ COMMON_GYP_PARAMETERS="
                       -Duse_gnome_keyring=0
                       -Dtoolkit_uses_gtk=0
                       "
+if [[ $BUILD_CONTENT_SHELL == 1 ]]; then
+  COMMON_GYP_PARAMETERS+="-Dchromium_efl_library_type=static_library"
+fi
 
 add_desktop_flags() {
   ADDITIONAL_GYP_PARAMETERS+="-Dbuilding_for_tizen=0"
