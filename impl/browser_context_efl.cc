@@ -84,6 +84,11 @@ void BrowserContextEfl::ResourceContextEfl::set_url_request_context_getter(
   getter_ = getter;
 }
 
+base::WeakPtr<CookieManager>
+BrowserContextEfl::ResourceContextEfl::GetCookieManager() const {
+  return getter_->cookieManager();
+}
+
 BrowserContextEfl::BrowserContextEfl(EWebContext* web_context, bool incognito)
   : resource_context_(NULL),
     web_context_(web_context),

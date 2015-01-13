@@ -77,7 +77,7 @@ Ewk_Cookie_Manager* WebContext::ewkCookieManager() const {
   return impl->ewkCookieManager();
 }
 
-CookieManager* WebContext::cookieManager() const {
+base::WeakPtr<CookieManager> WebContext::cookieManager() const {
   return impl->cookieManager();
 }
 

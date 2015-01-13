@@ -16,11 +16,11 @@
     CRITICAL("ewk cookie manager is NULL.");                            \
     return __VA_ARGS__;                                                 \
   }                                                                     \
-  if (!((manager)->cookieManager())) {                                  \
+  if (!(manager)->cookieManager().get()) {                              \
     CRITICAL("ewk cookie manager->cookieManager() is NULL.");           \
     return __VA_ARGS__;                                                 \
   }                                                                     \
-  CookieManager* cookie_manager = (manager)->cookieManager()
+  base::WeakPtr<CookieManager> cookie_manager = (manager)->cookieManager()
 
 
 void ewk_cookie_manager_persistent_storage_set(Ewk_Cookie_Manager* manager,

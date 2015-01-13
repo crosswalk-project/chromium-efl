@@ -99,7 +99,6 @@ class ContentBrowserClientEfl: public ContentBrowserClient {
 
  private:
   scoped_ptr<ResourceDispatcherHostDelegateEfl> resource_disp_host_del_efl_;
-  EWebContext* web_context_;
   BrowserMainPartsEfl* browser_main_parts_efl_;
 
   DISALLOW_COPY_AND_ASSIGN(ContentBrowserClientEfl);

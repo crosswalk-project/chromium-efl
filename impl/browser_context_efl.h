@@ -10,6 +10,7 @@
 #include "url_request_context_getter_efl.h"
 #include "base/files/scoped_temp_dir.h"
 #include "base/memory/scoped_ptr.h"
+#include "base/memory/weak_ptr.h"
 #include "base/synchronization/lock.h"
 #include "browser/download_manager_delegate_efl.h"
 #include "browser/geolocation/geolocation_permission_context_efl.h"
@@ -22,6 +23,7 @@
 #include "content/public/browser/resource_context.h"
 #include "net/url_request/url_request_context.h"
 
+class CookieManager;
 class EWebContext;
 
 namespace visitedlink {
@@ -52,6 +54,8 @@ class BrowserContextEfl
 
     void set_url_request_context_getter(
         scoped_refptr<URLRequestContextGetterEfl> getter);
+
+    base::WeakPtr<CookieManager> GetCookieManager() const;
 
    private:
     scoped_refptr<URLRequestContextGetterEfl> getter_;

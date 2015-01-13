@@ -65,13 +65,13 @@ URLRequestContextGetterEfl::URLRequestContextGetterEfl(
     ProtocolHandlerMap* protocol_handlers,
     URLRequestInterceptorScopedVector request_interceptors,
     net::NetLog* net_log)
-    : web_context_(web_context),
-      ignore_certificate_errors_(ignore_certificate_errors),
+    : ignore_certificate_errors_(ignore_certificate_errors),
       base_path_(base_path),
       io_task_runner_(io_task_runner),
       file_task_runner_(file_task_runner),
-      request_interceptors_(request_interceptors.Pass()),
-      net_log_(net_log) {
+      net_log_(net_log),
+      cookie_manager_(web_context.cookieManager()),
+      request_interceptors_(request_interceptors.Pass()) {
   // Must first be created on the UI thread.
   DCHECK(BrowserThread::CurrentlyOn(BrowserThread::UI));
 
@@ -96,7 +96,7 @@ net::URLRequestContext* URLRequestContextGetterEfl::GetURLRequestContext() {
     if (net_log_) {
       url_request_context_->set_net_log(net_log_);
     }
-    network_delegate_.reset(new net::NetworkDelegateEfl(*(web_context_.cookieManager())));
+    network_delegate_.reset(new net::NetworkDelegateEfl(cookie_manager_));
 
     url_request_context_->set_network_delegate(network_delegate_.get());
     storage_.reset(

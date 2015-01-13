@@ -9,6 +9,7 @@
 #include <string>
 #include <Evas.h>
 
+#include "base/memory/weak_ptr.h"
 #include "tizen_webview/public/tw_callbacks.h"
 #include "tizen_webview/public/tw_cache_model.h"
 #include "tizen_webview/public/tw_ref_counted.h"
@@ -38,7 +39,7 @@ struct WebContext : public tizen_webview::RefCounted<WebContext> {
   // Get related class
   content::BrowserContextEfl* browser_context() const;
   Ewk_Cookie_Manager* ewkCookieManager() const;
-  CookieManager* cookieManager() const;
+  base::WeakPtr<CookieManager> cookieManager() const;
 
   // Set Callbacks
   void SetDidStartDownloadCallback(Context_Did_Start_Download_Callback callback,

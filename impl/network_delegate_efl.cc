@@ -11,8 +11,9 @@
 
 namespace net {
 
-NetworkDelegateEfl::NetworkDelegateEfl(CookieManager& cookie_manager)
-  : cookie_manager_(cookie_manager) {
+NetworkDelegateEfl::NetworkDelegateEfl(
+    base::WeakPtr<CookieManager> cookie_manager)
+    : cookie_manager_(cookie_manager) {
 }
 
 NetworkDelegate::AuthRequiredResponse NetworkDelegateEfl::OnAuthRequired(
@@ -25,13 +26,17 @@ NetworkDelegate::AuthRequiredResponse NetworkDelegateEfl::OnAuthRequired(
 
 bool NetworkDelegateEfl::OnCanGetCookies(const URLRequest& request,
                                          const CookieList& cookie_list) {
-  return cookie_manager_.OnCanGetCookies(request, cookie_list);
+  if (!cookie_manager_)
+    return false;
+  return cookie_manager_->OnCanGetCookies(request, cookie_list);
 }
 
 bool NetworkDelegateEfl::OnCanSetCookie(const URLRequest& request,
                                         const std::string& cookie_line,
                                         CookieOptions* options) {
-  return cookie_manager_.OnCanSetCookie(request, cookie_line, options);
+  if (!cookie_manager_)
+    return false;
+  return cookie_manager_->OnCanSetCookie(request, cookie_line, options);
 }
 
 bool NetworkDelegateEfl::OnCanAccessFile(const URLRequest& request,

@@ -7,6 +7,7 @@
 #define _URL_REQUEST_CONTEXT_GETTER_EFL_H_
 
 #include "base/memory/scoped_ptr.h"
+#include "base/memory/weak_ptr.h"
 #include "content/public/browser/content_browser_client.h"
 #include "net/url_request/url_request_context_getter.h"
 
@@ -22,6 +23,7 @@ class ProxyConfigService;
 class URLRequestContextStorage;
 }
 
+class CookieManager;
 class EWebContext;
 
 namespace content {
@@ -48,6 +50,8 @@ class URLRequestContextGetterEfl : public net::URLRequestContextGetter {
                             bool persist_session_cookies,
                             bool file_storage=true);
 
+  base::WeakPtr<CookieManager> cookieManager() { return cookie_manager_; }
+
  protected:
   virtual ~URLRequestContextGetterEfl();
 
@@ -59,7 +63,6 @@ class URLRequestContextGetterEfl : public net::URLRequestContextGetter {
       const base::FilePath& path,
       bool persist_session_cookies);
 
-  EWebContext& web_context_;
   bool ignore_certificate_errors_;
   base::FilePath base_path_;
   const scoped_refptr<base::SingleThreadTaskRunner>& io_task_runner_;
@@ -68,6 +71,7 @@ class URLRequestContextGetterEfl : public net::URLRequestContextGetter {
 
   base::FilePath cookie_store_path_;
   scoped_refptr<net::CookieStore> cookie_store_;
+  base::WeakPtr<CookieManager> cookie_manager_;
 
   scoped_ptr<net::ProxyConfigService> proxy_config_service_;
   scoped_ptr<net::NetworkDelegate> network_delegate_;

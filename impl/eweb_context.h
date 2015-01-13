@@ -7,6 +7,7 @@
 
 #include "API/ewk_cookie_manager_private.h"
 #include "base/memory/scoped_ptr.h"
+#include "base/memory/weak_ptr.h"
 #include "browser/renderer_host/web_cache_manager_efl.h"
 #include "tizen_webview/public/tw_cache_model.h"
 #include "tizen_webview/public/tw_callbacks.h"
@@ -55,7 +56,7 @@ class EWebContext {
 
   void NotifyLowMemory();
   Ewk_Cookie_Manager* ewkCookieManager();
-  CookieManager* cookieManager()
+  base::WeakPtr<CookieManager> cookieManager()
   { return ewkCookieManager()->cookieManager(); }
   void SetProxyUri(const char* uri);
   const char* GetProxyUri() const

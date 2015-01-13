@@ -8,7 +8,6 @@
 #include <deque>
 
 #include "base/memory/scoped_ptr.h"
-#include "base/memory/weak_ptr.h"
 #include "content/public/browser/browser_context.h"
 #include "browser/javascript_dialog_manager_efl.h"
 #include "browser_context_efl.h"

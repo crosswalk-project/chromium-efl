@@ -19,8 +19,8 @@ class Ewk_Cookie_Manager {
 
   ~Ewk_Cookie_Manager() { }
 
-  CookieManager* cookieManager() const {
-    return cookie_manager_.get();
+  base::WeakPtr<CookieManager> cookieManager() const {
+    return cookie_manager_->GetWeakPtr();
   }
 
  private:
@@ -28,7 +28,7 @@ class Ewk_Cookie_Manager {
     : cookie_manager_(new CookieManager(request_context_getter)) {
   }
 
-  scoped_refptr<CookieManager> cookie_manager_;
+  scoped_ptr<CookieManager> cookie_manager_;
 };
 
 #endif // ewk_cookie_manager_private_h

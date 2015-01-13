@@ -15,7 +15,7 @@ namespace net {
 
 class NetworkDelegateEfl : public NetworkDelegate {
  public:
-  NetworkDelegateEfl(CookieManager& cookie_manager);
+  NetworkDelegateEfl(base::WeakPtr<CookieManager> cookie_manager);
 
  private:
   // NetworkDelegate implementation.
@@ -33,7 +33,7 @@ class NetworkDelegateEfl : public NetworkDelegate {
                                const base::FilePath& path) const override;
   virtual bool OnCanThrottleRequest(const URLRequest& request) const override;
 
-  CookieManager& cookie_manager_;
+  base::WeakPtr<CookieManager> cookie_manager_;
 };
 
 } // namespace net

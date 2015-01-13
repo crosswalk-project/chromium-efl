@@ -14,7 +14,6 @@
 #include "base/synchronization/waitable_event.h"
 #include "content/public/browser/browser_thread.h"
 #include "eweb_context.h"
-#include "url_request_context_getter_efl.h"
 #include "net/base/net_errors.h"
 #include "net/base/static_cookie_policy.h"
 #include "net/cookies/canonical_cookie.h"
@@ -78,7 +77,8 @@ class CookieManager::EwkGetHostCallback {
 CookieManager::CookieManager(content::URLRequestContextGetterEfl* request_context_getter)
     : is_clearing_(false),
       request_context_getter_(request_context_getter),
-      cookie_policy_(TW_COOKIE_ACCEPT_POLICY_ALWAYS)
+      cookie_policy_(TW_COOKIE_ACCEPT_POLICY_ALWAYS),
+      weak_ptr_factory_(this)
 {
 }
 
@@ -88,7 +88,7 @@ void CookieManager::DeleteCookiesAsync(const std::string& url,
   DCHECK(BrowserThread::CurrentlyOn(BrowserThread::UI));
   BrowserThread::PostTask(BrowserThread::IO, FROM_HERE,
                                     base::Bind(&CookieManager::DeleteCookiesOnIOThread,
-                                                 this,
+                                                 GetWeakPtr(),
                                                  url,
                                                  cookie_name));
 }
@@ -125,7 +125,7 @@ void CookieManager::SetStoragePath(const std::string& path,
     DCHECK(BrowserThread::CurrentlyOn(BrowserThread::UI));
     BrowserThread::PostTask(BrowserThread::IO, FROM_HERE,
                                     base::Bind(&CookieManager::SetStoragePathOnIOThread,
-                                                 this,
+                                                 GetWeakPtr(),
                                                  path,
                                                  persist_session_cookies,
                                                  file_storage_type));
@@ -143,7 +143,10 @@ void CookieManager::GetAcceptPolicyAsync(AsyncPolicyGetCb callback, void *data) 
 void CookieManager::GetHostNamesWithCookiesAsync(AsyncHostnamesGetCb callback, void *data) {
   DCHECK(BrowserThread::CurrentlyOn(BrowserThread::UI));
   host_callback_queue_.push(new EwkGetHostCallback(callback, data));
-  BrowserThread::PostTask(BrowserThread::IO, FROM_HERE, base::Bind(&CookieManager::FetchCookiesOnIOThread, this));
+  BrowserThread::PostTask(BrowserThread::IO,
+                          FROM_HERE,
+                          base::Bind(&CookieManager::FetchCookiesOnIOThread,
+                                     GetWeakPtr()));
 }
 
 void CookieManager::FetchCookiesOnIOThread() {
@@ -156,7 +159,8 @@ void CookieManager::FetchCookiesOnIOThread() {
       request_context_getter_->GetURLRequestContext()->
       cookie_store()->GetCookieMonster();
   if (cookie_monster.get()) {
-    cookie_monster->GetAllCookiesAsync(base::Bind(&CookieManager::OnFetchComplete, this));
+    cookie_monster->GetAllCookiesAsync(
+        base::Bind(&CookieManager::OnFetchComplete, GetWeakPtr()));
   } else {
     OnFetchComplete(net::CookieList());
   }
@@ -166,7 +170,7 @@ void CookieManager::OnFetchComplete(const net::CookieList& cookies) {
   if (!BrowserThread::CurrentlyOn(BrowserThread::UI)) {
     BrowserThread::PostTask(BrowserThread::UI, FROM_HERE,
                                     base::Bind(&CookieManager::OnFetchComplete,
-                                                   this,
+                                                   GetWeakPtr(),
                                                    cookies));
     return;
   }
@@ -281,7 +285,7 @@ void CookieManager::GetCookieValueOnIOThread(const GURL& host,
     cookie_monster->GetCookiesWithOptionsAsync(host,
                                                options,
                                                base::Bind(&CookieManager::GetCookieValueCompleted,
-                                                          this,
+                                                          GetWeakPtr(),
                                                           completion,
                                                           result));
   } else {
@@ -304,7 +308,7 @@ std::string CookieManager::GetCookiesForURL(const std::string& url) {
   base::WaitableEvent completion(false, false);
   BrowserThread::PostTask(BrowserThread::IO, FROM_HERE,
                                   base::Bind(&CookieManager::GetCookieValueOnIOThread,
-                                                 this,
+                                                 GetWeakPtr(),
                                                  GURL(url),
                                                  &cookie_value,
                                                  &completion));
@@ -314,4 +318,8 @@ std::string CookieManager::GetCookiesForURL(const std::string& url) {
 #endif
   completion.Wait();
   return cookie_value;
+}
+
+base::WeakPtr<CookieManager> CookieManager::GetWeakPtr() {
+  return weak_ptr_factory_.GetWeakPtr();
 }

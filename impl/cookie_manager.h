@@ -5,19 +5,19 @@
 #ifndef cookie_manager_h
 #define cookie_manager_h
 
-#include "base/synchronization/lock.h"
-#include "base/basictypes.h"
+#include <Eina.h>
+#include <queue>
+
 #include "url_request_context_getter_efl.h"
+#include "base/basictypes.h"
+#include "base/memory/weak_ptr.h"
+#include "base/synchronization/lock.h"
 #include "net/url_request/url_request_context.h"
 #include "net/url_request/url_request_context_getter.h"
 #include "net/cookies/canonical_cookie.h"
 #include "net/cookies/cookie_options.h"
 #include "net/cookies/cookie_util.h"
 #include "url/gurl.h"
-
-#include <queue>
-#include <Eina.h>
-
 #include "tizen_webview/public/tw_cookie_accept_policy.h"
 
 namespace content {
@@ -26,8 +26,7 @@ class ResourceContext;
 
 struct _Ewk_Error;
 
-class CookieManager 
-  : public base::RefCountedThreadSafe<CookieManager> {
+class CookieManager {
  public:
   typedef void (*AsyncPolicyGetCb)(tizen_webview::Cookie_Accept_Policy,
                                    void *);
@@ -89,11 +88,7 @@ class CookieManager
   //This is synchronous call
   std::string GetCookiesForURL(const std::string& url);
 
- protected:
-  friend class base::RefCountedThreadSafe<CookieManager>;
-
-  ~CookieManager()
-  {}
+  base::WeakPtr<CookieManager> GetWeakPtr();
 
  private:
   struct EwkGetHostCallback;
@@ -130,6 +125,8 @@ class CookieManager
   std::queue< EwkGetHostCallback* > host_callback_queue_;
 
   DISALLOW_COPY_AND_ASSIGN(CookieManager);
+
+  base::WeakPtrFactory<CookieManager> weak_ptr_factory_;
 };
 
 #endif //cookie_manager_h

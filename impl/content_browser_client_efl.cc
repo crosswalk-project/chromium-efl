@@ -5,6 +5,7 @@
 #include "content_browser_client_efl.h"
 
 #include "command_line_efl.h"
+#include "base/memory/scoped_ptr.h"
 #include "browser_main_parts_efl.h"
 #include "browser_context_efl.h"
 #include "web_contents_delegate_efl.h"
@@ -49,7 +50,7 @@ using tizen_webview::Security_Origin;
 namespace content {
 
 ContentBrowserClientEfl::ContentBrowserClientEfl()
-  : web_context_(NULL), browser_main_parts_efl_(NULL) {
+  : browser_main_parts_efl_(NULL) {
 }
 
 BrowserMainParts* ContentBrowserClientEfl::CreateBrowserMainParts(
@@ -164,10 +165,12 @@ bool ContentBrowserClientEfl::AllowGetCookie(const GURL& url,
                                              content::ResourceContext* context,
                                              int render_process_id,
                                              int render_frame_id) {
-  if (!web_context_)
-      return false;
+  BrowserContextEfl::ResourceContextEfl* rc =
+      static_cast<BrowserContextEfl::ResourceContextEfl*>(context);
+  if (!rc)
+    return false;
 
-  CookieManager* cookie_manager = web_context_->cookieManager();
+  base::WeakPtr<CookieManager> cookie_manager = rc->GetCookieManager();
   if (!cookie_manager)
     return false;
 
@@ -186,10 +189,12 @@ bool ContentBrowserClientEfl::AllowSetCookie(const GURL& url,
                                              int render_process_id,
                                              int render_frame_id,
                                              net::CookieOptions* options) {
-  if (!web_context_)
+  BrowserContextEfl::ResourceContextEfl* rc =
+      static_cast<BrowserContextEfl::ResourceContextEfl*>(context);
+  if (!rc)
     return false;
 
-  CookieManager* cookie_manager = web_context_->cookieManager();
+  base::WeakPtr<CookieManager> cookie_manager = rc->GetCookieManager();
   if (!cookie_manager)
     return false;
 
@@ -217,16 +222,6 @@ void ContentBrowserClientEfl::OverrideWebkitPrefs(
 
 void ContentBrowserClientEfl::RenderProcessWillLaunch(
     content::RenderProcessHost* host) {
-
-  BrowserContextEfl* browser_context = static_cast<BrowserContextEfl*>(
-                                          host->GetBrowserContext());
-
-  // TODO: is this situation possible? Should it ever happen?
-  DCHECK(browser_context);
-
-  if (browser_context)
-    web_context_ = browser_context->WebContext();
-
   host->AddFilter(new RenderMessageFilterEfl(host->GetID()));
   host->AddFilter(new VibrationMessageFilter());
   host->AddFilter(new editing::EditorClientObserver(host->GetID()));
