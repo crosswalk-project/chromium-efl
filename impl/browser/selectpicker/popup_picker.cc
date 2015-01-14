@@ -16,7 +16,7 @@
 
 #include <Elementary.h>
 #include <libintl.h>
-#include <Ecore_X.h>
+#include "ecore_x_wrapper.h"
 #ifdef OS_TIZEN_MOBILE
 #include <dlfcn.h>
 #include <efl_assist.h>

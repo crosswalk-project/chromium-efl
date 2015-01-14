@@ -984,6 +984,9 @@ bool EWebView::ExecuteJavaScript(const char* script, tizen_webview::View_Script_
   return true;
 }
 
+#ifdef GCC_4_6_X
+#undef override
+#endif
 bool EWebView::SetUserAgent(const char* userAgent) {
   const content::NavigationController& controller =
       web_contents_->GetController();
@@ -998,6 +1001,9 @@ bool EWebView::SetUserAgent(const char* userAgent) {
 
   return true;
 }
+#ifdef GCC_4_6_X
+#define override
+#endif
 
 bool EWebView::SetUserAgentAppName(const char* application_name) {
   EflWebView::VersionInfo::GetInstance()->

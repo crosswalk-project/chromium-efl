@@ -12,7 +12,7 @@
 #undef GetXDisplay
 #undef OpenNewXDisplay
 
-#include <Ecore_X.h>
+#include "ecore_x_wrapper.h"
 #include <X11/Xlib.h>
 
 namespace gfx {

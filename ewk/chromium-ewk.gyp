@@ -157,6 +157,12 @@
       'efl_integration/public/text_encoding_map_efl.h',
     ],
     'conditions': [
+      ['gcc_4_6_x==1', {
+        'defines': [
+          'override=',
+          'final=',
+        ],
+      }],
       ['ewk_bringup==1', {
         'defines': [ 'EWK_BRINGUP=1' ],
       }]

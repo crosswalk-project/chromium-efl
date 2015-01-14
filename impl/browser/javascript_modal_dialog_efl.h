@@ -13,7 +13,7 @@
 
 #include <Evas.h>
 #include <Elementary.h>
-#include <Ecore_X.h>
+#include "ecore_x_wrapper.h"
 
 namespace content {
 class WebContentsDelegateEfl;

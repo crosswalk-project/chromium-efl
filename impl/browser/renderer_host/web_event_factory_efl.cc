@@ -11,7 +11,7 @@
 #include "ui/events/keycodes/keyboard_code_conversion_x.h"
 
 #include <Ecore.h>
-#include <Ecore_X.h>
+#include "ecore_x_wrapper.h"
 
 // TODO: Figure out how to avoid this includes.
 #include <X11/Xutil.h>

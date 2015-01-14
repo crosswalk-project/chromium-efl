@@ -8,7 +8,7 @@
 #include <map>
 
 #include <Ecore.h>
-#include <Ecore_X.h>
+#include "ecore_x_wrapper.h"
 #include <gst/gst.h>
 
 #include "base/cancelable_callback.h"

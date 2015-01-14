@@ -10,7 +10,7 @@
 
 #if defined(TIZEN_MULTIMEDIA_PIXMAP_SUPPORT)
 #include <Ecore.h>
-#include <Ecore_X.h>
+#include "ecore_x_wrapper.h"
 #endif
 
 #include "base/memory/scoped_ptr.h"

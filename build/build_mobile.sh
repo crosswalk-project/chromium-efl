@@ -21,10 +21,7 @@ if [ "$USE_GLOBAL_GBS_CONF" == "" ]; then
   CONF_FLAG="--conf ${SCRIPTDIR}/gbs.conf"
 fi
 
-CUSTOM_LIBC_DIR="custom_libc_dir /opt/usr/eglibc-2.18/lib"
-
 gbs $CONF_FLAG build $PROFILE_FLAG -A armv7l --incremental \
-    --define "${CUSTOM_LIBC_DIR}" \
     --define "${TIZEN_VERSION}" "$@"
 
 ${SCRIPTDIR}/apply_patches.sh -r ${SCRIPTDIR}/patches

@@ -6,6 +6,11 @@
       ['building_for_tizen==1', {
         'clang': 0,
       }],
+      ['building_for_tizen_mobile==1', {
+        'gcc_4_6_x': 1,
+      }, {
+        'gcc_4_6_x': 0,
+      }],
     ],
    'chromium_efl_tizen_version%': '2.3',
    'custom_libc_dir%': '',
@@ -54,11 +59,34 @@
           ['exclude', 'gesture_detection/gesture_configuration_default\\.cc$'],
         ],
       }],
+      ['_target_name=="boringssl" or _target_name=="crypto" or _target_name=="genperf" or  _target_name=="yasm" or _target_name=="speech_proto" or _target_name=="skia_library" or  _target_name=="http_server" or _target_name=="libjingle" or  _target_name=="libjingle_webrtc_common" or _target_name=="content_renderer"', {
+        'defines!': [
+          'final=',
+        ],
+      }],
+      ['_target_name=="usrsctplib"', {
+        'defines!': [
+          'override=',
+        ],
+      }],
+      ['_target_name=="webrtc_base" or _target_name=="rtc_base" or _target_name=="v8_base"', {
+        'defines!': [
+          'final=',
+          'override=',
+        ],
+      }],
     ],
     'conditions': [
        ['use_efl==1', {
          'defines': [
            'USE_EFL=1',
+         ],
+       }],
+       ['gcc_4_6_x==1', {
+         'defines': [
+           'GCC_4_6_X=1',
+           'override=',
+           'final=',
          ],
        }],
        ['tizen_multimedia_support==1', {
@@ -77,6 +105,10 @@
            'OS_TIZEN=1',
            'TIZEN_MULTIMEDIA_PIXMAP_SUPPORT=1',
            'TIZEN_CAPI_PLAYER_SUPPORT=1',
+         # For GCC 4.5.3 bundled arm.h has a bug and don't define __ARM_PCS when it should.
+         # Force define this flag for the whole chromium on gbs gcc 4.5.3.
+         # Non-arm builds will ingore it in any case.
+         '__ARM_PCS',
          ],
          'conditions': [
            ['chromium_efl_tizen_version=="2.3"', {
@@ -103,7 +135,8 @@
            ['exclude', 'browser/sound_effect.cc$'],
            ['exclude', 'battery_status_manager_linux\\.(h|cc)$'],
          ],
-      }, { # building_for_tizen != 1
+         'cflags_cc': [ '-std=gnu++0x', '-fpermissive' ],
+      }, {
         'sources/': [
           ['exclude', 'browser/device_sensors/data_fetcher_impl_tizen\\.(cc|h)$'],
           ['exclude', 'browser/device_sensors/data_fetcher_shared_memory_tizen\\.cc$'],
@@ -123,9 +156,7 @@
            ],
       }],
       ['building_for_tizen_tv==1', {
-       'defines': [
-          'OS_TIZEN_TV=1'
-        ],
+       'defines': ['OS_TIZEN_TV=1'],
       }],
       ['host_arch=="arm"', {
         'target_conditions': [

@@ -60,7 +60,7 @@
 #include <Ecore.h>
 #include <Ecore_Evas.h>
 #include <Ecore_Input.h>
-#include <Ecore_X.h>
+#include "ecore_x_wrapper.h"
 #include <Elementary.h>
 
 #define EFL_MAX_WIDTH 10000

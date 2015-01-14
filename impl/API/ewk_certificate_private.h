@@ -13,7 +13,9 @@
 class _Ewk_Certificate_Policy_Decision : public Ewk_Suspendable_Object {
  public:
   _Ewk_Certificate_Policy_Decision(const GURL& url, const std::string& cert, int error_code, const base::Callback<void(bool)>& result_callback)
-      : Ewk_Suspendable_Object(result_callback),
+      : url_(NULL),
+        certificatePem_(NULL),
+        Ewk_Suspendable_Object(result_callback),
         error_(error_code) {
     url_ = eina_stringshare_add(url.spec().c_str());
     certificatePem_ = eina_stringshare_add(cert.c_str());
@@ -29,8 +31,8 @@ class _Ewk_Certificate_Policy_Decision : public Ewk_Suspendable_Object {
   int error() const { return error_; }
 
  private:
-  Eina_Stringshare* url_ = nullptr;
-  Eina_Stringshare* certificatePem_ = nullptr;
+  Eina_Stringshare* url_;
+  Eina_Stringshare* certificatePem_;
   int error_;
 };
 

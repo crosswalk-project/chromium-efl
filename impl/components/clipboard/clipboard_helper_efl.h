@@ -7,7 +7,7 @@
 
 #include <string>
 #include <Ecore.h>
-#include <Ecore_X.h>
+#include "ecore_x_wrapper.h"
 
 #include "base/basictypes.h"
 

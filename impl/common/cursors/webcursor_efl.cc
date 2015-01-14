@@ -4,7 +4,7 @@
 #include "content/common/cursors/webcursor.h"
 #include "third_party/WebKit/public/platform/WebCursorInfo.h"
 
-#include <Ecore_X.h>
+#include "ecore_x_wrapper.h"
 
 using namespace blink;
 
