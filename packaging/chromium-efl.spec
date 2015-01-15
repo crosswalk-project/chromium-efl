@@ -241,6 +241,11 @@ ninja %{_smp_mflags} -C"%{OUTPUT_FOLDER}" angle_unittests env_chromium_unittests
 cp src/third_party/icu/android/icudtl.dat "%{OUTPUT_FOLDER}"
 
 %install
+
+# Generate pkg-confg file
+mkdir -p "%{OUTPUT_FOLDER}"/pkgconfig/
+sed -e 's#?VERSION?#%{version}#' build/pkgconfig/chromium-efl.pc.in > "%{OUTPUT_FOLDER}"/pkgconfig/chromium-efl.pc
+
 install -d "%{buildroot}"%{_sysconfdir}/smack/accesses2.d
 install -d "%{buildroot}"%{_bindir}
 install -d "%{buildroot}"%{_bindir}
