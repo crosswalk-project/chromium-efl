@@ -56,6 +56,7 @@ add_desktop_flags() {
   ADDITIONAL_GYP_PARAMETERS+="-Dbuilding_for_tizen=0
                               -Dclang=${USE_CLANG}
                               -Dmake_clang_dir=${CLANG_DIR}
+                              -Dtizen_multimedia_use_capi_for_me=0
                              "
 }
 
@@ -80,6 +81,13 @@ add_tizen_flags() {
                               -Dlinux_use_bundled_binutils=0
                               -Dprebuilt_ld_gold_dir=${TOPDIR}/build/prebuild
                              "
+  if [ "$target" == "mobile" ]; then
+    ADDITIONAL_GYP_PARAMETERS+="-Dtizen_multimedia_use_capi_for_me=0
+                               "
+  elif [ "$target" == "tv" ]; then
+    ADDITIONAL_GYP_PARAMETERS+="-Dtizen_multimedia_use_capi_for_me=1
+                               "
+  fi
 }
 
 add_gbs_flags() {

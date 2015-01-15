@@ -50,17 +50,10 @@
        'TIZEN_VIDEO_CAPTURE_SUPPORT=1',
       ],
       'sources': [
-        'media/base/tizen/media_player_bridge_capi.cc',
-        'media/base/tizen/media_player_bridge_capi.h', #ME with CAPI-MEDIA-PLAYER
         'media/video/capture/tizen/video_capture_device_tizen.h',
         'media/video/capture/tizen/video_capture_device_tizen.cc',
         'media/video/capture/tizen/video_capture_device_factory_tizen.h',
         'media/video/capture/tizen/video_capture_device_factory_tizen.cc',
-      ],
-      # Exclude the sources that depend on CAPI-MEDIA-PLAYER
-      'sources!': [
-        'media/base/tizen/media_player_bridge_gstreamer.cc',
-        'media/base/tizen/media_player_bridge_gstreamer.h', # ME with Gstreamer
       ],
       'dependencies': [
         '<(chrome_src_dir)/third_party/libyuv/libyuv.gyp:libyuv',
@@ -70,6 +63,20 @@
       'sources': [
         'media/audio/tizen/audio_session_manager.h',
         'media/audio/tizen/audio_session_manager.cc', #ASM
+      ],
+    }],
+    ['tizen_multimedia_use_capi_for_me==1', {
+      'defines': [
+        'TIZEN_CAPI_PLAYER_SUPPORT=1',
+      ],
+      'sources': [
+        'media/base/tizen/media_player_bridge_capi.cc',
+        'media/base/tizen/media_player_bridge_capi.h', #ME with CAPI-MEDIA-PLAYER
+      ],
+      # Exclude the sources that depend on CAPI-MEDIA-PLAYER
+      'sources!': [
+        'media/base/tizen/media_player_bridge_gstreamer.cc',
+        'media/base/tizen/media_player_bridge_gstreamer.h', # ME with Gstreamer
       ],
     }],
   ],

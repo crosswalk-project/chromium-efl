@@ -104,7 +104,6 @@
          'defines': [
            'OS_TIZEN=1',
            'TIZEN_MULTIMEDIA_PIXMAP_SUPPORT=1',
-           'TIZEN_CAPI_PLAYER_SUPPORT=1',
          # For GCC 4.5.3 bundled arm.h has a bug and don't define __ARM_PCS when it should.
          # Force define this flag for the whole chromium on gbs gcc 4.5.3.
          # Non-arm builds will ingore it in any case.
