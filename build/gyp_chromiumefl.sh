@@ -44,6 +44,8 @@ COMMON_GYP_PARAMETERS="
                       -Duse_aura=0
                       -Duse_efl=1
                       -Duse_gnome_keyring=0
+                      -Duse_openssl=1
+                      -Duse_openssl_certs=1
                       -Dtoolkit_uses_gtk=0
                       "
 if [[ $BUILD_CONTENT_SHELL == 1 ]]; then
