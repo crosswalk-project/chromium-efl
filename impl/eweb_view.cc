@@ -2174,6 +2174,8 @@ void EWebView::InitializeContent() {
   web_contents_.reset(WebContents::Create(params));
   web_contents_delegate_.reset(new WebContentsDelegateEfl(this));
   web_contents_->SetDelegate(web_contents_delegate_.get());
+  back_forward_list_.reset(new tizen_webview::BackForwardList(
+      web_contents_->GetController()));
 
   back_forward_list_.reset(
     new tizen_webview::BackForwardList(web_contents_->GetController()));
