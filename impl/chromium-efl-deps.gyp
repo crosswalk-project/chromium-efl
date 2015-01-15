@@ -83,6 +83,7 @@
             'vconf',
             'libtbm',
             'libdri2',
+            'libdrm',
             'gles20',
             'ui-gadget-1',
             'feedback',
