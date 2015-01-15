@@ -7,45 +7,67 @@
 class utc_blink_ewk_notification_security_origin_get_func : public utc_blink_ewk_base
 {
 protected:
+  utc_blink_ewk_notification_security_origin_get_func() {}
 
-  /* Callback for "notification,permission,request" */
-  static void notificationPermissionRequest(void* owner, Evas_Object* webview, void* event_info)
+  /* Callback for notification permission request */
+  static Eina_Bool notificationPermissionRequest(Evas_Object* webview, Ewk_Notification_Permission_Request* request, void* data)
   {
     utc_message("[notificationPermissionRequest] ::");
-    ASSERT_TRUE(NULL != event_info);
+    utc_blink_ewk_notification_security_origin_get_func *owner = NULL;
+    OwnerFromVoid(data, &owner);
+    if (!request) {
+      owner->EventLoopStop(Failure);
+      return EINA_FALSE;
+    }
 
     //allow the notification
-    ewk_notification_permission_request_set(static_cast<Ewk_Notification_Permission_Request*>(event_info), EINA_TRUE);
+    ewk_notification_permission_reply(request, EINA_TRUE);
+    return EINA_TRUE;
   }
 
   /* Callback for "notification,show" */
-  static void notificationShow(void* owner, Evas_Object* webview, void* event_info)
+  static void notificationShow(void* data, Evas_Object* webview, void* event_info)
   {
     utc_message("[notificationShow] ::");
     ASSERT_TRUE(event_info != NULL);
-    ASSERT_TRUE(owner != NULL);
+    ASSERT_TRUE(data != NULL);
 
     //call ewk_notification API
     const Ewk_Security_Origin* origin = ewk_notification_security_origin_get(static_cast<Ewk_Notification*>(event_info));
     ASSERT_TRUE(origin != NULL);
+    utc_blink_ewk_notification_security_origin_get_func *owner = NULL;
+    OwnerFromVoid(data, &owner);
 
-    ASSERT_STREQ(ewk_security_origin_protocol_get(origin), "");
-    ASSERT_STREQ(ewk_security_origin_host_get(origin), "");
-    ASSERT_EQ(ewk_security_origin_port_get(origin), 0);
-    static_cast<utc_blink_ewk_notification_security_origin_get_func*>(owner)->EventLoopStop(Success);
+    owner->protocol = ewk_security_origin_protocol_get(origin);
+    owner->host = ewk_security_origin_host_get(origin);
+    owner->port = ewk_security_origin_port_get(origin);
+
+    owner->EventLoopStop(Success);
   }
 
   void PostSetUp()
   {
-    evas_object_smart_callback_add(GetEwkWebView(), "notification,permission,request", notificationPermissionRequest, this);
+    ewk_view_notification_permission_callback_set(GetEwkWebView(), notificationPermissionRequest, this);
     evas_object_smart_callback_add(GetEwkWebView(), "notification,show", notificationShow, this);
   }
 
   void PreTearDown()
   {
-    evas_object_smart_callback_del(GetEwkWebView(), "notification,permission,request", notificationPermissionRequest);
+    ewk_view_notification_permission_callback_set(GetEwkWebView(), NULL, NULL);
     evas_object_smart_callback_del(GetEwkWebView(), "notification,show", notificationShow);
   }
+
+  // helper function
+  bool click()
+  {
+    utc_message("[click] :: ");
+    return ewk_view_script_execute(GetEwkWebView(), "document.getElementById(\"startButton\").click();", NULL, NULL) == EINA_TRUE;
+  }
+
+protected:
+  const char* protocol;
+  const char* host;
+  uint16_t port;
 };
 
 /**
@@ -53,8 +75,14 @@ protected:
 */
 TEST_F(utc_blink_ewk_notification_security_origin_get_func, POS_TEST)
 {
-  ASSERT_TRUE(ewk_view_url_set(GetEwkWebView(), GetResourceUrl("common/sample_notification_1.html").c_str()));
-  EXPECT_EQ(Success, EventLoopStart());
+  std::string resource_url = GetResourceUrl("common/sample_notification_2.html");
+  ASSERT_EQ(EINA_TRUE, ewk_view_url_set(GetEwkWebView(), resource_url.c_str()));
+  ASSERT_EQ(Success, EventLoopStart());
+  ASSERT_TRUE(protocol);
+  ASSERT_TRUE(host);
+  ASSERT_STREQ("", protocol);
+  ASSERT_STREQ("", host);
+  ASSERT_EQ(0, port);
 }
 
 /**

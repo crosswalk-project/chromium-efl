@@ -199,6 +199,11 @@ class WebView {
   void InvokeWebAppIconUrlGetCallback(const std::string &iconUrl, int callbackId);
   void InvokeWebAppIconUrlsGetCallback(const std::map<std::string, std::string> &iconUrls, int callbackId);
 
+  // ---- Notification Permission Request
+  void SetNotificationPermissionCallback(
+      tizen_webview::View_Notification_Permission_Callback callback,
+      void* user_data);
+
   // ---- Misc.
   bool SaveAsPdf(int width, int height, const std::string& file_name);
   // Returns TCP port number with Inspector, or 0 if error.

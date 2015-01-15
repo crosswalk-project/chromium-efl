@@ -8,18 +8,23 @@
 
 #include <Evas.h>
 #include <string>
+
+#include "base/callback.h"
+#include "base/memory/scoped_ptr.h"
+
 #include "tizen_webview/public/tw_macro.h"
+#include "tizen_webview/public/tw_security_origin.h"
 
 struct _Ewk_Notification;
 struct _Ewk_Notification_Permission_Request;
 
 namespace content {
 class NotificationControllerEfl;
+class WebContents;
 }
 
 namespace tizen_webview {
 
-class Security_Origin;
 class URL;
 
 class Notification {
@@ -40,15 +45,20 @@ class Notification {
   const Security_Origin* GetSecurityOrigin() const;
 
  private:
-  typedef ::_Ewk_Notification Impl;
-  Impl *impl;
+  std::string body_;
+  std::string iconURL_;
+  std::string replaceID_;
+  std::string title_;
+  uint64_t notificationID_;
+  scoped_ptr<Security_Origin> origin_;
+
   DISALLOW_COPY_AND_ASSIGN(Notification);
 };
 
 class NotificationPermissionRequest {
  public:
   NotificationPermissionRequest(Evas_Object* webview,
-                                int callback_context,
+                                const base::Callback<void(bool)>& callback,
                                 const tizen_webview::URL& source_origin);
   ~NotificationPermissionRequest();
 
@@ -57,15 +67,14 @@ class NotificationPermissionRequest {
   bool IsDecided() const;
   bool IsSuspended() const;
   void SetSuspend(bool suspend) const;
+  void Reply(bool allow);
 
  private:
-  // get chromium internal callback context
-  int GetInternalCallbackContext() const;
-  friend class content::NotificationControllerEfl;
-
-  typedef ::_Ewk_Notification_Permission_Request Impl;
-  Impl *impl;
-
+  Evas_Object* webview_;
+  scoped_ptr<Security_Origin> origin_;
+  base::Callback<void(bool)> callback_;
+  bool decided_;
+  mutable bool suspended_;
 
   DISALLOW_COPY_AND_ASSIGN(NotificationPermissionRequest);
 };

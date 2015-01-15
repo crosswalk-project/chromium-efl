@@ -89,11 +89,23 @@ BrowserContextEfl::ResourceContextEfl::GetCookieManager() const {
   return getter_->cookieManager();
 }
 
+#if defined(ENABLE_NOTIFICATIONS)
+scoped_refptr<NotificationControllerEfl>
+    BrowserContextEfl::ResourceContextEfl::GetNotificationController() const {
+  return notification_controller_efl_;
+}
+
+void BrowserContextEfl::ResourceContextEfl::set_notification_controller_efl(
+    const scoped_refptr<NotificationControllerEfl>& controller) {
+  notification_controller_efl_ = controller;
+}
+#endif
+
 BrowserContextEfl::BrowserContextEfl(EWebContext* web_context, bool incognito)
   : resource_context_(NULL),
     web_context_(web_context),
 #if defined(ENABLE_NOTIFICATIONS)
-    notification_controllerefl_(new NotificationControllerEfl()),
+    notification_controller_efl_(new NotificationControllerEfl()),
 #endif
     temp_dir_creation_attempted_(false),
     incognito_(incognito) {
@@ -105,8 +117,13 @@ net::URLRequestContextGetter* BrowserContextEfl::GetRequestContext() {
 }
 
 ResourceContext* BrowserContextEfl::GetResourceContext() {
-  if (!resource_context_)
+  if (!resource_context_) {
     resource_context_ = new ResourceContextEfl();
+#if defined(ENABLE_NOTIFICATIONS)
+    resource_context_->set_notification_controller_efl(
+        notification_controller_efl_);
+#endif
+  }
 
   return resource_context_;
 }
@@ -135,14 +152,12 @@ base::FilePath BrowserContextEfl::GetPath() const {
   return path;
 }
 
-content::NotificationControllerEfl*
-BrowserContextEfl::GetNotificationController() const {
 #if defined(ENABLE_NOTIFICATIONS)
-  return notification_controllerefl_.get();
-#else
-  return NULL;
-#endif
+scoped_refptr<content::NotificationControllerEfl>
+    BrowserContextEfl::GetNotificationController() const {
+  return notification_controller_efl_;
 }
+#endif
 
 net::URLRequestContextGetter* BrowserContextEfl::CreateRequestContext(
     content::ProtocolHandlerMap* protocol_handlers,

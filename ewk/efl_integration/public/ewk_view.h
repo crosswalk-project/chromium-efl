@@ -111,6 +111,7 @@
 #include "ewk_window_features.h"
 #include "ewk_quota_permission_request.h"
 #include "ewk_geolocation.h"
+#include "ewk_notification.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -302,6 +303,17 @@ typedef void (*Ewk_Web_App_Screenshot_Captured_Callback)(Evas_Object* image, voi
  */
 typedef void (*Ewk_Web_App_Icon_URLs_Get_Callback)(Eina_List *icon_urls, void *user_data);
 // #endif
+
+/**
+ * Callback for ewk_view_notification_permission_callback_set
+ *
+ * @param o view object to request the notification permission
+ * @param request Ewk_Notification_Permission_Request object to get the information about notification permission request.
+ * @param user_data user data
+ *
+ * @return returned value is not used
+ */
+typedef Eina_Bool (*Ewk_View_Notification_Permission_Callback)(Evas_Object *o, Ewk_Notification_Permission_Request *request, void *user_data);
 
 /**
  * The version you have to put into the version field
@@ -1697,6 +1709,15 @@ EAPI void ewk_view_quota_permission_request_cancel(const Ewk_Quota_Permission_Re
  * @return void
  */
 EAPI Eina_Bool ewk_view_web_login_request(Evas_Object* ewkView);
+
+/**
+ * Sets the notification permission callback.
+ *
+ * @param o view object to request the notification permission
+ * @param callback Ewk_View_Notification_Permission_Callback function to notification permission
+ * @param user_data user data
+ */
+EAPI void ewk_view_notification_permission_callback_set(Evas_Object *o, Ewk_View_Notification_Permission_Callback callback, void *user_data);
 
 #ifdef __cplusplus
 }

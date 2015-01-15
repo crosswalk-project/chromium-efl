@@ -1586,6 +1586,28 @@ void EWebView::InvokeWebAppIconUrlsGetCallback(const StringMap &iconUrls, int ca
   callback->Run(iconUrls);
 }
 
+void EWebView::SetNotificationPermissionCallback(
+    View_Notification_Permission_Callback callback, void *user_data) {
+  if (!callback) {
+    notification_permission_callback_.reset(nullptr);
+    return;
+  }
+  notification_permission_callback_.reset(
+      new NotificationPermissionCallback(evas_object_, callback, user_data));
+}
+
+bool EWebView::IsNotificationPermissionCallbackSet() const {
+  return notification_permission_callback_;
+}
+
+bool EWebView::InvokeNotificationPermissionCallback(
+    NotificationPermissionRequest *request) {
+  if (!notification_permission_callback_) {
+    return false;
+  }
+  return notification_permission_callback_->Run(request);
+}
+
 void EwkViewPlainTextGetCallback::TriggerCallback(Evas_Object* obj, const std::string& content_text)
 {
   if(callback_)

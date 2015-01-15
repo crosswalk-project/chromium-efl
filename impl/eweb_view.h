@@ -201,6 +201,26 @@ class WebApplicationCapableGetCallback {
 };
 
 class AsyncHitTestRequest;
+class NotificationPermissionCallback {
+ public:
+  NotificationPermissionCallback(
+      Evas_Object* obj,
+      tizen_webview::View_Notification_Permission_Callback func,
+      void* user_data)
+      : obj_(obj), func_(func), user_data_(user_data) {}
+  bool Run(tizen_webview::NotificationPermissionRequest* request) {
+    if (func_) {
+      return (func_)(obj_, request, user_data_) == EINA_TRUE;
+    }
+    return false;
+  }
+
+private:
+  Evas_Object* obj_;
+  tizen_webview::View_Notification_Permission_Callback func_;
+  void* user_data_;
+};
+
 class JavaScriptDialogManagerEfl;
 class WebViewGeolocationPermissionCallback;
 
@@ -372,6 +392,9 @@ class EWebView {
   void InvokeWebAppCapableGetCallback(bool capable, int callbackId);
   void InvokeWebAppIconUrlGetCallback(const std::string &iconUrl, int callbackId);
   void InvokeWebAppIconUrlsGetCallback(const std::map<std::string, std::string> &iconUrls, int callbackId);
+  void SetNotificationPermissionCallback(tizen_webview::View_Notification_Permission_Callback callback, void* user_data);
+  bool IsNotificationPermissionCallbackSet() const;
+  bool InvokeNotificationPermissionCallback(tizen_webview::NotificationPermissionRequest* request);
 
   bool GetMHTMLData(tizen_webview::View_MHTML_Data_Get_Callback callback, void* user_data);
   void OnMHTMLContentGet(const std::string& mhtml_content, int callback_id);
@@ -526,6 +549,7 @@ class EWebView {
   IDMap<WebApplicationIconUrlsGetCallback, IDMapOwnPointer> web_app_icon_urls_get_callback_map_;
   IDMap<WebApplicationCapableGetCallback, IDMapOwnPointer> web_app_capable_get_callback_map_;
   IDMap< WebAppScreenshotCapturedCallback, IDMapOwnPointer> screen_capture_cb_map_;
+  scoped_ptr<NotificationPermissionCallback> notification_permission_callback_;
   content::DevToolsDelegateEfl* inspector_server_;
 #ifdef TIZEN_EDGE_EFFECT
   scoped_refptr<EdgeEffect> edge_effect_;

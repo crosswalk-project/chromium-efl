@@ -661,7 +661,7 @@ Eina_Bool ewk_view_notification_closed(Evas_Object* ewkView, Eina_List* notifica
   assert(impl->GetWebContext());
   assert(impl->GetWebContext()->browser_context());
   assert(impl->GetWebContext()->browser_context()->GetNotificationController());
-  content::NotificationControllerEfl* controller =
+  scoped_refptr<content::NotificationControllerEfl> controller =
       impl->GetWebContext()->browser_context()->GetNotificationController();
 
   Eina_List* notification_iterator = NULL;
@@ -1002,6 +1002,12 @@ Ewk_Back_Forward_List* ewk_view_back_forward_list_get(const Evas_Object* ewkView
 {
   EWK_VIEW_IMPL_GET_OR_RETURN(ewkView, impl, NULL);
   return chromium_glue::from(impl->GetBackForwardList());
+}
+
+void ewk_view_notification_permission_callback_set(Evas_Object *o, Ewk_View_Notification_Permission_Callback callback, void *user_data)
+{
+  EWK_VIEW_IMPL_GET_OR_RETURN(o, impl);
+  impl->SetNotificationPermissionCallback(reinterpret_cast<tizen_webview::View_Notification_Permission_Callback>(callback), user_data);
 }
 
 void ewk_view_draw_focus_ring_enable_set(Evas_Object* ewkView, Eina_Bool enable)

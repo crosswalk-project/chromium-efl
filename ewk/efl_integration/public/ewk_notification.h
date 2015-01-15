@@ -61,6 +61,16 @@ EAPI const char *ewk_notification_icon_url_get(const Ewk_Notification *ewk_notif
 EAPI uint64_t ewk_notification_id_get(const Ewk_Notification *ewk_notification);
 
 /**
+ * Requests for setting cached notification permissions.
+ *
+ * By calling this notification permission is replaced as passed ewk_notification_permissions.
+ *
+ * @param context context object
+ * @param ewk_notification_permissions list of cached permissions(Ewk_Notification_Permission)
+ */
+EAPI void ewk_notification_cached_permissions_set(Ewk_Context *context, Eina_List *ewk_notification_permissions);
+
+/**
  * Requests for getting origin of notification permission request.
  *
  * @param request Ewk_Notification_Permission_Request object to get origin for notification permission request
@@ -71,13 +81,22 @@ EAPI uint64_t ewk_notification_id_get(const Ewk_Notification *ewk_notification);
 EAPI const Ewk_Security_Origin *ewk_notification_permission_request_origin_get(const Ewk_Notification_Permission_Request *request);
 
 /**
+ * Reply the result about notification permission.
+ *
+ * @param request Ewk_Notification_Permission_Request object to get the infomation about notification permission request.
+ * @param allow result about notification permission
+ */
+EAPI void ewk_notification_permission_reply(Ewk_Notification_Permission_Request *request, Eina_Bool allow);
+
+/**
+ * Deprecated, use ewk_notification_permission_reply instead.
  * Sets permission of notification.
  *
  * @param request Ewk_Notification_Permission_Request object to allow/deny notification permission
  *        request is freed in this function.
  * @param allowed @c EINA_TRUE if permission is allowed, @c EINA_FALSE if permission is denied
  */
-EAPI void ewk_notification_permission_request_set(Ewk_Notification_Permission_Request *request, Eina_Bool allowed);
+EINA_DEPRECATED EAPI void ewk_notification_permission_request_set(Ewk_Notification_Permission_Request *request, Eina_Bool allowed);
 
 /**
  * Suspend the operation for permission request.

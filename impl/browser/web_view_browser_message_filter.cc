@@ -12,6 +12,7 @@
 #include "content/public/browser/notification_registrar.h"
 #include "content/public/browser/notification_source.h"
 #include "content/public/browser/notification_types.h"
+#include "content/public/browser/web_contents.h"
 #include "tizen_webview/public/tw_error.h"
 
 using content::BrowserThread;

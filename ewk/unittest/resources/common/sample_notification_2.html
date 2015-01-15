@@ -1,68 +1,58 @@
 <html>
+<meta name="viewport" content="initial-scale=1.0">
 <head>
-<title>EWK Notifications</title>
+<style>
+button {
+    width: 100%;
+    height: 100%;
+}
+</style>
 </head>
-<body onload="testNoti()">
-
-<h1>Sample Page</h1>
-
-<p id="notificationTest">This is a sample page to test EWK Notification APIs.</p>
-
+<body onload="test()">
+<button type="button" id="startButton" onclick="test()">start test</button>
 <script type="text/javascript">
-	
-function testNotifications()
-{
-    if (window.webkitNotifications.checkPermission() == 0)
-    {
-        var icon  = 'logo.png';
-        var title = 'Notification Title';
-        var body   = 'Notification body content';
 
-        var notification_test = window.webkitNotifications.createNotification(icon, title, body);
-        notification_test.show();
-    }
-    else
-    {
-        window.webkitNotifications.requestPermission(testNotifications);
-    }
+function showNotification() {
+    var notification = new Notification("Notification Title", {
+        icon: "logo.png",
+        body: "Notification body content"
+    });
+
+    notification.onclick = function() {
+        document.title = "notification_clicked";
+    };
+
+    notification.onshow = function() {
+        document.title = "notification_shown";
+    };
+
+    notification.onclose = function() {
+        document.title = "notification_closed";
+    };
 }
 
-function sleep()
-{
-    var startTime = new Date().getTime();
-    while(new Date().getTime() < startTime + 5000)
-    {
-    
+function test() {
+    console.log("Checking permissions");
+    if (!("Notification" in window)) {
+        console.log("Notifications not available!");
+        return;
     }
-
-}
-
-function testNotifications1()
-{
-    if (window.webkitNotifications.checkPermission() == 0)
-    {
-        var icon  = 'logo.png1';
-        var title = 'Notification Title1';
-        var body   = 'Notification body content1';
-
-        var notification_test = window.webkitNotifications.createNotification(icon, title, body);
-        notification_test.show();
+    if (Notification.permission === "granted") {
+        console.log("event_loop_stop:Permission granted");
+        showNotification();
+    } else {
+        console.log("Requesting permission...");
+        Notification.requestPermission(function (permission) {
+            console.log("received permission: " + permission);
+            if (permission === "granted") {
+               Notification.permission = permission;
+               console.log("event_loop_stop:Permission granted after request");
+               showNotification();
+            }
+        });
     }
-    else
-    {
-        window.webkitNotifications.requestPermission(testNotifications);
-    }
-}
-
-function testNoti()
-{
-   testNotifications();
-   sleep();
-   testNotifications1();
-    
 }
 
 </script>
-
 </body>
 </html>

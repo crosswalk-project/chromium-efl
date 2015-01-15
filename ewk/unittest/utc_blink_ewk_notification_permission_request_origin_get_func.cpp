@@ -6,27 +6,17 @@
 
 class utc_blink_ewk_notification_permission_request_origin_get : public utc_blink_ewk_base {
 protected:
-  static void script_execute_callback(Evas_Object* webview, const char* result_value, void* user_data)
-  {
-    utc_message("execution result: %s", result_value);
-  }
-
-  /* Callback for "load,finished" */
-  void LoadFinished(Evas_Object* webview)
-  {
-    utc_message("[loadFinished] :: ");
-    ewk_view_script_execute(webview, "noti();", script_execute_callback, this);
-  }
-
-  /* Callback for "notification,permission,request" */
-  static void notificationPermissionRequest(void* data, Evas_Object* webview, void* event_info)
+  /* Callback for notification permission request */
+  static Eina_Bool notificationPermissionRequest(Evas_Object* webview, Ewk_Notification_Permission_Request *request, void* data)
   {
     utc_message("[notificationPermissionRequest] :: ");
-    ASSERT_TRUE(data != NULL);
     utc_blink_ewk_notification_permission_request_origin_get *owner = static_cast<utc_blink_ewk_notification_permission_request_origin_get *>(data);
+    if (!owner) {
+      owner->EventLoopStop(Failure);
+      return EINA_FALSE;
+    }
 
     MainLoopResult res = Failure;
-    Ewk_Notification_Permission_Request *request = (Ewk_Notification_Permission_Request*)event_info;
     const Ewk_Security_Origin* origin = ewk_notification_permission_request_origin_get(request);
 
     if (origin) {
@@ -42,20 +32,21 @@ protected:
     }
 
     //allow the notification
-    ewk_notification_permission_request_set(request, EINA_TRUE);
+    ewk_notification_permission_reply(request, EINA_TRUE);
     owner->EventLoopStop(res);
+    return EINA_TRUE;
   }
 
   /* Startup and cleanup functions */
   virtual void PostSetUp()
   {
     ewk_view_mouse_events_enabled_set(GetEwkWebView(), EINA_TRUE);
-    evas_object_smart_callback_add(GetEwkWebView(), "notification,permission,request", notificationPermissionRequest, this);
+    ewk_view_notification_permission_callback_set(GetEwkWebView(), notificationPermissionRequest, this);
   }
 
   virtual void PreTearDown()
   {
-    evas_object_smart_callback_del(GetEwkWebView(), "notification,permission,request", notificationPermissionRequest);
+    ewk_view_notification_permission_callback_set(GetEwkWebView(), NULL, NULL);
   }
 
 protected:
@@ -65,20 +56,18 @@ protected:
   static const uint16_t expected_origin_port;
 };
 
-const char* const utc_blink_ewk_notification_permission_request_origin_get::resource_file = "common/sample_notification_3.html";
+const char* const utc_blink_ewk_notification_permission_request_origin_get::resource_file = "common/sample_notification_2.html";
 const char* const utc_blink_ewk_notification_permission_request_origin_get::expected_origin_protocol = "";
 const char* const utc_blink_ewk_notification_permission_request_origin_get::expected_origin_host = "";
 const uint16_t utc_blink_ewk_notification_permission_request_origin_get::expected_origin_port = 65535;
 
-
 /**
- * @brief Positive test case for ewk_notification_permission_request_set function
+ * @brief Positive test case for ewk_notification_permission_reply function
  */
 TEST_F(utc_blink_ewk_notification_permission_request_origin_get, POS_TEST)
 {
-  /* TODO: this code should use ewk_notification_permission_request_set and check its behaviour.
+  /* TODO: this code should use ewk_notification_permission_reply and check its behaviour.
   Results should be reported using one of utc_ macros */
-
   ASSERT_TRUE(ewk_view_url_set(GetEwkWebView(), GetResourceUrl(resource_file).c_str()));
   ASSERT_EQ(Success, EventLoopStart());
 }
@@ -90,7 +79,7 @@ TEST_F(utc_blink_ewk_notification_permission_request_origin_get, NEG_TEST)
 {
   /* TODO: this code should use ewk_notification_cached_permissions_set and check its behaviour.
   Results should be reported using one of utc_ macros */
-  ewk_notification_permission_request_set(NULL,0);
+  ewk_notification_permission_reply(NULL,0);
 
   // If  NULL argument passing wont give segmentation fault negative test case will pass
   utc_pass();

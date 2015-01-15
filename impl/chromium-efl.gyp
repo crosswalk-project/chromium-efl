@@ -105,8 +105,6 @@
       'API/ewk_geolocation_private.h',
       'API/ewk_hit_test_private.cc',
       'API/ewk_hit_test_private.h',
-      'API/ewk_notification_private.cc',
-      'API/ewk_notification_private.h',
       'API/ewk_policy_decision_private.cc',
       'API/ewk_policy_decision_private.h',
       'API/ewk_security_origin_private.h',

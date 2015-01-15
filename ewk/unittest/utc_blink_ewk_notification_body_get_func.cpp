@@ -6,30 +6,37 @@
 
 class utc_blink_ewk_notification_body_get : public utc_blink_ewk_base {
 protected:
+  utc_blink_ewk_notification_body_get() : body(NULL) {}
+
   /* Startup function */
   virtual void PostSetUp()
   {
-    evas_object_smart_callback_add(GetEwkWebView(), "notification,permission,request", notificationPermissionRequest, this);
+    ewk_view_notification_permission_callback_set(GetEwkWebView(), notificationPermissionRequest, this);
     evas_object_smart_callback_add(GetEwkWebView(), "notification,show", notificationShow, this);
   }
 
   /* Cleanup function */
   virtual void PreTearDown()
   {
-    evas_object_smart_callback_del(GetEwkWebView(), "notification,permission,request", notificationPermissionRequest);
+    ewk_view_notification_permission_callback_set(GetEwkWebView(), NULL, NULL);
     evas_object_smart_callback_del(GetEwkWebView(), "notification,show", notificationShow);
   }
 
-  /* Callback for "notification,permission,request" */
-  static void notificationPermissionRequest(void* data, Evas_Object* webview, void* event_info)
+  /* Callback for notification permission request */
+  static Eina_Bool notificationPermissionRequest(Evas_Object* webview, Ewk_Notification_Permission_Request* request, void* data)
   {
     utc_message("[notificationPermissionRequest] :: ");
 
-    if (!event_info)
-      utc_fail();
+    utc_blink_ewk_notification_body_get *owner = NULL;
+    OwnerFromVoid(data, &owner);
+    if (!request) {
+      owner->EventLoopStop(Failure);
+      return EINA_FALSE;
+    }
 
     //allow the notification
-    ewk_notification_permission_request_set((Ewk_Notification_Permission_Request*)event_info, EINA_TRUE);
+    ewk_notification_permission_reply(request, EINA_TRUE);
+    return EINA_TRUE;
   }
 
   /* Callback for "notification,show" */
@@ -48,20 +55,17 @@ protected:
     utc_blink_ewk_notification_body_get* owner = static_cast<utc_blink_ewk_notification_body_get*>(data);
 
     //call ewk_notification API
-    const char* body = ewk_notification_body_get((Ewk_Notification*)event_info);
-    if (strcmp(body, owner->notification_body_ref) == 0) {
-      owner->EventLoopStop(Success);
-    } else {
-      owner->EventLoopStop(Failure);
-    }
+    owner->body = strdup(ewk_notification_body_get((Ewk_Notification*)event_info));
+    owner->EventLoopStop(Success);
   }
 
 protected:
   static const char* const resource_relative_path;
   static const char* const notification_body_ref;
+  char* body;
 };
 
-const char* const utc_blink_ewk_notification_body_get::resource_relative_path = "/common/sample_notification_1.html";
+const char* const utc_blink_ewk_notification_body_get::resource_relative_path = "/common/sample_notification_2.html";
 const char* const utc_blink_ewk_notification_body_get::notification_body_ref = "Notification body content";
 
 /**
@@ -70,13 +74,11 @@ const char* const utc_blink_ewk_notification_body_get::notification_body_ref = "
 TEST_F(utc_blink_ewk_notification_body_get, POS_TEST)
 {
   std::string resource_url = GetResourceUrl(resource_relative_path);
-  Eina_Bool result = ewk_view_url_set(GetEwkWebView(), resource_url.c_str());
-
-  MainLoopResult loop_result = EventLoopStart();
-
-  if (loop_result != Success) {
-    FAIL();
-  }
+  ASSERT_EQ(EINA_TRUE, ewk_view_url_set(GetEwkWebView(), resource_url.c_str()));
+  ASSERT_EQ(Success, EventLoopStart());
+  ASSERT_TRUE(body);
+  ASSERT_STREQ(body, notification_body_ref);
+  free(body);
 }
 
 /**

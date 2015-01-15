@@ -120,7 +120,7 @@ static void __webprocess_crashed_cb(void* data, Evas_Object* obj, void* event_in
 
 static void on_evas_resize(Ecore_Evas*);
 static void __notification_show_cb(void *data, Evas_Object *obj, void *event_info);
-static void __notification_permission_cb(void *data, Evas_Object *obj, void *event_info);
+static Eina_Bool __notification_permission_cb(void *data, Evas_Object *obj, void *event_info);
 static void __notification_cancel_cb(void *data, Evas_Object *obj, void *event_info);
 static void __notification_cancel_byuser_cb(void *data, Evas_Object *obj, void *event_info);
 static void __download_callback(const char*download_url, void* user_data);
@@ -473,7 +473,6 @@ int main(int argc, char** argv)
   evas_object_smart_callback_add(view, "authentication,challenge", __auth_challenge_cb, 0);
   evas_object_smart_callback_add(view, "notification,show", __notification_show_cb,0);
   evas_object_smart_callback_add(view, "notification,cancel", __notification_cancel_cb,0);
-  evas_object_smart_callback_add(view, "notification,permission,request", __notification_permission_cb,0);
   evas_object_smart_callback_add(view, "policy,response,decide", __policy_response_decide_cb, 0);
   evas_object_smart_callback_add(view, "contextmenu,customize", __customize_context_menu_cb, 0);
   evas_object_smart_callback_add(view, "contextmenu,selected", __customize_context_menu_item_selected_cb, 0);
@@ -503,6 +502,7 @@ int main(int argc, char** argv)
   
   ewk_view_custom_header_add(view, "X-Test-header", "X-Value-1");
 
+  ewk_view_notification_permission_callback_set(view, __notification_permission_cb, 0);
   ewk_context_vibration_client_callbacks_set(context, __vibration_on_cb, __vibration_off_cb, NULL);
   ewk_context_mime_override_callback_set(__mime_override_cb);
   ewk_view_javascript_alert_callback_set(view, __ewk_view_javascript_alert_cb, 0);
@@ -978,7 +978,7 @@ void __notification_show_cb(void *data, Evas_Object *obj, void *event_info)
   printf ("APP.C callback called __notification_show_cb \n");
 }
 
-void __notification_permission_cb(void *data, Evas_Object *obj, void *event_info)
+Eina_Bool __notification_permission_cb(void *data, Evas_Object *obj, void *event_info)
 {
   Ewk_Notification_Permission_Request *request = (Ewk_Notification_Permission_Request*)event_info;
   if(request) {
@@ -987,8 +987,9 @@ void __notification_permission_cb(void *data, Evas_Object *obj, void *event_info
         printf("APP.C callback called __notification_permission_cb URL = %s, protocol = %s, port = %d\n",
         ewk_security_origin_host_get(sec_origin), ewk_security_origin_protocol_get(sec_origin),ewk_security_origin_port_get(sec_origin));
     }
-    ewk_notification_permission_request_set(request, 1);
+    ewk_notification_permission_reply(request, EINA_TRUE);
   }
+  return EINA_FALSE;
 }
 
 void __notification_cancel_cb(void *data, Evas_Object *obj, void *event_info)

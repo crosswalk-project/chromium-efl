@@ -42,6 +42,23 @@ EAPI Eina_Stringshare* ewk_security_origin_protocol_get(const Ewk_Security_Origi
  */
 EAPI uint16_t ewk_security_origin_port_get(const Ewk_Security_Origin* origin);
 
+/**
+ * Release all resources allocated by a security origin object.
+ *
+ * @param o security origin object
+ */
+EAPI void ewk_security_origin_free(Ewk_Security_Origin *o);
+
+/**
+ * Creates a security origin for a url.
+ *
+ * @param url the url for the security origin.
+ *
+ * @return the security origin object
+ */
+EAPI Ewk_Security_Origin *ewk_security_origin_new_from_string(const char *url);
+
+
 #ifdef __cplusplus
 }
 #endif

@@ -16,22 +16,19 @@ protected:
   virtual ~utc_blink_ewk_notification_permission_request_set() {
   }
 
-  /* Callback for "notification,permission,request" */
-  static void notificationPermissionRequest(void* data, Evas_Object* webview, void* event_info)
+  /* Callback for notification permission request */
+  static Eina_Bool notificationPermissionRequest(Evas_Object* webview, Ewk_Notification_Permission_Request* request, void* data)
   {
-    if (!data) {
-      FAIL();
-    }
-
     utc_blink_ewk_notification_permission_request_set* owner = static_cast<utc_blink_ewk_notification_permission_request_set*>(data);
 
     Ewk_Context *context = ewk_view_context_get(webview);
-    if (!event_info || !context) {
-      FAIL();
+    if (!request || !context) {
+      owner->EventLoopStop(Failure);
+      return EINA_FALSE;
     }
 
     //allow the notification
-    ewk_notification_permission_request_set((Ewk_Notification_Permission_Request*)event_info, EINA_TRUE);
+    ewk_notification_permission_request_set(request, EINA_TRUE);
 
     if (!owner->notificationPermissionFirsttime) {
       owner->notificationPermissionFirsttime = EINA_TRUE;
@@ -39,35 +36,46 @@ protected:
       owner->notificationPermissionSecondtime = EINA_TRUE;
       owner->EventLoopStop(Failure);
     }
+    return EINA_TRUE;
   }
 
-  /* Callback for "notification,show" */
-  static void notificationShow(void* data, Evas_Object* webview, void* event_info)
+  static void cb_console_message(utc_blink_ewk_notification_permission_request_set *owner, Evas_Object *obj, void *event_info)
   {
-    if (!event_info) {
-      FAIL();
+    Ewk_Console_Message* console = static_cast<Ewk_Console_Message*>(event_info);
+    const char *cmsg = ewk_console_message_text_get(console);
+    if (!cmsg) {
+      return;
     }
-
-    if (!data) {
-      FAIL();
+    std::string msg(cmsg);
+    std::string::size_type pos = msg.find(':');
+    if (pos == std::string::npos) {
+      return;
     }
+    if (msg.substr(0, pos) == "event_loop_stop") {
+      owner->EventLoopStop(Success);
+    }
+  }
 
-    utc_blink_ewk_notification_permission_request_set* owner = static_cast<utc_blink_ewk_notification_permission_request_set*>(data);
-
-    owner->EventLoopStop(Success);
+  // helper function
+  bool click()
+  {
+    utc_message("[click] :: ");
+    return ewk_view_script_execute(GetEwkWebView(), "document.getElementById(\"startButton\").click();", NULL, NULL) == EINA_TRUE;
   }
 
   /* Startup and cleanup functions */
   virtual void PostSetUp()
   {
-    evas_object_smart_callback_add(GetEwkWebView(), "notification,permission,request", notificationPermissionRequest, this);
-    evas_object_smart_callback_add(GetEwkWebView(), "notification,show", notificationShow, this);
+    ewk_view_notification_permission_callback_set(GetEwkWebView(), notificationPermissionRequest, this);
+    evas_object_smart_callback_add(GetEwkWebView(), "console,message",
+                                   ToSmartCallback(cb_console_message), this);
   }
 
   virtual void PreTearDown()
   {
-    evas_object_smart_callback_del(GetEwkWebView(), "notification,permission,request", notificationPermissionRequest);
-    evas_object_smart_callback_del(GetEwkWebView(), "notification,show", notificationShow);
+    ewk_view_notification_permission_callback_set(GetEwkWebView(), NULL, NULL);
+    evas_object_smart_callback_del(GetEwkWebView(), "console,message",
+                                   ToSmartCallback(cb_console_message));
   }
 
 protected:
@@ -84,20 +92,15 @@ const char* const utc_blink_ewk_notification_permission_request_set::resource_re
 TEST_F(utc_blink_ewk_notification_permission_request_set, POS_TEST)
 {
   std::string resource_url = GetResourceUrl(resource_relative_path);
+  ASSERT_EQ(EINA_TRUE, ewk_view_url_set(GetEwkWebView(), resource_url.c_str()));
+  ASSERT_EQ(Success, EventLoopStart());
+  ASSERT_EQ(EINA_TRUE, notificationPermissionFirsttime);
+  ASSERT_EQ(EINA_FALSE, notificationPermissionSecondtime);
 
-  if (!ewk_view_url_set(GetEwkWebView(), resource_url.c_str())) {
-    FAIL();
-  }
-  /* TODO: this code should use ewk_notification_permission_request_set and check its behaviour.
-  Results should be reported using one of utc_ macros */
-
-  MainLoopResult loop_result = EventLoopStart();
-
-  if (loop_result != Success) {
-    FAIL();
-  }
-
-  EXPECT_EQ(notificationPermissionSecondtime, EINA_FALSE);
+  ASSERT_TRUE(click());
+  ASSERT_EQ(Success, EventLoopStart());
+  ASSERT_EQ(EINA_TRUE, notificationPermissionFirsttime);
+  ASSERT_EQ(EINA_FALSE, notificationPermissionSecondtime);
 }
 
 /**

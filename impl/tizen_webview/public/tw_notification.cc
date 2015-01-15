@@ -5,7 +5,12 @@
 
 #include "tw_notification.h"
 
-#include "API/ewk_notification_private.h"
+#include "content/public/browser/browser_thread.h"
+#include "content/public/browser/web_contents.h"
+#include "eweb_view.h"
+#include "tw_web_context.h"
+
+using content::BrowserThread;
 
 namespace tizen_webview {
 
@@ -17,71 +22,98 @@ Notification::Notification(
     const std::string& title,
     uint64_t notificationID,
     const tizen_webview::URL& origin)
-    : impl(new Impl(body, iconURL, replaceID, title, notificationID, origin)) {
+    : body_(body)
+    , iconURL_(iconURL)
+    , replaceID_(replaceID)
+    , title_(title)
+    , notificationID_(notificationID)
+    , origin_(new Security_Origin(origin)) {
 }
 
 Notification::~Notification() {
-  delete impl;
 }
 
 const char* Notification::GetBody() const {
-  return impl->body_.c_str();
+  return body_.c_str();
 }
 
 const char* Notification::GetIconUrl() const {
-  return impl->iconURL_.c_str();
+  return iconURL_.c_str();
 }
 
 const char* Notification::GetReplaceId() const {
-  return impl->replaceID_.c_str();
+  return replaceID_.c_str();
 }
 
 const char* Notification::GetTitle() const {
-  return impl->title_.c_str();
+  return title_.c_str();
 }
 
 int Notification::GetID() const {
-  return impl->notificationID_;
+  return notificationID_;
 }
 
 const Security_Origin* Notification::GetSecurityOrigin() const {
-  return impl->securityOrigin_;
+  return origin_.get();
 }
 
 // tizen_webview::NotificationPermissionRequest -------------------------------
 
 NotificationPermissionRequest::NotificationPermissionRequest(
-    Evas_Object* webview, int callback_context, const URL& source_origin)
-    : impl(new _Ewk_Notification_Permission_Request(
-          webview, callback_context,source_origin)) {
+    Evas_Object* webview,
+    const base::Callback<void(bool)>& callback,
+    const URL& source_origin)
+    : webview_(webview)
+    , origin_(new Security_Origin(source_origin))
+    , callback_(callback)
+    , decided_(false)
+    , suspended_(false)
+{
 }
 
 NotificationPermissionRequest::~NotificationPermissionRequest() {
-  delete impl;
 }
 
 Evas_Object* NotificationPermissionRequest::GetWebviewEvasObject() const {
-  return impl->webview_;
+  return webview_;
 }
 
 const Security_Origin* NotificationPermissionRequest::GetSecurityOrigin() const {
-  return impl->origin_;
+  return origin_.get();
 }
 
 bool NotificationPermissionRequest::IsDecided() const {
-  return impl->decided_;
+  return decided_;
 }
 
 bool NotificationPermissionRequest::IsSuspended() const {
-  return impl->suspended_;
+  return suspended_;
 }
 
 void NotificationPermissionRequest::SetSuspend(bool suspend) const {
-  impl->suspended_ = suspend;
+  suspended_ = suspend;
 }
 
-int NotificationPermissionRequest::GetInternalCallbackContext() const {
-  return impl->callback_context_;
+void NotificationPermissionRequest::Reply(bool allow) {
+#if defined(ENABLE_NOTIFICATIONS)
+  if (decided_)
+    return;
+  decided_ = true;
+  EWebView* view = EWebView::FromEvasObject(webview_);
+  if (view) {
+    view->context()->browser_context()->GetNotificationController()->
+        SetPermissionForNotification(this, allow);
+  }
+  callback_.Run(allow);
+
+  if (suspended_) {
+    // If decision was suspended, then it was not deleted by the creator
+    // Deletion of this object must be done after decision was made, as
+    // this object will no longer be valid. But if decision was not suspended
+    // it will be deleted right after permission callbacks are executed.
+    BrowserThread::DeleteSoon(BrowserThread::UI, FROM_HERE, this);
+  }
+#endif
 }
 
 } // namespace tizen_webview

@@ -44,9 +44,6 @@ using tizen_webview::NotificationPermissionRequest;
 using tizen_webview::URL;
 using tizen_webview::Security_Origin;
 
-#warning "[M38] tempoary disable notification. remove below line"
-#undef ENABLE_NOTIFICATIONS
-
 namespace content {
 
 ContentBrowserClientEfl::ContentBrowserClientEfl()
@@ -109,6 +106,21 @@ void ContentBrowserClientEfl::AllowCertificateError(
   static_cast<content::WebContentsDelegateEfl*>(delegate)->
      RequestCertificateConfirm(web_contents, cert_error, ssl_info, request_url,
          resource_type, overridable, strict_enforcement, callback, result);
+}
+
+blink::WebNotificationPermission
+    ContentBrowserClientEfl::CheckDesktopNotificationPermission(
+        const GURL& source_url,
+        ResourceContext* context,
+        int) {
+  BrowserContextEfl::ResourceContextEfl* context_efl =
+      static_cast<BrowserContextEfl::ResourceContextEfl*>(context);
+#if defined(ENABLE_NOTIFICATIONS)
+  return context_efl->GetNotificationController()->CheckPermissionForOrigin(
+      source_url.GetOrigin());
+#else
+  return blink::WebNotificationPermissionDefault;
+#endif
 }
 
 void ContentBrowserClientEfl::ShowDesktopNotification(
@@ -258,17 +270,18 @@ void ContentBrowserClientEfl::RequestPermission(
     const GURL& requesting_frame,
     bool user_gesture,
     const base::Callback<void(bool)>& result_callback) {
+  DCHECK(BrowserThread::CurrentlyOn(BrowserThread::UI));
+
   int render_process_id = web_contents->GetRenderProcessHost()->GetID();
   int render_view_id = web_contents->GetRenderViewHost()->GetRoutingID();
 
-  GURL origin = requesting_frame.GetOrigin();
   BrowserContextEfl* browser_context =
       static_cast<BrowserContextEfl*>(web_contents->GetBrowserContext());
   const GeolocationPermissionContextEfl& geolocation_permission_context =
       browser_context->GetGeolocationPermissionContext();
 
   switch (permission) {
-    case content::PERMISSION_GEOLOCATION:
+    case content::PERMISSION_GEOLOCATION: {
       if (!browser_context) {
         LOG(ERROR) << "Dropping GeolocationPermission request";
         result_callback.Run(false);
@@ -280,15 +293,35 @@ void ContentBrowserClientEfl::RequestPermission(
                                                        requesting_frame,
                                                        result_callback);
       break;
+    }
+    case content::PERMISSION_NOTIFICATIONS:
+#if defined(ENABLE_NOTIFICATIONS)
+    {
+      scoped_refptr<content::NotificationControllerEfl> notification_controller
+          = browser_context->GetNotificationController();
+      DCHECK(notification_controller.get());
+      notification_controller->RequestPermission(web_contents,
+                                                 requesting_frame,
+                                                 result_callback);
+      break;
+    }
+#endif
     case content::PERMISSION_PROTECTED_MEDIA:
     case content::PERMISSION_MIDI_SYSEX:
-    case content::PERMISSION_NOTIFICATIONS:
-    case content::PERMISSION_PUSH_MESSAGING:
+    case content::PERMISSION_PUSH_MESSAGING: {
       NOTIMPLEMENTED() << "RequestPermission not implemented for "
                        << permission;
+      ContentBrowserClient::RequestPermission(permission,
+                                              web_contents,
+                                              bridge_id,
+                                              requesting_frame,
+                                              user_gesture,
+                                              result_callback);
       break;
-    default:
+    }
+    default: {
       NOTREACHED() << "Invalid RequestPermission for " << permission;
+    }
   }
 }
 

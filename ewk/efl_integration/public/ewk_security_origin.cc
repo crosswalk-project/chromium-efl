@@ -43,3 +43,13 @@ uint16_t ewk_security_origin_port_get(const Ewk_Security_Origin* origin)
     return static_cast<uint16_t>(origin->GetPort());
 }
 
+void ewk_security_origin_free(Ewk_Security_Origin *o)
+{
+  delete o;
+}
+
+Ewk_Security_Origin *ewk_security_origin_new_from_string(const char *url)
+{
+  return static_cast<Ewk_Security_Origin *>(tizen_webview::Security_Origin::CreateFromString(url));
+}
+

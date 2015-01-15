@@ -29,7 +29,7 @@ protected:
       utc_fail();
 
     //allow the notification
-    ewk_notification_permission_request_set((Ewk_Notification_Permission_Request*)event_info, EINA_TRUE);
+    ewk_notification_permission_reply((Ewk_Notification_Permission_Request*)event_info, EINA_TRUE);
   }
 
    /* Callback for "notification,show" */

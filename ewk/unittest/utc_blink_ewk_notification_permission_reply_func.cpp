@@ -4,29 +4,42 @@
 
 #include "utc_blink_ewk_base.h"
 
-class utc_blink_ewk_notification_permission_request_suspend : public utc_blink_ewk_base {
+class utc_blink_ewk_notification_permission_reply : public utc_blink_ewk_base {
 protected:
-  utc_blink_ewk_notification_permission_request_suspend() {}
+  utc_blink_ewk_notification_permission_reply()
+  : utc_blink_ewk_base()
+  , notificationPermissionFirsttime(EINA_FALSE)
+  , notificationPermissionSecondtime(EINA_FALSE)
+  {
+  }
+
+  virtual ~utc_blink_ewk_notification_permission_reply() {
+  }
+
   /* Callback for notification permission request */
   static Eina_Bool notificationPermissionRequest(Evas_Object* webview, Ewk_Notification_Permission_Request* request, void* data)
   {
+    utc_blink_ewk_notification_permission_reply* owner = static_cast<utc_blink_ewk_notification_permission_reply*>(data);
+
     Ewk_Context *context = ewk_view_context_get(webview);
-    utc_blink_ewk_notification_permission_request_suspend *owner = NULL;
-    OwnerFromVoid(data, &owner);
-    if(!request || !context) {
-      utc_message("event_info: %p\ncontext: %p", request, context);
+    if (!request || !context) {
       owner->EventLoopStop(Failure);
       return EINA_FALSE;
     }
 
     //allow the notification
-    ewk_notification_permission_request_suspend(request);
     ewk_notification_permission_reply(request, EINA_TRUE);
-    owner->EventLoopStop(Success);
+
+    if (!owner->notificationPermissionFirsttime) {
+      owner->notificationPermissionFirsttime = EINA_TRUE;
+    } else {
+      owner->notificationPermissionSecondtime = EINA_TRUE;
+      owner->EventLoopStop(Failure);
+    }
     return EINA_TRUE;
   }
 
-  static void cb_console_message(utc_blink_ewk_notification_permission_request_suspend *owner, Evas_Object *obj, void *event_info)
+  static void cb_console_message(utc_blink_ewk_notification_permission_reply *owner, Evas_Object *obj, void *event_info)
   {
     Ewk_Console_Message* console = static_cast<Ewk_Console_Message*>(event_info);
     const char *cmsg = ewk_console_message_text_get(console);
@@ -43,7 +56,7 @@ protected:
     }
   }
 
-  /* Startup function */
+  // helper function
   bool click()
   {
     utc_message("[click] :: ");
@@ -66,32 +79,39 @@ protected:
   }
 
 protected:
+  Eina_Bool notificationPermissionFirsttime;
+  Eina_Bool notificationPermissionSecondtime;
   static const char* const resource_relative_path;
-  static const char* const notification_title_ref;
 };
 
-const char* const utc_blink_ewk_notification_permission_request_suspend::resource_relative_path = "/common/sample_notification_2.html";
-const char* const utc_blink_ewk_notification_permission_request_suspend::notification_title_ref = "Notification Title";
+const char* const utc_blink_ewk_notification_permission_reply::resource_relative_path = "/common/sample_notification_2.html";
 
 /**
-* @brief Positive test case for ewk_notification_permission_request_suspened()
-*/
-TEST_F(utc_blink_ewk_notification_permission_request_suspend, POS_TEST)
+ * @brief Positive test case for ewk_notification_permission_reply function
+ */
+TEST_F(utc_blink_ewk_notification_permission_reply, POS_TEST)
 {
   std::string resource_url = GetResourceUrl(resource_relative_path);
   ASSERT_EQ(EINA_TRUE, ewk_view_url_set(GetEwkWebView(), resource_url.c_str()));
   ASSERT_EQ(Success, EventLoopStart());
+  ASSERT_EQ(EINA_TRUE, notificationPermissionFirsttime);
+  ASSERT_EQ(EINA_FALSE, notificationPermissionSecondtime);
+
   ASSERT_TRUE(click());
   ASSERT_EQ(Success, EventLoopStart());
-
+  ASSERT_EQ(EINA_TRUE, notificationPermissionFirsttime);
+  ASSERT_EQ(EINA_FALSE, notificationPermissionSecondtime);
 }
 
 /**
-* @brief Checking whether function works properly in case of NULL value pass
-*/
-TEST_F(utc_blink_ewk_notification_permission_request_suspend, NEG_TEST)
+ * @brief Tests whether function works properly in case of NULL value pass.
+ */
+TEST_F(utc_blink_ewk_notification_permission_reply, NEG_TEST)
 {
-  ewk_notification_permission_request_suspend(NULL);
+  /* TODO: this code should use ewk_notification_cached_permissions_set and check its behaviour.
+  Results should be reported using one of utc_ macros */
+  ewk_notification_permission_reply(NULL,0);
+
   // If  NULL argument passing wont give segmentation fault negative test case will pass
   SUCCEED();
 }

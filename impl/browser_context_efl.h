@@ -57,10 +57,19 @@ class BrowserContextEfl
 
     base::WeakPtr<CookieManager> GetCookieManager() const;
 
+#if defined(ENABLE_NOTIFICATIONS)
+    scoped_refptr<NotificationControllerEfl> GetNotificationController() const;
+    void set_notification_controller_efl(
+        const scoped_refptr<NotificationControllerEfl> &controller);
+#endif
+
    private:
     scoped_refptr<URLRequestContextGetterEfl> getter_;
     HTTPCustomHeadersEflMap http_custom_headers_;
     mutable base::Lock http_custom_headers_lock_;
+#if defined(ENABLE_NOTIFICATIONS)
+    scoped_refptr<NotificationControllerEfl> notification_controller_efl_;
+#endif
 
     DISALLOW_COPY_AND_ASSIGN(ResourceContextEfl);
   };
@@ -117,7 +126,10 @@ class BrowserContextEfl
   EWebContext* WebContext() const
   { return web_context_; }
 
-  content::NotificationControllerEfl* GetNotificationController() const;
+#if defined(ENABLE_NOTIFICATIONS)
+  scoped_refptr<content::NotificationControllerEfl>
+      GetNotificationController() const;
+#endif
 
  private:
   static void ReadCertificateAndAdd(base::FilePath* file_path);
@@ -129,7 +141,7 @@ class BrowserContextEfl
   scoped_refptr<URLRequestContextGetterEfl> request_context_getter_;
   EWebContext* web_context_;
 #if defined(ENABLE_NOTIFICATIONS)
-  scoped_ptr<NotificationControllerEfl> notification_controllerefl_;
+  scoped_refptr<NotificationControllerEfl> notification_controller_efl_;
 #endif
   DownloadManagerDelegateEfl download_manager_delegate_;
   base::ScopedTempDir temp_dir_;

@@ -14,7 +14,6 @@
 #include "private/ewk_notification_private.h"
 #include "private/ewk_private.h"
 
-
 const char *ewk_notification_body_get(const Ewk_Notification *ewk_notification)
 {
   EINA_SAFETY_ON_NULL_RETURN_VAL(ewk_notification, 0);
@@ -42,6 +41,23 @@ uint64_t ewk_notification_id_get(const Ewk_Notification *ewk_notification)
   return ewk_notification->GetID();
 }
 
+void ewk_notification_cached_permissions_set(Ewk_Context *context, Eina_List *ewk_notification_permissions)
+{
+#if defined(ENABLE_NOTIFICATIONS)
+  EINA_SAFETY_ON_NULL_RETURN(context);
+  scoped_refptr<content::NotificationControllerEfl> notification_controller(context->browser_context()->GetNotificationController());
+  notification_controller->ClearPermissions();
+  Eina_List* list;
+  void* data;
+  EINA_LIST_FOREACH(ewk_notification_permissions, list, data) {
+    Ewk_Notification_Permission* perm = static_cast<Ewk_Notification_Permission*>(data);
+    notification_controller->AddPermission(GURL(perm->origin), (perm->allowed == EINA_TRUE));
+  }
+#else
+  NOTIMPLEMENTED();
+#endif
+}
+
 const Ewk_Security_Origin *ewk_notification_permission_request_origin_get(
     const Ewk_Notification_Permission_Request *request)
 {
@@ -49,15 +65,19 @@ const Ewk_Security_Origin *ewk_notification_permission_request_origin_get(
   return static_cast<const Ewk_Security_Origin*>(request->GetSecurityOrigin());
 }
 
+void ewk_notification_permission_reply(Ewk_Notification_Permission_Request *request, Eina_Bool allow)
+{
+#if defined(ENABLE_NOTIFICATIONS)
+  EINA_SAFETY_ON_NULL_RETURN(request);
+  request->Reply(allow == EINA_TRUE);
+#endif
+}
+
 void ewk_notification_permission_request_set(Ewk_Notification_Permission_Request *request, Eina_Bool allowed)
 {
-#if !defined(EWK_BRINGUP)
-#warning "[M38] TODO: Fix and re-enable notifications (edit efl_integration/public/ewk_notifications.cc)"
+#if defined(ENABLE_NOTIFICATIONS)
   EINA_SAFETY_ON_NULL_RETURN(request);
-  EWebView* view = EWebView::FromEvasObject(request->GetWebviewEvasObject());
-  if (view)
-    view->context()->browser_context()->GetNotificationController()->SetPermissionForNotification(request, allowed);
-  delete request;
+  request->Reply(allowed == EINA_TRUE);
 #endif
 }
 
@@ -69,7 +89,13 @@ void ewk_notification_permission_request_suspend(Ewk_Notification_Permission_Req
 
 void ewk_notification_policies_removed(Ewk_Context* ewkContext, Eina_List* origins)
 {
-  LOG_EWK_API_MOCKUP();
+#if defined(ENABLE_NOTIFICATIONS)
+  EINA_SAFETY_ON_NULL_RETURN(ewkContext);
+  EINA_SAFETY_ON_NULL_RETURN(origins);
+  ewkContext->browser_context()->GetNotificationController()->RemovePermissions(origins);
+#else
+  NOTIMPLEMENTED();
+#endif
 }
 
 const Ewk_Security_Origin *ewk_notification_security_origin_get(const Ewk_Notification *ewk_notification)

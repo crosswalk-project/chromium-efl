@@ -4,7 +4,9 @@
 // found in the LICENSE file.
 
 #include "tw_security_origin.h"
+#include "tizen_webview/tw_misc_utility.h"
 #include "tizen_webview/public/tw_url.h"
+#include "url/gurl.h"
 
 namespace tizen_webview {
 
@@ -39,6 +41,17 @@ Eina_Stringshare* Security_Origin::GetProtocol() const {
 
 int Security_Origin::GetPort() const {
   return port;
+}
+
+Security_Origin* Security_Origin::CreateFromString(const char *url) {
+  if (!url)
+    return 0;
+
+  GURL gurl(url);
+  if (gurl.is_empty() || !gurl.is_valid())
+    return 0;
+
+  return new Security_Origin(tizen_webview::GetURL(gurl));
 }
 
 } // namespace tizen_webview

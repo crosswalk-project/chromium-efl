@@ -23,6 +23,8 @@ class Security_Origin {
   Eina_Stringshare* GetProtocol() const;
   int GetPort() const;
 
+  static Security_Origin* CreateFromString(const char* url);
+
  private:
   Eina_Stringshare* host;
   Eina_Stringshare* protocol;

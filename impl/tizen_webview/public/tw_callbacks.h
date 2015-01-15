@@ -11,6 +11,7 @@
 namespace tizen_webview {
 class Hit_Test;
 class Security_Origin;
+class NotificationPermissionRequest;
 
 // from ewk_context.h
 typedef void (*Local_File_System_Origins_Get_Callback)(Eina_List *origins, void *user_data);
@@ -54,6 +55,15 @@ typedef void (*Web_App_Screenshot_Captured_Callback)(Evas_Object* image, void* u
  * @param user_data user_data will be passsed when ewk_view_web_app_icon_urls_get is called
  */
 typedef void (*Web_App_Icon_URLs_Get_Callback)(Eina_List *icon_urls, void *user_data);
+
+/**
+ * Callback for ewk_view_notification_permission_callback_set
+ *
+ * @param o view object to request the notification permission
+ * @param request Ewk_Notification_Permission_Request object to get the information about notification permission request.
+ * @param user_data user data
+ */
+typedef Eina_Bool (*View_Notification_Permission_Callback)(Evas_Object *o, NotificationPermissionRequest *request, void *user_data);
 
 /**
  * Callback for ewk_view_script_execute

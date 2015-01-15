@@ -469,6 +469,11 @@ void WebView::InvokeWebAppIconUrlsGetCallback(const std::map<std::string, std::s
   return impl_->InvokeWebAppIconUrlsGetCallback(iconUrls, callbackId);
 }
 
+void WebView::SetNotificationPermissionCallback(
+    View_Notification_Permission_Callback callback, void* user_data) {
+  return impl_->SetNotificationPermissionCallback(callback, user_data);
+}
+
 bool WebView::SaveAsPdf(int width, int height, const std::string& file_name) {
   return impl_->SaveAsPdf(width, height, file_name);
 }
