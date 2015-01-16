@@ -11,11 +11,11 @@ ${SCRIPTDIR}/apply_patches.sh ${SCRIPTDIR}/patches
 PROFILE_NAME=$(echo "$@" | grep -Po "(?<=\-P\s)[^\s]*" || :)
 
 if [ "$PROFILE_NAME" == "" ]; then
-  PROFILE_NAME=tizenmb_v2.3
+  PROFILE_NAME=tizenmb_v2.4
   PROFILE_FLAG="-P $PROFILE_NAME"
 fi
 
-TIZEN_VERSION="chromium_efl_tizen_version 2.3"
+TIZEN_VERSION="chromium_efl_tizen_version 2.4"
 
 if [ "$USE_GLOBAL_GBS_CONF" == "" ]; then
   CONF_FLAG="--conf ${SCRIPTDIR}/gbs.conf"

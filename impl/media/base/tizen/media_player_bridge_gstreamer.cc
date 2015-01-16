@@ -19,7 +19,7 @@
 #include "media/base/tizen/media_player_manager_tizen.h"
 #include "ui/gfx/size.h"
 
-#if defined(OS_TIZEN_MOBILE) && defined(TIZEN_V_2_3)
+#if defined(OS_TIZEN_MOBILE) && (defined(TIZEN_V_2_3) || defined(TIZEN_V_2_4))
 #include <device/power.h>
 #endif
 
@@ -311,7 +311,7 @@ void MediaPlayerBridgeGstreamer::Play() {
     return;
   }
 
-#if defined(OS_TIZEN_MOBILE) && defined(TIZEN_V_2_3)
+#if defined(OS_TIZEN_MOBILE) && (defined(TIZEN_V_2_3) || defined(TIZEN_V_2_4))
   if (device_power_request_lock(POWER_LOCK_DISPLAY, 0) != DEVICE_ERROR_NONE)
     LOG(ERROR) << "|device_power_request_lock| request failed";
 #endif
@@ -333,7 +333,7 @@ void MediaPlayerBridgeGstreamer::Pause(bool is_media_related_action) {
     return;
   }
 
-#if defined(OS_TIZEN_MOBILE) && defined(TIZEN_V_2_3)
+#if defined(OS_TIZEN_MOBILE) && (defined(TIZEN_V_2_3) || defined(TIZEN_V_2_4))
   if (device_power_release_lock(POWER_LOCK_DISPLAY) != DEVICE_ERROR_NONE)
     LOG(ERROR) << "|device_power_release_lock| request failed";
 #endif
@@ -985,7 +985,7 @@ void MediaPlayerBridgeGstreamer::OnPlaybackComplete() {
   VLOG(1) << "OnPlaybackComplete" << " ID " << GetPlayerId();
   is_end_reached_ = true;
 
-#if defined(OS_TIZEN_MOBILE) && defined(TIZEN_V_2_3)
+#if defined(OS_TIZEN_MOBILE) && (defined(TIZEN_V_2_3) || defined(TIZEN_V_2_4))
   if (device_power_release_lock(POWER_LOCK_DISPLAY) != DEVICE_ERROR_NONE)
     LOG(ERROR) << "|device_power_release_lock| request failed";
 #endif
@@ -1105,7 +1105,7 @@ void MediaPlayerBridgeGstreamer::PlatformSurfaceUpdated() {
 void MediaPlayerBridgeGstreamer::HandleError(
     media::MediaPlayerTizen::NetworkState state) {
   LOG(ERROR) << "Error in MediaPlayerBridgeGstreamer::HandleError";
-#if defined(OS_TIZEN_MOBILE) && defined(TIZEN_V_2_3)
+#if defined(OS_TIZEN_MOBILE) && (defined(TIZEN_V_2_3) || defined(TIZEN_V_2_4))
   if (device_power_release_lock(POWER_LOCK_DISPLAY) != DEVICE_ERROR_NONE)
     LOG(ERROR) << "|device_power_release_lock| request failed";
 #endif

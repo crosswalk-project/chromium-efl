@@ -12,7 +12,7 @@
 #include "base/process/process.h"
 #include "media/base/tizen/media_player_manager_tizen.h"
 
-#if defined(OS_TIZEN_MOBILE) && defined(TIZEN_V_2_3)
+#if defined(OS_TIZEN_MOBILE) && (defined(TIZEN_V_2_3) || defined(TIZEN_V_2_4))
 #include <device/power.h>
 #endif
 
@@ -411,7 +411,7 @@ void MediaSourcePlayerGstreamer::Play() {
   VLOG(1) << "MediaSourcePlayerGstreamer::" << __FUNCTION__
           << "Player ID:" << GetPlayerId();
 
-#if defined(OS_TIZEN_MOBILE) && defined(TIZEN_V_2_3)
+#if defined(OS_TIZEN_MOBILE) && (defined(TIZEN_V_2_3) || defined(TIZEN_V_2_4))
   if (device_power_wakeup(false) != DEVICE_ERROR_NONE)
     LOG(ERROR) << "|device_power_wakeup| request failed";
 
@@ -440,7 +440,7 @@ void MediaSourcePlayerGstreamer::Pause(bool is_media_related_action) {
   StopCurrentTimeUpdateTimer();
   if (!is_media_related_action) {
 
-#if defined(OS_TIZEN_MOBILE) && defined(TIZEN_V_2_3)
+#if defined(OS_TIZEN_MOBILE) && (defined(TIZEN_V_2_3) || defined(TIZEN_V_2_4))
     if (device_power_release_lock(POWER_LOCK_DISPLAY) != DEVICE_ERROR_NONE)
       LOG(ERROR) << "|device_power_release_lock| request failed";
 #endif
@@ -1602,7 +1602,7 @@ void MediaSourcePlayerGstreamer::OnPlaybackComplete() {
   manager()->OnTimeUpdate(GetPlayerId(), time);
   manager()->OnTimeChanged(GetPlayerId());
 
-#if defined(OS_TIZEN_MOBILE) && defined(TIZEN_V_2_3)
+#if defined(OS_TIZEN_MOBILE) && (defined(TIZEN_V_2_3) || defined(TIZEN_V_2_4))
   if (device_power_release_lock(POWER_LOCK_DISPLAY) != DEVICE_ERROR_NONE)
     LOG(ERROR) << "|device_power_release_lock| request failed";
 #endif
@@ -1625,7 +1625,7 @@ void MediaSourcePlayerGstreamer::HandleError(
   error_occured_ = true;
   manager()->OnNetworkStateChange(GetPlayerId(), state);
 
-#if defined(OS_TIZEN_MOBILE) && defined(TIZEN_V_2_3)
+#if defined(OS_TIZEN_MOBILE) && (defined(TIZEN_V_2_3) || defined(TIZEN_V_2_4))
   if (device_power_release_lock(POWER_LOCK_DISPLAY) != DEVICE_ERROR_NONE)
     LOG(ERROR) << "|device_power_release_lock| request failed";
 #endif

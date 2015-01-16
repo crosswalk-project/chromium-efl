@@ -12,7 +12,7 @@
         'gcc_4_6_x': 0,
       }],
     ],
-   'chromium_efl_tizen_version%': '2.3',
+   'chromium_efl_tizen_version%': '2.4',
    'custom_libc_dir%': '',
    'prebuilt_ld_gold_dir%': '',
    'grit_additional_defines': ['-D', 'use_efl',],
@@ -110,6 +110,11 @@
          '__ARM_PCS',
          ],
          'conditions': [
+           ['chromium_efl_tizen_version=="2.4"', {
+             'defines': [
+               'TIZEN_V_2_4=1',
+             ],
+           }],
            ['chromium_efl_tizen_version=="2.3"', {
              'defines': [
                'TIZEN_V_2_3=1',
