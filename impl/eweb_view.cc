@@ -44,6 +44,7 @@
 #include "ui/events/event_switches.h"
 #include "browser/motion/wkext_motion.h"
 #include "ui/base/l10n/l10n_util.h"
+#include "ui/gfx/screen.h"
 #include "devtools_delegate_efl.h"
 
 #include "tizen_webview/public/tw_hit_test.h"
@@ -1574,7 +1575,7 @@ tizen_webview::Hit_Test* EWebView::RequestHitTestDataAtBlinkCoords(int x, int y,
   DCHECK(render_view_host);
   DCHECK(render_process_host);
 
-  if (render_view_host && render_process_host) {
+  if (render_view_host && render_process_host && rwhv()) {
     // We wait on UI thread till hit test data is updated.
 #if !defined(EWK_BRINGUP)
     base::ThreadRestrictions::ScopedAllowWait allow_wait;
@@ -1588,17 +1589,20 @@ tizen_webview::Hit_Test* EWebView::RequestHitTestDataAtBlinkCoords(int x, int y,
 }
 
 void EWebView::EvasToBlinkCords(int x, int y, int* view_x, int* view_y) {
+  DCHECK(gfx::Screen::GetNativeScreen());
   Evas_Coord tmpX, tmpY;
   evas_object_geometry_get(evas_object_, &tmpX, &tmpY, NULL, NULL);
 
   if (view_x) {
     *view_x = x - tmpX;
-    *view_x /= rwhv()->device_scale_factor();
+    *view_x /= gfx::Screen::GetNativeScreen()->
+        GetPrimaryDisplay().device_scale_factor();
   }
 
   if (view_y) {
     *view_y = y - tmpY;
-    *view_y /= rwhv()->device_scale_factor();
+    *view_x /= gfx::Screen::GetNativeScreen()->
+        GetPrimaryDisplay().device_scale_factor();
   }
 }
 
