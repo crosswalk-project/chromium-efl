@@ -5,7 +5,8 @@
 #ifndef GL_GL_SHARED_CONTEXT_EFL_H
 #define GL_GL_SHARED_CONTEXT_EFL_H
 
-typedef struct _Evas_Object Evas_Object;
+#include <Evas.h>
+
 typedef struct _Evas_GL_Context Evas_GL_Context;
 
 namespace gfx {
