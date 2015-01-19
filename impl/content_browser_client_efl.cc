@@ -29,10 +29,6 @@
 #include "browser/geolocation/location_provider_efl.h"
 #endif
 
-#if defined(OS_TIZEN_MOBILE)
-#include "browser/speech/tts_message_filter_efl.h"
-#endif
-
 #include "tizen_webview/public/tw_notification.h"
 #include "tizen_webview/public/tw_security_origin.h"
 #include "tizen_webview/public/tw_url.h"
@@ -237,11 +233,6 @@ void ContentBrowserClientEfl::RenderProcessWillLaunch(
   host->AddFilter(new RenderMessageFilterEfl(host->GetID()));
   host->AddFilter(new VibrationMessageFilter());
   host->AddFilter(new editing::EditorClientObserver(host->GetID()));
-#if defined(OS_TIZEN_MOBILE)
-  TtsMessageFilterEfl* tts_message_filter = new TtsMessageFilterEfl();
-  if(tts_message_filter->Init())
-    host->AddFilter(tts_message_filter);
-#endif
 
   scoped_ptr<RenderWidgetHostIterator> widgets(RenderWidgetHost::GetRenderWidgetHosts());
   RenderWidgetHost* widget = NULL;

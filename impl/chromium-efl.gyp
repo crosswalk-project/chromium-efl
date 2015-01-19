@@ -451,19 +451,6 @@
           ],
         },
       }],
-      ['building_for_tizen_mobile==1', {
-        'sources': [
-          'browser/speech/tts_message_filter_efl.cc',
-          'browser/speech/tts_message_filter_efl.h',
-          'browser/speech/tts_tizen.cc',
-          'browser/speech/tts_tizen.h',
-          'common/tts_messages_efl.h',
-          'common/tts_utterance_request_efl.cc',
-          'common/tts_utterance_request_efl.h',
-          'renderer/tts_dispatcher_efl.cc',
-          'renderer/tts_dispatcher_efl.h',
-        ],
-      }],
       ['ewk_bringup==1', {
         'defines': [ 'EWK_BRINGUP=1' ],
         'defines!': [ 'TIZEN_CONTENTS_DETECTION=1' ],

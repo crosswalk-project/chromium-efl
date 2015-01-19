@@ -28,11 +28,6 @@
 #include "components/editing/content/renderer/editorclient_agent.h"
 #include "components/visitedlink/renderer/visitedlink_slave.h"
 
-#if defined(OS_TIZEN_MOBILE)
-#include "common/tts_messages_efl.h"
-#include "renderer/tts_dispatcher_efl.h"
-#endif
-
 #ifdef TIZEN_AUTOFILL_SUPPORT
 #include "components/autofill/content/renderer/autofill_agent.h"
 #include "components/autofill/content/renderer/password_autofill_agent.h"
@@ -239,9 +234,5 @@ void ContentRendererClientEfl::GetNavigationErrorStrings(
 
 blink::WebSpeechSynthesizer* ContentRendererClientEfl::OverrideSpeechSynthesizer(
       blink::WebSpeechSynthesizerClient* client) {
-#if defined(OS_TIZEN_MOBILE)
-  return new content::TtsDispatcherEfl(client);
-#else
   return NULL;
-#endif
 }

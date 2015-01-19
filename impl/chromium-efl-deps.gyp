@@ -87,7 +87,6 @@
             'gles20',
             'ui-gadget-1',
             'feedback',
-            'tts',
           ],
         },
         'direct_dependent_settings': {
