@@ -212,7 +212,11 @@ fi
   -Dbuilding_for_tizen_"%{OUTPUT_BUILD_PROFILE_TARGET}"=1
 %endif
 
+%ifarch %{arm}
+build/prebuild/ninja.arm %{_smp_mflags} -C"%{OUTPUT_FOLDER}" \
+%else
 build/prebuild/ninja %{_smp_mflags} -C"%{OUTPUT_FOLDER}" \
+%endif
 %if 0%{?_enable_content_shell}
   content_shell_efl \
 %endif
