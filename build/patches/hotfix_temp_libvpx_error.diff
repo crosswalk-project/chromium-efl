@@ -1,0 +1,64 @@
+diff --git a/third_party/libvpx/libvpx.gyp b/third_party/libvpx/libvpx.gyp
+index 4f8cb2b..c556b42 100644
+--- a/third_party/libvpx/libvpx.gyp
++++ b/third_party/libvpx/libvpx.gyp
+@@ -144,8 +144,8 @@
+                 'libvpx_intrinsics_sse2',
+                 # Currently no sse3 intrinsic functions
+                 #'libvpx_intrinsics_sse3',
+-                'libvpx_intrinsics_ssse3',
+-                'libvpx_intrinsics_sse4_1',
++                #'libvpx_intrinsics_ssse3',
++                #'libvpx_intrinsics_sse4_1',
+                 # Currently no avx intrinsic functions
+                 #'libvpx_intrinsics_avx',
+                 #'libvpx_intrinsics_avx2',
+diff --git a/third_party/libvpx/source/config/linux/ia32/vp8_rtcd.h b/source/config/linux/ia32/vp8_rtcd.h
+index 3fe9d07..f6287a5 100644
+--- a/third_party/libvpx/source/config/linux/ia32/vp8_rtcd.h
++++ b/third_party/libvpx/source/config/linux/ia32/vp8_rtcd.h
+@@ -543,7 +543,6 @@ static void setup_rtcd_internal(void)
+     if (flags & HAS_SSE3) vp8_diamond_search_sad = vp8_diamond_search_sadx4;
+     vp8_fast_quantize_b = vp8_fast_quantize_b_c;
+     if (flags & HAS_SSE2) vp8_fast_quantize_b = vp8_fast_quantize_b_sse2;
+-    if (flags & HAS_SSSE3) vp8_fast_quantize_b = vp8_fast_quantize_b_ssse3;
+     vp8_filter_by_weight16x16 = vp8_filter_by_weight16x16_c;
+     if (flags & HAS_SSE2) vp8_filter_by_weight16x16 = vp8_filter_by_weight16x16_sse2;
+     vp8_filter_by_weight8x8 = vp8_filter_by_weight8x8_c;
+@@ -603,7 +602,6 @@ static void setup_rtcd_internal(void)
+     if (flags & HAS_SSE3) vp8_refining_search_sad = vp8_refining_search_sadx4;
+     vp8_regular_quantize_b = vp8_regular_quantize_b_c;
+     if (flags & HAS_SSE2) vp8_regular_quantize_b = vp8_regular_quantize_b_sse2;
+-    if (flags & HAS_SSE4_1) vp8_regular_quantize_b = vp8_regular_quantize_b_sse4_1;
+     vp8_sad16x16 = vp8_sad16x16_c;
+     if (flags & HAS_MMX) vp8_sad16x16 = vp8_sad16x16_mmx;
+     if (flags & HAS_SSE2) vp8_sad16x16 = vp8_sad16x16_wmt;
+@@ -686,11 +684,9 @@ static void setup_rtcd_internal(void)
+     vp8_sub_pixel_variance16x16 = vp8_sub_pixel_variance16x16_c;
+     if (flags & HAS_MMX) vp8_sub_pixel_variance16x16 = vp8_sub_pixel_variance16x16_mmx;
+     if (flags & HAS_SSE2) vp8_sub_pixel_variance16x16 = vp8_sub_pixel_variance16x16_wmt;
+-    if (flags & HAS_SSSE3) vp8_sub_pixel_variance16x16 = vp8_sub_pixel_variance16x16_ssse3;
+     vp8_sub_pixel_variance16x8 = vp8_sub_pixel_variance16x8_c;
+     if (flags & HAS_MMX) vp8_sub_pixel_variance16x8 = vp8_sub_pixel_variance16x8_mmx;
+     if (flags & HAS_SSE2) vp8_sub_pixel_variance16x8 = vp8_sub_pixel_variance16x8_wmt;
+-    if (flags & HAS_SSSE3) vp8_sub_pixel_variance16x8 = vp8_sub_pixel_variance16x8_ssse3;
+     vp8_sub_pixel_variance4x4 = vp8_sub_pixel_variance4x4_c;
+     if (flags & HAS_MMX) vp8_sub_pixel_variance4x4 = vp8_sub_pixel_variance4x4_mmx;
+     if (flags & HAS_SSE2) vp8_sub_pixel_variance4x4 = vp8_sub_pixel_variance4x4_wmt;
+diff --git a/third_party/libvpx/source/config/linux/ia32/vp9_rtcd.h b/source/config/linux/ia32/vp9_rtcd.h
+index 2d6c530..bfa079e 100644
+--- a/third_party/libvpx/source/config/linux/ia32/vp9_rtcd.h
++++ b/third_party/libvpx/source/config/linux/ia32/vp9_rtcd.h
+@@ -996,12 +996,10 @@ static void setup_rtcd_internal(void)
+     if (flags & HAS_SSSE3) vp9_h_predictor_8x8 = vp9_h_predictor_8x8_ssse3;
+     vp9_idct16x16_10_add = vp9_idct16x16_10_add_c;
+     if (flags & HAS_SSE2) vp9_idct16x16_10_add = vp9_idct16x16_10_add_sse2;
+-    if (flags & HAS_SSSE3) vp9_idct16x16_10_add = vp9_idct16x16_10_add_ssse3;
+     vp9_idct16x16_1_add = vp9_idct16x16_1_add_c;
+     if (flags & HAS_SSE2) vp9_idct16x16_1_add = vp9_idct16x16_1_add_sse2;
+     vp9_idct16x16_256_add = vp9_idct16x16_256_add_c;
+     if (flags & HAS_SSE2) vp9_idct16x16_256_add = vp9_idct16x16_256_add_sse2;
+-    if (flags & HAS_SSSE3) vp9_idct16x16_256_add = vp9_idct16x16_256_add_ssse3;
+     vp9_idct32x32_1024_add = vp9_idct32x32_1024_add_c;
+     if (flags & HAS_SSE2) vp9_idct32x32_1024_add = vp9_idct32x32_1024_add_sse2;
+     vp9_idct32x32_1_add = vp9_idct32x32_1_add_c;
