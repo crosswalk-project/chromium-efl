@@ -152,6 +152,12 @@ Chromium EFL unit test utilities
 
 %build
 
+# TODO : This execution will be removed by multimedia team
+# Bug : http://107.108.218.239/bugzilla/show_bug.cgi?id=10516
+%if %{!?chromium_efl_tizen_version:1}%{?chromium_efl_tizen_version:0}
+build/apply_patches.sh build/patches
+%endif
+
 # workaround for new nss library : search it in /usr/lib first, rather than /lib (system nss)
 export LD_RUN_PATH=%{_libdir}
 #/usr/lib
@@ -242,6 +248,12 @@ ninja %{_smp_mflags} -C"%{OUTPUT_FOLDER}" angle_unittests env_chromium_unittests
 
 #XXX icudtl.dat is not copied by gyp. Do that manually
 cp src/third_party/icu/android/icudtl.dat "%{OUTPUT_FOLDER}"
+
+# TODO : This execution will be removed by multimedia team
+# Bug : http://107.108.218.239/bugzilla/show_bug.cgi?id=10516
+%if %{!?chromium_efl_tizen_version:1}%{?chromium_efl_tizen_version:0}
+build/apply_patches.sh -r build/patches
+%endif
 
 %install
 
