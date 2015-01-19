@@ -20,7 +20,9 @@
 #include <stdlib.h>
 #include <string.h>
 
-#if defined(OS_TIZEN_MOBILE)
+// TODO : Enable vibration once it is supported by the platform.
+// Bug : http://107.108.218.239/bugzilla/show_bug.cgi?id=10508
+#if defined(OS_TIZEN_MOBILE) && !defined(TIZEN_V_2_4)
 #ifndef TIZEN_LEGACY_V_2_2_1
 #include <device/haptic.h>
 #else
@@ -52,8 +54,7 @@
 #define IMF_START_POINT_Y 635
 #endif
 
-// To support vibration
-#if defined(OS_TIZEN_MOBILE)
+#if defined(OS_TIZEN_MOBILE) && !defined(TIZEN_V_2_4)
 static haptic_device_h s_haptic_handle; // haptic handle.
 static Ecore_Timer* s_haptic_timer_id; // Timer ID.
 static haptic_effect_h s_haptic_effect; // haptic_effect struct.
@@ -219,8 +220,7 @@ static Eina_Bool __javascript_alert_cb(Evas_Object* o, const char* alert_text, v
 static Eina_Bool __javascript_confirm_cb(Evas_Object* o, const char* message, void* user_data);
 static Eina_Bool __javascript_prompt_cb(Evas_Object* o, const char* message, const char* default_value, void* user_data);
 
-// To support vibration
-#if defined(OS_TIZEN_MOBILE)
+#if defined(OS_TIZEN_MOBILE) && !defined(TIZEN_V_2_4)
 static Eina_Bool __vibration_timeout_cb(void *data);
 static void __vibration_on_cb(uint64_t vibration_time, void *data);
 static void __vibration_off_cb(void *data);
@@ -347,8 +347,7 @@ Evas_Object* _create_view(Evas_Object *parent, app_data *data)
   ewk_view_javascript_confirm_callback_set(webview, __javascript_confirm_cb, data);
   ewk_view_javascript_prompt_callback_set(webview, __javascript_prompt_cb, data);
 
-  // To support vibration
-#if defined(OS_TIZEN_MOBILE)
+#if defined(OS_TIZEN_MOBILE) && !defined(TIZEN_V_2_4)
   printf("[%s][%d][%s] calling ewk_context_vibration_client_callbacks_set...\n", __FUNCTION__, __LINE__, "vibration");
   ewk_context_vibration_client_callbacks_set(webview, __vibration_on_cb, __vibration_off_cb, NULL);
 #endif
@@ -1438,7 +1437,7 @@ Eina_Bool __javascript_prompt_cb(Evas_Object* o, const char* message, const char
   return EINA_TRUE;
 }
 
-#if defined(OS_TIZEN_MOBILE)
+#if defined(OS_TIZEN_MOBILE) && !defined(TIZEN_V_2_4)
 // To support vibration: this is a timeout callback.
 // The original source code author is kinipk.
 Eina_Bool __vibration_timeout_cb(void *data)

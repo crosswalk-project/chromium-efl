@@ -25,7 +25,9 @@
 #include <Evas.h>
 #include <Elementary.h>
 
-#if defined(OS_TIZEN_MOBILE)
+// TODO : Enable vibration once it is supported by the platform.
+// Bug : http://107.108.218.239/bugzilla/show_bug.cgi?id=10508
+#if defined(OS_TIZEN_MOBILE) && !defined(TIZEN_V_2_4)
 #ifndef TIZEN_LEGACY_V_2_2_1
 #include <device/haptic.h>
 #else
@@ -64,7 +66,7 @@ static Eina_List* application_cache_origins = NULL;
 static Evas_Object* prompt_entry;
 static Eina_List* web_database_origins = NULL;
 
-#if defined(OS_TIZEN_MOBILE)
+#if defined(OS_TIZEN_MOBILE) && !defined(TIZEN_V_2_4)
 static haptic_device_h g_haptic_handle;
 static Ecore_Timer *g_haptic_timer_id;
 static haptic_effect_h g_haptic_effect;
@@ -136,11 +138,12 @@ static void __back_forward_list_changed_cb(void *data, Evas_Object *obj, void *e
 static Eina_Bool __mime_override_cb(const char* url, const char *mime, char **new_mime);
 static void __console_message_cb(void *data, Evas_Object *obj, void *event_info);
 
-#if defined(OS_TIZEN_MOBILE)
+#if defined(OS_TIZEN_MOBILE) && !defined(TIZEN_V_2_4)
 static Eina_Bool __vibration_timeout_cb(void *data);
-#endif
 static void __vibration_on_cb(uint64_t vibration_time, void *data);
 static void __vibration_off_cb(void *data);
+#endif
+
 static void __undo_size_cb(void* data, Evas_Object* obj, void* event_info);
 static void __redo_size_cb(void* data, Evas_Object* obj, void* event_info);
 void __mhtml_save_cb(Evas_Object *obj, const char *mhtml_data, void *data);
@@ -503,7 +506,11 @@ int main(int argc, char** argv)
   ewk_view_custom_header_add(view, "X-Test-header", "X-Value-1");
 
   ewk_view_notification_permission_callback_set(view, __notification_permission_cb, 0);
+
+#if defined(OS_TIZEN_MOBILE) && !defined(TIZEN_V_2_4)
   ewk_context_vibration_client_callbacks_set(context, __vibration_on_cb, __vibration_off_cb, NULL);
+#endif
+
   ewk_context_mime_override_callback_set(__mime_override_cb);
   ewk_view_javascript_alert_callback_set(view, __ewk_view_javascript_alert_cb, 0);
   ewk_view_javascript_confirm_callback_set(view, __ewk_view_javascript_confirm_cb, 0);
@@ -1239,7 +1246,7 @@ void __edge_bottom_cb(void* data, Evas_Object* obj, void* event_info)
   printf("Edge_Bottom Notification\n");
 }
 
-#if defined(OS_TIZEN_MOBILE)
+#if defined(OS_TIZEN_MOBILE) && !defined(TIZEN_V_2_4)
 Eina_Bool __vibration_timeout_cb(void *data)
 {
   g_haptic_timer_id = NULL;
@@ -1256,12 +1263,10 @@ Eina_Bool __vibration_timeout_cb(void *data)
 
   return ECORE_CALLBACK_CANCEL;
 }
-#endif
 
 void __vibration_on_cb(uint64_t vibration_time, void *data)
 {
   printf("__vibration_on_cb called");
-  #if defined(OS_TIZEN_MOBILE)
     uint64_t duration = vibration_time;
 
     if (g_haptic_timer_id) {
@@ -1299,13 +1304,11 @@ void __vibration_on_cb(uint64_t vibration_time, void *data)
     printf("__vibration_on_cb:duration=%f", in);
 
     g_haptic_timer_id = ecore_timer_add(in, __vibration_timeout_cb, NULL);
-  #endif
 }
 
 void __vibration_off_cb(void *data)
 {
   printf("__vibration_off_cb called");
-  #if defined(OS_TIZEN_MOBILE)
     if (g_haptic_timer_id) {
       ecore_timer_del(g_haptic_timer_id);
       g_haptic_timer_id = NULL;
@@ -1321,8 +1324,8 @@ void __vibration_off_cb(void *data)
 #endif
       g_haptic_handle = NULL;
     }
-  #endif
 }
+#endif
 
 void __text_style_state_changed_cb(void *data, Evas_Object *obj, void *event_info)
 {

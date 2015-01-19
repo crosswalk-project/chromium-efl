@@ -24,7 +24,12 @@ Requires(post): /sbin/ldconfig
 Requires(post): xkeyboard-config
 Requires(postun): /sbin/ldconfig
 BuildRequires: which, vi, python, python-xml, bison, flex, gperf, gettext, perl, edje-tools
-BuildRequires: libjpeg-turbo-devel, expat-devel, libhaptic, libcap-devel
+BuildRequires: libjpeg-turbo-devel, expat-devel, libcap-devel
+%if "%{?chromium_efl_tizen_version:%{chromium_efl_tizen_version}}%{!?chromium_efl_tizen_version:0}" == "2.4"
+%ifarch %{arm}
+BuildRequires: libhaptic
+%endif
+%endif
 BuildRequires: pkgconfig(glesv2)
 BuildRequires: pkgconfig(libpulse)
 BuildRequires: pkgconfig(recordproto)
