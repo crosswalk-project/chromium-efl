@@ -114,7 +114,7 @@ add_gbs_flags() {
     SYSTEM_DEPS+="-Duse_system_bzip2=1
                   -Duse_system_libexif=1
                   -Duse_system_nspr=1
-                  -Duse_system_vpx=1"
+                 "
   fi
 }
 
