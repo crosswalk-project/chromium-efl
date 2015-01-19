@@ -79,7 +79,6 @@ BuildRequires: bzip2-devel
 BuildRequires: pkgconfig(vpx)
 BuildRequires: pkgconfig(efl-assist)
 BuildRequires: pkgconfig(capi-network-connection)
-BuildRequires: pkgconfig(capi-telephony-network-info)
 %else # TIZEN_PROFILE_TV
 BuildRequires: pkgconfig(audio-session-mgr)
 BuildRequires: pkgconfig(mm-session)
