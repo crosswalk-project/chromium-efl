@@ -1601,7 +1601,7 @@ void EWebView::EvasToBlinkCords(int x, int y, int* view_x, int* view_y) {
 
   if (view_y) {
     *view_y = y - tmpY;
-    *view_x /= gfx::Screen::GetNativeScreen()->
+    *view_y /= gfx::Screen::GetNativeScreen()->
         GetPrimaryDisplay().device_scale_factor();
   }
 }
