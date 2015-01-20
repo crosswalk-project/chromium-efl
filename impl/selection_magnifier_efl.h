@@ -31,6 +31,8 @@ class SelectionMagnifierEfl {
   void OnAnimatorUp();
 
  private:
+  void DestroyAnimator();
+
   static Eina_Bool MoveAnimatorCallback(void* data);
   static void OnAnimatorUp(void* data, Evas*, Evas_Object*, void*);
 

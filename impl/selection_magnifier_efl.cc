@@ -4,6 +4,7 @@
 
 #include "base/path_service.h"
 #include "base/files/file_path.h"
+#include "content/public/browser/browser_thread.h"
 #include "eweb_view.h"
 #include "paths_efl.h"
 #include "selection_magnifier_efl.h"
@@ -38,6 +39,12 @@ SelectionMagnifierEfl::SelectionMagnifierEfl(content::SelectionControllerEfl* co
 }
 
 SelectionMagnifierEfl::~SelectionMagnifierEfl() {
+  // reset animator if present
+  // in some conditions SelectionMagnifierEfl may be destroyed before OnAnimatorUp
+  // is called (this is were animator_ is usually destroyed).
+  // We detect such situtation and destroy animator on our own.
+  DestroyAnimator();
+
   if (content_image_) {
     evas_object_del(content_image_);
     content_image_ = 0;
@@ -54,7 +61,20 @@ void SelectionMagnifierEfl::HandleLongPress(const gfx::Point& touch_point) {
   UpdateLocation(touch_point);
   Move(touch_point);
   Show();
+  CHECK(!animator_);
   animator_ = ecore_animator_add(&SelectionMagnifierEfl::MoveAnimatorCallback, this);
+}
+
+void SelectionMagnifierEfl::DestroyAnimator() {
+  CHECK(BrowserThread::CurrentlyOn(BrowserThread::UI));
+  if (animator_) {
+    ecore_animator_del(animator_);
+    animator_ = 0;
+  }
+
+  evas_object_event_callback_del(controller_->GetParentView()->evas_object(),
+                                 EVAS_CALLBACK_MOUSE_UP,
+                                 OnAnimatorUp);
 }
 
 Eina_Bool SelectionMagnifierEfl::MoveAnimatorCallback(void* data) {
@@ -80,14 +100,7 @@ void SelectionMagnifierEfl::OnAnimatorUp(void* data, Evas*, Evas_Object*, void*)
 }
 
 void SelectionMagnifierEfl::OnAnimatorUp() {
-  if (animator_) {
-    ecore_animator_del(animator_);
-    animator_ = 0;
-  }
-
-  evas_object_event_callback_del(controller_->GetParentView()->evas_object(),
-                                 EVAS_CALLBACK_MOUSE_UP,
-                                 OnAnimatorUp);
+  DestroyAnimator();
   Hide();
   controller_->HandleLongPressEndEvent();
 }
