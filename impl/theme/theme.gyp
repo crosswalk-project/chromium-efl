@@ -5,9 +5,9 @@
 
     'includes': [
       # NOTE: gyp includes need to be relative
-      '../../src/build/common.gypi',
-      '../../src/third_party/WebKit/Source/build/features.gypi',
-      '../../src/skia/skia_common.gypi',
+      '../../../build/common.gypi',
+      '../../../third_party/WebKit/Source/build/features.gypi',
+      '../../../skia/skia_common.gypi',
     ],
     'dependencies': [
       '<(chrome_src_dir)/third_party/WebKit/Source/core/core.gyp:webcore',
