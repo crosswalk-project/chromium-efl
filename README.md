@@ -26,7 +26,7 @@ $ cd xwalk-efl
 
 ```
 gclient config --name=src/tizen_src \
-    https://github.com/crosswalk-project/chromium-efl.git@efl/crosswalk-10/39.0.2171.19
+    https://github.com/crosswalk-project/chromium-efl.git@efl/crosswalk-11/40.0.2214.28
 ```
 
 3) gclient sync

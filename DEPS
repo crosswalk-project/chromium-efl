@@ -5,7 +5,7 @@ vars = {
 }
 
 deps = {
-  "src/xwalk": "https://github.com/crosswalk-project/crosswalk-efl.git@efl/crosswalk-10/39.0.2171.19",
+  "src/xwalk": "https://github.com/crosswalk-project/crosswalk-efl.git@efl/crosswalk-11/11.40.277.3",
 }
 
 hooks = [

@@ -34,7 +34,8 @@ blink_upstream_rev = '184144'  # FIXME(wang16): Specify a later revision than
                                # This will not be needed in M40 or M39 past
                                # Blink r184144.
 
-efl_integration_branch = 'efl/crosswalk-10/39.0.2171.19'
+efl_integration_branch = 'efl/crosswalk-11/40.0.2214.28'
+v8_efl_integration_branch = 'crosswalk-11/40.0.2214.28'
 
 crosswalk_git = 'https://github.com/crosswalk-project'
 ozone_wayland_git = 'https://github.com/01org'
@@ -54,7 +55,7 @@ solutions = [
       'src/third_party/WebKit':
         crosswalk_git + '/blink-crosswalk-efl.git@' + efl_integration_branch,
       'src/v8':
-        crosswalk_git + '/v8-crosswalk.git@' + v8_crosswalk_rev,
+        crosswalk_git + '/v8-crosswalk.git@' + v8_efl_integration_branch,
 
       # Include OpenCL header files for WebCL support, target version 1.2.
       'src/third_party/khronos/CL':
